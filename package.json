@@ -1,0 +1,25 @@
+{
+  "name": "markdownlint-custom-rules",
+  "version": "1.0.0",
+  "description": "Custom rules for markdownlint",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "markdownlint '**/*.md' --ignore node_modules"
+  },
+  "dependencies": {
+    "markdownlint": "^0.28.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "markdownlint-rule-helpers": "^0.18.0"
+  },
+  "keywords": [
+    "markdown",
+    "markdownlint",
+    "lint",
+    "rules"
+  ],
+  "author": "",
+  "license": "MIT"
+}
