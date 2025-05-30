@@ -1,48 +1,78 @@
-# `rules`
+# `rules` directory
 
 This directory contains custom rules for markdownlint. Each rule is implemented in its own file and follows the markdownlint rule API.
 
-## Available Rules
+## Available rules
 
 ### backtick-code-elements.js
 
-Ensures that code elements are properly wrapped in backticks.
+Ensures that filenames, directory paths, and code elements are properly wrapped in backticks for better readability and proper markdown formatting.
+
+**Rule name**: `backtick-code-elements`
+
+**Tags**: formatting, code
 
 **Options**: None
 
-**Example**:
+**Implementation details**:
+
+- Scans text content for unwrapped code elements
+- Detects filenames (e.g., `example.js`)
+- Detects directory paths (e.g., `src/components/`)
+- Detects code keywords (e.g., `function`, `const`, `import`)
+- Ignores text within links and existing code spans
+
+**Examples**:
 
 ```markdown
 <!-- Bad -->
-
-Use `const` to declare variables.
+Use const instead of var for better scoping.
+Check the src/components/ directory.
+Open example.js file.
 
 <!-- Good -->
-
-Use `const` to declare variables.
+Use `const` instead of `var` for better scoping.
+Check the `src/components/` directory.
+Open `example.js` file.
 ```
 
 ### sentence-case.js
 
-Enforces sentence case for headings.
+Enforces sentence case for headings and bold text instead of title case. Properly handles proper nouns, acronyms, and technical terms.
+
+**Rule name**: `sentence-case-headings-bold`
+
+**Tags**: headings, bold, case
 
 **Options**:
 
-- `sentence-case-headings-bold`: When true, enforces sentence case for bold text in headings
+- None configurable via options object, behavior is controlled by the rule name
 
-**Example**:
+**Implementation details**:
+
+- Analyzes heading text to detect title case patterns
+- Analyzes bold text to detect title case patterns
+- Intelligently ignores proper nouns, acronyms, and technical terms
+- Uses percentage-based detection to avoid false positives
+- Maintains a list of common proper nouns and technical terms
+
+**Examples**:
 
 ```markdown
-<!-- Bad -->
+<!-- Bad (will be flagged) -->
+# This Is Title Case
+Some text with **Title Case Bold Text** here.
 
-# This is a Heading
+<!-- Good (will not be flagged) -->
+# This is sentence case
+Some text with **bold text in sentence case** here.
 
-<!-- Good -->
-
-# This is a heading
+<!-- Also good (proper nouns and technical terms) -->
+# Using JavaScript with React and TypeScript
+The **GitHub API** provides access to repositories.
 ```
 
-## Creating a New Rule
+## Creating a new rule
 
 1. Create a new file in this directory with a descriptive name.
 2. Implement the rule following the markdownlint rule API.
@@ -53,7 +83,7 @@ Enforces sentence case for headings.
 4. Add tests in the `tests/rules` directory.
 5. Document the rule in this README.
 
-## Testing Rules
+## Testing rules
 
 Run the test suite:
 

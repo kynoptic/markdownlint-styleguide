@@ -2,30 +2,44 @@
 
 Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), a Node.js lint tool for Markdown/CommonMark files.
 
----
-
 ## Key features
 
-- 🛡️ Enforce sentence case for headings
-- `backtick-code-elements`: Require code elements to be wrapped in backticks
-- Easy to extend with new rules
-- Well-structured tests and documentation
-
----
+- 🛡️ `sentence-case-headings-bold`: Enforce sentence case for headings and bold text
+- 🔤 `backtick-code-elements`: Require code elements to be wrapped in backticks
+- 📚 Well-documented code with comprehensive JSDoc comments
+- ✅ Extensive test coverage with Jest
+- 🧩 Easy to extend with new rules
 
 ## Installation
 
 ```bash
-npm install --save-dev markdownlint
+npm install --save-dev markdownlint markdownlint-custom-rules
 # or clone this repo if using custom rules directly
 ```
 
----
-
 ## Usage
 
-1. Clone this repo or copy the `rules/` directory into your project.
-2. Configure `.markdownlint.json` to use the custom rules:
+### Using as a package
+
+```javascript
+// In your markdownlint configuration
+const customRules = require("markdownlint-custom-rules");
+
+module.exports = {
+  "customRules": customRules,
+  "sentence-case-headings-bold": true,
+  "backtick-code-elements": true
+  // other markdownlint configuration
+};
+```
+
+### Using directly from the repository
+
+Follow these steps to use the rules directly:
+
+**Step 1:** Clone this repo or copy the `rules/` directory into your project.
+
+**Step 2:** Configure `.markdownlint.json` to use the custom rules:
 
 ```jsonc
 {
@@ -38,101 +52,76 @@ npm install --save-dev markdownlint
 }
 ```
 
-3. Run markdownlint:
+**Step 3:** Run markdownlint:
 
 ```bash
 npx markdownlint "**/*.md"
 ```
-
----
 
 ## Project structure
 
-```
+```text
 markdownlint-rules/
 ├── rules/           # Custom markdownlint rules
 │   └── README.md    # Rule documentation
 ├── tests/           # Tests for custom rules
 │   └── README.md    # Test documentation
 ├── docs/            # Additional documentation
-│   └── configuration.md
+│   ├── tutorials/   # Getting started tutorials
+│   ├── how-to/      # How-to guides
+│   ├── reference/   # Reference documentation
+│   └── explanations/# Conceptual explanations
 ├── scripts/         # Utility scripts
-├── .markdownlint.json
+├── index.js         # Main entry point
 ├── package.json
 ├── jest.config.js
-├── .gitignore
+├── eslint.config.js
 ├── LICENSE
-├── CONTRIBUTING.md
 └── README.md
 ```
 
----
+## Available rules
 
-## Project status & roadmap
+### sentence-case-headings-bold
 
-- **Status:** Active, used in production and evolving.
-- **Roadmap:** See [issues](https://github.com/your-username/markdownlint-rules/issues) for planned features and enhancements.
+Enforces sentence case for headings and bold text instead of title case.
 
----
+**Example:**
 
-## License & attribution
+```markdown
+# This Is Title Case (incorrect)
+# This is sentence case (correct)
 
-MIT License. See [LICENSE](LICENSE).
-
----
-
-## Resources
-
-- [Configuration Reference](docs/reference/configuration-reference.md)
-- [Rules Documentation](rules/README.md)
-- [Tests Documentation](tests/README.md)
-- [Contribution Guide](CONTRIBUTING.md)
-- [markdownlint documentation](https://github.com/DavidAnson/markdownlint)
-
-  "sentence-case-headings-bold": true,
-  "backtick-code-elements": true
-}
+Some text with **Title Case Bold Text** (incorrect)
+Some text with **bold text in sentence case** (correct)
 ```
 
-3. Run markdownlint:
+### backtick-code-elements
 
-```bash
-npx markdownlint "**/*.md"
+Requires filenames, directory paths, and code elements to be wrapped in backticks.
+
+**Example:**
+
+```markdown
+Use const instead of var. (incorrect)
+Use `const` instead of `var`. (correct)
+
+Check the src/components/ directory. (incorrect)
+Check the `src/components/` directory. (correct)
+
+Open example.js file. (incorrect)
+Open `example.js` file. (correct)
 ```
-
-## Project Structure
-
-```
-markdownlint-rules/
-├── rules/           # Custom markdownlint rules
-│   └── README.md    # Rule documentation
-├── tests/           # Tests for custom rules
-│   └── README.md    # Test documentation
-├── docs/            # Additional documentation
-│   └── configuration.md
-├── scripts/         # Utility scripts
-├── .markdownlint.json
-├── package.json
-├── jest.config.js
-├── .gitignore
-├── LICENSE
-├── CONTRIBUTING.md
-└── README.md
-```
-
-- [Configuration Reference](docs/reference/configuration-reference.md)
-- [Rules Documentation](rules/README.md)
-- [Tests Documentation](tests/README.md)
 
 ## Development
 
-### Adding New Rules
+### Adding new rules
 
 1. Create a new rule file in the `rules` directory.
 2. Export a rule object with a `names` array and a `description` string.
 3. Implement the rule logic in the function.
 4. Add tests in the `tests/rules` directory.
-5. Update the README.md with documentation for the new rule.
+5. Update documentation for the new rule.
 
 ### Testing
 
@@ -141,6 +130,13 @@ Run the test suite:
 ```bash
 npm test
 ```
+
+## Resources
+
+- [Configuration Reference](docs/reference/configuration-reference.md)
+- [Rules Documentation](rules/README.md)
+- [Tests Documentation](tests/README.md)
+- [markdownlint documentation](https://github.com/DavidAnson/markdownlint)
 
 ## License
 
