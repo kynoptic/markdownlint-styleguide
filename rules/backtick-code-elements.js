@@ -2,11 +2,26 @@
 
 "use strict";
 
+/**
+ * Markdownlint rule to enforce backtick wrapping around code elements
+ *
+ * @description Ensures that filenames, directory paths, and code snippets are properly
+ * wrapped in backticks for better readability and proper markdown formatting
+ * @module backtick-code-elements
+ */
+
 module.exports = {
   names: ["backtick-code-elements"],
   description:
     "Filenames, directories, and code snippets must be wrapped in backticks",
   tags: ["formatting", "code"],
+  /**
+   * Rule implementation function
+   * 
+   * @param {Object} params - Parameters object from markdownlint
+   * @param {Array} params.tokens - Tokens from markdown-it
+   * @param {Function} onError - Callback to report errors
+   */
   function: function rule(params, onError) {
     params.tokens.forEach(function (token) {
       // Only check inline tokens
@@ -27,6 +42,13 @@ module.exports = {
   },
 };
 
+/**
+ * Checks text content for unwrapped code elements
+ * 
+ * @param {string} text - The text content to check
+ * @param {number} lineNumber - The line number in the markdown file
+ * @param {Function} onError - Callback function to report errors
+ */
 function checkText(text, lineNumber, onError) {
   const patterns = [
     { regex: /\b([A-Za-z0-9_\-]+\.[A-Za-z0-9]+)\b/g, type: "Filename" },
