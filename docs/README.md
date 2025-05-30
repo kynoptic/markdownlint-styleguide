@@ -8,7 +8,7 @@ Project documentation and configuration references for markdownlint custom rules
 
 ### Files
 
-* [`configuration.md`](./configuration.md) – Explains all configuration options for markdownlint and custom rules.
+* [`configuration-reference.md`](../reference/configuration-reference.md) – Explains all configuration options for markdownlint and custom rules.
 
 ## Usage
 

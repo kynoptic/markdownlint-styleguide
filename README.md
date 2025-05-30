@@ -83,7 +83,7 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Resources
 
-- [Configuration Reference](docs/configuration.md)
+- [Configuration Reference](docs/reference/configuration-reference.md)
 - [Rules Documentation](rules/README.md)
 - [Tests Documentation](tests/README.md)
 - [Contribution Guide](CONTRIBUTING.md)
@@ -120,7 +120,7 @@ markdownlint-rules/
 └── README.md
 ```
 
-- [Configuration Reference](docs/configuration.md)
+- [Configuration Reference](docs/reference/configuration-reference.md)
 - [Rules Documentation](rules/README.md)
 - [Tests Documentation](tests/README.md)
 

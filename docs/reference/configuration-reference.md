@@ -1,8 +1,10 @@
 # Configuration reference
 
+For a hands-on setup, see the [quick start tutorial](../tutorials/quick-start-tutorial.md). For rationale behind these options, see [system architecture](../explanations/system-architecture.md).
+
 This document explains the configuration options available for markdownlint and the custom rules in this repository.
 
-## `.markdownlint.json`
+## Basic usage: `.markdownlint.json`
 
 Example:
 
