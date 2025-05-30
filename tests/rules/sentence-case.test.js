@@ -2,6 +2,15 @@
 
 "use strict";
 
+/**
+ * Test suite for the sentence-case-headings-bold markdownlint rule
+ * 
+ * @description Tests various scenarios for the sentence case rule to ensure
+ * it correctly identifies title case in headings and bold text while properly
+ * handling special cases like technical terms, acronyms, and proper nouns
+ * @module sentence-case.test
+ */
+
 const markdownlint = require("markdownlint");
 const assert = require("assert");
 

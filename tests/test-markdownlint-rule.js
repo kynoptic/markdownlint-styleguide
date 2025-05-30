@@ -2,7 +2,15 @@
 
 /**
  * Test script for the sentence-case-headings-bold markdownlint rule
- * This script will test the rule against various test cases and report the results
+ * 
+ * @description This script tests the sentence-case rule against various test cases and reports the results.
+ * It provides a lightweight testing framework that mocks the markdownlint environment
+ * to validate rule behavior without requiring the full markdownlint test infrastructure.
+ * 
+ * @module test-markdownlint-rule
+ * @example
+ * // Run the test script
+ * node tests/test-markdownlint-rule.js
  */
 
 const fs = require("fs");
@@ -11,7 +19,13 @@ const path = require("path");
 // Import the custom rule
 const customRule = require("../.markdownlint-rules/sentence-case.js");
 
-// Mock the markdownlint environment
+/**
+ * Mocks the markdownlint environment to test a rule against text
+ * 
+ * @param {string} text - The markdown text to test
+ * @param {Object} rule - The markdownlint rule object to test
+ * @returns {Array} - Array of errors found by the rule
+ */
 function mockMarkdownlint(text, rule) {
   // Split text into lines
   const lines = text.split("\n");

@@ -1,3 +1,10 @@
+/**
+ * Jest configuration for markdownlint-rules project
+ * 
+ * @description Defines testing configuration for the project including
+ * test environment, coverage thresholds, and file patterns to test
+ */
+
 module.exports = {
   testEnvironment: "node",
   testMatch: ["**/tests/**/*.test.js"],

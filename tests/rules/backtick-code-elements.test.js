@@ -2,6 +2,12 @@
 
 "use strict";
 
+/**
+ * Test suite for the backtick-code-elements markdownlint rule
+ * 
+ * @module backtick-code-elements.test
+ */
+
 const markdownlint = require("markdownlint");
 const assert = require("assert");
 

@@ -5,7 +5,16 @@
 /**
  * Sentence case rule for markdownlint
  *
- * @description Enforces sentence case for headings and bold text
+ * @description Enforces sentence case for headings and bold text instead of title case
+ * @module sentence-case-headings-bold
+ * @example
+ * // Incorrect (will be flagged)
+ * # This Is Title Case
+ * Some text with **Title Case Bold Text** here
+ *
+ * // Correct (will not be flagged)
+ * # This is sentence case
+ * Some text with **bold text in sentence case** here
  */
 
 module.exports = {
@@ -13,6 +22,13 @@ module.exports = {
   description: "Headings and bold text must use sentence case (not title case)",
   tags: ["headings", "bold", "case"],
   information: new URL("https://github.com/DavidAnson/markdownlint"),
+  /**
+   * Rule implementation function
+   * 
+   * @param {Object} params - Parameters object from markdownlint
+   * @param {Array} params.tokens - Tokens from markdown-it
+   * @param {Function} onError - Callback to report errors
+   */
   function: function rule(params, onError) {
     // Initialize state
     const tokens = params.tokens;

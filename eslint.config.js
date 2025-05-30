@@ -1,3 +1,10 @@
+/**
+ * ESLint configuration for markdownlint-rules project
+ * 
+ * @description Defines linting rules for JavaScript files in the project
+ * to ensure consistent code style and quality
+ */
+
 module.exports = [
   {
     files: ["rules/**/*.js", "tests/**/*.js"],
