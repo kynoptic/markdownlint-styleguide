@@ -9,7 +9,7 @@
  */
 
 const sentenceCase = require("../../rules/sentence-case");
-const { testRule } = require("../test-helpers");
+const { testRule } = require("../helpers/test-helpers");
 
 describe("sentence-case-headings-bold", () => {
   test("headings with sentence case pass", (done) => {
