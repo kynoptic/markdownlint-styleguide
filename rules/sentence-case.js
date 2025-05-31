@@ -91,6 +91,8 @@ function isDefinitelyTitleCase(text) {
   // of the actual content.
   let processedText = text.replace(/^\d+\.\s+/, ""); // Step 1: Try to remove numbered list marker
   processedText = processedText.replace(/^[\u002D*+]\s+/, ""); // Step 2: Try to remove bullet list marker
+  // Step 3: Try to remove leading emojis (broad range, includes symbols, pictographs, transport, etc.)
+  processedText = processedText.replace(/^[\u{1F000}-\u{1FFFF}\u{2000}-\u{3FFF}]\s*/u, "").trim();
 
   // If, after removing a potential marker, the text is empty (e.g., original was "1. ")
   // or contains no spaces (e.g., original was "Word" or "1. Word" becoming "Word"),
