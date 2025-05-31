@@ -418,4 +418,69 @@ describe("sentence-case-headings-bold rule", function () {
     }
     assert.strictEqual(foundError, false, "False positive: '### - Configuration' was flagged.");
   });
+
+  it("should not flag sentence case headings starting with an emoji", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "## 🚀 Quick start",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = result.content || [];
+    assert.strictEqual(errors.length, 0, "Should not flag emoji-prefixed sentence case heading. Found: " + JSON.stringify(errors));
+  });
+
+  it("should not flag sentence case headings starting with a number (user example)", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### 1. Install dependencies",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = result.content || [];
+    assert.strictEqual(errors.length, 0, "Should not flag numbered sentence case heading. Found: " + JSON.stringify(errors));
+  });
+
+  it("should not flag sentence case headings containing a dotfile after a number", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### 2. Create .markdownlint.json",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = result.content || [];
+    assert.strictEqual(errors.length, 0, "Should not flag numbered heading with dotfile. Found: " + JSON.stringify(errors));
+  });
+
+  it("should not flag sentence case headings starting with an emoji (custom rules example)", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "## ✅ Custom rules",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = result.content || [];
+    assert.strictEqual(errors.length, 0, "Should not flag emoji-prefixed sentence case heading (custom rules). Found: " + JSON.stringify(errors));
+  });
+
+  it("should not flag sentence case headings starting with an emoji (license example)", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "## 📄 License",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = result.content || [];
+    assert.strictEqual(errors.length, 0, "Should not flag emoji-prefixed sentence case heading (license). Found: " + JSON.stringify(errors));
+  });
 });

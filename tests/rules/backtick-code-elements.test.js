@@ -253,4 +253,30 @@ describe("backtick-code-elements rule", function () {
     }
     assert.ok(foundFilenameError, "Should detect a filename without backticks");
   });
+
+  it("should not flag file patterns inside JSON code blocks", function () {
+    const options = {
+      customRules: [backtickCodeElementsRule],
+      strings: {
+        content: [
+          "```json",
+          "{",
+          '  "scripts": {',
+          '    "lint:md": "markdownlint \"**/*.md\"",',
+          '    "lint:md:fix": "markdownlint --fix \"**/*.md\""',
+          "  }",
+          "}",
+          "```",
+        ].join("\n"),
+      },
+      config: { // Configuration to disable other rules for this test
+        "MD041": false,
+        "MD047": false
+      }
+    };
+
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    assert.strictEqual(errors.length, 0, "Should not find errors in JSON code block strings. Found: " + JSON.stringify(errors));
+  });
 });
