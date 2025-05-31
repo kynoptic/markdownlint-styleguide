@@ -1,75 +1,55 @@
-# `tests` directory
+# Markdownlint custom rules tests
 
-This directory contains tests for the custom markdownlint rules. The tests ensure that each rule correctly identifies markdown issues and provides appropriate error messages.
+This directory contains tests for the custom markdownlint rules.
 
 ## Test structure
 
-- `rules/`: Contains test files for individual rules
-  - `sentence-case.test.js`: Tests for the sentence case rule, verifying it correctly identifies title case in headings and bold text
-  - `backtick-code-elements.test.js`: Tests for the backtick code elements rule, ensuring it correctly flags unwrapped code elements
-- `test-markdownlint-rule.js`: A standalone test script that provides a lightweight testing framework for the sentence case rule
-- `utils/`: Contains helper functions and utilities for testing
-
-## Writing tests
-
-Each test file should:
-
-1. Import the rule being tested
-2. Define test cases with input and expected output
-3. Use Jest's test functions to verify the rule behavior
-4. Include both positive tests (cases that should pass) and negative tests (cases that should fail)
-5. Test edge cases and potential false positives
-
-### Example test
-
-```javascript
-const rule = require("../../rules/example-rule");
-const ruleTester = require("../utils/rule-tester");
-
-describe("example-rule", () => {
-  it("should pass when ...", () => {
-    const input = "...";
-    const expected = [];
-    ruleTester.test(rule, input, expected);
-  });
-});
-```
+- `unit/`: Unit tests for individual rules
+  - `sentence-case.test.js`: Tests for the sentence case rule
+  - `backtick-code-elements.test.js`: Tests for the backtick code elements rule
+- `fixtures/`: Markdown files used for testing
+  - `sentence-case-sample.md`: Sample markdown with sentence case examples
+  - `backtick-code-elements-sample.md`: Sample markdown with code element examples
+- `integration.test.js`: Integration tests that test multiple rules together
+- `test-helpers.js`: Helper functions for testing rules
 
 ## Running tests
 
-Run all tests:
+To run all tests:
 
 ```bash
 npm test
 ```
 
-Run tests for a specific rule:
+To run a specific test file:
 
 ```bash
-npx jest tests/rules/example-rule.test.js
+npx jest tests/unit/sentence-case.test.js
 ```
 
-Run tests with coverage:
+To run tests with coverage:
 
 ```bash
-npm test -- --coverage
+npx jest --coverage
 ```
 
-## Test utilities
+## Test coverage
 
-The `utils/` directory contains helper functions for testing rules, including:
+The Jest configuration is set to enforce 80% code coverage for:
 
-- Mock functions for simulating markdownlint's environment
-- Assertion helpers for verifying rule behavior
-- Utilities for generating test cases
+- Statements
+- Branches
+- Functions
+- Lines
 
-## Test coverage requirements
+## Known issues
 
-All rules should have comprehensive test coverage that includes:
+The `backtick-code-elements` rule has known performance issues that can cause timeouts during testing. The tests for this rule have an increased timeout setting to accommodate this.
 
-- Basic functionality tests
-- Edge case tests
-- False positive tests
-- Integration tests with markdownlint
+## Adding new tests
 
-The project aims to maintain at least 80% code coverage for all rules.
+When adding new tests:
+
+1. For unit tests, create a new file in the `tests/unit/` directory
+2. Use the `testRule` helper from `test-helpers.js` to test rule violations
+3. Add appropriate test fixtures in the `tests/fixtures/` directory if needed
