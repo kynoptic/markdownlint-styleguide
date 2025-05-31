@@ -1,50 +1,62 @@
-# markdownlint-rules
+# markdownlint-custom-rules
 
-Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), a linter for Markdown/CommonMark files.
-
-These rules help enforce **sentence case** and ensure **inline code elements** are properly formatted for readability and consistency.
+Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), the popular Markdown/CommonMark linter.
 
 ---
 
-**Note:** All test fixtures, including `test-rules.md`, are now located in [`tests/fixtures/`](./tests/fixtures/). Refer to that directory for sample markdown files used in testing.
+## Project overview
+
+**markdownlint-custom-rules** provides reusable, opinionated linting rules to enforce consistent Markdown style and best practices across your documentation. This package is designed for easy integration with markdownlint and markdownlint-cli.
 
 ---
 
-## 🚀 Quick start
+## Key features
 
-### 1. Install dependencies
+- **Sentence case enforcement** for headings and bold text
+- **Inline code formatting**: Ensures backtick code elements are used properly
+- Easily extendable and compatible with markdownlint and markdownlint-cli
+- Thoroughly tested with Jest
+- Actively maintained and open source
+
+---
+
+## Installation
 
 ```bash
-npm install --save-dev markdownlint markdownlint-cli markdownlint-rules
+npm install --save-dev markdownlint markdownlint-cli markdownlint-custom-rules
 ```
 
-### 2. Create `.markdownlint.json`
+---
+
+## Usage
+
+### 1. Configure markdownlint
+
+**JSON config:**
 
 ```json
 {
-  "extends": "markdownlint-rules",
+  "extends": "markdownlint-custom-rules",
   "MD013": false
 }
 ```
 
-Or use JavaScript config:
+**JavaScript config:**
 
 ```js
 module.exports = {
-  extends: "markdownlint-rules",
+  extends: "markdownlint-custom-rules",
   MD013: false
 };
 ```
 
-### 3. Run the linter
+### 2. Run the linter
 
 ```bash
-npx markdownlint "**/*.md"
-# Optional auto-fix:
-# npx markdownlint --fix "**/*.md"
+npx markdownlint . --rules ./rules
 ```
 
-Add to `package.json` scripts for convenience:
+Or use npm script:
 
 ```json
 {
