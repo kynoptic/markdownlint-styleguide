@@ -11,6 +11,7 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: "coverage",
   collectCoverageFrom: ["rules/**/*.js", "!**/node_modules/**"],
+  // Coverage thresholds restored after fixing performance issues in backtick-code-elements rule
   coverageThreshold: {
     global: {
       branches: 80,
