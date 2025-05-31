@@ -97,10 +97,10 @@ describe("sentence-case-headings-bold", () => {
         markdown: "# The GitHub API and Node.js integration\n\nContent here.",
         expected: 0
       },
-      // All caps is not title case
+      // All caps is not title case (should FAIL)
       {
         markdown: "# ALL CAPS IS NOT TITLE CASE\n\nContent here.",
-        expected: 0
+        expected: 1 // should fail: all-caps is not sentence case
       }
     ];
     

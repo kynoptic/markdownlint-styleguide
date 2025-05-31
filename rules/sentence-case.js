@@ -102,9 +102,9 @@ function isDefinitelyTitleCase(text) {
     return false;
   }
 
-  // All caps is not title case (e.g. "THIS IS ALL CAPS" after marker removal)
+  // All caps is not sentence case (e.g. "THIS IS ALL CAPS" after marker removal)
   if (processedText === processedText.toUpperCase()) {
-    return false;
+    return true; // Flag all-caps headings as violations
   }
 
   // Split the processed text into words
