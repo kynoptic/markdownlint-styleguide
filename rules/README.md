@@ -4,7 +4,7 @@ This directory contains custom rules for markdownlint. Each rule is implemented 
 
 ## Available rules
 
-### backtick-code-elements.js
+### `backtick-code-elements.js`
 
 Ensures that filenames, directory paths, and code elements are properly wrapped in backticks for better readability and proper markdown formatting.
 

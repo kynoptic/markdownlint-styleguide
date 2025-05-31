@@ -97,7 +97,7 @@ Run `setup.sh` in the `scripts` folder.
 
 Project layout:
 
-```
+```text
 markdownlint-rules/
 ├── rules/        # Rule implementations
 ├── tests/        # Jest tests
