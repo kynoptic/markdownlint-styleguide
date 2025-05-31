@@ -66,6 +66,27 @@ function testRule(rule, testCases, done) {
   return Promise.all(promises).then(() => done());
 }
 
+/**
+ * Lints a markdown string using all custom rules, returns triggered rule names.
+ * @param {string} markdown - Markdown content to lint
+ * @returns {Promise<string[]>} - Array of triggered rule names
+ */
+async function lintMarkdown(markdown) {
+  const sentenceCaseRule = require('../../rules/sentence-case');
+  // Add other custom rules here if needed
+  const options = {
+    strings: { input: markdown },
+    config: { 'sentence-case': true },
+    customRules: [sentenceCaseRule],
+  };
+  const result = await markdownlint.promises.markdownlint(options);
+  // result is a MarkdownLintResults object: { input: [ { lineNumber, ruleNames, ruleDescription, ... } ] }
+  const violations = result.input || [];
+  // Flatten all rule names triggered
+  return violations.flatMap(v => v.ruleNames);
+}
+
 module.exports = {
   testRule,
+  lintMarkdown,
 };
