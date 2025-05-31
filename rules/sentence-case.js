@@ -61,13 +61,25 @@ module.exports = {
 
       // Check bold text
       if (token.type === "inline" && token.children) {
-        token.children.forEach(function forChild(child) {
+        token.children.forEach(function forChild(child, childIdx) {
           if (child.type === "strong_open") {
-            const boldIdx = token.children.indexOf(child);
+            const boldIdx = childIdx;
             const boldTextToken = token.children[boldIdx + 1];
             if (boldTextToken && boldTextToken.type === "text") {
               const boldText = boldTextToken.content.trim();
+              
+              // Check if the bold text is in title case or ALL CAPS
               if (isDefinitelyTitleCase(boldText) || isAllCaps(boldText)) {
+                // Don't flag bold text in sentence case within a paragraph
+                // Only flag if it's standalone bold text or definitely title case/ALL CAPS
+                const isBoldInSentenceCase = boldText === boldText.charAt(0).toUpperCase() + boldText.slice(1).toLowerCase();
+                const isWithinParagraph = token.content.trim() !== `**${boldText}**`;
+                
+                // Skip if it's within a paragraph AND it's just normal sentence case (first letter capitalized)
+                if (isWithinParagraph && isBoldInSentenceCase && !isDefinitelyTitleCase(boldText) && !isAllCaps(boldText)) {
+                  return;
+                }
+                
                 onError({
                   lineNumber: token.lineNumber,
                   ruleNames: ["sentence-case"],
