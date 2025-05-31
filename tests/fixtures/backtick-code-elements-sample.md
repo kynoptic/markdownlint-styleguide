@@ -1,37 +1,57 @@
-# Backtick Code Elements Sample
+# Backtick code elements sample
 
-## Correct Usage
+## Should pass (no lint)
 
-The file `example.js` contains JavaScript code.
+The file `example.js` contains JavaScript code. <!-- ✅ filename wrapped -->
 
-You can find components in the `src/components` directory.
+You can find components in the `src/components` directory. <!-- ✅ dir wrapped -->
 
-Use the `function` keyword to define functions in JavaScript.
+Use the `function` keyword to define functions in JavaScript. <!-- ✅ code word wrapped -->
 
-Use `const` for constants and `let` for variables.
+Use `const` for constants and `let` for variables. <!-- ✅ code words wrapped -->
 
-Install packages using `npm` or `yarn`.
+Install packages using `npm` or `yarn`. <!-- ✅ commands wrapped -->
 
-## Incorrect Usage
+A markdown link: [the file.js](file.js) should not be flagged. <!-- ✅ link text -->
 
-The file example.js contains JavaScript code.
+A code block:
 
-You can find components in the src/components directory.
+```javascript
+import foo from './foo.js';
+const path = 'src/components';
+```
+<!-- ✅ code block should not trigger -->
 
-Use the function keyword to define functions in JavaScript.
+Visit <https://example.com/path/to/file.js> for more information. <!-- ✅ URL ignored -->
 
-Use const for constants and let for variables.
+Check <http://github.com/user/repo/blob/main/src/index.js> for the source code. <!-- ✅ URL ignored -->
 
-Install packages using npm or yarn.
+Bare URL: <https://foo.com/bar.js> should not be flagged. <!-- ✅ URL ignored -->
 
-## Mixed Content
+Email: <user+test@domain.com> should not be flagged. <!-- ✅ email ignored -->
 
-The file `example.js` is good, but file.js needs backticks.
+## Should fail (should trigger lint)
 
-Check `src/components` and also check tests/unit for tests.
+The file example.js contains JavaScript code. <!-- ❌ filename not wrapped -->
 
-## URLs (Should Be Ignored)
+You can find components in the src/components directory. <!-- ❌ dir not wrapped -->
 
-Visit https://example.com/path/to/file.js for more information.
+Use the function keyword to define functions in JavaScript. <!-- ❌ code word not wrapped -->
 
-Check http://github.com/user/repo/blob/main/src/index.js for the source code.
+Use const for constants and let for variables. <!-- ❌ code words not wrapped -->
+
+Install packages using npm or yarn. <!-- ❌ commands not wrapped -->
+
+A tricky one: file.js, `file.js`, and <file.js> in a list:
+
+- file.js <!-- ❌ not wrapped -->
+- `file.js` <!-- ✅ wrapped -->
+- <file.js> <!-- ❌ not wrapped -->
+
+> Blockquote with src/index.js and `src/index.js` <!-- ❌ first not wrapped, second wrapped -->
+
+The file `example.js` is good, but file.js needs backticks. <!-- ❌ file.js not wrapped -->
+
+Check `src/components` and also check tests/unit for tests. <!-- ❌ tests/unit not wrapped -->
+
+A sentence with function as a word and `function` as code. <!-- ❌ 'function' as word not wrapped -->
