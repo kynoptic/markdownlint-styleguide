@@ -18,8 +18,8 @@
  */
 
 module.exports = {
-  names: ["sentence-case-headings-bold"],
-  description: "Headings and bold text must use sentence case (not title case)",
+  names: ["sentence-case", "sentence-case-headings-bold"],
+  description: "Headings and bold text must use sentence case (not title case or ALL CAPS)",
   tags: ["headings", "bold", "case"],
   information: new URL("https://github.com/DavidAnson/markdownlint"),
   /**
@@ -40,10 +40,13 @@ module.exports = {
         const inline = tokens[idx + 1];
         if (inline && inline.type === "inline") {
           const text = inline.content.trim();
-          if (text && isDefinitelyTitleCase(text)) {
+          if (text && (isDefinitelyTitleCase(text) || isAllCaps(text))) {
             onError({
               lineNumber: token.lineNumber,
-              detail: "Heading is not in sentence case",
+              ruleNames: ["sentence-case"],
+              detail: isAllCaps(text)
+                ? "Heading is ALL CAPS, not sentence case"
+                : "Heading is not in sentence case (appears to be title case)",
               context: text,
             });
           }
@@ -58,11 +61,13 @@ module.exports = {
             const boldTextToken = token.children[boldIdx + 1];
             if (boldTextToken && boldTextToken.type === "text") {
               const boldText = boldTextToken.content.trim();
-              // Only flag if it's clearly title case (multiple capitalized words)
-              if (boldText && isDefinitelyTitleCase(boldText)) {
+              if (isDefinitelyTitleCase(boldText) || isAllCaps(boldText)) {
                 onError({
                   lineNumber: token.lineNumber,
-                  detail: "Bold text is not in sentence case",
+                  ruleNames: ["sentence-case"],
+                  detail: isAllCaps(boldText)
+                    ? "Bold text is ALL CAPS, not sentence case"
+                    : "Bold text is not in sentence case (appears to be title case)",
                   context: boldText,
                 });
               }
@@ -73,6 +78,17 @@ module.exports = {
     });
   },
 };
+
+/**
+ * Checks if text is ALL CAPS (ignoring non-letters)
+ * @param {string} text
+ * @returns {boolean}
+ */
+function isAllCaps(text) {
+  // Remove non-letters, check if at least 2 letters, and all are uppercase
+  const letters = text.replace(/[^A-Za-z]/g, "");
+  return letters.length >= 2 && letters === letters.toUpperCase();
+}
 
 /**
  * Checks if text is definitely in title case (not sentence case)
