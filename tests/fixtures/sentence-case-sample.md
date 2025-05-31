@@ -1,63 +1,49 @@
-# ✅ This is a proper sentence case heading <!-- should pass -->
+# Sentence-case rule fixture
 
-This paragraph contains normal text with no issues. <!-- ✅ -->
+## Headings that pass
 
-## ❌ This Is A Title Case Heading That Should Fail <!-- should fail -->
+### This is a proper sentence case heading <!-- ✅ -->
 
-This paragraph has **Bold Text In Title Case** that should fail the check. <!-- ❌ bold should fail -->
+### Another heading in sentence case with `code` elements <!-- ✅ -->
 
-### ✅ Another sentence case heading with JavaScript <!-- should pass -->
+### This heading has JavaScript and `npm` in it <!-- ✅ -->
 
-This paragraph has **bold text in sentence case** that should pass the check. <!-- ✅ -->
+#### Single word heading <!-- ✅ -->
 
-## ❌ ALL CAPS HEADING IS NOT TITLE CASE <!-- should fail -->
+#### API documentation for JavaScript <!-- ✅ -->
 
-This paragraph has **BOLD ALL CAPS** which is not title case. <!-- ❌ bold should fail -->
 
-### ❌ The GitHub API and Node.js Integration Should Fail <!-- should fail (title case, API acronym) -->
+## Headings that fail
 
-This paragraph mentions `file.js` and `src/components` correctly. <!-- ✅ -->
+### This Is A Title Case Heading That Should Fail <!-- ❌ -->
 
----
+### Another Heading In Title Case <!-- ❌ -->
 
-# ❌ heading with an API acronym and 123 numbers <!-- should fail (API acronym, numbers) -->
+### The GitHub API and Node.js Integration Should Fail <!-- ❌ -->
 
-**bold with API** should fail, but **bold text in sentence case** should pass. <!-- ❌/✅ -->
+#### ALL CAPS IS NOT SENTENCE CASE <!-- ❌ -->
 
-## Heading with punctuation! does it work? <!-- should pass -->
 
-### Heading: with colon and - dash <!-- should pass -->
+## Bold text that passes
 
-#### Heading with trailing whitespace <!-- should pass -->
+**bold text in sentence case** <!-- ✅ -->
+**Bold123** <!-- ✅ -->
+**Bold with `inline code`** <!-- ✅ -->
 
-# ✅ Emoji at the start should pass <!-- ✅ (emoji allowed) -->
 
-# ❌ Emoji At The Start Should Fail <!-- ❌ (title case after emoji) -->
+## Bold text that fails
 
-# 1. Numbered heading should pass <!-- ✅ (numbered list style) -->
+**Bold Text In Title Case** <!-- ❌ -->
+**Example With Title Case** <!-- ❌ -->
+**BOLD ALL CAPS** <!-- ❌ -->
 
-# 2. Numbered Heading Should Fail <!-- ❌ (title case after number) -->
 
-# - Dash at start should pass <!-- ✅ (dash allowed) -->
+## Mixed content
 
-# - Dash At Start Should Fail <!-- ❌ (title case after dash) -->
+This paragraph has **bold text in sentence case** and `code` elements. <!-- ✅ -->
+This paragraph has **Bold Text In Title Case** and unwrapped function keyword. <!-- ❌ -->
 
-# Heading with emoji ✅ in the middle <!-- ✅ (emoji allowed) -->
 
-# Heading With Emoji ❌ In The Middle Should Fail <!-- ❌ (title case with emoji) -->
+## Edge cases
 
-**BOLD123** should pass. <!-- ✅ -->
-
-**Bold With 123** should fail. <!-- ❌ -->
-
-**bold with a URL <https://foo.com/bar.js>** should pass. <!-- ✅ -->
-
-**bold with `inline code`** should pass. <!-- ✅ -->
-
-**Bold With `Inline Code`** should fail. <!-- ❌ -->
-
-# Heading with `inline code` and src/path <!-- ✅ -->
-
-## Heading With a URL <https://foo.com/bar.js> <!-- ✅ (URL, not a sentence) -->
-
-**Bold with `inline code`** should pass. <!-- ✅ -->
+Email: <user+test@domain.com> <!-- ✅ -->
