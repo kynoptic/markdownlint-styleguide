@@ -106,7 +106,7 @@ Enforces sentence case for all headings and any bold text inside them.
 
 ### `backtick-code-elements`
 
-Wraps filenames, functions, and paths in backticks for clarity.
+Wraps filenames, functions, and paths in backticks for clarity. Detects filenames (e.g., `example.js`), directory paths (e.g., `src/components/`), and code keywords (e.g., `function`, `const`, `import`). Ignores descriptive documentation text and examples, as covered in fixtures and feature tests.
 
 **Incorrect**:
 
@@ -120,9 +120,30 @@ Run setup.sh in the scripts folder.
 Run `setup.sh` in the `scripts` folder.
 ```
 
-## Developing new rules
+## Usage example
 
-Project layout:
+Lint all Markdown files in the repo:
+
+```bash
+npx markdownlint . --rules ./rules
+```
+
+## Project status and roadmap
+
+This project is actively maintained. See [`CHANGELOG.md`](./CHANGELOG.md) for recent updates and [`rules/README.md`](./rules/README.md) for details on custom rules. Roadmap items and planned improvements are tracked in GitHub Issues.
+
+## License and attribution
+
+MIT License. See [`LICENSE`](./LICENSE) for details. Built and maintained by contributors—see GitHub for full list.
+
+## Resources and related documentation
+
+- [`rules/README.md`](./rules/README.md): Details on custom rules
+- [`tests/README.md`](./tests/README.md): Test structure and usage
+- [`tests/fixtures/README.md`](./tests/fixtures/README.md): Fixture documentation
+- [`scripts/README.md`](./scripts/README.md): Utility scripts and automation
+- [`CHANGELOG.md`](./CHANGELOG.md): Release notes
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md): (If present) Contribution guidelines
 
 ```text
 markdownlint-rules/

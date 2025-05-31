@@ -120,6 +120,8 @@ This is a test for the git workflow. <!-- ✅ -->
 - Detects directory paths (e.g., `src/components/`) <!-- ✅ -->
 - Detects code keywords (e.g., `function`, `const`, `import`) <!-- ✅ -->
 
+- [`markdownlint-absolute.js`](./markdownlint-absolute.js): Like `markdownlint.js`, but uses absolute paths for custom rules—helpful if your config is loaded from outside the package root. <!-- ✅ -->
+
 `function`: The rule implementation function <!-- ✅ -->
 This paragraph has **bold text in sentence case** and `code` elements. <!-- ✅ -->
 

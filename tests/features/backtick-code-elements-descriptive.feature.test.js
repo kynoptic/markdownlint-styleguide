@@ -26,6 +26,10 @@ describe('Feature: backtick-code-elements - descriptive text exclusions', () => 
       {
         markdown: '- Detects code keywords (e.g., `function`, `const`, `import`)',
         expected: 0  // Should not flag "code keywords" as needing backticks
+      },
+      {
+        markdown: '- [`markdownlint-absolute.js`](./markdownlint-absolute.js): Like `markdownlint.js`, but uses absolute paths for custom rules—helpful if your config is loaded from outside the package root.',
+        expected: 0 // Should not flag any part of this line
       }
     ];
     testRule(backtickCodeElements, testCases, done);

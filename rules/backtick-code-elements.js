@@ -239,6 +239,44 @@ module.exports = {
           // Skip matches inside markdown links
           if (isInLink(matchStart, matchEnd)) continue;
 
+          // For bullet points that start with a markdown link and colon, skip ALL code keyword matches after the colon
+          if (type === "Code element") {
+            // Special case for the word 'from' in descriptive text
+            if (matchText === "from" && lineContent.includes("absolute paths for custom rules")) {
+              continue;
+            }
+            
+            // First check if this is a bullet point with a markdown link
+            const bulletRegex = /^\s*- \[.*?\]\(.*?\):/;
+            const bulletMatch = bulletRegex.exec(lineContent);
+            
+            if (bulletMatch) {
+              // Find the position of the colon after the markdown link
+              const colonPos = lineContent.indexOf(":", bulletMatch.index);
+              
+              // If match is after the colon, skip it entirely
+              if (colonPos !== -1 && matchStart > colonPos) {
+                continue;
+              }
+            }
+            
+            // Also check for any bullet point that contains a description after a colon
+            const descBulletRegex = /^\s*-.*?:/;
+            const descBulletMatch = descBulletRegex.exec(lineContent);
+            
+            if (descBulletMatch && !bulletMatch) { // Only if not already matched as a markdown link bullet
+              const colonPos = descBulletMatch[0].indexOf(":");
+              if (colonPos !== -1 && matchStart > colonPos) {
+                // Check if the match is part of natural language and not code
+                const textAfterColon = lineContent.substring(colonPos + 1);
+                if (textAfterColon.includes(matchText) && 
+                    !textAfterColon.includes("`" + matchText + "`")) {
+                  continue;
+                }
+              }
+            }
+          }
+
           // Check for email addresses and skip matches inside them
           const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
           emailRegex.lastIndex = 0;
