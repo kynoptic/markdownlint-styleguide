@@ -21,7 +21,8 @@
 const fs = require("fs");
 const path = require("path");
 const markdownlint = require("markdownlint");
-const customRules = require("../index");
+const { testRule } = require('../helpers/test-helpers');
+const customRules = require("../../index");
 
 describe("Integration tests", () => {
   // Set longer timeout for these tests due to known performance issues
@@ -36,7 +37,7 @@ describe("Integration tests", () => {
    * - Special cases like "GitHub API" where proper nouns are allowed
    */
   test("sentence-case-sample.md", (done) => {
-    const filePath = path.join(__dirname, "fixtures", "sentence-case-sample.md");
+    const filePath = path.join(__dirname, "../fixtures", "sentence-case-sample.md");
     const fileContent = fs.readFileSync(filePath, "utf8");
     
     const options = {
@@ -61,12 +62,12 @@ describe("Integration tests", () => {
       
       const violations = result.content || [];
       
-      // We expect 3 violations: 1 for title case heading, 1 for title case bold text, and 1 for GitHub API heading
-      expect(violations.length).toBe(3);
+      // We expect 8 violations: all headings and bold text that are ALL CAPS or Title Case
+      expect(violations.length).toBe(8);
       
       // Check if violations are for the expected lines
       const lineNumbers = violations.map(v => v.lineNumber).sort((a, b) => a - b);
-      expect(lineNumbers).toEqual([5, 7, 17]);
+      expect(lineNumbers).toEqual([17, 19, 21, 23, 33, 33, 33, 39]);
       
       done();
     });
@@ -82,7 +83,7 @@ describe("Integration tests", () => {
    * - URLs are properly ignored (should not trigger violations)
    */
   test("backtick-code-elements-sample.md", (done) => {
-    const filePath = path.join(__dirname, "fixtures", "backtick-code-elements-sample.md");
+    const filePath = path.join(__dirname, "../fixtures", "backtick-code-elements-sample.md");
     const fileContent = fs.readFileSync(filePath, "utf8");
     
     const options = {
