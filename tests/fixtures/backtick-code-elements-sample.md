@@ -116,6 +116,13 @@ You can install using npm or yarn. <!-- ✅ -->
 
 This is a test for the git workflow. <!-- ✅ -->
 
+- Detects filenames (e.g., `example.js`) <!-- ✅ -->
+- Detects directory paths (e.g., `src/components/`) <!-- ✅ -->
+- Detects code keywords (e.g., `function`, `const`, `import`) <!-- ✅ -->
+
+`function`: The rule implementation function <!-- ✅ -->
+This paragraph has **bold text in sentence case** and `code` elements. <!-- ✅ -->
+
 ## Special formats
 
 Code block (should be ignored):
