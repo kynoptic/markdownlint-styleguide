@@ -5,7 +5,17 @@
 /**
  * Integration tests for all custom rules
  * 
+ * @description Tests the custom markdownlint rules against real markdown samples to ensure
+ * they work correctly together and individually. These tests use the fixture files in the
+ * tests/fixtures directory and also test with inline markdown content.
+ * 
  * @module integration.test
+ * @example
+ * // Run all integration tests
+ * npx jest tests/integration.test.js
+ * 
+ * // Run a specific test
+ * npx jest tests/integration.test.js -t "sentence-case-sample.md"
  */
 
 const fs = require("fs");
@@ -17,6 +27,14 @@ describe("Integration tests", () => {
   // Set longer timeout for these tests due to known performance issues
   jest.setTimeout(15000);
 
+  /**
+   * Tests the sentence-case-headings-bold rule against a sample markdown file
+   * 
+   * This test verifies that the rule correctly identifies violations in:
+   * - Headings that use title case instead of sentence case
+   * - Bold text that uses title case instead of sentence case
+   * - Special cases like "GitHub API" where proper nouns are allowed
+   */
   test("sentence-case-sample.md", (done) => {
     const filePath = path.join(__dirname, "fixtures", "sentence-case-sample.md");
     const fileContent = fs.readFileSync(filePath, "utf8");
@@ -54,6 +72,15 @@ describe("Integration tests", () => {
     });
   });
 
+  /**
+   * Tests the backtick-code-elements rule against a sample markdown file
+   * 
+   * This test verifies that the rule correctly identifies violations where:
+   * - Filenames are not wrapped in backticks
+   * - Directory paths are not wrapped in backticks
+   * - Code keywords are not wrapped in backticks
+   * - URLs are properly ignored (should not trigger violations)
+   */
   test("backtick-code-elements-sample.md", (done) => {
     const filePath = path.join(__dirname, "fixtures", "backtick-code-elements-sample.md");
     const fileContent = fs.readFileSync(filePath, "utf8");
@@ -88,6 +115,17 @@ describe("Integration tests", () => {
     });
   });
 
+  /**
+   * Tests both custom rules working together on the same content
+   * 
+   * This test ensures that both rules can be applied simultaneously without conflicts
+   * and that they correctly identify their respective violations in mixed content.
+   * The test checks for:
+   * - Title case heading violations
+   * - Unwrapped filename violations
+   * - Unwrapped code keyword violations
+   * - Title case bold text violations
+   */
   test("both rules together", (done) => {
     // Test both rules together on a sample
     const markdown = `

@@ -6,6 +6,10 @@ These rules help enforce **sentence case** and ensure **inline code elements** a
 
 ---
 
+**Note:** All test fixtures, including `test-rules.md`, are now located in [`tests/fixtures/`](./tests/fixtures/). Refer to that directory for sample markdown files used in testing.
+
+---
+
 ## 🚀 Quick start
 
 ### 1. Install dependencies
