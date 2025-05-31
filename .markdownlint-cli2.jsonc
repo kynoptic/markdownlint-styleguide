@@ -7,30 +7,19 @@
  * For more information, see: https://github.com/DavidAnson/markdownlint-cli2
  */
 {
-  // Enable all default markdownlint rules as a baseline
-  "default": true,
-  
-  // Disable specific default rules that conflict with our style preferences
-  "MD204": false, // Code blocks should use fenced syntax (we allow both styles)
-  "MD013": false, // Line length limit (we don't enforce line length limits)
-  
+  // File inclusion patterns (glob format)
+  "globs": [
+    "**/*.md"
+  ],
+
   // Include custom rules from this package
   // These paths are relative to the location of this config file
   "customRules": [
     "./rules/sentence-case.js",       // Enforces sentence case in headings and bold text
     "./rules/backtick-code-elements.js" // Ensures code elements are wrapped in backticks
   ],
-  
-  // Configure custom rules with specific options
-  "sentence-case-headings-bold": {
-    "enabled": true  // Enable the sentence case rule
-  },
-  "backtick-code-elements": {
-    "enabled": true  // Enable the backtick code elements rule
-  },
-  
-  // File inclusion/exclusion patterns (glob format)
-  // These patterns determine which files to ignore during linting
+
+  // File exclusion patterns can be added here using the 'ignores' property if needed
   "ignores": [
     "node_modules/**", // Ignore all files in node_modules
     ".git/**"          // Ignore all git internal files
