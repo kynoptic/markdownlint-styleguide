@@ -1,10 +1,14 @@
 {
   "MD204": false,
   "MD013": false,
-  "customRules": {
-    "sentence-case": "./rules/sentence-case.js",
-    "backtick-code-elements": "./rules/backtick-code-elements.js"
+  "customRules": [
+    "./rules/sentence-case.js",
+    "./rules/backtick-code-elements.js"
+  ],
+  "sentence-case-headings-bold": {
+    "enabled": true
   },
-  "sentence-case-headings-bold": true,
-  "backtick-code-elements": true
+  "backtick-code-elements": {
+    "enabled": true
+  }
 }
