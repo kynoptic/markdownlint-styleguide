@@ -1,6 +1,6 @@
 {
   "name": "markdownlint-custom-rules",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Custom rules for markdownlint",
   "main": "index.js",
   "scripts": {
