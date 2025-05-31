@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [`0.2.1`] - 2025-05-31
+
+### Fixed
+
+- Fixed false positives in `backtick-code-elements` rule for code keywords in descriptive bullet points with markdown links
+- Improved exclusion logic for descriptive text in documentation
+
+### Added
+
+- Added feature tests for descriptive text exclusions in `backtick-code-elements` rule
+- Added test fixtures to prevent regression of fixed false positives
+
+### Documentation
+
+- Added comprehensive README files to all test subfolders (`features`, `helpers`, `integration`, `unit`)
+- Expanded existing READMEs with usage examples and cross-references
+
 ## [`0.2.0`] - 2025-05-31
 
 ### Added
