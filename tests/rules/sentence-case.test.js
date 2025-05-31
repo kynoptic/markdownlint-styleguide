@@ -297,4 +297,125 @@ describe("sentence-case-headings-bold rule", function () {
       "Should not flag headings with unusual capitalization patterns",
     );
   });
+
+  it("should not flag sentence case headings starting with numbers", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false }, // Disable other heading rules for isolation
+      strings: {
+        content: "### 1. Installation guide for users", // Correct sentence case
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, false, "False positive: Numbered heading '### 1. Installation guide for users' was flagged.");
+  });
+
+  it("should flag title case headings starting with numbers", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### 1. Installation Guide For Users", // Incorrect title case
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, true, "Should have flagged title case numbered heading: '### 1. Installation Guide For Users'");
+  });
+
+  it("should not flag sentence case headings starting with bullets", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### - Configuration options detailed", // Correct sentence case
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, false, "False positive: Bulleted heading '### - Configuration options detailed' was flagged.");
+  });
+
+  it("should flag title case headings starting with bullets", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### - Configuration Options Detailed", // Incorrect title case
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, true, "Should have flagged title case bulleted heading: '### - Configuration Options Detailed'");
+  });
+
+  // Test for the specific reported false positive
+  it("should not flag '### 1. Installation' as title case", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### 1. Installation",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, false, "False positive: '### 1. Installation' was flagged.");
+  });
+
+  it("should not flag '### - Configuration' as title case", function () {
+    const options = {
+      customRules: [sentenceCaseRule],
+      config: { MD041: false, MD047: false },
+      strings: {
+        content: "### - Configuration",
+      },
+    };
+    const result = markdownlint.sync(options);
+    const errors = Array.isArray(result["content"]) ? result["content"] : [];
+    let foundError = false;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i].ruleNames && errors[i].ruleNames.includes("sentence-case-headings-bold")) {
+        foundError = true;
+        break;
+      }
+    }
+    assert.strictEqual(foundError, false, "False positive: '### - Configuration' was flagged.");
+  });
 });

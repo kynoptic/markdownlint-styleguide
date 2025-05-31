@@ -82,51 +82,70 @@ module.exports = {
  */
 function isDefinitelyTitleCase(text) {
   // Empty text is fine
-  if (!text) return false;
+  if (!text) {
+    return false;
+  }
 
-  // Single words are never title case
-  if (!text.includes(" ")) return false;
+  // Preprocess text to remove leading list markers (e.g., "1. ", "- ")
+  // This ensures "Installation" in "1. Installation" is treated as the first word
+  // of the actual content.
+  let processedText = text.replace(/^\d+\.\s+/, ""); // Step 1: Try to remove numbered list marker
+  processedText = processedText.replace(/^[\u002D*+]\s+/, ""); // Step 2: Try to remove bullet list marker
 
-  // All caps is not title case
-  if (text === text.toUpperCase()) return false;
+  // If, after removing a potential marker, the text is empty (e.g., original was "1. ")
+  // or contains no spaces (e.g., original was "Word" or "1. Word" becoming "Word"),
+  // it's not considered title case.
+  if (!processedText || !processedText.includes(" ")) {
+    // This log is now less relevant as the main check is the output of the function for the specific input
+    return false;
+  }
 
-  // Split into words
-  const words = text.split(/\s+/);
+  // All caps is not title case (e.g. "THIS IS ALL CAPS" after marker removal)
+  if (processedText === processedText.toUpperCase()) {
+    return false;
+  }
 
-  // Count capitalized words and total eligible words (excluding first word, small words, acronyms, and proper nouns)
+  // Split the processed text into words
+  const words = processedText.split(/\s+/);
+
+  // At this point, 'words' will have at least two elements because
+  // !processedText.includes(" ") was false earlier.
+
+  // Count capitalized words and total eligible words
+  // The first word of 'processedText' (words[0]) can be capitalized in sentence case.
+  // We check words from words[1] onwards.
   let capitalizedWordCount = 0;
   let eligibleWordCount = 0;
 
-  // Skip the first word (can be capitalized in sentence case)
   for (let i = 1; i < words.length; i++) {
     const word = words[i];
 
-    // Skip small words, acronyms, and proper nouns
+    // Skip small words (e.g., "a", "is", "to"), acronyms (e.g., "API"), and likely proper nouns (e.g., "JavaScript")
     if (
-      word.length <= 2 ||
-      word === word.toUpperCase() ||
-      isLikelyProperNoun(word)
+      word.length <= 2 || // Handles very short words, often articles/prepositions
+      word === word.toUpperCase() || // Handles acronyms
+      isLikelyProperNoun(word) // Handles known proper nouns or patterns
     ) {
       continue;
     }
 
-    // Count this as an eligible word
     eligibleWordCount++;
 
-    // Check if word starts with capital letter
+    // Check if the word starts with a capital letter followed by lowercase letters
     if (/^[A-Z][a-z]+/.test(word)) {
       capitalizedWordCount++;
     }
   }
 
-  // If there are no eligible words, it's not title case
-  if (eligibleWordCount === 0) return false;
+  // If there are no "eligible" words to check (e.g., "First Word an API the"), it's not title case.
+  if (eligibleWordCount === 0) {
+    return false;
+  }
 
-  // Calculate the percentage of eligible words that are capitalized
-  const capitalizedPercentage =
-    (capitalizedWordCount / eligibleWordCount) * 100;
+  // Calculate the percentage of eligible (non-first, non-proper/acronym, non-small) words that are capitalized.
+  const capitalizedPercentage = (capitalizedWordCount / eligibleWordCount) * 100;
 
-  // If more than 40% of eligible words are capitalized, it's likely title case
+  // If more than 40% of these eligible words are capitalized, it's likely title case.
   return capitalizedPercentage > 40;
 }
 
