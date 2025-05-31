@@ -1,24 +1,17 @@
-# markdownlint-custom-rules
+# Custom rules for markdownlint
 
 Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), the popular Markdown/CommonMark linter.
-
----
 
 ## Project overview
 
 **markdownlint-custom-rules** provides reusable, opinionated linting rules to enforce consistent Markdown style and best practices across your documentation. This package is designed for easy integration with markdownlint and markdownlint-cli.
 
----
-
 ## Key features
 
 - **Sentence case enforcement** for headings and bold text
 - **Inline code formatting**: Ensures backtick code elements are used properly
-- Easily extendable and compatible with markdownlint and markdownlint-cli
-- Thoroughly tested with Jest
-- Actively maintained and open source
-
----
+- Extendable and compatible with markdownlint and markdownlint-cli
+- Tested with Jest
 
 ## Installation
 
@@ -26,22 +19,16 @@ Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdow
 npm install --save-dev markdownlint markdownlint-cli markdownlint-custom-rules
 ```
 
----
+## Configure markdownlint
 
-## Usage
-
-### 1. Configure markdownlint
-
-**JSON config:**
+Add the following to your markdownlint config file (e.g. `.markdownlint.json`):
 
 ```json
 {
   "extends": "markdownlint-custom-rules",
-  "MD013": false
-
+  "MD013": false // Disable line length rule
+}
 ```
-
----
 
 ## Using custom rules in VSCode
 
@@ -50,7 +37,7 @@ To use these custom markdownlint rules in VSCode:
 1. **Ensure you have a `.markdownlint.json` config file** in your project root (as shown above).
 2. **Install the [markdownlint extension for VSCode](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)** if you haven't already.
 3. **Configure VSCode to use your local config:**
-   - Create or update `.vscode/settings.json` in your project root with:
+   Create or update `.vscode/settings.json` in your project root with:
 
      ```json
      {
@@ -58,10 +45,10 @@ To use these custom markdownlint rules in VSCode:
      }
      ```
 
-   - This ensures VSCode uses your project's specific rules (including custom ones) when linting Markdown files.
+   This ensures VSCode uses your project's specific rules (including custom ones) when linting Markdown files.
 
-4. **(Optional) Point to custom rules directory:**
-   - If your custom rules are not picked up automatically, add this to `.vscode/settings.json`:
+4. ***Optional*: Point to custom rules directory:**
+   If your custom rules are not picked up automatically, add this to `.vscode/settings.json`:
 
      ```json
      {
@@ -71,14 +58,12 @@ To use these custom markdownlint rules in VSCode:
 
 Now, when you edit Markdown files in VSCode, the linter will apply your custom rules automatically.
 
----
-
-**JavaScript config:**
+## JavaScript config
 
 ```js
 module.exports = {
   extends: "markdownlint-custom-rules",
-  MD013: false
+  MD013: false // Disable line length rule
 };
 ```
 
@@ -99,9 +84,7 @@ Or use npm script:
 }
 ```
 
----
-
-## ✅ Custom rules
+## Custom rules
 
 ### `sentence-case-headings-bold`
 
@@ -121,8 +104,6 @@ Enforces sentence case for all headings and any bold text inside them.
 ## A **bold** statement
 ```
 
----
-
 ### `backtick-code-elements`
 
 Wraps filenames, functions, and paths in backticks for clarity.
@@ -139,9 +120,7 @@ Run setup.sh in the scripts folder.
 Run `setup.sh` in the `scripts` folder.
 ```
 
----
-
-## 🛠️ Developing new rules
+## Developing new rules
 
 Project layout:
 
@@ -158,8 +137,6 @@ To add or test rules:
 npm test
 ```
 
----
-
-## 📄 License
+## License
 
 [MIT](LICENSE)
