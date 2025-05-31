@@ -7,7 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-05-30
+## [`0.2.0`] - 2025-05-31
+
+### Added
+
+- Added alternative markdownlint configuration formats for improved flexibility
+- Added test fixtures for unit tests and manual rule testing
+- Added README for `test-fixtures` directory to document purpose and usage
+
+### Changed
+
+- Optimized `backtick-code-elements` rule for better performance with precompiled regex patterns
+- Updated markdownlint configuration format to use array format for custom rules
+- Migrated to Jest-based test structure with shared test utilities
+- Improved documentation formatting and clarity throughout the project
+- Reorganized test files and moved `test-rules.md` to `fixtures` directory
+
+### Fixed
+
+- Fixed handling of emoji-prefixed headings in sentence-case rule
+- Added null checks for result in integration tests
+- Fixed handling of sentence case for list marker headings
+
+## [`0.1.0`] - 2025-05-30
 
 ### Added
 
