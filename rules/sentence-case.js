@@ -40,6 +40,12 @@ module.exports = {
         const inline = tokens[idx + 1];
         if (inline && inline.type === "inline") {
           const text = inline.content.trim();
+          
+          // Skip version numbers in CHANGELOG headings (e.g., ## [`0.2.1`] - 2025-05-31)
+          if (isVersionHeading(text)) {
+            return;
+          }
+          
           if (text && (isDefinitelyTitleCase(text) || isAllCaps(text))) {
             onError({
               lineNumber: token.lineNumber,
@@ -168,10 +174,18 @@ function isDefinitelyTitleCase(text) {
 }
 
 /**
- * Checks if a word is likely a proper noun (very basic check)
- * @param {string} word - The word to check
- * @returns {boolean} - True if likely a proper noun
+ * Checks if a heading contains a version number in the format commonly used in CHANGELOG.md
+ * @param {string} text - The heading text to check
+ * @returns {boolean} - True if the heading contains a version number
  */
+function isVersionHeading(text) {
+  // Match patterns like:
+  // [0.2.1] - 2025-05-31
+  // [`0.2.1`] - 2025-05-31
+  // [v1.0.0] - 2025-05-31
+  return /^\[(?:`?v?\d+\.\d+\.\d+`?|Unreleased)\](?:\s+-\s+\d{4}-\d{2}-\d{2})?/.test(text);
+}
+
 function isLikelyProperNoun(word) {
   // Only consider capitalized words as potential proper nouns
   if (!/^[A-Z]/.test(word)) return false;
