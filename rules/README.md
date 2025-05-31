@@ -36,7 +36,7 @@ Check the `src/components/` directory.
 Open `example.js` file.
 ```
 
-### sentence-case.js
+### `sentence-case.js`
 
 Enforces sentence case for headings and bold text instead of title case. Properly handles proper nouns, acronyms, and technical terms.
 
