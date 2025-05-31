@@ -122,6 +122,17 @@ This is a test for the git workflow. <!-- ✅ -->
 
 - [`markdownlint-absolute.js`](./markdownlint-absolute.js): Like `markdownlint.js`, but uses absolute paths for custom rules—helpful if your config is loaded from outside the package root. <!-- ✅ -->
 
+## CHANGELOG entries (should pass)
+
+- Added `index.js` to allow usage as an npm package. <!-- ✅ -->
+- Added `package.json` and updated `README.md` <!-- ✅ -->
+- Implemented JSDoc comments for improved code understanding. <!-- ✅ -->
+
+## CHANGELOG entries (should fail)
+
+- Added index.js to allow usage as an npm package. <!-- ❌ -->
+- Updated package.json and README.md <!-- ❌ -->
+
 `function`: The rule implementation function <!-- ✅ -->
 This paragraph has **bold text in sentence case** and `code` elements. <!-- ✅ -->
 

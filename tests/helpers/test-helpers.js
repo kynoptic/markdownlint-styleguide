@@ -73,11 +73,15 @@ function testRule(rule, testCases, done) {
  */
 async function lintMarkdown(markdown) {
   const sentenceCaseRule = require('../../rules/sentence-case');
-  // Add other custom rules here if needed
+  const backtickCodeElementsRule = require('../../rules/backtick-code-elements');
+  // Configure options with all custom rules
   const options = {
     strings: { input: markdown },
-    config: { 'sentence-case': true },
-    customRules: [sentenceCaseRule],
+    config: { 
+      'sentence-case': true,
+      'backtick-code-elements': true
+    },
+    customRules: [sentenceCaseRule, backtickCodeElementsRule],
   };
   const result = await markdownlint.promises.markdownlint(options);
   // result is a MarkdownLintResults object: { input: [ { lineNumber, ruleNames, ruleDescription, ... } ] }
