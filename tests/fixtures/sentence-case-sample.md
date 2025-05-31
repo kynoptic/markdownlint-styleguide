@@ -12,7 +12,6 @@
 
 #### API documentation for JavaScript <!-- ✅ -->
 
-
 ## Headings that fail
 
 ### This Is A Title Case Heading That Should Fail <!-- ❌ -->
@@ -23,13 +22,11 @@
 
 #### ALL CAPS IS NOT SENTENCE CASE <!-- ❌ -->
 
-
 ## Bold text that passes
 
 **bold text in sentence case** <!-- ✅ -->
 **Bold123** <!-- ✅ -->
 **Bold with `inline code`** <!-- ✅ -->
-
 
 ## Bold text that fails
 
@@ -37,12 +34,10 @@
 **Example With Title Case** <!-- ❌ -->
 **BOLD ALL CAPS** <!-- ❌ -->
 
-
 ## Mixed content
 
 This paragraph has **bold text in sentence case** and `code` elements. <!-- ✅ -->
 This paragraph has **Bold Text In Title Case** and unwrapped function keyword. <!-- ❌ -->
-
 
 ## Edge cases
 
