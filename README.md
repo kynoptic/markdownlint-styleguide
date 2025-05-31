@@ -38,8 +38,40 @@ npm install --save-dev markdownlint markdownlint-cli markdownlint-custom-rules
 {
   "extends": "markdownlint-custom-rules",
   "MD013": false
-}
+
 ```
+
+---
+
+## Using custom rules in VSCode
+
+To use these custom markdownlint rules in VSCode:
+
+1. **Ensure you have a `.markdownlint.json` config file** in your project root (as shown above).
+2. **Install the [markdownlint extension for VSCode](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)** if you haven't already.
+3. **Configure VSCode to use your local config:**
+   - Create or update `.vscode/settings.json` in your project root with:
+
+     ```json
+     {
+       "markdownlint.configFile": ".markdownlint.json"
+     }
+     ```
+
+   - This ensures VSCode uses your project's specific rules (including custom ones) when linting Markdown files.
+
+4. **(Optional) Point to custom rules directory:**
+   - If your custom rules are not picked up automatically, add this to `.vscode/settings.json`:
+
+     ```json
+     {
+       "markdownlint.customRules": "./rules"
+     }
+     ```
+
+Now, when you edit Markdown files in VSCode, the linter will apply your custom rules automatically.
+
+---
 
 **JavaScript config:**
 
@@ -131,7 +163,3 @@ npm test
 ## 📄 License
 
 [MIT](LICENSE)
-
----
-
-Let me know if you want a version that includes TypeScript support or examples of rule authoring.
