@@ -1,0 +1,28 @@
+{
+  // Enable all default rules
+  "default": true,
+  
+  // Disable specific default rules
+  "MD204": false,
+  "MD013": false,
+  
+  // Include custom rules
+  "customRules": [
+    "./rules/sentence-case.js",
+    "./rules/backtick-code-elements.js"
+  ],
+  
+  // Configure custom rules
+  "sentence-case-headings-bold": {
+    "enabled": true
+  },
+  "backtick-code-elements": {
+    "enabled": true
+  },
+  
+  // File inclusion/exclusion
+  "ignores": [
+    "node_modules/**",
+    ".git/**"
+  ]
+}
