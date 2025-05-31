@@ -70,12 +70,6 @@ Use const for constants and let for variables. <!-- ❌ -->
 
 Install packages using npm or yarn. <!-- ❌ -->
 
-Use the function keyword to define functions. <!-- ❌ -->
-
-Use const for constants and let for variables. <!-- ❌ -->
-
-Install packages using npm or yarn. <!-- ❌ -->
-
 A paragraph with multiple issues: const, let, and file.js all need backticks. <!-- ❌ -->
 
 This paragraph has **Bold Text In Title Case** and unwrapped function keyword. <!-- ❌ -->
@@ -109,8 +103,18 @@ A paragraph with multiple issues: const, let, and file.js all need backticks. <!
 - List item with <file.js> <!-- ❌ -->
 
 > Blockquote with src/index.js and `src/index.js` <!-- ❌ -->
-
+>
 > Blockquote with `src/index.js` <!-- ✅ -->
+
+## Documentation phrases with code keywords (should pass)
+
+Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), the popular Markdown/CommonMark linter. <!-- ✅ -->
+
+Or use npm script: <!-- ✅ -->
+
+You can install using npm or yarn. <!-- ✅ -->
+
+This is a test for the git workflow. <!-- ✅ -->
 
 ## Special formats
 

@@ -181,6 +181,33 @@ describe("backtick-code-elements", () => {
     testRule(backtickCodeElements, testCases, done);
   });
 
+  test("common phrases with code keywords are not flagged", (done) => {
+    const testCases = [
+      {
+        markdown: "Custom, shareable rules for markdownlint, the popular Markdown/CommonMark linter.",
+        expected: 0  // Should not flag 'markdownlint' due to context exclusion
+      },
+      {
+        markdown: "Or use npm script:",
+        expected: 0  // Should not flag 'npm' due to context exclusion
+      },
+      {
+        markdown: "Or use yarn to install dependencies",
+        expected: 0  // Should not flag 'yarn' due to context exclusion
+      },
+      {
+        markdown: "This is a git workflow guide",
+        expected: 0  // Should not flag 'git' due to context exclusion
+      },
+      // The following should be flagged with our stricter rules
+      {
+        markdown: "You can install using npm or yarn",
+        expected: 2  // Should flag both 'npm' and 'yarn' with stricter rules
+      }
+    ];
+    testRule(backtickCodeElements, testCases, done);
+  });
+
   test("unclosed backticks are handled correctly", (done) => {
     const testCases = [
       {
@@ -246,6 +273,26 @@ describe("backtick-code-elements", () => {
         markdown: "No space: index.js. With space: index.js at the end.",
         expected: 2,  // Both instances of 'index.js' should be flagged
         lineNumbers: [1, 1]
+      }
+    ];
+    
+    testRule(backtickCodeElements, testCases, done);
+  });
+
+  test("markdown links with file extensions are ignored", (done) => {
+    const testCases = [
+      {
+        markdown: "A markdown link: [the file.js](file.js) should not be flagged.",
+        expected: 0  // file.js inside markdown link should not be flagged
+      },
+      {
+        markdown: "Multiple links: [README.md](README.md) and [index.js](https://example.com/index.js) should be ignored.",
+        expected: 0  // No files should be flagged inside links
+      },
+      {
+        markdown: "Link with text: [Check this file](file.js) but standalone file.js should be flagged.",
+        expected: 1,  // Only the standalone file.js should be flagged
+        lineNumbers: [1]
       }
     ];
     
