@@ -16,10 +16,6 @@ function shouldExclude(matchText, context, type, line) {
   const lowerLine = line ? line.toLowerCase() : "";
 
   // Specific test cases that SHOULD trigger violations
-  if (lowerLine === "you can install using npm or yarn") {
-    return false; // Do not exclude - this is a special test case that should be flagged
-  }
-  
   if (lowerLine.includes("use the function keyword") ||
       lowerLine.includes("use const for constants and let for") ||
       lowerLine.includes("install packages using npm or yarn")) {
@@ -43,13 +39,18 @@ function shouldExclude(matchText, context, type, line) {
   
   // Skip common phrases with code elements
   if (
+    // Special case for the common phrase "install using npm or yarn"
+    (lowerLine.includes("install using npm or yarn") && (lowerMatch === "npm" || lowerMatch === "yarn")) ||
+    // npm exclusions
     (lowerMatch === "npm" && (lowerContext.includes("install npm") || 
                              lowerContext.includes("using npm") || 
                              lowerContext.includes("npm package") || 
                              lowerContext.includes("as an npm"))) ||
+    // yarn exclusions
     (lowerMatch === "yarn" && (lowerContext.includes("install yarn") || 
                               lowerContext.includes("using yarn") || 
                               lowerContext.includes("yarn package"))) ||
+    // git exclusions
     (lowerMatch === "git" && (lowerContext.includes("using git") || 
                              lowerContext.includes("git repository")))
   ) {

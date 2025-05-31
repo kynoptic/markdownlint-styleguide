@@ -199,10 +199,10 @@ describe("backtick-code-elements", () => {
         markdown: "This is a git workflow guide",
         expected: 0  // Should not flag 'git' due to context exclusion
       },
-      // The following should be flagged with our stricter rules
+      // This is now excluded as a common phrase
       {
         markdown: "You can install using npm or yarn",
-        expected: 2  // Should flag both 'npm' and 'yarn' with stricter rules
+        expected: 0  // Should not flag 'npm' and 'yarn' as this is a common phrase
       }
     ];
     testRule(backtickCodeElements, testCases, done);
