@@ -122,6 +122,30 @@ This is a test for the git workflow. <!-- ✅ -->
 
 - [`markdownlint-absolute.js`](./markdownlint-absolute.js): Like `markdownlint.js`, but uses absolute paths for custom rules—helpful if your config is loaded from outside the package root. <!-- ✅ -->
 
+## Proper nouns and technology names (should pass)
+
+You can use Node.js or React.js for this project. <!-- ✅ -->
+
+- **From JavaScript code (Node.js)**: <!-- ✅ -->
+
+Data from the API is processed by the application. <!-- ✅ -->
+
+VSCode automatically checks Markdown files as you type. It reads settings from `.vscode/settings.json`. <!-- ✅ -->
+
+## Bold phrases as labels (should pass)
+
+- **Tested with Jest** ensures rules are working as expected. <!-- ✅ -->
+
+## Proper nouns and keywords (should fail)
+
+You can use Nodejs or Reactjs for this project. <!-- ❌ -->
+
+VSCode automatically checks Markdown files as you type. It reads settings from .vscode/settings.json. <!-- ❌ -->
+
+Data from API is processed by the application. <!-- ❌ -->
+
+- **Tested With Jest** ensures rules are working as expected. <!-- ❌ -->
+
 ## CHANGELOG entries (should pass)
 
 - Added `index.js` to allow usage as an npm package. <!-- ✅ -->
