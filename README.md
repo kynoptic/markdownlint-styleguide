@@ -1,36 +1,20 @@
 # Custom rules for markdownlint
 
-Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint), the popular Markdown/CommonMark linter.
+Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint).
 
 ## Project overview
 
-**markdownlint-custom-rules** provides reusable, opinionated linting rules to enforce consistent Markdown style and best practices across your documentation. This package is designed for easy integration with markdownlint and markdownlint-cli.
+**markdownlint-custom-rules** provides reusable, opinionated linting rules to enforce sentence case for headings and bold text, and inline code formatting.
+
+This package is designed for easy integration with markdownlint and markdownlint-cli.
 
 ## Key features
 
-- **Sentence case enforcement** for headings and bold text
-- **Inline code formatting**: Ensures backtick code elements are used properly
-- Extendable and compatible with markdownlint and markdownlint-cli
-- Tested with Jest
+- **Sentence case enforcement** for headings and bold text.
+- **Inline code formatting** ensures backtick code elements are used properly.
+- **Tested with Jest** ensures rules are working as expected.
 
-## Installation
-
-```bash
-npm install --save-dev markdownlint markdownlint-cli markdownlint-custom-rules
-```
-
-## Configure markdownlint
-
-Add the following to your markdownlint config file (e.g. `.markdownlint.json`):
-
-```json
-{
-  "extends": "markdownlint-custom-rules",
-  "MD013": false // Disable line length rule
-}
-```
-
-## Using custom rules in VSCode
+## Installation and configuration in VSCode
 
 To use these custom markdownlint rules in VSCode:
 
@@ -58,106 +42,47 @@ To use these custom markdownlint rules in VSCode:
 
 Now, when you edit Markdown files in VSCode, the linter will apply your custom rules automatically.
 
-## JavaScript config
-
-```js
-module.exports = {
-  extends: "markdownlint-custom-rules",
-  MD013: false // Disable line length rule
-};
-```
-
-### 2. Run the linter
-
-```bash
-npx markdownlint . --rules ./rules
-```
-
-Or use npm script:
-
-```json
-{
-  "scripts": {
-    "lint:md": "markdownlint \"**/*.md\"",
-    "lint:md:fix": "markdownlint --fix \"**/*.md\""
-  }
-}
-```
-
 ## Custom rules
 
 ### `sentence-case-headings-bold`
 
 Enforces sentence case for all headings and any bold text inside them.
 
-**Incorrect**:
+❌ Incorrect:
 
 ```markdown
 # This Is a Heading
-## A **Bold** Statement
+
+A **Bold Statement** in a paragraph.
 ```
 
-**Correct**:
+✅ Correct :
 
 ```markdown
 # This is a heading
-## A **bold** statement
+
+A **bold statement** in a paragraph.
 ```
 
 ### `backtick-code-elements`
 
 Wraps filenames, functions, and paths in backticks for clarity. Detects filenames (e.g., `example.js`), directory paths (e.g., `src/components/`), and code keywords (e.g., `function`, `const`, `import`). Ignores descriptive documentation text and examples, as covered in fixtures and feature tests.
 
-**Incorrect**:
+❌ Incorrect:
 
 ```markdown
 Run setup.sh in the scripts folder.
 ```
 
-**Correct**:
+✅ Correct:
 
 ```markdown
 Run `setup.sh` in the `scripts` folder.
 ```
 
-## Usage example
-
-Lint all Markdown files in the repo:
-
-```bash
-npx markdownlint . --rules ./rules
-```
-
-## Project status and roadmap
-
-This project is actively maintained. See [`CHANGELOG.md`](./CHANGELOG.md) for recent updates and [`rules/README.md`](./rules/README.md) for details on custom rules. Roadmap items and planned improvements are tracked in GitHub Issues.
-
-## License and attribution
-
-MIT License. See [`LICENSE`](./LICENSE) for details. Built and maintained by contributors—see GitHub for full list.
-
-## Resources and related documentation
+## Additional documentation
 
 - [`rules/README.md`](./rules/README.md): Details on custom rules
 - [`tests/README.md`](./tests/README.md): Test structure and usage
-- [`tests/fixtures/README.md`](./tests/fixtures/README.md): Fixture documentation
 - [`scripts/README.md`](./scripts/README.md): Utility scripts and automation
 - [`CHANGELOG.md`](./CHANGELOG.md): Release notes
-- [`CONTRIBUTING.md`](./CONTRIBUTING.md): (If present) Contribution guidelines
-
-```text
-markdownlint-rules/
-├── rules/        # Rule implementations
-├── tests/        # Jest tests
-├── index.js      # Entry point (exports all rules)
-```
-
-To add or test rules:
-
-```bash
-npm test
-```
-
-## License
-
-[MIT](LICENSE)
