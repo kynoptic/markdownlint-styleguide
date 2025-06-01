@@ -13,7 +13,7 @@
  * @module markdownlint-absolute-config
  * @example
  * // In a file located in a different directory
- * const markdownlintConfig = require("markdownlint-rules/markdownlint-absolute");
+ * const markdownlintConfig = require("markdownlint-clarity/markdownlint-absolute");
  * 
  * // Use the configuration
  * const markdownlint = require("markdownlint");

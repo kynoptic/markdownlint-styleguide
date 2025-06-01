@@ -1,7 +1,7 @@
 {
-  "name": "markdownlint-custom-rules",
+  "name": "markdownlint-clarity",
   "version": "0.2.2",
-  "description": "Custom rules for markdownlint",
+  "description": "Clarity-enhancing custom rules for markdownlint",
   "main": "index.js",
   "scripts": {
     "test": "jest",

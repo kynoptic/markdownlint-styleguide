@@ -1,5 +1,5 @@
 /**
- * ESLint configuration for markdownlint-rules project
+ * ESLint configuration for markdownlint-clarity project
  * 
  * @description Defines linting rules for JavaScript files in the project
  * to ensure consistent code style and quality

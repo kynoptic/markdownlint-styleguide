@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Helper utilities and shared functions for the markdownlint custom rule test suite.
+Helper utilities and shared functions for the markdownlint-clarity custom rule test suite.
 
 ## Contents
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Unit tests for individual custom markdownlint rules. These tests ensure each rule behaves correctly in isolation and covers edge cases.
+Unit tests for individual custom markdownlint-clarity rules. These tests ensure each rule behaves correctly in isolation and covers edge cases.
 
 ## Contents
 

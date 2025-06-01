@@ -1,5 +1,5 @@
 /**
- * Jest configuration for markdownlint-rules project
+ * Jest configuration for markdownlint-clarity project
  * 
  * @description Defines testing configuration for the project including
  * test environment, coverage thresholds, and file patterns to test

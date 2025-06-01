@@ -1,10 +1,10 @@
-# Custom rules for markdownlint
+# markdownlint-clarity
 
-Custom, shareable rules for [markdownlint](https://github.com/DavidAnson/markdownlint).
+Custom, clarity-focused rules for [markdownlint](https://github.com/DavidAnson/markdownlint).
 
 ## Project overview
 
-**markdownlint-custom-rules** provides reusable, opinionated linting rules to enforce sentence case for headings and bold text, and inline code formatting.
+**markdownlint-clarity** provides reusable, opinionated linting rules to enforce sentence case for headings and bold text, and inline code formatting.
 
 This package is designed for easy integration with markdownlint and markdownlint-cli.
 

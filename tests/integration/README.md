@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Integration tests that validate the interaction of multiple custom rules and overall markdownlint configuration.
+Integration tests that validate the interaction of multiple custom rules and overall markdownlint-clarity configuration.
 
 ## Contents
 

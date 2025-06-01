@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Utility scripts for project maintenance, syncing, and automation.
+Utility scripts for markdownlint-clarity maintenance, syncing, and automation.
 
 ## Contents
 

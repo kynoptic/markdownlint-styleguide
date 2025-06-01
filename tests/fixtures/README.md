@@ -1,6 +1,6 @@
 # Test fixtures
 
-This folder contains sample markdown files and related assets used for testing markdownlint custom rules.
+This folder contains sample markdown files and related assets used for testing markdownlint-clarity custom rules.
 
 ## Available fixtures
 

@@ -1,6 +1,6 @@
 # `rules` directory
 
-This directory contains custom rules for markdownlint. Each rule is implemented in its own file and follows the markdownlint rule API.
+This directory contains custom rules for markdownlint-clarity. Each rule is implemented in its own file and follows the markdownlint rule API.
 
 ## Available rules
 
