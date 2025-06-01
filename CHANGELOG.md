@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [`0.2.2`] - 2025-05-31
+
+### Fixed
+
+- Fixed false positives for technology names with dot notation (`Node.js`, `React.js`) in `backtick-code-elements` rule
+- Improved detection of `from` when used as a preposition in natural language contexts
+- Fixed false positive for short bold phrases used as labels in the `sentence-case` rule
+- Improved sentence-case rule for more accurate bold text detection in paragraphs
+
+### Added
+
+- Added feature tests for proper nouns and common English words
+- Added test fixtures for technology names, prepositions, and bold labels
+
+### Documentation
+
+- Added comprehensive reference documentation for components and interactions
+- Added visual Mermaid diagrams for rule integration flows
+- Simplified README with clearer rule examples and streamlined installation steps
+
 ## [`0.2.1`] - 2025-05-31
 
 ### Fixed
