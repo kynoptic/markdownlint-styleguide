@@ -29,6 +29,12 @@ function shouldExclude(matchText, context, type, line) {
     "changelog.md",
   ];
   
+  // Exclude technology names with dot notation (e.g., Node.js, React.js)
+  if (type === "Filename" && 
+      (/^(node|react|vue|angular|next|nuxt|svelte|deno|electron)\.(js|ts)$/i.test(matchText))) {
+    return true;
+  }
+  
   // Only exclude README.md in certain contexts, not in unit tests
   if (commonPhrases.includes(lowerMatch) || 
       (lowerMatch === "readme.md" && 
@@ -73,8 +79,17 @@ function shouldExclude(matchText, context, type, line) {
     }
   }
 
-  // Special case for 'from' in descriptive text about absolute paths
-  if (lowerMatch === "from" && lowerLine.includes("absolute paths for custom rules")) {
+  // Special case for 'from' in natural language contexts
+  if (lowerMatch === "from" && 
+      (lowerLine.includes("absolute paths for custom rules") ||
+       lowerLine.includes("settings from") ||
+       lowerLine.includes("data from") ||
+       lowerLine.includes("files from") ||
+       lowerLine.includes("reads settings from") ||
+       // Check if 'from' is used as a preposition (surrounded by spaces and not in import statement)
+       (lowerLine.match(/\s+from\s+/) && !lowerLine.match(/import.*from/)) ||
+       // Check if 'from' is at the start of a sentence
+       lowerLine.match(/^from\s+/))) {
     return true;
   }
 

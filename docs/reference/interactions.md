@@ -72,12 +72,12 @@ Once rules are added, they can be used in different ways:
     ConfigFile -->|"loads"| Rules
   ```
 
-* **From VS Code** – VS Code automatically checks Markdown files as you type. It reads settings from `.vscode/settings.json` and `.markdownlint.json`. Errors or issues appear immediately in your editor.
+* **From VSCode** – VSCode automatically checks Markdown files as you type. It reads settings from `.vscode/settings.json` and `.markdownlint.json`. Errors or issues appear immediately in your editor.
 
 ```mermaid
 flowchart TD
 
-  VSCode(["VS Code<br/><small>*markdownlint extension*</small>"])
+  VSCode(["VSCode<br/><small>*markdownlint extension*</small>"])
   LocalSettings[".vscode/settings.json<br/>+ .markdownlint.json"]
   WorkspaceConfig["configs/markdownlint.js"]
   Rules["rules/ folder<br/><small>*custom rules*</small>"]

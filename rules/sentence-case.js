@@ -70,11 +70,28 @@ module.exports = {
               
               // Check if the bold text is in title case or ALL CAPS
               if (isDefinitelyTitleCase(boldText) || isAllCaps(boldText)) {
-                // Don't flag bold text in sentence case within a paragraph
-                // Only flag if it's standalone bold text or definitely title case/ALL CAPS
                 const isBoldInSentenceCase = boldText === boldText.charAt(0).toUpperCase() + boldText.slice(1).toLowerCase();
                 const isWithinParagraph = token.content.trim() !== `**${boldText}**`;
-                
+                // NEW: Allow short bold phrases as labels (e.g., '**Tested with Jest** ensures ...')
+                const wordCount = boldText.split(/\s+/).length;
+                let isShortLabel = false;
+                if (wordCount <= 4 && isWithinParagraph) {
+                  const rawContent = token.content;
+                  const boldMarkdown = `**${boldText}**`;
+                  // Check if bold is at the start of the line
+                  if (rawContent.indexOf(boldMarkdown) === 0) {
+                    isShortLabel = true;
+                  } else {
+                    // Check for bullet/list marker followed by bold
+                    const bulletMatch = rawContent.match(/^([-*+]\s+)\*\*/);
+                    if (bulletMatch && rawContent.indexOf(boldMarkdown) === bulletMatch[0].length - 2) {
+                      isShortLabel = true;
+                    }
+                  }
+                }
+                if (isShortLabel) {
+                  return;
+                }
                 // Skip if it's within a paragraph AND it's just normal sentence case (first letter capitalized)
                 if (isWithinParagraph && isBoldInSentenceCase && !isDefinitelyTitleCase(boldText) && !isAllCaps(boldText)) {
                   return;

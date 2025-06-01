@@ -63,6 +63,16 @@ describe("sentence-case-headings-bold", () => {
     testRule(sentenceCase, testCases, done);
   });
 
+  test("bold text: 'Tested with Jest' is not falsely flagged", (done) => {
+    const testCases = [
+      {
+        markdown: "- **Tested with Jest** ensures rules are working as expected.",
+        expected: 0
+      }
+    ];
+    testRule(sentenceCase, testCases, done);
+  });
+
   test("bold text with title case fails", (done) => {
     const testCases = [
       {
