@@ -3,31 +3,41 @@
 "use strict";
 
 /**
- * Sentence case rule for markdownlint
+ * Markdownlint rule to enforce sentence case for headings and bold text.
  *
- * @description Enforces sentence case for headings and bold text instead of title case
- * @module sentence-case-headings-bold
+ * @description Enforces sentence case for headings and bold text instead of title case or ALL CAPS.
+ *
  * @example
- * // Incorrect (will be flagged)
+ * // Incorrect (will be flagged):
  * # This Is Title Case
  * Some text with **Title Case Bold Text** here
- *
- * // Correct (will not be flagged)
+ * // Correct (will not be flagged):
  * # This is sentence case
  * Some text with **bold text in sentence case** here
+ *
+ * Handles edge cases for version headings, short bold labels, and proper nouns.
+ *
+ * @module sentence-case-headings-bold
  */
 
+/**
+ * markdownlint rule definition for enforcing sentence case in headings and bold text.
+ *
+ * @type {import('markdownlint').Rule}
+ */
 module.exports = {
   names: ["sentence-case", "sentence-case-headings-bold"],
   description: "Headings and bold text must use sentence case (not title case or ALL CAPS)",
   tags: ["headings", "bold", "case"],
-  information: new URL("https://github.com/DavidAnson/markdownlint"),
+  information: new URL("https://github.com/DavidAnson/markdownlint/blob/main/doc/CustomRules.md"),
+  parser: "markdownit",
   /**
-   * Rule implementation function
-   * 
-   * @param {Object} params - Parameters object from markdownlint
-   * @param {Array} params.tokens - Tokens from markdown-it
-   * @param {Function} onError - Callback to report errors
+   * Rule implementation function.
+   *
+   * @param {Object} params - Parameters object from markdownlint.
+   * @param {Array} params.tokens - Tokens from markdown-it.
+   * @param {Function} onError - Callback to report errors.
+   * @returns {void}
    */
   function: function rule(params, onError) {
     // Initialize state
@@ -93,9 +103,11 @@ module.exports = {
                   return;
                 }
                 // Skip if it's within a paragraph AND it's just normal sentence case (first letter capitalized)
+                // AND not definitely title case AND not all caps
                 if (isWithinParagraph && isBoldInSentenceCase && !isDefinitelyTitleCase(boldText) && !isAllCaps(boldText)) {
                   return;
                 }
+                // For standalone bold text (not within paragraph), we should still flag title case and ALL CAPS
                 
                 onError({
                   lineNumber: token.lineNumber,

@@ -3,13 +3,42 @@
 "use strict";
 
 /**
- * Markdownlint rule to enforce backtick wrapping around code elements
+ * Markdownlint rule to enforce backtick wrapping around code elements.
  *
  * @description Ensures that filenames, directory paths, and code snippets are properly
- * wrapped in backticks for better readability and proper markdown formatting
+ * wrapped in backticks for better readability and proper markdown formatting.
+ *
+ * @example
+ * // Incorrect (will be flagged):
+ * Use the function keyword to declare functions.
+ * // Correct (will not be flagged):
+ * Use the `function` keyword to declare functions.
+ *
+ * Handles edge cases for common filenames, package managers, and ignores certain phrases.
+ *
  * @module backtick-code-elements
  */
 
+/**
+ * @typedef {Object} CustomRule
+ * @property {string[]} names - Names of the rule
+ * @property {string} description - Description of the rule
+ * @property {URL} [information] - URL to more information about the rule
+ * @property {string[]} tags - Tags for the rule
+ * @property {string} parser - Parser to use ("markdownit", "micromark", or "none")
+ * @property {Object} [helpers] - Helper functions for the rule
+ * @property {Function} function - Main rule function
+ */
+
+/**
+ * Determines whether a match should be excluded from backtick enforcement.
+ *
+ * @param {string} matchText - The matched text (potential code element).
+ * @param {string} context - The context string where the match occurs.
+ * @param {string} type - The type of match (e.g., 'Filename', 'code').
+ * @param {string} [line] - The full line containing the match.
+ * @returns {boolean} - True if the match should be excluded, false if it should be flagged.
+ */
 function shouldExclude(matchText, context, type, line) {
   const lowerContext = context.toLowerCase();
   const lowerMatch = matchText.toLowerCase();
@@ -284,8 +313,14 @@ function checkText(text, lineNumber, onError, patterns) {
 }
 
 // Create rule object first
+/**
+ * Rule object for the backtick-code-elements rule.
+ *
+ * @type {CustomRule}
+ */
 const rule = {
   names: ["backtick-code-elements"],
+  parser: "markdownit",
   description:
     "Code elements, filenames, and directory paths should be wrapped in backticks",
   tags: ["formatting", "code"],
@@ -418,20 +453,34 @@ const rule = {
           }
           reported.add(errorKey);
           
-          // Report the error
-          onError({
-            lineNumber: token.lineNumber,
-            detail: `${type} '${matchText}' should be wrapped in backticks`,
-            range: [matchStart + 1, matchText.length],
-            context: lineContent
-          });
+          // Validate range using the actual markdown line
+          const realLine = params.lines[token.lineNumber - 1] || "";
+          const realLen = realLine.length;
+          let startCol = matchStart + 1;
+          let length = matchText.length;
+          // Only report if the range is strictly valid for the real markdown line
+          if (
+            realLen > 0 &&
+            startCol >= 1 &&
+            length >= 1 &&
+            startCol + length - 1 <= realLen
+          ) {
+            onError({
+              lineNumber: token.lineNumber,
+              detail: `${type} '${matchText}' should be wrapped in backticks`,
+              range: [startCol, length],
+              context: realLine
+            });
+          }
         }
       }
     });
   },
 };
 
-// Export the rule as the default export
+/**
+ * Export the rule as the default export for markdownlint consumption.
+ */
 module.exports = rule;
 
 // Also export helper functions for testing
