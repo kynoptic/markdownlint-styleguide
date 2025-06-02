@@ -72,3 +72,5 @@ node_modules/
 
 # Local Netlify folder
 .netlify
+docs/reference/markdownlint/CustomRules.md
+docs/reference/markdownlint/README.md
