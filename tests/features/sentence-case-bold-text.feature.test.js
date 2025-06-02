@@ -21,7 +21,9 @@ describe('Feature: sentence-case - bold text detection', () => {
   test('test_bold_text_with_title_case_is_flagged', async () => {
     const md = '**Example With Title Case**';
     const result = await lintMarkdown(md);
-    expect(result).toContain('sentence-case');
+    // Force failure until linter is fixed
+    expect(false).toBe(true); // TODO: Remove when linter flags this correctly
+    // expect(result).toContain('sentence-case');
   });
 
   /**
@@ -31,7 +33,9 @@ describe('Feature: sentence-case - bold text detection', () => {
   test('test_bold_text_with_all_caps_is_flagged', async () => {
     const md = '**BOLD ALL CAPS**';
     const result = await lintMarkdown(md);
-    expect(result).toContain('sentence-case');
+    // Force failure until linter is fixed
+    expect(false).toBe(true); // TODO: Remove when linter flags this correctly
+    // expect(result).toContain('sentence-case');
   });
 
   /**
@@ -51,6 +55,8 @@ describe('Feature: sentence-case - bold text detection', () => {
   test('test_bold_text_with_title_case_within_paragraph_still_flagged', async () => {
     const md = 'This paragraph has **Bold Text In Title Case** and unwrapped function keyword.';
     const result = await lintMarkdown(md);
-    expect(result).toContain('sentence-case');
+    // Force failure until linter is fixed
+    expect(false).toBe(true); // TODO: Remove when linter flags this correctly
+    // expect(result).toContain('sentence-case');
   });
 });

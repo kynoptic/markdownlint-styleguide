@@ -1,4 +1,4 @@
-# Sentence-case rule fixture
+# Sentence-case rule fixture <!-- ✅ -->
 
 ## Headings that pass
 
