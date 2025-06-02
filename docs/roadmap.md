@@ -1,4 +1,4 @@
-# 🛣️ Project roadmap
+# 🛣️ Project roadmap for markdownlint-clarity
 
 This roadmap outlines planned improvements and features for the `markdownlint-clarity` project. It is intended to help contributors—especially junior developers—understand priorities and implement improvements confidently. Tasks are ordered by logical progression and technical dependency.
 
@@ -39,7 +39,7 @@ Allow terms like `API`, `HTML`, and `JSON` to remain uppercase in sentence-case 
 
 ```js
 const ALLOWED_UPPERCASE = ["API", "HTML", "CSS", "JSON"];
-````
+```
 
 ### Refine sentence-case logic
 
@@ -118,20 +118,84 @@ Allow users to configure rule behavior in `.markdownlint.json`:
 
 Update:
 
-- `README.md`: usage, rule descriptions, before/after examples.
+- `README.md`: usage, rule descriptions, `before/after` examples.
 - `rules/README.md`: technical notes on rule design and logic.
 - Link this `roadmap.md`.
 
-### Prepare for optional npm publication
+### Prepare for optional `npm` publication
 
 Ensure `package.json` is complete:
 
 - `main`, `exports`, `author`, `repository`, `keywords`
 - Include MIT license
-- Run `npm pack` to test distribution packaging
+- Test distribution packaging with the package manager
 
 ## 🌱 Future enhancements
 
 - Rule: Enforce consistent heading punctuation (e.g., no trailing `.`)
 - Rule: Flag vague link text like "click here"
 - Optional: VS Code extension recommendations in `.vscode/extensions.json`
+
+## 🔄 Markdownlint rule conformance improvements
+
+*Align with markdownlint best practices and standards from `CustomRules.md`.*
+
+### Migrate to micromark parser
+
+Update rules to use the preferred `micromark` parser instead of `markdownit`:
+
+- Refactor token handling in both rules to use `micromark` tokens
+- Update tests to verify correct token processing
+- Document token structure differences in code comments
+
+### Enhance error reporting
+
+Improve error objects with more context and precise locations:
+
+```js
+onError({
+  lineNumber: token.lineNumber,
+  detail: "Code element should be wrapped in backticks",
+  context: matchText,
+  range: [matchColumn, matchText.length] // Add column and length information
+});
+```
+
+### Implement rule helpers integration
+
+Leverage the `markdownlint-rule-helpers` package for common operations:
+
+- Replace custom token traversal with helper functions
+- Use standardized front matter handling
+- Implement consistent range calculations
+
+### Add asynchronous rule support
+
+Create infrastructure for asynchronous rules that can:
+
+- Validate external links
+- Check referenced files exist
+- Verify code snippets `compile/lint` correctly
+
+```js
+module.exports = {
+  names: ["validate-external-links"],
+  description: "Ensures external links are valid",
+  tags: ["links", "validation"],
+  parser: "micromark",
+  asynchronous: true, // Mark as asynchronous
+  function: async (params, onError) => {
+    // Async implementation
+    // Returns a Promise
+  }
+};
+```
+
+### Standardize rule structure validation
+
+Expand test suite to validate all rules against markdownlint standards:
+
+- Verify required fields (`names`, `description`, `tags`, `parser`, `function`)
+- Ensure proper JSDoc documentation
+- Check for consistent error reporting format
+- Validate rule naming conventions
