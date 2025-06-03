@@ -16,7 +16,7 @@ dist/
 !.vscode/settings.json
 .idea/
 .history/
-.windsurf/
+.windsurf/*/global/*
 *.suo
 *.ntvs*
 *.njsproj
@@ -74,3 +74,4 @@ node_modules/
 .netlify
 docs/reference/markdownlint/CustomRules.md
 docs/reference/markdownlint/README.md
+rules/sentence-case.js.bak
