@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [`0.3.0`] - 2025-06-03
+
+### Added
+
+- Added `index.js` as package entry point
+- Enhanced test helpers with `lintMarkdown` `function`
+- Enhanced sentence-case rule with ALL CAPS detection
+- Added feature tests for markdownlint rules
+- Added alternative markdownlint configuration formats
+
+### Fixed
+
+- Fixed test helpers to work with new directory structure
+- Prevented false positives for common abbreviations like `e.g.` and `i.e.`
+- Corrected sentence-case rule and added comprehensive tests
+- Improved handling of proper nouns and natural language in rules
+- Fixed sentence-case rule for bold text detection
+- Improved backtick-code-elements rule for common phrases
+- Excluded version numbers in CHANGELOG headings from sentence case checking
+- Added null checks for result in integration tests
+- Fixed handling of emoji-prefixed headings in sentence-case rule
+
+### Changed
+
+- Improved repository structure with dedicated helpers directory
+- Extracted backtick-code-elements helpers and added TypeScript types
+- Enhanced rule documentation and error handling
+- Restructured backtick-code-elements rule for testability
+- Reorganized test files into proper directories
+- Moved markdownlint config files to configs/
+- Migrated to Jest-based test structure
+
+### Documentation
+
+- Added project stack definition for Windsurf
+- Improved repository structure documentation
+- Added comprehensive unit tests for backtick-code-elements-helpers
+- Updated rules directory documentation
+- Restructured `docs/README.md` using Diátaxis framework
+- Added JSDoc comments to improve code documentation
+
 ## [`0.2.2`] - 2025-05-31
 
 ### Fixed
