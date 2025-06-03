@@ -52,7 +52,7 @@ const {
   isWholeWordMatch,
   isPreposition,
   isCommonDocPhrase,
-} = require("./backtick-code-elements-helpers");
+} = require("./helpers/backtick-code-elements-helpers");
 
 /**
  * Determines whether a match should be excluded from backtick enforcement.
@@ -110,7 +110,7 @@ function shouldExclude(matchText, context, type, line, options = {}) {
   if (isPreposition(lowerMatch, lowerLine, options)) return true;
 
   // Exclude common documentation phrases
-  if (isCommonDocPhrase(lowerContext, options)) return true;
+  if (isCommonDocPhrase(lowerContext, matchText, options)) return true;
 
   // Exclude content after a colon in list items
   if (
@@ -326,7 +326,7 @@ const rule = {
   function: function rule(params, onError) {
     // Get options from params.config or use defaults
     const options = params.config || {};
-    const { mergeOptions } = require("./backtick-code-elements-helpers");
+    const { mergeOptions } = require("./helpers/backtick-code-elements-helpers");
     const ruleOptions = mergeOptions(options);
     
     /**

@@ -208,11 +208,23 @@ function isPreposition(matchText, lowerLine, options = DEFAULT_OPTIONS) {
 /**
  * Checks for common documentation phrases in context.
  * @param {string} lowerContext
+ * @param {string} matchText - The text being evaluated
  * @param {BacktickRuleOptions} options
  * @returns {boolean}
  */
-function isCommonDocPhrase(lowerContext, options = DEFAULT_OPTIONS) {
+function isCommonDocPhrase(lowerContext, matchText = '', options = DEFAULT_OPTIONS) {
   const regex = options.commonDocPhrasesRegex || DEFAULT_OPTIONS.commonDocPhrasesRegex;
+  
+  // Check if the match itself is a common abbreviation like e.g. or i.e.
+  if (matchText) {
+    const lowerMatch = matchText.toLowerCase();
+    if (lowerMatch === 'e.g.' || lowerMatch === 'i.e.' || 
+        lowerMatch === 'e.g' || lowerMatch === 'i.e') {
+      return true;
+    }
+  }
+  
+  // Also check the full context as before
   return regex && regex.test(lowerContext);
 }
 
