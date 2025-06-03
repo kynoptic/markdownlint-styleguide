@@ -54,6 +54,7 @@ const commonProperNouns = new Set([
  */
 function sentenceCaseRuleFunction(params, onError) {
   // Process heading tokens
+  if (params.tokens) {
   for (const token of params.tokens.filter(t => t.type === 'heading_open')) {
     const headingIndex = params.tokens.indexOf(token);
     const headingContentToken = params.tokens[headingIndex + 1];
@@ -88,7 +89,8 @@ function sentenceCaseRuleFunction(params, onError) {
     }
   }
   
-  // Process bold (strong) text
+    }
+// Process bold (strong) text
   let tokenIndex = 0;
   while (tokenIndex < params.tokens.length) {
     const token = params.tokens[tokenIndex];

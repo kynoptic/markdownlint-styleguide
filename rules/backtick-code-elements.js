@@ -383,7 +383,8 @@ const rule = {
       let pos = 0;
       
       // First pass: collect all regions and build line content
-      token.children.forEach((child) => {
+      if (token.children) {
+  token.children.forEach((child) => {
         if (child.type === "code_inline") {
           // Mark code region (for exclusion)
           codeRegions.push([pos, pos + child.content.length]);
@@ -407,6 +408,7 @@ const rule = {
           pos += 1;
         }
       });
+      }
 
       /**
        * Detect URL and email ranges in the line for exclusion
