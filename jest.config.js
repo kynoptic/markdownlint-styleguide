@@ -1,6 +1,6 @@
 /**
- * Jest configuration for markdownlint-clarity project
- * 
+ * Jest configuration for markdownlint-trap project
+ *
  * @description Defines testing configuration for the project including
  * test environment, coverage thresholds, and file patterns to test
  */
