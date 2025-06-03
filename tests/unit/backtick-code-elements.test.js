@@ -8,11 +8,24 @@
  * @module backtick-code-elements.test
  */
 
+// @ts-check
+
+/**
+ * @typedef {import('../../types').CustomRule} CustomRule
+ */
+
+// Import the rule for testing
+/** @type {CustomRule} */
 const backtickCodeElements = require("../../rules/backtick-code-elements");
 const { testRule } = require("../helpers/test-helpers");
 
-// Now we can directly test the exported helper functions
-const { checkText, checkSegment } = backtickCodeElements;
+// Make sure helpers exists before destructuring
+if (!backtickCodeElements.helpers) {
+  throw new Error('Helpers not found on backtickCodeElements rule');
+}
+
+// Import helpers from the rule's helpers property
+const { checkText, checkSegment } = backtickCodeElements.helpers;
 
 describe("backtick-code-elements", () => {
   // Set longer timeout for these tests due to known performance issues
