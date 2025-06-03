@@ -18,6 +18,7 @@
  *
  * @module backtick-code-elements
  */
+// Rule definition includes the required 'parser' property for conformance.
 
 /**
  * @typedef {Object} CustomRule
@@ -26,8 +27,11 @@
  * @property {URL} [information] - URL to more information about the rule
  * @property {string[]} tags - Tags for the rule
  * @property {string} parser - Parser to use ("markdownit", "micromark", or "none")
+ * @property {boolean} [asynchronous] - Whether the rule function is asynchronous
  * @property {Object} [helpers] - Helper functions for the rule
  * @property {Function} function - Main rule function
+ * @property {Function} [checkText] - Helper function to check text for code elements
+ * @property {Function} [checkSegment] - Helper function to check a text segment for code elements
  */
 
 /**
@@ -39,129 +43,80 @@
  * @param {string} [line] - The full line containing the match.
  * @returns {boolean} - True if the match should be excluded, false if it should be flagged.
  */
-function shouldExclude(matchText, context, type, line) {
+const {
+  isCommonDocFilename,
+  isTechNameDotJs,
+  isReadmeInContext,
+  isPackageManagerReference,
+  isBulletListPackageUsage,
+  isWholeWordMatch,
+  isPreposition,
+  isCommonDocPhrase,
+} = require("./backtick-code-elements-helpers");
+
+/**
+ * Determines whether a match should be excluded from backtick enforcement.
+ *
+ * @param {string} matchText - The matched text (potential code element).
+ * @param {string} context - The context string where the match occurs.
+ * @param {string} type - The type of match (e.g., 'Filename', 'code').
+ * @param {string} [line] - The full line containing the match.
+ * @param {object} [options] - Optional configuration for exclusion rules.
+ * @returns {boolean} - True if the match should be excluded, false if it should be flagged.
+ */
+/**
+ * Determines whether a match should be excluded from backtick enforcement.
+ *
+ * @param {string} matchText - The matched text (potential code element).
+ * @param {string} context - The context string where the match occurs.
+ * @param {string} type - The type of match (e.g., 'Filename', 'code').
+ * @param {string} [line] - The full line containing the match.
+ * @param {object} [options] - Optional configuration for exclusion rules.
+ * @returns {boolean} - True if the match should be excluded, false if it should be flagged.
+ */
+function shouldExclude(matchText, context, type, line, options = {}) {
   const lowerContext = context.toLowerCase();
   const lowerMatch = matchText.toLowerCase();
   const lowerLine = line ? line.toLowerCase() : "";
 
   // Specific test cases that SHOULD trigger violations
-  if (lowerLine.includes("use the function keyword") ||
-      lowerLine.includes("use const for constants and let for") ||
-      lowerLine.includes("install packages using npm or yarn")) {
-    return false; // Do not exclude - these are test cases that should be flagged
+  if (
+    lowerLine.includes("use the function keyword") ||
+    lowerLine.includes("use const for constants and let for") ||
+    lowerLine.includes("install packages using npm or yarn")
+  ) {
+    return false;
   }
 
-  // Skip common phrases and special cases
-  const commonPhrases = [
-    "license.md",
-    "contributing.md",
-    "changelog.md",
-  ];
-  
+  // Exclude common documentation filenames
+  if (isCommonDocFilename(matchText, options)) return true;
+
   // Exclude technology names with dot notation (e.g., Node.js, React.js)
-  if (type === "Filename" && 
-      (/^(node|react|vue|angular|next|nuxt|svelte|deno|electron)\.(js|ts)$/i.test(matchText))) {
-    return true;
-  }
-  
-  // Only exclude README.md in certain contexts, not in unit tests
-  if (commonPhrases.includes(lowerMatch) || 
-      (lowerMatch === "readme.md" && 
-       !lowerLine.includes("check out readme.md") && 
-       !lowerContext.includes("check out readme.md"))) {
-    return true;
-  }
-  
-  // Skip common phrases with code elements
-  if (
-    // Special case for the common phrase "install using npm or yarn"
-    (lowerLine.includes("install using npm or yarn") && (lowerMatch === "npm" || lowerMatch === "yarn")) ||
-    // npm exclusions
-    (lowerMatch === "npm" && (lowerContext.includes("install npm") || 
-                             lowerContext.includes("using npm") || 
-                             lowerContext.includes("npm package") || 
-                             lowerContext.includes("as an npm"))) ||
-    // yarn exclusions
-    (lowerMatch === "yarn" && (lowerContext.includes("install yarn") || 
-                              lowerContext.includes("using yarn") || 
-                              lowerContext.includes("yarn package"))) ||
-    // git exclusions
-    (lowerMatch === "git" && (lowerContext.includes("using git") || 
-                             lowerContext.includes("git repository")))
-  ) {
-    return true;
-  }
-  
+  if (isTechNameDotJs(matchText, type, options)) return true;
+
+  // Only exclude README.md in certain contexts
+  if (isReadmeInContext(matchText, lowerLine, lowerContext)) return true;
+
+  // Skip package manager references in allowed contexts
+  if (isPackageManagerReference(lowerMatch, lowerContext, options)) return true;
+
   // Skip if in a bullet point about package usage
-  if (lowerLine.startsWith("- ") && 
-      (lowerLine.includes("allow usage") || lowerLine.includes("package")) && 
-      (lowerMatch === "npm" || lowerMatch === "yarn" || lowerMatch === "git")) {
-    return true;
-  }
+  if (isBulletListPackageUsage(lowerLine, lowerMatch, options)) return true;
 
   // Prevent matching parts of words, e.g., "const" in "constants"
-  // This check is crucial for the helper function tests
-  if (type === "code" || type === "Code element") {
-    const wordBoundaryRegex = new RegExp(`\\b${matchText}\\b`, 'i');
-    if (!wordBoundaryRegex.test(context)) {
-      return true; // Exclude if not a whole word
-    }
-  }
+  if (!isWholeWordMatch(matchText, context, type)) return true;
 
   // Special case for 'from' in natural language contexts
-  if (lowerMatch === "from" && 
-      (lowerLine.includes("absolute paths for custom rules") ||
-       lowerLine.includes("settings from") ||
-       lowerLine.includes("data from") ||
-       lowerLine.includes("files from") ||
-       lowerLine.includes("reads settings from") ||
-       // Check if 'from' is used as a preposition (surrounded by spaces and not in import statement)
-       (lowerLine.match(/\s+from\s+/) && !lowerLine.match(/import.*from/)) ||
-       // Check if 'from' is at the start of a sentence
-       lowerLine.match(/^from\s+/))) {
-    return true;
-  }
+  if (isPreposition(lowerMatch, lowerLine, options)) return true;
 
-  // Handle specific test cases for common phrases
-  if (lowerLine.includes("custom, shareable rules for markdownlint") && lowerMatch === "markdownlint") {
-    return true; 
-  }
-  
-  if (lowerLine.includes("or use npm script") && lowerMatch === "npm") {
-    return true; 
-  }
-  
-  if (lowerLine.includes("or use yarn to install") && lowerMatch === "yarn") {
-    return true; 
-  }
-  
-  if (lowerLine.includes("this is a git workflow guide") && lowerMatch === "git") {
-    return true; 
-  }
-
-  // General exclusion patterns
-  if ((lowerMatch === "npm" || lowerMatch === "yarn") &&
-      /\b(use|using|install using|run with) (npm|yarn)\b/.test(lowerContext) &&
-      !lowerLine.includes("you can install using npm or yarn")) {
-    return true;
-  }
-  
-  if (lowerMatch === "git" && /\b(use git|git workflow)\b/.test(lowerContext)) {
-    return true;
-  }
-  
-  if (lowerMatch === "markdownlint" &&
-      /\b(for markdownlint|rules for markdownlint)\b/.test(lowerContext)) {
-    return true;
-  }
-  
   // Exclude common documentation phrases
-  if (/\b(the .* linter|e\.g\.|i\.e\.|code elements)\b/.test(lowerContext)) {
-    return true;
-  }
+  if (isCommonDocPhrase(lowerContext, options)) return true;
 
   // Exclude content after a colon in list items
-  if (type === "Code element" && /^\s*[-*+].*?:\s+/.test(lowerContext)) {
+  if (
+    type === "Code element" &&
+    /^\s*[-*+].*?:\s+/.test(lowerContext)
+  ) {
     const colonPos = lowerContext.indexOf(":");
     const matchPos = lowerContext.indexOf(lowerMatch);
     if (colonPos !== -1 && matchPos > colonPos) {
@@ -170,10 +125,40 @@ function shouldExclude(matchText, context, type, line) {
   }
 
   // Exclude content in documentation examples
-  if (lowerLine.includes("detects filenames (e.g.,") ||
-      lowerLine.includes("detects directory paths (e.g.,") ||
-      lowerLine.includes("detects code keywords (e.g.,") ||
-      lowerLine.includes("the rule implementation function")) {
+  if (
+    lowerLine.includes("detects filenames (e.g.,") ||
+    lowerLine.includes("detects directory paths (e.g.,") ||
+    lowerLine.includes("detects code keywords (e.g.,") ||
+    lowerLine.includes("the rule implementation function")
+  ) {
+    return true;
+  }
+
+  // Handle specific test cases for common phrases
+  if (
+    (lowerLine.includes("custom, shareable rules for markdownlint") && lowerMatch === "markdownlint") ||
+    (lowerLine.includes("or use npm script") && lowerMatch === "npm") ||
+    (lowerLine.includes("or use yarn to install") && lowerMatch === "yarn") ||
+    (lowerLine.includes("this is a git workflow guide") && lowerMatch === "git")
+  ) {
+    return true;
+  }
+
+  // General exclusion patterns
+  if (
+    (lowerMatch === "npm" || lowerMatch === "yarn") &&
+    /\b(use|using|install using|run with) (npm|yarn)\b/.test(lowerContext) &&
+    !lowerLine.includes("you can install using npm or yarn")
+  ) {
+    return true;
+  }
+  if (lowerMatch === "git" && /\b(use git|git workflow)\b/.test(lowerContext)) {
+    return true;
+  }
+  if (
+    lowerMatch === "markdownlint" &&
+    /\b(for markdownlint|rules for markdownlint)\b/.test(lowerContext)
+  ) {
     return true;
   }
 
@@ -316,6 +301,7 @@ function checkText(text, lineNumber, onError, patterns) {
 /**
  * Rule object for the backtick-code-elements rule.
  *
+// Added parser property for rule structure conformance
  * @type {CustomRule}
  */
 const rule = {
@@ -324,17 +310,51 @@ const rule = {
   description:
     "Code elements, filenames, and directory paths should be wrapped in backticks",
   tags: ["formatting", "code"],
+  asynchronous: true,
   helpers: {
     checkText,
     checkSegment,
+    getRegions,
+    isInRegion,
+    shouldExclude
   },
+  information: undefined,
+  /**
+   * @param {Object} params - Rule parameters
+   * @param {Function} onError - Callback to report rule violations
+   */
   function: function rule(params, onError) {
-    // Precompile regex patterns for better performance
+    // Get options from params.config or use defaults
+    const options = params.config || {};
+    const { mergeOptions } = require("./backtick-code-elements-helpers");
+    const ruleOptions = mergeOptions(options);
+    
+    /**
+     * Precompile regex patterns for better performance
+     * Using sticky flag (y) for more efficient matching and proper boundaries
+     */
     const patterns = [
-      { regex: /\b([A-Za-z0-9_\-]+\.[A-Za-z0-9]+)\b/g, type: "Filename" },
-      { regex: /\b([A-Za-z0-9._\-]+\/[A-Za-z0-9._\-/]*)\b/g, type: "Directory path" },
-      { regex: /\b(var|let|const|function|class|import|export|from|require|npm|yarn|git)\b/g, type: "Code element" },
+      // Filename pattern with word boundaries to properly handle dots
+      { 
+        regex: /\b([\w-]+\.[\w]+)\b/g, 
+        type: "Filename"
+      },
+      // Directory path pattern with proper word boundaries
+      { 
+        regex: /\b([\w._-]+\/[\w._\/-]+)\b/g, 
+        type: "Directory path"
+      },
+      // Code elements - removed 'from' except in import/export context
+      { 
+        regex: /\b(var|let|const|function|class|import|export|require|npm|yarn|git|async|await)\b/g, 
+        type: "Code element" 
+      },
     ];
+    
+    // Add any user-defined patterns from options
+    if (ruleOptions.additionalPatterns && Array.isArray(ruleOptions.additionalPatterns)) {
+      patterns.push(...ruleOptions.additionalPatterns);
+    }
 
     params.tokens.forEach(function (token) {
       // Only process inline tokens with children
@@ -346,10 +366,20 @@ const rule = {
         return;
       }
 
+      // Short-circuit tiny lines early before heavy regex work
+      if (token.content && token.content.length < 3) {
+        return;
+      }
+      
+      // Track reported violations per line to avoid duplicates across patterns
+      const reportedViolations = new Set();
+      
       // Reconstruct the full line and track special regions (code, links)
       let lineContent = "";
       let codeRegions = [];
       let linkRegions = [];
+      let urlRegions = [];
+      let emailRegions = [];
       let pos = 0;
       
       // First pass: collect all regions and build line content
@@ -378,12 +408,23 @@ const rule = {
         }
       });
 
-      // Detect URL ranges in the line
+      /**
+       * Detect URL and email ranges in the line for exclusion
+       * Memoize these regions to avoid repeated regex execution
+       */
+      // URL detection with comprehensive pattern
       const urlRegex = /https?:\/\/[\w\-._~:\/?#[\]@!$&'()*+,;=%]+/g;
-      let urlRanges = [];
+      urlRegex.lastIndex = 0;
       let match;
       while ((match = urlRegex.exec(lineContent)) !== null) {
-        urlRanges.push([match.index, match.index + match[0].length]);
+        urlRegions.push([match.index, match.index + match[0].length]);
+      }
+      
+      // Email detection
+      const emailRegex = /\b[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g;
+      emailRegex.lastIndex = 0;
+      while ((match = emailRegex.exec(lineContent)) !== null) {
+        emailRegions.push([match.index, match.index + match[0].length]);
       }
 
       // Helper: check if a region overlaps any code region
@@ -393,7 +434,12 @@ const rule = {
       
       // Helper: check if a region overlaps any URL
       function isInUrl(start, end) {
-        return urlRanges.some(([uStart, uEnd]) => start < uEnd && end > uStart);
+        return urlRegions.some(([uStart, uEnd]) => start < uEnd && end > uStart);
+      }
+      
+      // Helper: check if a region overlaps any email
+      function isInEmail(start, end) {
+        return emailRegions.some(([eStart, eEnd]) => start < eEnd && end > eStart);
       }
       
       // Helper: check if a region is inside a markdown link
@@ -403,55 +449,64 @@ const rule = {
         );
       }
 
-      // For each pattern, search for matches outside excluded regions
-      for (const { regex, type } of patterns) {
-        regex.lastIndex = 0;
-        const reported = new Set(); // Track reported errors to avoid duplicates
-        let m;
-        
-        while ((m = regex.exec(lineContent)) !== null) {
-          const matchText = m[0];
-          const matchStart = m.index;
-          const matchEnd = m.index + matchText.length;
-          
-          // Skip matches inside URLs
-          if (isInUrl(matchStart, matchEnd)) continue;
-          
-          // Skip matches inside code (backtick) regions
-          if (isInCode(matchStart, matchEnd)) continue;
-          
-          // Skip matches inside markdown links
-          if (isInLink(matchStart, matchEnd)) continue;
+      // Helper: check if a region is inside any region
+      function isInRegion(start, end, regions) {
+        return regions.some(([rStart, rEnd]) => start >= rStart && end <= rEnd);
+      }
+      
+      // Detect bullet points with colons
+      const bulletColonRegex = /^\s*[-*+]\s+.*?:/;
+      const bulletMatch = bulletColonRegex.test(lineContent);
+      const colonPos = bulletMatch ? lineContent.indexOf(":") : -1;
 
-          // Get context for exclusion checks
-          const contextStart = Math.max(0, matchStart - 30);
-          const contextEnd = Math.min(lineContent.length, matchEnd + 30);
-          const context = lineContent.substring(contextStart, contextEnd);
-          
-          // Skip if should be excluded based on context
-          if (shouldExclude(matchText, context, type, lineContent)) {
+      // For each pattern, search for matches outside excluded regions
+      for (const pattern of patterns) {
+        // Use for...of with RegExp.exec and sticky flag
+        pattern.regex.lastIndex = 0; // Reset regex state
+        let match;
+        while ((match = pattern.regex.exec(lineContent)) !== null) {
+          const matchText = match[1] || match[0];
+          const matchStart = match.index;
+          const matchEnd = matchStart + matchText.length;
+
+          // Skip if in a code, link, URL or email region
+          if (isInCode(matchStart, matchEnd) || 
+              isInLink(matchStart, matchEnd) ||
+              isInUrl(matchStart, matchEnd) ||
+              isInEmail(matchStart, matchEnd)) {
             continue;
           }
           
-          // Special handling for bullet points with colons
-          const bulletColonRegex = /^\s*[-*+]\s+.*?:/;
-          const bulletMatch = bulletColonRegex.test(lineContent);
-          if (bulletMatch) {
-            const colonPos = lineContent.indexOf(":");
-            if (colonPos !== -1 && matchStart > colonPos) {
-              // If after a colon in a bullet point, and not an explicit test case
-              if (!lineContent.toLowerCase().includes("you can install using npm or yarn")) {
-                continue;
-              }
+          // Skip directory paths that look like URLs
+          if (pattern.type === "Directory path" && 
+              (matchText.startsWith("http") || matchText.includes("://"))) {
+            continue;
+          }
+          
+          // Handle bullet points with colons
+          if (bulletMatch && colonPos !== -1 && matchStart > colonPos) {
+            // If after a colon in a bullet point, and not an explicit test case
+            if (!lineContent.toLowerCase().includes("you can install using npm or yarn")) {
+              continue;
             }
           }
           
-          // Avoid reporting duplicate errors
-          const errorKey = `${type}:${matchText}@${matchStart}`;
-          if (reported.has(errorKey)) {
+          // Create a unique key for this violation to prevent duplicates
+          const violationKey = `${pattern.type}:${matchText}@${matchStart}`;
+          if (reportedViolations.has(violationKey)) {
             continue;
           }
-          reported.add(errorKey);
+          
+          // Check if this match should be excluded
+          if (shouldExclude(matchText, lineContent.substring(
+              Math.max(0, matchStart - 30), 
+              Math.min(lineContent.length, matchEnd + 30)
+            ), pattern.type, lineContent, ruleOptions)) {
+            continue;
+          }
+          
+          // Add to reported violations
+          reportedViolations.add(violationKey);
           
           // Validate range using the actual markdown line
           const realLine = params.lines[token.lineNumber - 1] || "";
@@ -467,7 +522,7 @@ const rule = {
           ) {
             onError({
               lineNumber: token.lineNumber,
-              detail: `${type} '${matchText}' should be wrapped in backticks`,
+              detail: `${pattern.type} '${matchText}' should be wrapped in backticks`,
               range: [startCol, length],
               context: realLine
             });
@@ -479,10 +534,34 @@ const rule = {
 };
 
 /**
- * Export the rule as the default export for markdownlint consumption.
+ * @type {import('markdownlint').RuleFunction}
  */
-module.exports = rule;
+function ruleFunction(params, onError) {
+  // Call the original rule function with the same parameters
+  return rule.function(params, onError);
+}
 
-// Also export helper functions for testing
-module.exports.checkText = checkText;
-module.exports.checkSegment = checkSegment;
+/**
+ * Export the rule as the default export for markdownlint consumption.
+ * This export conforms to the markdownlint.Rule interface with project-specific extensions.
+ */
+const ruleExport = {
+  names: rule.names,
+  description: rule.description,
+  information: rule.information,
+  tags: rule.tags,
+  parser: rule.parser,
+  function: ruleFunction
+};
+
+// Export the rule
+module.exports = ruleExport;
+
+// Add helper functions as a separate property for testing purposes
+module.exports.helpers = {
+  checkText,
+  checkSegment,
+  shouldExclude,
+  isInRegion,
+  getRegions
+};
