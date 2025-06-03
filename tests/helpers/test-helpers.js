@@ -93,12 +93,18 @@ async function lintMarkdown(markdown) {
   /** @type {CustomRule} */
   const backtickCodeElementsRule = require('../../rules/backtick-code-elements');
   
+  // Import helpers directly to ensure they're properly loaded
+  const { DEFAULT_OPTIONS } = require('../../rules/helpers/backtick-code-elements-helpers');
+  
   // Configure options with all custom rules
   const options = {
     strings: { input: markdown },
     config: { 
       'sentence-case': true,
-      'backtick-code-elements': true
+      'backtick-code-elements': {
+        // Explicitly include default options to ensure abbreviation detection works
+        commonDocPhrasesRegex: DEFAULT_OPTIONS.commonDocPhrasesRegex
+      }
     },
     customRules: [sentenceCaseRule, backtickCodeElementsRule],
   };
