@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `index.js` as package entry point
-- Enhanced test helpers with `lintMarkdown` `function`
+- Enhanced test helpers with `lintMarkdown` function
 - Enhanced sentence-case rule with ALL CAPS detection
 - Added feature tests for markdownlint rules
 - Added alternative markdownlint configuration formats
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed test helpers to work with new directory structure
-- Prevented false positives for common abbreviations like `e.g.` and `i.e.`
+- Prevented false positives for common abbreviations like "e.g." and "i.e."
 - Corrected sentence-case rule and added comprehensive tests
 - Improved handling of proper nouns and natural language in rules
 - Fixed sentence-case rule for bold text detection
