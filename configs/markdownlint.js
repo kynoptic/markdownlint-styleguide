@@ -12,7 +12,7 @@
  * @module markdownlint-config
  * @example
  * // In your JavaScript file
- * const markdownlintConfig = require("markdownlint-clarity/markdownlint");
+ * const markdownlintConfig = require("markdownlint-trap/markdownlint");
  *
  * // Use the configuration
  * const markdownlint = require("markdownlint");

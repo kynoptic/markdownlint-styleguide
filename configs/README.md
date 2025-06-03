@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Reusable configuration modules for markdownlint-clarity. These files enable consumers to adopt clarity-focused linting standards, including custom rules, by importing or referencing these configs in their own projects or CI setups.
+Reusable configuration modules for markdownlint-trap. These files enable consumers to adopt clarity-focused linting standards, including custom rules, by importing or referencing these configs in their own projects or CI setups.
 
 ## Contents
 
