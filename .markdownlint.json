@@ -1,14 +1,36 @@
 {
   "MD024": false,
   "MD013": false,
-  "customRules": [
-    "./rules/sentence-case.js",
-    "./rules/backtick-code-elements.js"
-  ],
+  "MD033": {
+    "allowed_elements": ["kbd"]
+  },
   "sentence-case-headings-bold": {
     "enabled": true
   },
   "backtick-code-elements": {
     "enabled": true
+  },
+  "search-replace": {
+    "rules": [
+      {
+        "name": "ellipses",
+        "message": "Do not use three dots '...' for ellipsis.",
+        "search": "...",
+        "replace": "…",
+        "searchScope": "text"
+      },
+      {
+        "name": "curly-quotes",
+        "message": "Use straight quotes.",
+        "searchPattern": "/[“”]/g",
+        "replace": "\""
+      },
+      {
+        "name": "space-after-link",
+        "message": "Add a space after linked text",
+        "searchPattern": "/(\\[.+\\]\\(.+\\))(\\w)/g",
+        "replace": "$1 $2"
+      }
+    ]
   }
 }
