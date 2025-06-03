@@ -1,5 +1,5 @@
 {
-  "name": "markdownlint-clarity",
+  "name": "markdownlint-trap",
   "version": "0.2.2",
   "description": "Clarity-enhancing custom rules for markdownlint",
   "main": "index.js",
