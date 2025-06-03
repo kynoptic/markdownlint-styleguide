@@ -1,10 +1,10 @@
 # Interactions
 
-This document explains clearly how the `markdownlint-clarity` project is structured and how you can use it—even if you're totally new to markdownlint or coding.
+This document explains clearly how the `markdownlint-trap` project is structured and how you can use it—even if you're totally new to markdownlint or coding.
 
-## What `markdownlint-clarity` is
+## What `markdownlint-trap` is
 
-`markdownlint-clarity` is a set of custom rules used to check Markdown files for errors or style issues. Markdown is a simple text format for writing structured documents (like READMEs).
+`markdownlint-trap` is a set of custom rules used to check Markdown files for errors or style issues. Markdown is a simple text format for writing structured documents (like READMEs).
 
 ## Add and use rules
 

@@ -1,6 +1,6 @@
-# 🛣️ Project roadmap for markdownlint-clarity
+# 🛣️ Project roadmap for markdownlint-trap
 
-This roadmap outlines planned improvements and features for the `markdownlint-clarity` project. It is intended to help contributors—especially junior developers—understand priorities and implement improvements confidently. Tasks are ordered by logical progression and technical dependency.
+This roadmap outlines planned improvements and features for the `markdownlint-trap` project. It is intended to help contributors—especially junior developers—understand priorities and implement improvements confidently. Tasks are ordered by logical progression and technical dependency.
 
 ## 📦 Code cleanup and modularization
 
