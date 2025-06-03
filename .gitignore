@@ -13,7 +13,7 @@ dist/
 # Editor directories and files
 .vscode/
 .vscode/*
-!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 .history/
 .windsurf/
