@@ -1,4 +1,4 @@
-# Backtick code elements rule fixture
+# Backtick code elements rule fixture <!-- ✅ -->
 
 ## Filenames (should pass)
 

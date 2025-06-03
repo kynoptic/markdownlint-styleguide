@@ -1,4 +1,4 @@
-# Backtick code elements abbreviation fixture
+# Backtick code elements abbreviation fixture <!-- ✅ -->
 
 ## Common abbreviations (should pass)
 
