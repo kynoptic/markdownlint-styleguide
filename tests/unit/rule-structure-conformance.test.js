@@ -18,7 +18,9 @@ const path = require("path");
 const loadAllRules = () => {
   const rulesDir = path.resolve(__dirname, "../../rules");
   const ruleFiles = fs.readdirSync(rulesDir)
-    .filter(file => file.endsWith(".js"));
+    .filter(file => file.endsWith(".js"))
+    // Exclude helper files from rule checks
+    .filter(file => !file.includes("-helpers"));
   
   return ruleFiles.map(file => {
     const rulePath = path.join(rulesDir, file);
@@ -90,6 +92,11 @@ describe("Rule structure conformance", () => {
   });
 
   test.each(allRules)("$name JSDoc should be comprehensive", (rule) => {
+    // Skip helper files
+    if (rule.name.includes("-helpers")) {
+      return;
+    }
+    
     // Read the file content to check JSDoc
     const fileContent = fs.readFileSync(rule.path, "utf8");
     

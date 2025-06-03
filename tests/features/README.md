@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Feature tests for user-facing behaviors and integration flows. These tests validate end-to-end scenarios and ensure that custom markdownlint-clarity rules behave as expected in real-world usage.
+Feature tests for user-facing behaviors and integration flows. These tests validate end-to-end scenarios and ensure that custom markdownlint-trap rules behave as expected in real-world usage.
 
 ## Contents
 

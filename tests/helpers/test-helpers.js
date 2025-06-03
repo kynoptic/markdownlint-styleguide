@@ -8,15 +8,18 @@
  * @module test-helpers
  */
 
+/**
+ * @typedef {import('../../types').CustomRule} CustomRule
+ */
+
 const markdownlint = require("markdownlint");
 
 /**
- * Tests a rule against a set of test cases
- *
- * @param {Object} rule - The rule module to test
- * @param {Array<Object>} testCases - Array of test cases
+ * Test a markdownlint rule against a set of test cases
+ * 
+ * @param {CustomRule} rule - The rule to test
+ * @param {Array<{markdown: string, expected: number, lineNumbers?: number[]}>} testCases - Test cases to run
  * @param {Function} done - Jest done callback
- * @returns {Promise<void>}
  */
 function testRule(rule, testCases, done) {
   // Process each test case
@@ -38,32 +41,45 @@ function testRule(rule, testCases, done) {
       /** @type {(resolve: (value?: void) => void, reject: (reason?: any) => void) => void} */ (resolve, reject) => {
         markdownlint(options, (err, result) => {
           if (err) {
-            throw err;
+            reject(err);
+            return;
           }
-          const violations = result?.testCase || [];
+          
+          try {
+            const violations = result?.testCase || [];
 
-          if (testCase.expected === 0) {
-            // Should have no violations
-            expect(violations).toHaveLength(0);
-          } else {
-            // Should have expected number of violations
-            expect(violations).toHaveLength(testCase.expected);
+            if (testCase.expected === 0) {
+              // Should have no violations
+              expect(violations).toHaveLength(0);
+            } else {
+              // Should have expected number of violations
+              expect(violations).toHaveLength(testCase.expected);
 
-            // If line numbers are specified, check them
-            if (testCase.lineNumbers) {
-              const actualLineNumbers = violations.map((v) => v.lineNumber);
-              expect(actualLineNumbers.sort()).toEqual(
-                testCase.lineNumbers.sort()
-              );
+              // If line numbers are specified, check them
+              if (testCase.lineNumbers) {
+                const actualLineNumbers = violations.map((v) => v.lineNumber);
+                expect(actualLineNumbers.sort()).toEqual(
+                  testCase.lineNumbers.sort()
+                );
+              }
             }
+            resolve();
+          } catch (error) {
+            // Catch test assertion failures and reject the promise
+            reject(error);
           }
-          resolve();
         });
       }
     );
   });
 
-  return Promise.all(promises).then(() => done());
+  // Make sure to call done() even if tests fail
+  Promise.all(promises)
+    .then(() => done())
+    .catch((error) => {
+      // Ensure done is called with the error to properly fail the test
+      done(error);
+    });
 }
 
 /**
@@ -72,8 +88,11 @@ function testRule(rule, testCases, done) {
  * @returns {Promise<string[]>} - Array of triggered rule names
  */
 async function lintMarkdown(markdown) {
+  /** @type {CustomRule} */
   const sentenceCaseRule = require('../../rules/sentence-case');
+  /** @type {CustomRule} */
   const backtickCodeElementsRule = require('../../rules/backtick-code-elements');
+  
   // Configure options with all custom rules
   const options = {
     strings: { input: markdown },
