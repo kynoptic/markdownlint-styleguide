@@ -4,7 +4,7 @@
  * @description Tests for the helper functions in backtick-code-elements-helpers.js
  */
 
-const helpers = require("../../rules/backtick-code-elements-helpers");
+const helpers = require("../../rules/helpers/backtick-code-elements-helpers");
 
 describe("backtick-code-elements-helpers", () => {
   describe("DEFAULT_OPTIONS", () => {

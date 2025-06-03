@@ -80,10 +80,17 @@ Run setup.sh in the scripts folder.
 Run `setup.sh` in the `scripts` folder.
 ```
 
-## Additional documentation
+## Project structure
 
-- [`rules/README.md`](./rules/README.md): Details on custom rules
-- [`tests/README.md`](./tests/README.md): Test structure and usage
-- [`docs/README.md`](./docs/README.md): Detailed documentation and roadmap
-- [`types/README.md`](./types/README.md): TypeScript type definitions
+- `rules/`: Custom markdownlint rules
+  - `helpers/`: Helper functions and utilities for rules
+  - See [`rules/README.md`](./rules/README.md) for details
+- `tests/`: Test files for rules and helpers
+  - See [`tests/README.md`](./tests/README.md) for test structure and usage
+- `docs/`: Project documentation
+  - See [`docs/README.md`](./docs/README.md) for detailed documentation and roadmap
+- `types/`: TypeScript type definitions
+  - See [`types/README.md`](./types/README.md) for TypeScript usage
 - [`CHANGELOG.md`](./CHANGELOG.md): Release notes
+- `.vscode/`: Editor configuration
+  - See [`.vscode/README.md`](./.vscode/README.md) for VSCode settings

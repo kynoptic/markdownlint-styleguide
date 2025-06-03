@@ -2,6 +2,12 @@
 
 This directory contains custom rules for markdownlint-trap. Each rule is implemented in its own file and follows the markdownlint rule API.
 
+## Directory structure
+
+- `helpers/`: Helper functions and utilities used by rules
+  - See [`helpers/README.md`](./helpers/README.md) for details
+- Rule implementation files (`e.g.`, `backtick-code-elements.js`, `sentence-case.js`)
+
 ## Available rules
 
 ### `backtick-code-elements.js`
