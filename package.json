@@ -20,8 +20,17 @@
     "markdown",
     "markdownlint",
     "lint",
-    "rules"
+    "rules",
+    "sentence-case",
+    "code-formatting"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Joseph Casciano",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kynoptic/markdownlint-trap"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }

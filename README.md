@@ -84,5 +84,6 @@ Run `setup.sh` in the `scripts` folder.
 
 - [`rules/README.md`](./rules/README.md): Details on custom rules
 - [`tests/README.md`](./tests/README.md): Test structure and usage
-- [`scripts/README.md`](./scripts/README.md): Utility scripts and automation
+- [`docs/README.md`](./docs/README.md): Detailed documentation and roadmap
+- [`types/README.md`](./types/README.md): TypeScript type definitions
 - [`CHANGELOG.md`](./CHANGELOG.md): Release notes

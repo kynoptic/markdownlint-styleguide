@@ -4,6 +4,8 @@ node_modules/
 # Build outputs
 coverage/
 dist/
+build/
+lib/
 
 # Environment variables
 .env
@@ -41,9 +43,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Dependency directories
-node_modules/
-
 # Optional npm cache directory
 .npm
 
@@ -72,6 +71,13 @@ node_modules/
 
 # Local Netlify folder
 .netlify
-docs/reference/markdownlint/CustomRules.md
-docs/reference/markdownlint/README.md
-rules/sentence-case.js.bak
+
+# Backup files
+*.bak
+*.backup
+*.swp
+*.tmp
+
+# Test coverage
+.nyc_output/
+
