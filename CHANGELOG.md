@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed false positives for technology names with dot notation (`Node.js`, `React.js`) in `backtick-code-elements` rule
-- Improved detection of `from` when used as a preposition in natural language contexts
+- Fixed false positives for technology names with dot notation (Node.js, React.js) in `backtick-code-elements` rule
+- Improved detection of from when used as a preposition in natural language contexts
 - Fixed false positive for short bold phrases used as labels in the `sentence-case` rule
 - Improved sentence-case rule for more accurate bold text detection in paragraphs
 
