@@ -1,6 +1,6 @@
 # Markdownlint custom rules tests
 
-This directory contains tests for the custom markdownlint-clarity rules.
+This directory contains tests for the custom markdownlint-trap rules.
 
 ## Test structure
 
