@@ -22,6 +22,12 @@ const fs = require("fs");
 const path = require("path");
 const markdownlint = require("markdownlint");
 const { testRule } = require('../helpers/test-helpers');
+
+/**
+ * @typedef {import('../../types').CustomRule} CustomRule
+ */
+
+/** @type {CustomRule[]} */
 const customRules = require("../../index");
 
 describe("Integration tests", () => {
