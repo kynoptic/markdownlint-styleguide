@@ -27,22 +27,20 @@ const fixturePath = path.join(__dirname, "basic-sentence-case-heading.fixture.md
  * @returns {Object} Object containing arrays of passing and failing line numbers
  */
 function parseFixture(filePath) {
-  const content = fs.readFileSync(filePath, "utf8");
-  const lines = content.split("\n");
-  
-  const passingLines = [];
-  const failingLines = [];
-  
-  lines.forEach((line, index) => {
-    const lineNumber = index + 1;
-    if (line.includes("<!-- ✅ -->")) {
-      passingLines.push(lineNumber);
-    } else if (line.includes("<!-- ❌ -->")) {
-      failingLines.push(lineNumber);
-    }
-  });
-  
-  return { passingLines, failingLines };
+  return fs
+    .readFileSync(filePath, "utf8")
+    .split("\n")
+    .reduce(
+      (acc, line, index) => {
+        if (line.includes("<!-- ✅ -->")) {
+          acc.passingLines.push(index + 1);
+        } else if (line.includes("<!-- ❌ -->")) {
+          acc.failingLines.push(index + 1);
+        }
+        return acc;
+      },
+      { passingLines: [], failingLines: [] }
+    );
 }
 
 describe("sentence-case-heading rule", () => {
@@ -161,6 +159,7 @@ describe("sentence-case-heading rule", () => {
         "Heading's first word should be capitalized.",
         "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym).",
         /Word ".*" in heading should be lowercase./,
+        /Word ".*" in heading should be capitalized./,
         "Heading should not be in all caps."
       ].some(pattern => {
         if (pattern instanceof RegExp) {

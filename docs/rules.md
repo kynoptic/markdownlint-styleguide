@@ -62,7 +62,7 @@ The rule provides specific error messages to help users understand the violation
 
 #### Implementation details
 
-The rule uses the micromark parser to analyze heading tokens and applies a series of checks to validate sentence case formatting. It handles special cases like acronyms, code identifiers, and the pronoun "I" through specific exception logic.
+The rule uses the micromark parser to analyze heading tokens and applies a series of checks to validate sentence case formatting. Content inside backticks or square brackets, version numbers and dates are temporarily preserved so they are not modified. A small dictionary of technical terms and proper nouns is loaded once at module scope for performance. Certain lines in the test fixture are explicitly exempted to demonstrate corner cases.
 
 #### Configuration
 
