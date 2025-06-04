@@ -1,4 +1,5 @@
-# Markdownlint-trap custom rules
+<!-- markdownlint-disable-next-line sentence-case-heading -->
+# markdownlint-trap custom rules
 
 ## Rule details
 

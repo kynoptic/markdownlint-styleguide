@@ -20,7 +20,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
    - Rules follow the markdownlint plugin architecture
    - Currently implements `sentence-case-heading` rule (SC001)
 
-2. **Testing**: 
+2. **Testing**:
    - Test files are located in `tests/` directory
    - Uses fixture-based testing with annotated markdown files
    - Fixtures contain HTML comments indicating expected pass/fail status
@@ -32,6 +32,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
 
 ## Coding conventions
 
+<!-- markdownlint-disable-next-line sentence-case-heading -->
 ### JavaScript
 
 - **Module system**: ES Modules (import/export)

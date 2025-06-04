@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added validation markers to test fixtures
 - Improved changelog formatting
 
-### BREAKING CHANGES
+### Breaking changes
 
 - Complete restructuring of the project. Old import paths and rule structure are no longer valid
 - Documentation structure has been significantly reorganized

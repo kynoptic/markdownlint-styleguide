@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-next-line sentence-case-heading -->
 # markdownlint-trap
 
 A collection of custom rules for markdownlint that enforce consistent Markdown styling and formatting standards.
