@@ -1,17 +1,16 @@
 ---
 trigger: model_decision
-title: "JavaScript markdownlint custom rules project"
+description: Project's technology stack, development patterns, and code organization.
 ---
 
-## Project stack
+# Project stack and toolchain
 
-- **Primary language**: JavaScript (Node.js) with JSDoc type annotations for improved code clarity and documentation
-- **Project purpose**: Custom rule extensions for markdownlint to enforce documentation clarity standards
-- **Dependencies**: Uses markdownlint `v0.28.0` as the core linting engine with markdownlint-rule-helpers `v0.18.0` for rule development utilities
-- **Testing framework**: Jest `v29.0.0` with comprehensive unit, integration, and feature tests organized in a structured test hierarchy
-- **Code organization**: Follows a modular pattern with rules in the root `/rules` directory and shared helper functions in `/rules/helpers`
-- **Documentation**: Maintains extensive JSDoc comments for all functions and a structured documentation approach in the `/docs` directory
-- **Type system**: Uses JSDoc annotations with TypeScript declarations in the `/types` directory for type checking without TypeScript compilation
-- **Code quality**: Enforces high test coverage (minimum 80% for branches, functions, lines, and statements) as defined in `jest.config.js`
-- **Naming conventions**: Uses descriptive, semantic naming with kebab-case for files and camelCase for variables and functions
-- **Build process**: No transpilation required; runs directly with Node.js (requires `v14.0.0` or higher)
+- Use JavaScript (ES modules) for all project code, with JSDoc type annotations for improved code clarity and IDE support.
+- Implement custom markdownlint rules following the markdownlint plugin architecture and micromark parser integration.
+- Write tests using Jest with the ES modules configuration (`--experimental-vm-modules`), following a fixture-based testing approach.
+- Structure tests with descriptive names and use the `describe`/`test`/`expect` pattern from Jest for clear test organization.
+- Document code with JSDoc comments that include parameter types, return values, and function descriptions.
+- Use fixture files with explicit pass/fail annotations (`<!-- ✅ -->` and `<!-- ❌ -->`) to validate rule behavior against real examples.
+- Follow a test-driven development approach where test fixtures define expected behavior before rule implementation.
+- Organize custom rules in the `.vscode/custom-rules/` directory with consistent naming patterns (`rule-name.js`).
+- Export rules with standardized metadata including names (both full name and code), description, tags, and parser type.

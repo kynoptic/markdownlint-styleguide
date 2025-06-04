@@ -4,7 +4,7 @@ description: "Ensure that all markdownlint custom rules follow the documented st
 globs: "rules/*.js"
 ---
 
-# Custom Markdownlint Rule Authoring
+# Custom markdownlint rule authoring
 
 - Store all custom rule `.js` files in a consistent location, e.g., `/.vscode/custom-rules/`.
 - Export either a **single rule object** or an **array of rule objects** using `module.exports`.
