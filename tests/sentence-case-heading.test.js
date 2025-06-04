@@ -72,17 +72,17 @@ describe("sentence-case-heading rule", () => {
     console.log('Detected violations:', ruleViolations.map(v => ({ 
       lineNumber: v.lineNumber, 
       detail: v.errorDetail,
-      context: v.errorContext
+      context: v.context
     })));
     
     // Get the content of each line in the fixture file
     const fixtureLines = fixtureContent.split('\n');
     
-    // Check that all failing lines have corresponding violations
-    // Note: We're checking the content of the lines rather than the exact line numbers
-    // because markdownlint might report violations on different lines than we expect
+    // Check that all failing lines have corresponding violations by line number
+    // This is more reliable than checking context strings
     const missingViolations = [];
     
+    console.log('\nChecking expected violations against actual violations by line number:');
     failingLines.forEach(lineNum => {
       // Get the content of the line that should have a violation
       const lineContent = fixtureLines[lineNum - 1].trim();
@@ -90,24 +90,18 @@ describe("sentence-case-heading rule", () => {
       const headingMatch = lineContent.match(/^#+\s*([^<]+)/);
       if (headingMatch) {
         const headingText = headingMatch[1].trim();
-        // Check if any violation has this heading text in its context
-        const hasViolation = ruleViolations.some(v => 
-          v.errorContext && v.errorContext.includes(headingText)
-        );
+        // Check if any violation is on this line number
+        const hasViolation = ruleViolations.some(v => v.lineNumber === lineNum);
+        
+        // Log for debugging
+        console.log(`Line ${lineNum}: "${headingText}" - Violation found: ${hasViolation}`);
         
         if (!hasViolation) {
           missingViolations.push({ lineNum, headingText });
         }
         
-        // Special case for line 29 (API GOOD)
-        if (lineContent.includes('API GOOD')) {
-          // This is a known issue with the current implementation
-          // The rule doesn't detect this as a violation because it treats "API" as an acronym
-          // and "GOOD" as a short all-caps word, which are both allowed exceptions
-          console.log('\nNote: "API GOOD" is not detected as a violation because both words are treated as acronyms/short all-caps words');
-        } else {
-          expect(hasViolation).toBe(true);
-        }
+        // Individual assertion for each line, with better error message
+        expect(hasViolation).toBe(true, `Line ${lineNum}: "${headingText}" should have a violation but none was found`);
       }
     });
     

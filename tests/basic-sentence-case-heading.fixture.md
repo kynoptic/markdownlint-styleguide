@@ -14,9 +14,9 @@
  *
  * Annotations:
  *
- * * <!-- ✅ --> = This heading should PASS the rule check (no violations)
- * * <!-- ❌ --> = This heading should FAIL the rule check (rule should report a violation)
- */
+ * * ✅ = This heading should PASS the rule check (no violations)
+ * * ❌ = This heading should FAIL the rule check (rule should report a violation)
+ -->
 
 <!-- markdownlint-disable MD025 -->
 
@@ -29,7 +29,7 @@ They are used to test the custom rule's ability to detect various heading case i
 
 # Simple sentence case <!-- ✅ -->
 
-# Word <!-- ✅ -->
+# Keywords in markdown <!-- ✅ -->
 
 # I am a heading <!-- ✅ -->
 
@@ -37,22 +37,52 @@ They are used to test the custom rule's ability to detect various heading case i
 
 # Nasa is also fine <!-- ✅ -->
 
+## [`1.0.0`] - 2025-06-03 <!-- ✅ -->
+
+# What is markdownlint? <!-- ✅ -->
+
+# How to use `markdownlint-cli2` effectively <!-- ✅ -->
+
+# Visiting Paris in the spring <!-- ✅ -->
+
+# How the FBI approached Facebook <!-- ✅ -->
+
+# Why I think this matters — a brief overview <!-- ✅ -->
+
 # Title Case Heading Should Fail <!-- ❌ -->
 
-# FIRST word all caps but long <!-- ❌ -->
+# FIRST example of poor heading case <!-- ❌ -->
 
 # First word Has mixedCase <!-- ❌ -->
 
-# ALL CAPS HEADING IS BAD <!-- ❌ -->
+# SYSTEM FAILURE DETECTED <!-- ❌ -->
 
-# Sentence with Another word capitalized <!-- ❌ -->
+# This Is not correct <!-- ❌ -->
 
-# Sentence with Proper Noun <!-- ❌ -->
+# Visiting paris during summer <!-- ❌ -->
 
-# API Is Good <!-- ❌ -->
+# API Is Not Responding <!-- ❌ -->
 
 # API GOOD <!-- ❌ -->
 
 # css <!-- ❌ -->
 
 # api <!-- ❌ -->
+
+# Why This Should Fail <!-- ❌ -->
+
+# Understanding The API Limits <!-- ❌ -->
+
+# Visiting paris in the spring <!-- ❌ -->
+
+# Using JSON and Html with CSS <!-- ❌ -->
+
+# How to use Api Keys <!-- ❌ -->
+
+# Low-cost solutions for small teams <!-- ✅ -->
+
+# Low-Cost Solutions For Small Teams <!-- ❌ -->
+
+# 10 ways to improve performance <!-- ✅ -->
+
+# 10 Ways To Improve Performance <!-- ❌ -->

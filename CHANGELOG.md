@@ -16,10 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dedicated rules documentation file
 - Added sentence-case-heading markdownlint rule
 
-### Fixed
-
-- Added null checks to prevent errors in rule processing
-
 ### Changed
 
 - Reorganized project documentation structure
