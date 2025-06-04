@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [`1.0.0`] - 2025-06-03
+
+### Added
+
+- Added dedicated rules documentation file
+- Added sentence-case-heading markdownlint rule
+
+### Fixed
+
+- Added null checks to prevent errors in rule processing
+
+### Changed
+
+- Reorganized project documentation structure
+- Removed legacy code structure
+- Updated project dependencies and structure
+- Switched to ES modules with type: module in package.json
+- Updated to latest markdownlint and markdownlint-cli2
+- Updated Jest with experimental VM modules support
+
+### Documentation
+
+- Enhanced project documentation and test fixtures
+- Updated markdownlint rule authoring guidelines
+- Added validation markers to test fixtures
+- Improved changelog formatting
+
+### BREAKING CHANGES
+
+- Complete restructuring of the project. Old import paths and rule structure are no longer valid
+- Documentation structure has been significantly reorganized
+
 ## [`0.3.0`] - 2025-06-03
 
 ### Added
