@@ -17,6 +17,8 @@ lib/
 .vscode/*
 !.vscode/settings.json
 !.vscode/README.md
+!.vscode/custom-rules/
+!.vscode/custom-rules/*
 .idea/
 .history/
 .windsurf/*/global/*
@@ -82,3 +84,4 @@ yarn-error.log*
 # Test coverage
 .nyc_output/
 
+/docs/reference/markdownlint-main/*
