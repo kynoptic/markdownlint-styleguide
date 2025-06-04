@@ -1,20 +1,18 @@
 ---
-trigger: glob
+trigger: manual
 description: "Ensure that all markdownlint custom rules follow the documented structure and conventions."
 globs: "rules/*.js"
 ---
-# Markdownlint custom rule structure
 
-- Export a single object or array of rule objects conforming to the `markdownlint` custom rule interface.
-- Define the following required fields in every rule object:
-  - `names`: array of one or more strings identifying the rule.
-  - `description`: human-readable explanation of the rule’s purpose.
-  - `tags`: array of string tags to support rule categorization.
-  - `parser`: one of `"micromark"`, `"markdownit"`, or `"none"`.
-  - `function`: implementation that inspects `params` and reports errors via `onError`.
-- Prefer the `micromark` parser over `markdownit` or `none`, unless legacy support is required.
-- Use `params.parsers[parser].tokens` for token analysis instead of raw text when possible.
-- Include an `information` field with a full `URL` for documentation or rule details if available.
-- For rules requiring asynchronous operations (e.g. I/O), set `asynchronous: true` and return a `Promise`.
-- Ensure all `onError` calls include at minimum the `lineNumber`; include `detail`, `context`, and `range` if meaningful.
-- Leverage the `markdownlint-rule-helpers` package for shared logic where appropriate.
+# Custom Markdownlint Rule Authoring
+
+- Store all custom rule `.js` files in a consistent location, e.g., `/.vscode/custom-rules/`.
+- Export either a **single rule object** or an **array of rule objects** using `module.exports`.
+- Each rule object **must include**: `names` (array of strings), `description` (string), `tags` (array), `parser` (`"micromark"`, `"markdownit"`, or `"none"`), and a `function(params, onError)`.
+- Begin each rule function with a robust check for `params`, `onError`, and expected parser tokens.
+- Use `params.parsers.micromark.tokens` for `micromark` rules, or `params.parsers.markdownit.tokens` for `markdownit`.
+- Use `params.lines`, `params.config`, and proper `onError({ ... })` reporting with `lineNumber`, `context`, and optional `range`/`fixInfo`.
+- For `micromark`, understand token flows and extract text from `data` tokens carefully using accurate `startLine`, `startColumn`, etc.
+- Break down logic into helper functions to improve maintainability and testability.
+- Use `@ts-check` and appropriate JSDoc annotations to enable type checking with `markdownlint` types.
+- Define `asynchronous: true` in the rule object if using async logic and ensure the function returns a `Promise`.
