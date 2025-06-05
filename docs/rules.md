@@ -1,30 +1,39 @@
 <!-- markdownlint-disable-next-line sentence-case-heading -->
 # markdownlint-trap custom rules
 
-## Rule details
+This document describes the custom markdownlint rules included in **markdownlint-trap**.
 
-### `sentence-case-heading` (SC001)
+## `sentence-case-heading` (SC001)
 
-Ensures ATX headings (`#`, `##`, etc.) use sentence case formatting, where only the first word is capitalized. This promotes consistency and readability across documentation.
+The `sentence-case-heading` rule enforces sentence case for ATX headings. Only the first word is capitalized, keeping documentation consistent and easy to read.
 
-#### Rationale
+### Why sentence case?
 
-Sentence case is often preferred in technical documentation because:
+Sentence case is common in technical writing because it:
 
-* It's easier to read and appears less formal than title case
-* It reduces inconsistencies in capitalization decisions
-* It aligns with many modern style guides for technical content
-* It's easier to maintain consistency across a large documentation set
+- Is less formal and easier to scan
+- Avoids confusion over which words should be capitalized
+- Aligns with many modern style guides
+- Helps keep large sets of documentation consistent
 
-#### Rule behavior
+### How the rule works
 
-This rule checks each heading and validates that:
+The rule checks each heading and ensures that:
 
-1. The first word's first letter is capitalized
-2. All other words are lowercase, with specific exceptions
+1. The first word begins with a capital letter
+2. Remaining words are lower case unless covered by an exception
 3. The heading is not entirely in uppercase
 
-#### Correct examples
+### Allowed exceptions
+
+The following elements may remain as they appear:
+
+- Short acronyms (four letters or fewer), such as API, REST or HTML
+- The pronoun "I"
+- Words in parentheses, often code identifiers
+- Text wrapped in backticks
+
+### Correct examples
 
 ```markdown
 # This is a correct heading
@@ -34,7 +43,7 @@ This rule checks each heading and validates that:
 # Using the getUserData() function
 ```
 
-#### Incorrect examples
+### Incorrect examples
 
 ```markdown
 # This Is Not Correct
@@ -43,28 +52,19 @@ This rule checks each heading and validates that:
 # Sentence with Another capitalized Word
 ```
 
-#### Rule exceptions
+### Error messages
 
-The following exceptions are allowed in sentence case headings:
+When a violation is detected, the rule reports:
 
-* Short acronyms (≤ 4 letters) like API, REST, JSON, HTML
-* The pronoun "I"
-* Words in parentheses (likely code identifiers or technical terms)
-* Words within code backticks (preserved as-is)
+- "Heading's first word should be capitalized."
+- "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym)."
+- "Word \"X\" in heading should be lowercase."
+- "Heading should not be in all caps."
 
-#### Error messages
+### Implementation notes
 
-The rule provides specific error messages to help users understand the violation:
+The rule uses the micromark parser to analyze heading tokens and run a series of checks. Content inside backticks or square brackets, version numbers and dates is temporarily preserved so it is not modified. A small dictionary of technical terms and proper nouns is loaded once for performance. Some lines in the test fixture are exempt to illustrate edge cases.
 
-* "Heading's first word should be capitalized."
-* "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym)."
-* "Word "X" in heading should be lowercase."
-* "Heading should not be in all caps."
+### Configuration
 
-#### Implementation details
-
-The rule uses the micromark parser to analyze heading tokens and applies a series of checks to validate sentence case formatting. Content inside backticks or square brackets, version numbers and dates are temporarily preserved so they are not modified. A small dictionary of technical terms and proper nouns is loaded once at module scope for performance. Certain lines in the test fixture are explicitly exempted to demonstrate corner cases.
-
-#### Configuration
-
-Currently, this rule has no configuration options. Future versions may include options to customize acronym length or add a custom dictionary of proper nouns.
+There are currently no configuration options. Future versions may allow custom acronym lengths or additional dictionaries of proper nouns.
