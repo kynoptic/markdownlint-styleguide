@@ -9,6 +9,8 @@ This directory contains comprehensive documentation for the markdownlint-trap pr
 ### Files
 
 * **[`rules.md`](./rules.md)** – Detailed documentation of custom markdownlint rules implemented in this project
+* **[`project-stack.md`](./project-stack.md)** – Overview of the project's technology stack and architecture
+* **[`roadmap.md`](./roadmap.md)** – Planned improvements and future work
 
 ## Usage
 
