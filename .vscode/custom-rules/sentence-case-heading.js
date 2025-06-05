@@ -22,16 +22,11 @@ const technicalTerms = Object.freeze({
   FBI: true
 });
 
-// Lines in the fixture that are ignored by the rule
-const exemptLines = Object.freeze({
-  44: true,
-  46: true,
-  48: true
-});
 
 // Proper nouns that must be capitalized when checked
 const properNouns = Object.freeze({
-  paris: 'Paris'
+  paris: 'Paris',
+  facebook: 'Facebook'
 });
 
 /**
@@ -113,15 +108,6 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
-    if (lineNumber === 66) {
-      onError({
-        lineNumber,
-        detail: 'Heading should not be in all caps.',
-        context: headingText,
-        errorContext: headingText
-      });
-      return;
-    }
 
     if (headingText.trim().startsWith('[') || headingText.trim().startsWith('`')) {
       return;
@@ -232,11 +218,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         continue;
       }
 
-      if (exemptLines[lineNumber]) {
-        return;
-      }
-
-      if ((lineNumber === 62 || lineNumber === 76) && properNouns[word.toLowerCase()] && word === word.toLowerCase()) {
+      if (properNouns[word.toLowerCase()] && word === word.toLowerCase()) {
         onError({
           lineNumber,
           detail: `Word "${word}" in heading should be capitalized.`,
@@ -250,6 +232,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         !(word.length <= 4 && word === word.toUpperCase()) &&
         word !== 'I' &&
         !technicalTerms[word] &&
+        !properNouns[word.toLowerCase()] &&
         !word.startsWith('PRESERVED')
       ) {
         if (checkHyphenatedWord(word, lineNumber, headingText, onError)) {
