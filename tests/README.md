@@ -19,6 +19,16 @@ Tests are run using Jest with ES modules support:
 npm test
 ```
 
+### Debug output
+
+Verbose test output can be enabled using the [`debug`](https://www.npmjs.com/package/debug) module. Set the
+`DEBUG` environment variable when running tests to see additional logging from the
+test suite:
+
+```bash
+DEBUG=markdownlint-trap* npm test
+```
+
 ### Fixture format
 
 Test fixtures use HTML comments to mark passing and failing examples:

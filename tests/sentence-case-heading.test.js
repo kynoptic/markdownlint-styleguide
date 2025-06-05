@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect } from '@jest/globals';
+import debug from '../logger.js';
 
 // Import markdownlint using the proper ES modules path
 import { lint } from 'markdownlint/promise';
@@ -45,6 +46,7 @@ function parseFixture(filePath) {
 
 describe("sentence-case-heading rule", () => {
   const { passingLines, failingLines } = parseFixture(fixturePath);
+  const log = debug.extend('tests');
   
   test("identifies violations correctly", async () => {
     const options = {
@@ -63,7 +65,14 @@ describe("sentence-case-heading rule", () => {
     
     const fixtureContent = fs.readFileSync(fixturePath, 'utf8');
 
-    // Debug output has been removed to keep test output clean
+    // Only log debug output when DEBUG environment variable includes 'tests'
+    log('Fixture content:', fixtureContent);
+    log('Expected failing lines:', failingLines);
+    log('Detected violations:', ruleViolations.map(v => ({
+      lineNumber: v.lineNumber,
+      detail: v.errorDetail,
+      context: v.context
+    })));
 
     // Get the content of each line in the fixture file
     const fixtureLines = fixtureContent.split('\n');
@@ -72,6 +81,7 @@ describe("sentence-case-heading rule", () => {
     // This is more reliable than checking context strings
     const missingViolations = [];
     
+    log('Checking expected violations against actual violations by line number:');
     failingLines.forEach(lineNum => {
       // Get the content of the line that should have a violation
       const lineContent = fixtureLines[lineNum - 1].trim();
@@ -81,6 +91,8 @@ describe("sentence-case-heading rule", () => {
         const headingText = headingMatch[1].trim();
         // Check if any violation is on this line number
         const hasViolation = ruleViolations.some(v => v.lineNumber === lineNum);
+        // Log for debugging
+        log(`Line ${lineNum}: "${headingText}" - Violation found: ${hasViolation}`);
         
         if (!hasViolation) {
           missingViolations.push({ lineNum, headingText });
@@ -92,7 +104,7 @@ describe("sentence-case-heading rule", () => {
     });
     
     if (missingViolations.length > 0) {
-      // Leave a hook for debugging if needed
+      log('Missing violations for lines:', missingViolations);
     }
     
     // Check that no passing lines are detected as violations
@@ -118,7 +130,7 @@ describe("sentence-case-heading rule", () => {
     });
     
     if (unexpectedViolations.length > 0) {
-      // Leave a hook for debugging if needed
+      log('Unexpected violations for lines:', unexpectedViolations);
     }
     
     // We don't verify the total number of violations anymore since we're making an exception for "API GOOD"
