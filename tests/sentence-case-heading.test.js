@@ -61,18 +61,10 @@ describe("sentence-case-heading rule", () => {
       v.ruleNames.includes("sentence-case-heading") || v.ruleNames.includes("SC001")
     );
     
-    // Debug output
-    console.log('Fixture content:');
     const fixtureContent = fs.readFileSync(fixturePath, 'utf8');
-    console.log(fixtureContent);
-    
-    console.log('\nExpected failing lines:', failingLines);
-    console.log('Detected violations:', ruleViolations.map(v => ({ 
-      lineNumber: v.lineNumber, 
-      detail: v.errorDetail,
-      context: v.context
-    })));
-    
+
+    // Debug output has been removed to keep test output clean
+
     // Get the content of each line in the fixture file
     const fixtureLines = fixtureContent.split('\n');
     
@@ -80,7 +72,6 @@ describe("sentence-case-heading rule", () => {
     // This is more reliable than checking context strings
     const missingViolations = [];
     
-    console.log('\nChecking expected violations against actual violations by line number:');
     failingLines.forEach(lineNum => {
       // Get the content of the line that should have a violation
       const lineContent = fixtureLines[lineNum - 1].trim();
@@ -90,9 +81,6 @@ describe("sentence-case-heading rule", () => {
         const headingText = headingMatch[1].trim();
         // Check if any violation is on this line number
         const hasViolation = ruleViolations.some(v => v.lineNumber === lineNum);
-        
-        // Log for debugging
-        console.log(`Line ${lineNum}: "${headingText}" - Violation found: ${hasViolation}`);
         
         if (!hasViolation) {
           missingViolations.push({ lineNum, headingText });
@@ -104,7 +92,7 @@ describe("sentence-case-heading rule", () => {
     });
     
     if (missingViolations.length > 0) {
-      console.log('\nMissing violations for lines:', missingViolations);
+      // Leave a hook for debugging if needed
     }
     
     // Check that no passing lines are detected as violations
@@ -130,7 +118,7 @@ describe("sentence-case-heading rule", () => {
     });
     
     if (unexpectedViolations.length > 0) {
-      console.log('\nUnexpected violations for lines:', unexpectedViolations);
+      // Leave a hook for debugging if needed
     }
     
     // We don't verify the total number of violations anymore since we're making an exception for "API GOOD"
