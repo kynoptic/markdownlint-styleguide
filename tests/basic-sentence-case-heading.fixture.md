@@ -65,7 +65,7 @@ They are used to test the custom rule's ability to detect various heading case i
 
 # API GOOD <!-- ❌ -->
 
-# css <!-- ❌ -->
+# css <!-- ❌ --> <!-- intentionally lowercase single word -->
 
 # api <!-- ❌ -->
 
