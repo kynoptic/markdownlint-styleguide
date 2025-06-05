@@ -44,6 +44,17 @@ Add the custom rules to your `.markdownlint-cli2.jsonc` file:
 npx markdownlint-cli2 "**/*.md"
 ```
 
+## Testing
+
+Run the tests with:
+
+```bash
+npm test
+```
+
+Use `DEBUG=markdownlint-trap*` for verbose output.
+
+
 ## License and attribution
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
