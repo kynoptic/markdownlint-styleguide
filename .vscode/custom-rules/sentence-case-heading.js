@@ -45,10 +45,11 @@ function extractHeadingText(tokens, lines, token) {
   );
   if (seq) {
     const textStartColumn = seq.endColumn;
-    return lineText.substring(textStartColumn - 1, token.endColumn - 1).trim();
+    const text = lineText.substring(textStartColumn - 1, token.endColumn - 1);
+    return text.replace(/<!--.*-->/g, '').trim();
   }
   const match = lineText.match(/^#+\s*(.*)/);
-  return match && match[1] ? match[1].trim() : '';
+  return match && match[1] ? match[1].replace(/<!--.*-->/g, '').trim() : '';
 }
 
 /**

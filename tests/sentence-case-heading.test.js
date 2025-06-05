@@ -158,6 +158,7 @@ describe("sentence-case-heading rule", () => {
       expect([
         "Heading's first word should be capitalized.",
         "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym).",
+        "Single-word heading should be capitalized.",
         /Word ".*" in heading should be lowercase./,
         /Word ".*" in heading should be capitalized./,
         "Heading should not be in all caps."
@@ -168,5 +169,11 @@ describe("sentence-case-heading rule", () => {
         return violation.errorDetail === pattern;
       })).toBe(true);
     });
+
+    const fixtureLines = fs.readFileSync(fixturePath, "utf8").split("\n");
+    const cssLine = fixtureLines.findIndex(line => line.startsWith("# css")) + 1;
+    const cssViolation = ruleViolations.find(v => v.lineNumber === cssLine);
+    expect(cssViolation).toBeTruthy();
+    expect(cssViolation.errorDetail).toBe("Single-word heading should be capitalized.");
   });
 });
