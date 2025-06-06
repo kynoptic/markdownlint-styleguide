@@ -11,8 +11,12 @@ This directory contains test fixtures and test implementations for the markdownl
 ```
 tests/
   fixtures/
-    backtick/       - Fixtures for the backtick-code-elements rule
-    sentence-case/  - Fixtures for the sentence-case-heading rule
+    backtick/
+      failing/  - Violating examples for the backtick rule
+      passing/  - Valid examples for the backtick rule
+    sentence-case/
+      failing/  - Violating examples for the sentence-case rule
+      passing/  - Valid examples for the sentence-case rule
   rules/     - Jest test suites implementing the rule checks
   utils/     - Helper modules shared across tests
 ```
