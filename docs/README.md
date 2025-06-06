@@ -1,4 +1,5 @@
 # `/docs`
+<!-- markdownlint-disable backtick-code-elements -->
 
 ## Purpose
 
@@ -27,3 +28,4 @@ Reference these documents when:
 * [`src/`](../src/) – General library code and package entry point
 * [`vscode/custom-rules`](../.vscode/custom-rules/) – Implementation of the custom rules
 * [`README.md`](../README.md) – Project overview
+<!-- markdownlint-enable backtick-code-elements -->

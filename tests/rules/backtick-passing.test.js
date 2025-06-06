@@ -11,8 +11,8 @@ const fixturePath = path.join(
   '../fixtures/backtick/passing.fixture.md'
 );
 
-describe('backtick-code-elements false positives', () => {
-  test('does not flag common valid phrases', async () => {
+describe('backtick-code-elements passing fixture', () => {
+  test('does not flag valid lines', async () => {
     const options = {
       customRules: [backtickRule],
       files: [fixturePath],
