@@ -15,6 +15,7 @@ lib/
 # Editor directories and files
 .vscode/
 .vscode/*
+!.vscode/
 !.vscode/settings.json
 !.vscode/README.md
 !.vscode/custom-rules/
@@ -57,9 +58,6 @@ yarn-error.log*
 
 # Output of 'npm pack'
 *.tgz
-
-# dotenv environment variables file
-.env
 
 # next.js build output
 .next

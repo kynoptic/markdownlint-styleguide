@@ -1,0 +1,12 @@
+# Development and documentation
+/tests/
+/docs/
+
+# Editor and workflow configs
+.vscode/
+.windsurf/
+
+# Miscellaneous
+*.log
+coverage/
+

@@ -68,3 +68,19 @@ The rule uses the micromark parser to analyze heading tokens and run a series of
 ### Configuration
 
 There are currently no configuration options. Future versions may allow custom acronym lengths or additional dictionaries of proper nouns.
+
+## `backtick-code-elements` (BCE001)
+
+The `backtick-code-elements` rule ensures that file names, folder names and simple code snippets are wrapped in backticks when referenced in normal text.
+
+### When to use backticks
+
+- File names like `package.json`
+- Directory paths such as `src/utils`
+- Shell commands or function calls
+
+### Example
+
+```markdown
+Run `./build.sh` to start the build
+```

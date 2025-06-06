@@ -1,4 +1,5 @@
 # `/docs`
+<!-- markdownlint-disable backtick-code-elements -->
 
 ## Purpose
 
@@ -23,6 +24,7 @@ Reference these documents when:
 
 ## Related modules
 
-* [`../tests/`](../tests/) – Test fixtures and implementations for the rules
-* [`../.vscode/custom-rules/`](../.vscode/custom-rules/) – Implementation of the custom rules
-* [`../README.md`](../README.md) – Project overview
+* [`tests/`](../tests/) – Test fixtures and implementations for the rules
+* [`src/`](../src/) – General library code and package entry point
+* [`vscode/custom-rules`](../.vscode/custom-rules/) – Implementation of the custom rules
+* [`README.md`](../README.md) – Project overview

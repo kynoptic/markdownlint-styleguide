@@ -6,10 +6,18 @@ This directory contains test fixtures and test implementations for the markdownl
 
 ## Contents
 
-### Files
+### Structure
 
-* **[`basic-sentence-case-heading.fixture.md`](./basic-sentence-case-heading.fixture.md)** – Test fixture containing examples of correct and incorrect heading formats for the sentence-case-heading rule
-* **[`sentence-case-heading.test.js`](./sentence-case-heading.test.js)** – Jest test implementation that validates the sentence-case-heading rule against the fixture
+```
+tests/
+  fixtures/  - Markdown fixture files used by the tests
+  rules/     - Jest test suites implementing the rule checks
+  utils/     - Helper modules shared across tests
+```
+
+Fixtures contain examples annotated with `<!-- ✅ -->` or `<!-- ❌ -->` to mark
+passing and failing lines. The Jest suites under `rules/` load these fixtures and
+verify rule behavior using the helpers from `utils/`.
 
 ## Usage
 

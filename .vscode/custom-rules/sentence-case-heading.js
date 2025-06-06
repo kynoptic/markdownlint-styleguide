@@ -26,7 +26,8 @@ const technicalTerms = Object.freeze({
 // Proper nouns that must be capitalized when checked
 const properNouns = Object.freeze({
   paris: 'Paris',
-  facebook: 'Facebook'
+  facebook: 'Facebook',
+  github: 'GitHub'
 });
 
 /**
@@ -109,6 +110,12 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
+    // Strip leading emoji or symbol characters before analysis
+    headingText = headingText.replace(/^[\u{1F000}-\u{1FFFF}\u{2000}-\u{3FFF}]+\s*/u, '').trim();
+    if (!headingText) {
+      return;
+    }
+
 
     if (headingText.trim().startsWith('[') || headingText.trim().startsWith('`')) {
       return;
@@ -149,7 +156,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       });
 
-    const clean = processed.replace(/[\#\*_~!\-+=\{\}|:;"'<>,.?\\]/g, ' ').trim();
+    const clean = processed.replace(/[\#\*_~!\-+=\{\}|:;"<>,.?\\]/g, ' ').trim();
     if (!clean) {
       return;
     }

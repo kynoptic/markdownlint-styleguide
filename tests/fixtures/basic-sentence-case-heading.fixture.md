@@ -86,3 +86,13 @@ They are used to test the custom rule's ability to detect various heading case i
 # 10 ways to improve performance <!-- ✅ -->
 
 # 10 Ways To Improve Performance <!-- ❌ -->
+
+# Don't panic <!-- ✅ -->
+
+# Don't Panic <!-- ❌ -->
+
+# don't panic <!-- ❌ -->
+
+# Using GitHub features <!-- ✅ -->
+
+# Tools from github <!-- ❌ -->
