@@ -36,3 +36,10 @@ This repository contains custom markdownlint rules implemented in JavaScript. Fo
 
 - Summarize key changes and reference the files that were modified.
 - Include a **Testing** section describing the commands run and their results.
+
+## Roadmap maintenance
+
+- After every commit, update `docs/roadmap.md`.
+  - Check off items that are complete.
+  - Add new unchecked items for remaining work.
+  - If all tasks are done, suggest new roadmap entries.
