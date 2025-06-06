@@ -10,11 +10,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const failingFixture = path.join(
   __dirname,
-  '../fixtures/backtick/failing/basic.fixture.md'
+  '../fixtures/backtick/failing.fixture.md'
 );
 const passingFixture = path.join(
   __dirname,
-  '../fixtures/backtick/passing/basic.fixture.md'
+  '../fixtures/backtick/passing.fixture.md'
 );
 
 

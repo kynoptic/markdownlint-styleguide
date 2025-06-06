@@ -23,11 +23,11 @@ const __dirname = path.dirname(__filename);
 // Path to the fixture file
 const passingFixture = path.join(
   __dirname,
-  '../fixtures/sentence-case/passing/basic.fixture.md'
+  '../fixtures/sentence-case/passing.fixture.md'
 );
 const failingFixture = path.join(
   __dirname,
-  '../fixtures/sentence-case/failing/basic.fixture.md'
+  '../fixtures/sentence-case/failing.fixture.md'
 );
 
 

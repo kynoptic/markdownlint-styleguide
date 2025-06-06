@@ -19,3 +19,13 @@
 # Don't Panic <!-- ❌ -->
 # don't panic <!-- ❌ -->
 # Tools from github <!-- ❌ -->
+# using the CLI with Node.js 20 <!-- ❌ -->
+# Using the CLI with Node.js 20 <!-- ❌ -->
+# Node.js-Based tools <!-- ❌ -->
+# Should fail: NodeJS 18 <!-- ❌ -->
+# When to use 'Git' vs GitHub <!-- ❌ -->
+# The 2025-06-05 Release Notes <!-- ❌ -->
+# 🎉 party time <!-- ❌ -->
+# 🚀 quick start <!-- ❌ -->
+# 🚀 Quick Start <!-- ❌ -->
+# Quick Start 🚀 <!-- ❌ -->

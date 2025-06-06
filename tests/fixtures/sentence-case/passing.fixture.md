@@ -15,3 +15,11 @@
 # 10 ways to improve performance <!-- ✅ -->
 # Don't panic <!-- ✅ -->
 # Using GitHub features <!-- ✅ -->
+# Interacting with the `fs` module <!-- ✅ -->
+# Node.js-based tools <!-- ✅ -->
+# When to use `git` vs GitHub <!-- ✅ -->
+# The 2025-06-05 release notes <!-- ✅ -->
+# 🎉 Party time <!-- ✅ -->
+# 🚀 Quick start <!-- ✅ -->
+# 😀 <!-- ✅ -->
+# Quick start 🚀 <!-- ✅ -->

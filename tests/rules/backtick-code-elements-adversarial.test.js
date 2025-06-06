@@ -8,24 +8,29 @@ import { parseFixture } from '../utils/fixture.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const fixturePath = path.join(
+const failingFixture = path.join(
   __dirname,
-  '../fixtures/backtick/adversarial.fixture.md'
+  '../fixtures/backtick/failing.fixture.md'
+);
+const passingFixture = path.join(
+  __dirname,
+  '../fixtures/backtick/passing.fixture.md'
 );
 
 
 describe('backtick-code-elements adversarial cases', () => {
-  const { passingLines, failingLines } = parseFixture(fixturePath);
+  const failingLines = parseFixture(failingFixture).failingLines;
+  const passingLines = parseFixture(passingFixture).passingLines;
 
   test('detects unwrapped code elements', async () => {
     const options = {
       customRules: [backtickRule],
-      files: [fixturePath],
+      files: [failingFixture],
       resultVersion: 3
     };
 
     const results = await lint(options);
-    const violations = results[fixturePath] || [];
+    const violations = results[failingFixture] || [];
     const ruleViolations = violations.filter(v =>
       v.ruleNames.includes('backtick-code-elements') || v.ruleNames.includes('BCE001')
     );
@@ -34,20 +39,27 @@ describe('backtick-code-elements adversarial cases', () => {
     failingLines.forEach(line => {
       expect(failingNumbers).toContain(line);
     });
-    passingLines.forEach(line => {
-      expect(failingNumbers).not.toContain(line);
-    });
+    const optionsPass = {
+      customRules: [backtickRule],
+      files: [passingFixture],
+      resultVersion: 3
+    };
+    const resultsPass = await lint(optionsPass);
+    const passViolations = (resultsPass[passingFixture] || []).filter(v =>
+      v.ruleNames.includes('backtick-code-elements') || v.ruleNames.includes('BCE001')
+    );
+    expect(passViolations).toHaveLength(0);
   });
 
   test('provides descriptive error details', async () => {
     const options = {
       customRules: [backtickRule],
-      files: [fixturePath],
+      files: [failingFixture],
       resultVersion: 3
     };
 
     const results = await lint(options);
-    const violations = results[fixturePath] || [];
+    const violations = results[failingFixture] || [];
 
     const ruleViolations = violations.filter(v =>
       v.ruleNames.includes('backtick-code-elements') ||

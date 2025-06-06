@@ -21,72 +21,92 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Path to the fixture file
-const fixturePath = path.join(
+const failingFixture = path.join(
   __dirname,
-  '../fixtures/sentence-case/edge-cases.fixture.md'
+  '../fixtures/sentence-case/failing.fixture.md'
+);
+const passingFixture = path.join(
+  __dirname,
+  '../fixtures/sentence-case/passing.fixture.md'
 );
 
 
 
 describe("sentence-case-heading edge cases", () => {
-  const { passingLines, failingLines } = parseFixture(fixturePath);
+  const failingParse = parseFixture(failingFixture);
+  const passingParse = parseFixture(passingFixture);
   const log = debug.extend('tests');
-  const fixtureLines = fs.readFileSync(fixturePath, 'utf8').split('\n');
-  // Build an array of heading cases for easier per-heading assertions
-  const headingCases = fixtureLines.reduce((acc, line, index) => {
-    const match = line.match(/^#+\s*([^<]+)/);
+  const fixtureLinesFail = fs.readFileSync(failingFixture, 'utf8').split('\n');
+  const fixtureLinesPass = fs.readFileSync(passingFixture, 'utf8').split('\n');
+  const headingCases = [];
+  failingParse.failingLines.forEach(lineNumber => {
+    const match = fixtureLinesFail[lineNumber - 1].match(/^#+\s*([^<]+)/);
     if (match) {
-      const lineNumber = index + 1;
-      if (passingLines.includes(lineNumber) || failingLines.includes(lineNumber)) {
-        acc.push({
-          lineNumber,
-          headingText: match[1].trim(),
-          expectViolation: failingLines.includes(lineNumber)
-        });
-      }
+      headingCases.push({
+        filePath: failingFixture,
+        lineNumber,
+        headingText: match[1].trim(),
+        expectViolation: true
+      });
     }
-    return acc;
-  }, []);
+  });
+  passingParse.passingLines.forEach(lineNumber => {
+    const match = fixtureLinesPass[lineNumber - 1].match(/^#+\s*([^<]+)/);
+    if (match) {
+      headingCases.push({
+        filePath: passingFixture,
+        lineNumber,
+        headingText: match[1].trim(),
+        expectViolation: false
+      });
+    }
+  });
 
-  let ruleViolations;
+  let violationsFail;
+  let violationsPass;
 
   beforeAll(async () => {
     const options = {
       customRules: [sentenceCaseHeadingRule],
-      files: [fixturePath],
+      files: [failingFixture, passingFixture],
       resultVersion: 3
     };
 
     const results = await lint(options);
-    const violations = results[fixturePath] || [];
+    const violFail = results[failingFixture] || [];
+    const violPass = results[passingFixture] || [];
 
     // Filter violations for our specific rule
-    ruleViolations = violations.filter(v =>
+    violationsFail = violFail.filter(v =>
+      v.ruleNames.includes("sentence-case-heading") || v.ruleNames.includes("SC001")
+    );
+    violationsPass = violPass.filter(v =>
       v.ruleNames.includes("sentence-case-heading") || v.ruleNames.includes("SC001")
     );
 
-    log('Detected violations:', ruleViolations.map(v => ({
+    log('Detected violations:', violationsFail.map(v => ({
       lineNumber: v.lineNumber,
       detail: v.errorDetail,
       context: v.context
     })));
   });
 
-  headingCases.forEach(({ lineNumber, headingText, expectViolation }) => {
+  headingCases.forEach(({ filePath, lineNumber, headingText, expectViolation }) => {
     test(`line ${lineNumber}: "${headingText}"`, () => {
-      const hasViolation = ruleViolations.some(v => v.lineNumber === lineNumber);
+      const list = filePath === failingFixture ? violationsFail : violationsPass;
+      const hasViolation = list.some(v => v.lineNumber === lineNumber);
       expect(hasViolation).toBe(expectViolation);
     });
   });
   test("provides appropriate error messages", async () => {
     const options = {
       customRules: [sentenceCaseHeadingRule],
-      files: [fixturePath],
+      files: [failingFixture],
       resultVersion: 3
     };
-    
+
     const results = await lint(options);
-    const violations = results[fixturePath] || [];
+    const violations = results[failingFixture] || [];
     
     // Filter violations for our specific rule
     const ruleViolations = violations.filter(v => 
@@ -112,6 +132,5 @@ describe("sentence-case-heading edge cases", () => {
       })).toBe(true);
     });
 
-    const fixtureLines = fs.readFileSync(fixturePath, "utf8").split("\n");
   });
 });
