@@ -14,12 +14,23 @@ This repository contains custom markdownlint rules implemented in JavaScript. Fo
 - Document functions with **JSDoc**.
 - Follow the naming conventions outlined in `docs/project-stack.md`.
 - Markdown headings should be written in **sentence case**.
-- When authoring or modifying custom markdownlint rules, consult `.windsurf/workflows/local/markdownlint-rule-create.md` for the test-driven workflow.
+- Place rule modules under `.vscode/custom-rules/` and follow `.windsurf/rules/local/markdownlint-custom-rules.md`.
+- When authoring or modifying custom markdownlint rules, consult `.windsurf/workflows/local/markdownlint-rule-create.md` for the test-driven workflow and update `docs/rules.md`.
+
+## Test file conventions
+
+- Write one test suite per behavior group under `tests/`.
+- Use descriptive names that express expected outcomes.
+- Focus on observable results rather than internal logic.
+- Keep fixtures minimal and include edge cases and failures.
 
 ## Commit style
 
-- Start commit messages with a short imperative summary such as `feat: add rule` or `fix: handle edge case`.
-- Wrap the first line at 72 characters or less.
+- Use the Conventional Commits `<type>: <subject>` format with no scope.
+- Limit the subject line to 50 characters.
+- Leave a blank line before the body.
+- Write body lines as bullets under 72 characters.
+- Describe what changed and why in each bullet.
 
 ## Pull request message
 
