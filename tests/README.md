@@ -10,7 +10,9 @@ This directory contains test fixtures and test implementations for the markdownl
 
 ```
 tests/
-  fixtures/  - Markdown fixture files used by the tests
+  fixtures/
+    backtick/       - Fixtures for the backtick-code-elements rule
+    sentence-case/  - Fixtures for the sentence-case-heading rule
   rules/     - Jest test suites implementing the rule checks
   utils/     - Helper modules shared across tests
 ```

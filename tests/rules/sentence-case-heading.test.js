@@ -23,7 +23,7 @@ const __dirname = path.dirname(__filename);
 // Path to the fixture file
 const fixturePath = path.join(
   __dirname,
-  '../fixtures/basic-sentence-case-heading.fixture.md'
+  '../fixtures/sentence-case/basic.fixture.md'
 );
 
 
