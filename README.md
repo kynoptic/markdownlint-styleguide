@@ -1,4 +1,3 @@
-<!-- markdownlint-disable backtick-code-elements -->
 <!-- markdownlint-disable-next-line sentence-case-heading -->
 # markdownlint-trap
 
@@ -20,8 +19,8 @@ npm install markdownlint-trap
 
 ### Requirements
 
-- Node.js (v14 or higher)
-- markdownlint (v0.38.0 or compatible)
+- Node.js (v`14` or higher)
+- markdownlint (v`0.38.0` or compatible)
 
 ## Usage
 

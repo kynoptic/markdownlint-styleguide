@@ -1,5 +1,4 @@
 # `/docs`
-<!-- markdownlint-disable backtick-code-elements -->
 
 ## Purpose
 
