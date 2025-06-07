@@ -70,6 +70,14 @@ markdownlint-trap provides custom markdownlint rules enforcing consistent Markdo
 - Name variables and files for clarity over brevity
 - Mark provisional logic with `// TODO:` or `// FIXME:`
 
+## Markdown formatting conventions
+
+- Use backticks to wrap all:
+  - Filenames (e.g., `main.py`)
+  - Directories (e.g., `src/`)
+  - Code snippets, flags, and inline commands (e.g., `--help`)
+- Prefer fenced code blocks (` ``` `) for multi-line commands or examples
+
 ## Code clarity and documentation standards
 
 ### Naming and file metadata
