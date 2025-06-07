@@ -9,9 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [`1.1.0`] - 2025-06-06
+
 ### Added
 
 - Added backtick-code-elements markdownlint rule
+- Added debug logging infrastructure (#8)
+
+### Fixed
+
+- Improved sentence case heading rule to handle special cases
+
+### Changed
+
+- Simplified sentence-case rule logic (#5)
+- Reorganized tests directory structure (#29)
+- Restructured test fixtures by outcome and consolidated rule fixtures (#33, #34, #36)
+
+### Documentation
+
+- Added project roadmap (#7)
+- Added basic testing instructions (#12)
+- Improved rule documentation (#9)
+- Updated error messages docs and tests (#10)
+- Listed all docs in docs README (#11)
+- Clarified contributor guidelines (#32)
 
 ## [`1.0.0`] - 2025-06-03
 
