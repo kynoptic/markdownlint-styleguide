@@ -134,7 +134,7 @@ tests/
   fixtures/
   rules/
   utils/
-```text
+```
 
 ## Test file conventions
 
