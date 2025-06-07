@@ -1,5 +1,11 @@
 import fs from 'fs';
 
+/**
+ * Read a fixture file and gather expected passing and failing lines.
+ *
+ * @param {string} filePath - Absolute path to the fixture file.
+ * @returns {{passingLines: number[], failingLines: number[]}} Line numbers grouped by outcome.
+ */
 export function parseFixture(filePath) {
   return fs
     .readFileSync(filePath, 'utf8')

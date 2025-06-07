@@ -16,6 +16,14 @@ const ignoredTerms = new Set([
   'pass/fail',
   'Describe/test'
 ]);
+
+/**
+ * markdownlint rule enforcing backticks around file paths and commands.
+ *
+ * @param {import('markdownlint').RuleParams} params - Parsed Markdown input.
+ * @param {import('markdownlint').RuleOnError} onError - Callback to report violations.
+ * @returns {void}
+ */
 function backtickCodeElements(params, onError) {
   if (!params || !params.lines || typeof onError !== 'function') {
     return;
