@@ -6,4 +6,4 @@
 - [ ] **VS Code extension integration** – Provide steps and configuration for bundling these rules into a VS Code extension.
 - [x] **Simplify test structure** – Map each fixture to a dedicated test file.
 - [ ] **Enhanced documentation** – Add missing JSDoc comments for functions and utilities.
-- [ ] **Folder-level READMEs** – Document purpose and usage for each subdirectory.
+- [x] **Folder-level READMEs** – Document purpose and usage for each subdirectory.
