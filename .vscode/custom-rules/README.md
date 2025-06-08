@@ -13,7 +13,7 @@ Store the project's custom markdownlint rules for local development and testing.
 
 ## Usage
 
-Point markdownlint at this directory using the `customRules` option or import the files into your own configuration.
+Point markdownlint at this directory using the `customRules` option or `import` the files into your own configuration.
 
 ## Related modules
 

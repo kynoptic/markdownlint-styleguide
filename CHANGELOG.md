@@ -60,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking changes
 
-- Complete restructuring of the project. Old import paths and rule structure are no longer valid
+- Complete restructuring of the project. Old `import` paths and rule structure are no longer valid
 - Documentation structure has been significantly reorganized
 
 ## [`0.3.0`] - 2025-06-03
@@ -169,6 +169,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release of `markdownlint-custom-rules`.
 - Includes custom rules such as `sentence-case-headings-bold` and `backtick-code-elements`.
-- Added `index.js` to allow usage as an npm package.
+- Added `index.js` to allow usage as an `npm` package.
 - Implemented JSDoc comments for improved code understanding.
 - Structured project documentation following the Diátaxis framework.

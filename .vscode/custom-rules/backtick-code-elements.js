@@ -57,7 +57,15 @@ function backtickCodeElements(params, onError) {
     const patterns = [
       /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
       /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
-      /\b[a-zA-Z][\w.-]*\([^)]*\)/g        // simple function or command()
+      /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or command()
+      /\B\.[\w.-]+\b/g,                    // dotfiles like .env
+      /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
+      /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
+      /\b(?:npm|yarn|npx|git|pip|python(?:3)?|node|ls|chmod|curl|wget|java|grep|cat|cp|mv|rm)\b[^`]*/g,
+                                             // common CLI commands
+      /\bimport\s+\w+/g,                     // import statements
+      /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
+      /\b[A-Z]+\+[A-Z]\b/g                  // key combos like CTRL+C
     ];
 
     const flaggedPositions = new Set();

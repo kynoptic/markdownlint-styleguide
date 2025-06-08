@@ -22,7 +22,8 @@ const technicalTerms = Object.freeze({
   FBI: true,
   COVID: true,
   iOS: true,
-  macOS: true
+  macOS: true,
+  Markdown: true
 });
 
 
@@ -33,6 +34,12 @@ const properNouns = Object.freeze({
   github: 'GitHub',
   zoloft: 'Zoloft',
   michael: 'Michael',
+  andes: 'Andes',
+  japanese: 'Japanese',
+  windows: 'Windows',
+  glossary: 'Glossary',
+  vs: 'VS',
+  code: 'Code'
 });
 
 /**
@@ -120,7 +127,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
     // Strip leading emoji or symbol characters before analysis
-    headingText = headingText.replace(/^[\u{1F000}-\u{1FFFF}\u{2000}-\u{3FFF}]+\s*/u, '').trim();
+    headingText = headingText
+      .replace(/^[\u{1F000}-\u{1FFFF}\u{2000}-\u{3FFF}\u{FE0F}]+\s*/u, '')
+      .trim();
     if (!headingText) {
       return;
     }
@@ -205,16 +214,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (!firstWord.startsWith('__PRESERVED_')) {
       const base = firstWord.split('-')[0];
       const numericPrefixSkipped = firstIndex > 0 && numeric.test(words[0]);
-      if (numericPrefixSkipped && !startsWithYear) {
-        if (firstWord[0] !== firstWord[0].toLowerCase()) {
-          onError({
-            lineNumber,
-            detail: "Heading's first word after a numeric prefix should be lowercase.",
-            context: headingText,
-            errorContext: headingText
-          });
-          return;
-        }
+      if (numericPrefixSkipped && startsWithYear) {
+        // year-prefixed headings may start with a lowercase word
       } else if (!isSingleWordHyphen && firstWord[0] !== firstWord[0].toUpperCase()) {
         onError({
           lineNumber,
@@ -251,8 +252,16 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
+    const colonIndex = headingText.indexOf(':');
     for (let i = firstIndex + 1; i < words.length; i++) {
       const word = words[i];
+      const wordPos = headingText.indexOf(word);
+      if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {
+        const afterColon = headingText.slice(colonIndex + 1).trimStart();
+        if (afterColon.startsWith(word)) {
+          continue; // allow capitalization after colon
+        }
+      }
       if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
         continue;
       }

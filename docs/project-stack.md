@@ -41,7 +41,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
 - **Naming convention**:
   - camelCase for variables and functions
   - PascalCase for classes and constructors
-  - UPPER_SNAKE_CASE for constants
+    - `UPPER_SNAKE_CASE` for constants
 
 ### Documentation
 
