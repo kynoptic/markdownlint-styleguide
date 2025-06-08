@@ -1,5 +1,4 @@
 # `/.vscode/custom-rules`
-<!-- markdownlint-disable backtick-code-elements -->
 
 ## Purpose
 
@@ -21,4 +20,3 @@ Point markdownlint at this directory using the `customRules` option or import th
 * [`../../src/`](../../src/) – Exports these rules as a single array.
 * [`../../docs/rules.md`](../../docs/rules.md) – Rule descriptions and examples.
 * [`../../README.md`](../../README.md) – Project overview.
-<!-- markdownlint-enable backtick-code-elements -->
