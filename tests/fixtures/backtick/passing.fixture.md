@@ -221,3 +221,5 @@ Bones/Soft Tissues:   The bones and soft tissues are unremarkable for age. <!-- 
 Signed by: Monica Wood, M.D. <!-- ✅ -->
 **Exam:** Ultrasound, Abdominal, Limited, Single Organ/Quadrant <!-- ✅ -->
 - Father: High cholesterol, anxiety/depression <!-- ✅ -->
+Use the and/or operator in logic. <!-- ✅ -->
+A/B testing improves results. <!-- ✅ -->

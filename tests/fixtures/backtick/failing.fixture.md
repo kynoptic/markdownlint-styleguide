@@ -14,3 +14,4 @@ Open path/to/folder/ for logs <!-- ❌ -->
 Run mycmd(arg1, arg2) to start <!-- ❌ -->
 
 Look up the file "sample file.md" <!-- ❌ -->
+Check docs/api for more info <!-- ❌ -->

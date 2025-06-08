@@ -19,7 +19,10 @@ const technicalTerms = Object.freeze({
   REST: true,
   UI: true,
   UX: true,
-  FBI: true
+  FBI: true,
+  COVID: true,
+  CHEST: true,
+  LATERAL: true
 });
 
 
@@ -27,7 +30,12 @@ const technicalTerms = Object.freeze({
 const properNouns = Object.freeze({
   paris: 'Paris',
   facebook: 'Facebook',
-  github: 'GitHub'
+  github: 'GitHub',
+  zoloft: 'Zoloft',
+  michael: 'Michael',
+  curry: 'Curry',
+  radiology: 'Radiology',
+  report: 'Report'
 });
 
 /**
@@ -64,7 +72,11 @@ function isAllCapsHeading(words) {
       !(w.startsWith('__PRESERVED_') && w.endsWith('__'))
   );
   const allCaps = relevant.filter((w) => w === w.toUpperCase());
-  return relevant.length > 1 && allCaps.length === relevant.length;
+  return (
+    relevant.length > 1 &&
+    allCaps.length === relevant.length &&
+    !/\d/.test(relevant.join(''))
+  );
 }
 
 /**
@@ -121,7 +133,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
-    if (headingText.trim().split(/\s+/).length === 1 && headingText.trim() === headingText.trim().toLowerCase()) {
+    if (
+      headingText.trim().split(/\s+/).length === 1 &&
+      headingText.trim() === headingText.trim().toLowerCase() &&
+      !/[0-9-]/.test(headingText)
+    ) {
       onError({
         lineNumber,
         detail: 'Single-word heading should be capitalized.',
@@ -134,6 +150,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const matches = [...headingText.matchAll(codeContentRegex)];
     const totalCodeLength = matches.reduce((sum, m) => sum + m[0].length, 0);
     if (totalCodeLength > 0 && totalCodeLength / headingText.length > 0.4) {
+      return;
+    }
+
+    if (/^[\d./-]+$/.test(headingText.replace(/\s+/g, ''))) {
       return;
     }
 
@@ -160,16 +180,23 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (!clean) {
       return;
     }
+    if (/^\d+[\d./-]*$/.test(clean)) {
+      return;
+    }
     const words = clean.split(/\s+/).filter((w) => w.length > 0);
     if (words.every((w) => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
       return;
     }
 
     let firstIndex = 0;
+    const numeric = /^[-\d.,/]+$/;
+    const startsWithYear = /^\d{4}(?:\D|$)/.test(headingText);
+    const isSingleWordHyphen = headingText.trim().split(/\s+/).length === 1 && headingText.includes('-');
     while (
       firstIndex < words.length &&
-      words[firstIndex].startsWith('__PRESERVED_') &&
-      words[firstIndex].endsWith('__')
+      ((words[firstIndex].startsWith('__PRESERVED_') &&
+        words[firstIndex].endsWith('__')) ||
+        numeric.test(words[firstIndex]))
     ) {
       firstIndex++;
     }
@@ -179,7 +206,19 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
     const firstWord = words[firstIndex];
     if (!firstWord.startsWith('__PRESERVED_')) {
-      if (firstWord[0] !== firstWord[0].toUpperCase()) {
+      const base = firstWord.split('-')[0];
+      const numericPrefixSkipped = firstIndex > 0 && numeric.test(words[0]);
+      if (numericPrefixSkipped && !startsWithYear) {
+        if (firstWord[0] !== firstWord[0].toLowerCase()) {
+          onError({
+            lineNumber,
+            detail: "Heading's first word after a numeric prefix should be lowercase.",
+            context: headingText,
+            errorContext: headingText
+          });
+          return;
+        }
+      } else if (!isSingleWordHyphen && firstWord[0] !== firstWord[0].toUpperCase()) {
         onError({
           lineNumber,
           detail: "Heading's first word should be capitalized.",
@@ -189,9 +228,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return;
       }
       if (
-        firstWord.length > 1 &&
-        firstWord.substring(1) !== firstWord.substring(1).toLowerCase() &&
-        !(firstWord.length <= 4 && firstWord === firstWord.toUpperCase())
+        !technicalTerms[base] &&
+        base.length > 1 &&
+        base.substring(1) !== base.substring(1).toLowerCase() &&
+        !(base.length <= 4 && base === base.toUpperCase()) &&
+        !(base === base.toUpperCase() && /\d/.test(base))
       ) {
         onError({
           lineNumber,

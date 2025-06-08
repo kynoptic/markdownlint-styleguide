@@ -14,7 +14,16 @@ const ignoredTerms = new Set([
   'i.e.',
   'import/export',
   'pass/fail',
-  'Describe/test'
+  'Describe/test',
+  'anxiety/depression',
+  'minutes/week',
+  'times/week',
+  'kg/m',
+  'medication/treatment',
+  'D.C',
+  'M.D',
+  'colitis/proctitis',
+  'runs/yoga/strength'
 ]);
 
 /**
@@ -54,9 +63,65 @@ function backtickCodeElements(params, onError) {
 
     const patterns = [
       /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
-      /\b[\w.-]+\.[a-zA-Z0-9]{1,5}\b/g,    // file name with extension
-      /\b\w+\([^)]*\)/g                    // simple function or command()
+      /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
+      /\b[a-zA-Z][\w.-]*\([^)]*\)/g        // simple function or command()
     ];
+
+    const flaggedPositions = new Set();
+
+    const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
+    const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
+    /**
+     * Determine if an index range is within a Markdown link or image.
+     *
+     * @param {string} text - Line being evaluated.
+     * @param {number} start - Start index of match.
+     * @param {number} end - End index of match.
+     * @returns {boolean}
+     */
+    function inMarkdownLink(text, start, end) {
+      let m;
+      linkRegex.lastIndex = 0;
+      while ((m = linkRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function inWikiLink(text, start, end) {
+      let m;
+      wikiLinkRegex.lastIndex = 0;
+      while ((m = wikiLinkRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function isLikelyFilePath(str) {
+      if (!str.includes('/')) {
+        return false;
+      }
+      if (/[A-Z]/.test(str) || /\s/.test(str)) {
+        return false;
+      }
+      const segments = str.split('/');
+      if (segments.length < 2) {
+        return false;
+      }
+      if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
+        if (segments[0].length <= 2 || segments[1].length <= 2) {
+          return false;
+        }
+      }
+      if (/^\d+$/.test(segments[0])) {
+        return false;
+      }
+      return /[a-zA-Z]/.test(str);
+    }
 
     for (const regex of patterns) {
       regex.lastIndex = 0;
@@ -79,6 +144,20 @@ function backtickCodeElements(params, onError) {
         if (prefix.includes('http://') || prefix.includes('https://')) {
           continue;
         }
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end)) {
+          continue;
+        }
+        if (/^\d+(?:\.\d+)+$/.test(text)) {
+          continue;
+        }
+        if (regex === patterns[0] && !isLikelyFilePath(text)) {
+          continue;
+        }
+        const key = `${start}-${end}`;
+        if (flaggedPositions.has(key)) {
+          continue;
+        }
+        flaggedPositions.add(key);
         onError({
           lineNumber,
           detail: `Wrap "${text}" in backticks.`,
