@@ -14,16 +14,9 @@ const ignoredTerms = new Set([
   'i.e.',
   'import/export',
   'pass/fail',
-  'Describe/test',
-  'anxiety/depression',
-  'minutes/week',
-  'times/week',
   'kg/m',
-  'medication/treatment',
   'D.C',
-  'M.D',
-  'colitis/proctitis',
-  'runs/yoga/strength'
+  'M.D'
 ]);
 
 /**

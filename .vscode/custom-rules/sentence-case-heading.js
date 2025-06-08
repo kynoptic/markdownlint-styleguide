@@ -21,8 +21,8 @@ const technicalTerms = Object.freeze({
   UX: true,
   FBI: true,
   COVID: true,
-  CHEST: true,
-  LATERAL: true
+  iOS: true,
+  macOS: true
 });
 
 
@@ -33,9 +33,6 @@ const properNouns = Object.freeze({
   github: 'GitHub',
   zoloft: 'Zoloft',
   michael: 'Michael',
-  curry: 'Curry',
-  radiology: 'Radiology',
-  report: 'Report'
 });
 
 /**
