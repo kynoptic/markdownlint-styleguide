@@ -38,6 +38,8 @@ See the full spec at [semver.org](https://semver.org/spec/v2.0.0.html) <!-- ✅ 
 Refer to [README](./README.md) for setup instructions <!-- ✅ -->
 Open [docs/index.md#Getting-Started](docs/index.md#Getting-Started) <!-- ✅ -->
 Visit [localhost:8000](http://localhost:8000) to test locally <!-- ✅ -->
+Visit github.com for more information <!-- ✅ -->
+Apply at ulca.edu for more information <!-- ✅ -->
 
 ## Images and embeds
 
