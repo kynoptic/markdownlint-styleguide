@@ -38,8 +38,8 @@ const properNouns = Object.freeze({
   japanese: 'Japanese',
   windows: 'Windows',
   glossary: 'Glossary',
-  vs: 'VS',
-  code: 'Code'
+  'vs code': 'VS Code',
+  vscode: 'VS Code'
 });
 
 /**

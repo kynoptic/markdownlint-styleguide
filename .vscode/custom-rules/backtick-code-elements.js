@@ -6,6 +6,7 @@
  */
 const ignoredTerms = new Set([
   'Node.js',
+  'npm',
   'React.js',
   'CI/CD',
   'e.g',
