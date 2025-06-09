@@ -3,29 +3,31 @@
 
 ## Purpose
 
-This directory contains comprehensive documentation for the markdownlint-trap project, including detailed rule specifications, usage guidelines, and examples.
+Comprehensive documentation for **markdownlint-trap**, organized using the Diátaxis framework.
 
 ## Contents
 
-### Files
+### Folders
 
-* **[`rules.md`](./rules.md)** – Detailed documentation of custom markdownlint rules implemented in this project
-* **[`project-stack.md`](./project-stack.md)** – Overview of the project's technology stack and architecture
-* **[`roadmap.md`](./roadmap.md)** – Planned improvements and future work
+- [`tutorials/`](./tutorials/) – Step-by-step guides for newcomers
+- [`how-to/`](./how-to/) – Recipes for accomplishing specific tasks
+- [`reference/`](./reference/) – Definitive descriptions of rules and configuration
+- [`explanations/`](./explanations/) – Background material and project overviews
+
+### Key files
+
+- [`reference/rules.md`](./reference/rules.md) – Documentation of custom rules
+- [`explanations/project-stack.md`](./explanations/project-stack.md) – Technology stack and architecture
+- [`explanations/roadmap.md`](./explanations/roadmap.md) – Planned improvements
 
 ## Usage
 
-Reference these documents when:
-
-* Implementing new rules
-* Understanding how existing rules work
-* Configuring markdownlint for your project
-* Troubleshooting rule violations
+Consult these documents when implementing or adjusting rules, configuring the project, or understanding its design choices.
 
 ## Related modules
 
-* [`tests/`](../tests/) – Test fixtures and implementations for the rules
-* [`src/`](../src/) – General library code and package entry point
-* [`vscode/custom-rules`](../.vscode/custom-rules/) – Implementation of the custom rules
-* [`README.md`](../README.md) – Project overview
+- [`tests/`](../tests/) – Test fixtures and implementations for the rules
+- [`src/`](../src/) – General library code and package entry point
+- [`vscode/custom-rules`](../.vscode/custom-rules/) – Implementation of the custom rules
+- [`README.md`](../README.md) – Project overview
 <!-- markdownlint-enable backtick-code-elements -->

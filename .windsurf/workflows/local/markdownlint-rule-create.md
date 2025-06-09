@@ -39,7 +39,7 @@ description: Automates a test-driven workflow for developing, validating, and re
    - Append the rule path to `customRules`
    - Enable the rule explicitly in `config.rules` using its exported name
 
-8. **Document rule in README** – Update `docs/rules.md` to include:
+8. **Document rule in README** – Update `docs/reference/rules.md` to include:
    - Rule name
    - Short description
    - Failing cases

@@ -20,6 +20,13 @@ npm install markdownlint-trap
 ### Requirements
 
 - Node.js (v`14` or higher)
+- Use `nvm` to load the version from `.nvmrc`:
+
+```bash
+nvm install
+nvm use
+```
+
 - markdownlint (v`0.38.0` or compatible)
 
 ## Usage
@@ -63,7 +70,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 ## Resources
 <!-- markdownlint-disable backtick-code-elements -->
 
-- [`docs/rules.md`](./docs/rules.md) – Detailed rule documentation
+- [`docs/reference/rules.md`](./docs/reference/rules.md) – Detailed rule documentation
 - [`tests/`](./tests/) – Test fixtures and examples
 - [`CHANGELOG.md`](./CHANGELOG.md) – Version history and changes
 <!-- markdownlint-enable backtick-code-elements -->

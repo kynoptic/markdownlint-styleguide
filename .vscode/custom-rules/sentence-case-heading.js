@@ -67,7 +67,9 @@ function extractHeadingText(tokens, lines, token) {
 
 /**
  * Determine if all non-acronym words are uppercase.
- * @param {string[]} words
+ *
+ * @param {string[]} words - Words extracted from the heading.
+ * @returns {boolean} True when every relevant word is uppercase.
  */
 function isAllCapsHeading(words) {
   const relevant = words.filter(
@@ -84,7 +86,13 @@ function isAllCapsHeading(words) {
 }
 
 /**
- * Validate a hyphenated word. Returns true if a violation was reported.
+ * Validate a hyphenated word.
+ *
+ * @param {string} word - Candidate word from the heading.
+ * @param {number} lineNumber - Line number for error reporting.
+ * @param {string} headingText - Full heading text.
+ * @param {import("markdownlint").RuleOnError} onError - Callback to report violations.
+ * @returns {boolean} True if a lint error was generated.
  */
 function checkHyphenatedWord(word, lineNumber, headingText, onError) {
   if (!word.includes('-')) {

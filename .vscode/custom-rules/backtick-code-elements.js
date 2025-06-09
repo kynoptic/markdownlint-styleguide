@@ -92,6 +92,14 @@ function backtickCodeElements(params, onError) {
       return false;
     }
 
+    /**
+     * Check if an index range falls inside a wiki-style link.
+     *
+     * @param {string} text - Line being evaluated.
+     * @param {number} start - Start index of match.
+     * @param {number} end - End index of match.
+     * @returns {boolean} True when the range is within a wiki link.
+     */
     function inWikiLink(text, start, end) {
       let m;
       wikiLinkRegex.lastIndex = 0;
@@ -103,6 +111,12 @@ function backtickCodeElements(params, onError) {
       return false;
     }
 
+    /**
+     * Heuristically determine if a string looks like a file path.
+     *
+     * @param {string} str - Text to evaluate.
+     * @returns {boolean} True if the string resembles a file path.
+     */
     function isLikelyFilePath(str) {
       if (!str.includes('/')) {
         return false;

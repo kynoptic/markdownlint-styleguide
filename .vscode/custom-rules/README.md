@@ -18,5 +18,5 @@ Point markdownlint at this directory using the `customRules` option or `import` 
 ## Related modules
 
 * [`../../src/`](../../src/) – Exports these rules as a single array.
-* [`../../docs/rules.md`](../../docs/rules.md) – Rule descriptions and examples.
+* [`../../docs/reference/rules.md`](../../docs/reference/rules.md) – Rule descriptions and examples.
 * [`../../README.md`](../../README.md) – Project overview.

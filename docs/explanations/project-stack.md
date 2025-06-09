@@ -28,7 +28,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
    - Fixtures contain HTML comments indicating expected pass/fail status
 4. **Documentation**:
    - Main documentation in `README.md`
-   - Detailed rule documentation in `docs/rules.md`
+   - Detailed rule documentation in `docs/reference/rules.md`
    - JSDoc comments for all functions and exports
 
 ## Coding conventions
@@ -70,7 +70,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
    - Run tests with `npm test`
 
 3. **Documentation**:
-   - Update rule documentation in `docs/rules.md`
+   - Update rule documentation in `docs/reference/rules.md`
    - Ensure README reflects current features and usage
 
 ## Integration points
