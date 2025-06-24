@@ -43,6 +43,60 @@ const properNouns = Object.freeze({
 });
 
 /**
+ * Determine indices of words that are part of multi-word proper nouns.
+ *
+ * @param {string[]} words - Tokenized heading words.
+ * @param {Record<string, string>} nouns - Mapping of proper nouns.
+ * @returns {Set<number>} Indices that should be ignored during case checks.
+ */
+function getProperPhraseIndices(words, nouns) {
+  const indices = new Set();
+  const lowerWords = words.map((w) => w.toLowerCase());
+  Object.keys(nouns).forEach((key) => {
+    if (!key.includes(' ')) {
+      return;
+    }
+    const parts = key.split(' ');
+    for (let i = 0; i <= lowerWords.length - parts.length; i++) {
+      const match = parts.every((p, j) => lowerWords[i + j] === p);
+      if (match) {
+        for (let j = 0; j < parts.length; j++) {
+          indices.add(i + j);
+        }
+      }
+    }
+  });
+  return indices;
+}
+
+/**
+ * Validate multi-word proper nouns for correct capitalization.
+ *
+ * @param {string} text - Original heading text.
+ * @param {import('markdownlint').RuleOnError} onError - Callback for violations.
+ * @param {number} lineNumber - Line number for error reporting.
+ * @returns {boolean} True if a violation was reported.
+ */
+function validateProperPhrases(text, onError, lineNumber) {
+  for (const [phrase, expected] of Object.entries(properNouns)) {
+    if (!phrase.includes(' ')) {
+      continue;
+    }
+    const regex = new RegExp(`\\b${phrase}\\b`, 'i');
+    const match = regex.exec(text);
+    if (match && match[0] !== expected) {
+      onError({
+        lineNumber,
+        detail: `Phrase "${match[0]}" should be "${expected}".`,
+        context: text
+      });
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Extract the plain heading text from tokens.
  * @param {import("markdownlint").Token[]} tokens
  * @param {string[]} lines
@@ -171,6 +225,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
+    if (validateProperPhrases(headingText, onError, lineNumber)) {
+      return;
+    }
+
     const preservedSegments = [];
     let processed = headingText
       .replace(/`([^`]+)`/g, (m) => {
@@ -198,6 +256,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     const words = clean.split(/\s+/).filter((w) => w.length > 0);
+    const phraseIgnore = getProperPhraseIndices(words, properNouns);
     if (words.every((w) => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
       return;
     }
@@ -219,7 +278,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
     const firstWord = words[firstIndex];
-    if (!firstWord.startsWith('__PRESERVED_')) {
+    if (!phraseIgnore.has(firstIndex) && !firstWord.startsWith('__PRESERVED_')) {
       const base = firstWord.split('-')[0];
       const numericPrefixSkipped = firstIndex > 0 && numeric.test(words[0]);
       if (numericPrefixSkipped && startsWithYear) {
@@ -262,6 +321,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
     const colonIndex = headingText.indexOf(':');
     for (let i = firstIndex + 1; i < words.length; i++) {
+      if (phraseIgnore.has(i)) {
+        continue;
+      }
       const word = words[i];
       const wordPos = headingText.indexOf(word);
       if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {
