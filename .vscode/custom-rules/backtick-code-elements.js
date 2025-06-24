@@ -28,7 +28,11 @@ const ignoredTerms = new Set([
  * @returns {void}
  */
 function backtickCodeElements(params, onError) {
-  if (!params || !params.lines || typeof onError !== 'function') {
+  if (
+    !params ||
+    !Array.isArray(params.lines) ||
+    typeof onError !== 'function'
+  ) {
     return;
   }
 
@@ -39,7 +43,7 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-    if (/^```/.test(line.trim())) {
+    if (/^(?:```|~~~)/.test(line.trim())) {
       inCodeBlock = !inCodeBlock;
       continue;
     }

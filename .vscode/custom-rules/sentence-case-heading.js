@@ -171,7 +171,14 @@ function checkHyphenatedWord(word, lineNumber, headingText, onError) {
  * @param {import("markdownlint").RuleOnError} onError
  */
 function basicSentenceCaseHeadingFunction(params, onError) {
-  if (!params || !params.parsers || !params.parsers.micromark || !params.parsers.micromark.tokens || typeof onError !== 'function') {
+  if (
+    !params ||
+    !params.parsers ||
+    !params.parsers.micromark ||
+    !params.parsers.micromark.tokens ||
+    !Array.isArray(params.lines) ||
+    typeof onError !== 'function'
+  ) {
     return;
   }
 
