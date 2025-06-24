@@ -1,20 +1,21 @@
 // @ts-check
 
 /**
- * Rule that requires code snippets, file names and directory paths
- * to be wrapped in backticks when used in prose.
+
+* Rule that requires code snippets, file names and directory paths
+* to be wrapped in backticks when used in prose.
  */
 /**
- * Categorized sets of terms to ignore when checking for code elements in prose.
- * - acronyms: Common technical acronyms (e.g., API, CLI, UTC)
- * - technical: Terms and abbreviations that are not code (e.g., CI/CD, et al.)
- * - fileExtensions: Common file extensions that may appear in prose
- * - domains: Known domains or URLs
- * - phrases: Common phrases that are not code or file paths
+* Categorized sets of terms to ignore when checking for code elements in prose.
+* * acronyms: Common technical acronyms (e.g., API, CLI, UTC)
+* * technical: Terms and abbreviations that are not code (e.g., CI/CD, et al.)
+* * fileExtensions: Common file extensions that may appear in prose
+* * domains: Known domains or URLs
+* * phrases: Common phrases that are not code or file paths
  */
 /**
- * Categorized sets of terms to ignore when checking for code elements in prose.
- * @type {{ acronyms: Set<string>, technical: Set<string>, fileExtensions: Set<string>, domains: Set<string>, phrases: Set<string> }}
+* Categorized sets of terms to ignore when checking for code elements in prose.
+* @type {{ acronyms: Set<string>, technical: Set<string>, fileExtensions: Set<string>, domains: Set<string>, phrases: Set<string> }}
  */
 const ignoredTerms = {
   acronyms: new Set([
@@ -36,22 +37,23 @@ const ignoredTerms = {
 };
 
 /**
- * markdownlint rule enforcing backticks around file paths and commands.
- *
- * @param {import('markdownlint').RuleParams} params - Parsed Markdown input.
- * @param {import('markdownlint').RuleOnError} onError - Callback to report violations.
- * @returns {void}
+
+* markdownlint rule enforcing backticks around file paths and commands.
+*
+* @param {`import('markdownlint')``.RuleParams`} params - Parsed Markdown input.
+* @param {`import('markdownlint')``.RuleOnError`} onError - Callback to report violations.
+* @returns {void}
  */
-function backtickCodeElements(params, onError) {
+function `backtickCodeElements(params, onError)` {
   if (
     !params ||
-    !Array.isArray(params.lines) ||
+    !Array.isArray(`params.lines`) ||
     typeof onError !== 'function'
   ) {
     return;
   }
 
-  const lines = params.lines;
+  const lines = `params.lines`;
   let inCodeBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -59,57 +61,57 @@ function backtickCodeElements(params, onError) {
     const line = lines[i];
 
     // Detect both ``` and ~~~ as code block fences (ATX or tilde).
-    const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
+    const fenceMatch = `line.trim()`.`match(/^(`{3,}|~{3,})`/);
     if (fenceMatch) {
       inCodeBlock = !inCodeBlock;
       continue;
     }
 
-    if (inCodeBlock || /^\s*#/.test(line)) {
+    if (inCodeBlock || /^\s*#/.`test(line)`) {
       continue;
     }
 
     const codeSpans = [];
     const spanRegex = /`[^`]+`/g;
     let spanMatch;
-    while ((spanMatch = spanRegex.exec(line)) !== null) {
-      codeSpans.push([spanMatch.index, spanMatch.index + spanMatch[0].length]);
+    while ((spanMatch = `spanRegex.exec(line)`) !== null) {
+      codeSpans.push([`spanMatch.index`, `spanMatch.index` + spanMatch[0]`.length`]);
     }
 
     const patterns = [
-      /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
-      /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
-      /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or command()
-      /\B\.[\w.-]+\b/g,                    // dotfiles like .env
-      /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
-      /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
+      /\`b(?:\.?\/?[\w.-]+\/)`+[\w.-]+\b/g, // directory or file path
+      /\b[?=[^\d\s]](\w.-)*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
+      /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or `command()`
+      /\B\.[\w.-]+\b/g,                    // dotfiles like `.env`
+      /\b[A-Z][A-Z0-9]**[A-Z0-9*]+\b/g,      // environment variables like `NODE_ENV`
+      /\b(?:`PATH`|`HOME`|`TEMP`|`TMPDIR`|`USER`|`SHELL`|`PORT`|`HOST`)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
-      /\b(?:git|npm|pip|yarn|docker|brew|cargo|pnpm)\s+[a-z][\w-]*/g, // common two-word CLI commands
+      /\`b(?:git|npm|pip|yarn|docker|brew|cargo|pnpm)`\s+[a-z][\w-]*/g, // common two-word CLI commands
 
                                              // common CLI commands
-      /\bimport\s+\w+/g,                     // import statements
+      /\bimport\s+\w+/g,                     // `import statements`
       /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
-      /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like CTRL+C
-      /\b(?:export|set)\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g   // shell variable assignments
+      /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like `CTRL+C`
+      /\`b(?:export|set)`\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g   // shell variable assignments
     ];
 
-    const flaggedPositions = new Set();
+    const flaggedPositions = new `Set()`;
 
     const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
     const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
     /**
-     * Determine if an index range is within a Markdown link or image.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean}
+  * Determine if an index range is within a Markdown link or image.
+  *
+  * @param {string} text - Line being evaluated.
+  * @param {number} start - Start index of match.
+  * @param {number} end - End index of match.
+  * @returns {boolean}
      */
-    function inMarkdownLink(text, start, end) {
+    function `inMarkdownLink(text, start, end)` {
       let m;
       linkRegex.lastIndex = 0;
-      while ((m = linkRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
+      while ((m = `linkRegex.exec(text)`) !== null) {
+        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
           return true;
         }
       }
@@ -117,18 +119,18 @@ function backtickCodeElements(params, onError) {
     }
 
     /**
-     * Check if an index range falls inside a wiki-style link.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within a wiki link.
+  * Check if an index range falls inside a wiki-style link.
+  *
+  * @param {string} text - Line being evaluated.
+  * @param {number} start - Start index of match.
+  * @param {number} end - End index of match.
+  * @returns {boolean} True when the range is within a wiki link.
      */
-    function inWikiLink(text, start, end) {
+    function `inWikiLink(text, start, end)` {
       let m;
       wikiLinkRegex.lastIndex = 0;
-      while ((m = wikiLinkRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
+      while ((m = `wikiLinkRegex.exec(text)`) !== null) {
+        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
           return true;
         }
       }
@@ -136,18 +138,18 @@ function backtickCodeElements(params, onError) {
     }
 
     /**
-     * Check if an index range falls inside an HTML comment.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within an HTML comment.
+  * Check if an index range falls inside an HTML comment.
+  *
+  * @param {string} text - Line being evaluated.
+  * @param {number} start - Start index of match.
+  * @param {number} end - End index of match.
+  * @returns {boolean} True when the range is within an HTML comment.
      */
-    function inHtmlComment(text, start, end) {
+    function `inHtmlComment(text, start, end)` {
       const commentRegex = /<!--.*?-->/g;
       let m;
-      while ((m = commentRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
+      while ((m = `commentRegex.exec(text)`) !== null) {
+        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
           return true;
         }
       }
@@ -155,20 +157,20 @@ function backtickCodeElements(params, onError) {
     }
 
     /**
-     * Check if an index range falls inside a LaTeX math expression.
-     * Handles both inline ($...$) and block ($$...$$) math expressions.
-     * Distinguishes between LaTeX math and shell variables like $value.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within a LaTeX math expression.
+  * Check if an index range falls inside a LaTeX math expression.
+  * Handles both inline ($...$) and block ($$...$$) math expressions.
+  * Distinguishes between LaTeX math and shell variables like $value.
+  *
+  * @param {string} text - Line being evaluated.
+  * @param {number} start - Start index of match.
+  * @param {number} end - End index of match.
+  * @returns {boolean} True when the range is within a LaTeX math expression.
      */
-    function inLatexMath(text, start, end) {
+    function `inLatexMath(text, start, end)` {
       // Skip if the match contains shell command indicators
-      if (text.substring(start, end).includes('grep ') || 
-          text.substring(start, end).includes('export ') ||
-          text.substring(start, end).includes(' command')) {
+      if (`text.substring(start, end)`.`includes('grep ')` ||
+          `text.substring(start, end)`.`includes('export ')` ||
+          `text.substring(start, end)`.`includes(' command')`) {
         return false;
       }
 
@@ -176,13 +178,13 @@ function backtickCodeElements(params, onError) {
       // This pattern matches text between dollar signs that contain LaTeX-like content
       const inlineMathRegex = /\$(\s*[a-zA-Z0-9\\{}^_()=+\-*\/><\s]+\s*)\$/g;
       let m;
-      while ((m = inlineMathRegex.exec(text)) !== null) {
+      while ((m = `inlineMathRegex.exec(text)`) !== null) {
         // Verify this looks like a math expression (contains LaTeX operators or spaces)
         const content = m[1];
-        if (content.includes('\\') || content.includes('^') || 
-            content.includes('_') || content.includes('{') ||
-            content.includes('=') || content.includes(' ')) {
-          if (start >= m.index && end <= m.index + m[0].length) {
+        if (`content.includes('\\')` || `content.includes('^')` || 
+            `content.includes('_')` || `content.includes('{')` ||
+            `content.includes('=')` || `content.includes(' ')`) {
+          if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
             return true;
           }
         }
@@ -190,14 +192,14 @@ function backtickCodeElements(params, onError) {
 
       // Check for block math expressions ($$...$$)
       const blockMathRegex = /\$\$([^\$]|\$[^\$])*\$\$/g;
-      while ((m = blockMathRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
+      while ((m = `blockMathRegex.exec(text)`) !== null) {
+        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
           return true;
         }
       }
 
       // Check if the line starts with a standalone $$ which indicates a math block start
-      if (text.trim() === '$$' || text.trim().startsWith('$$\n')) {
+      if (`text.trim()` === '$$' || text.trim().`startsWith('$$\n')`) {
         return true;
       }
 
@@ -211,88 +213,94 @@ function backtickCodeElements(params, onError) {
     }
 
     /**
-     * Heuristically determine if a string looks like a file path.
-     *
-     * @param {string} str - Text to evaluate.
-     * @returns {boolean} True if the string resembles a file path.
+  * Heuristically determine if a string looks like a file path.
+  *
+  * @param {string} str - Text to evaluate.
+  * @returns {boolean} True if the string resembles a file path.
      */
-    function isLikelyFilePath(str) {
-      if (!str.includes('/')) {
+    function `isLikelyFilePath(str)` {
+      if (!`str.includes('/')`) {
         return false;
       }
-      if (/[A-Z]/.test(str) || /\s/.test(str)) {
+      if (/[A-Z]/.`test(str)` || /\s/.`test(str)`) {
         return false;
       }
-      const segments = str.split('/');
+      const segments = `str.split('/')`;
       if (segments.length < 2) {
         return false;
       }
-      if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
-        if (segments[0].length <= 2 || segments[1].length <= 2) {
+      if (segments.length === 2 && !/\.[^/]+$/.`test(segments[1])`) {
+        if (segments[0]`.length` <= 2 || segments[1]`.length` <= 2) {
           return false;
         }
       }
-      if (/^\d+$/.test(segments[0])) {
+      if (/^\d+$/.`test(segments[0])`) {
         return false;
       }
-      return /[a-zA-Z]/.test(str);
+      return /[a-zA-Z]/.`test(str)`;
     }
 
     for (const regex of patterns) {
       regex.lastIndex = 0;
       let match;
-      while ((match = regex.exec(line)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
+      while ((match = `regex.exec(line)`) !== null) {
+        const start = `match.index`;
+        const end = start + match[0]`.length`;
         const text = match[0];
-        const inSpan = codeSpans.some(([s, e]) => start >= s && end <= e);
+        const inSpan = `codeSpans.some(([s, e])` => start >= s && end <= e);
         if (inSpan) {
           continue;
         }
         // Check all ignoredTerms categories
-        function isIgnoredTerm(term) {
-          return Object.values(ignoredTerms).some(set => set.has(term) || set.has(term.replace(/\.$/, '')));
+        function `isIgnoredTerm(term)` {
+          return `Object.values(ignoredTerms)`.some(set => `set.has`(term) || `set.has(term.replace(/\.$/, '')`));
         }
-        if (isIgnoredTerm(text)) {
+        if (`isIgnoredTerm(text)`) {
           continue;
         }
-        const prefix = line.slice(0, start);
-        if (/\(https?:\/\/[^)]*$/.test(prefix)) {
+        const prefix = `line.slice(0, start)`;
+        if (/\(https?:\/\/[^)]*$/.`test(prefix)`) {
           continue;
         }
-        if (prefix.includes('http://') || prefix.includes('https://')) {
+        if (`prefix.includes('http://')` || prefix.includes('https://')) {
           continue;
         }
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end) || inLatexMath(line, start, end)) {
+        if (`inMarkdownLink(line, start, end)` || `inWikiLink(line, start, end)` || `inHtmlComment(line, start, end)` || `inLatexMath(line, start, end)`) {
           continue;
         }
-        if (/^\d+(?:\.\d+)+$/.test(text)) {
+        if (/^\d+(?:\.\d+)+$/.`test(text)`) {
           continue;
         }
-        if (regex === patterns[0] && !isLikelyFilePath(text)) {
+        if (regex === patterns[0] && !`isLikelyFilePath(text)`) {
           continue;
         }
         const key = `${start}-${end}`;
-        if (flaggedPositions.has(key)) {
+        if (`flaggedPositions.has(key)`) {
           continue;
         }
-        flaggedPositions.add(key);
+        `flaggedPositions.add(key)`;
         onError({
           lineNumber,
           detail: `Wrap "${text}" in backticks.`,
-          context: line.trim()
+          context: `line.trim()`,
+          range: [start + 1, text.length],
+          fixInfo: {
+            editColumn: start + 1,
+            deleteCount: text.length,
+            insertText:`\`${text}\``
+          }
         });
-        // Stop after first reported violation on this line to avoid duplicates
-        break;
+        // No break statement to allow fixing multiple violations per line
       }
     }
   }
 }
 
-export default {
+`export default` {
   names: ['backtick-code-elements', 'BCE001'],
   description: 'Require code snippets, folder names and directories to be wrapped in backticks.',
   tags: ['style', 'code', 'prose'],
   parser: 'micromark',
-  function: backtickCodeElements
+  function: backtickCodeElements,
+  fixable: true
 };
