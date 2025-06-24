@@ -43,7 +43,9 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-    if (/^(?:```|~~~)/.test(line.trim())) {
+    // Detect both ``` and ~~~ as code block fences (ATX or tilde).
+    const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
+    if (fenceMatch) {
       inCodeBlock = !inCodeBlock;
       continue;
     }

@@ -255,7 +255,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       });
 
-    const clean = processed.replace(/[\#\*_~!\-+=\{\}|:;"<>,.?\\]/g, ' ').trim();
+    const clean = processed
+      .replace(/[\#\*_~!+=\{\}|:;"<>,.?\\]/g, ' ')
+      .trim();
     if (!clean) {
       return;
     }
