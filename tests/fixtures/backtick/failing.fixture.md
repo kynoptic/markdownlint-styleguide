@@ -47,6 +47,8 @@ Check docs/api for more info <!-- ❌ -->
 
 Set NODE_ENV to production <!-- ❌ -->
 Add export PATH=$PATH:/usr/local/bin to your profile <!-- ❌ -->
+Update PATH variable to /usr/local/bin <!-- ❌ -->
+Set HOME to /home/user <!-- ❌ -->
 
 ### ⌨️ Keyboard shortcuts
 

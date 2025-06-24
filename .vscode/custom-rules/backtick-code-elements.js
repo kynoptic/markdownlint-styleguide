@@ -17,7 +17,18 @@ const ignoredTerms = new Set([
   'pass/fail',
   'kg/m',
   'D.C',
-  'M.D'
+  'M.D',
+  'HTTP',
+  'HTTPS',
+  'HTML',
+  'CSS',
+  'JSON',
+  'API',
+  'REST',
+  'CLI',
+  'UTC',
+  'github.com',
+  'ulca.edu'
 ]);
 
 /**
@@ -67,6 +78,7 @@ function backtickCodeElements(params, onError) {
       /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or command()
       /\B\.[\w.-]+\b/g,                    // dotfiles like .env
       /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
+      /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
       /\b(?:npm|yarn|npx|git|pip|python(?:3)?|node|ls|chmod|curl|wget|java|grep|cat|cp|mv|rm)\b[^`]*/g,
                                              // common CLI commands
@@ -110,6 +122,25 @@ function backtickCodeElements(params, onError) {
       let m;
       wikiLinkRegex.lastIndex = 0;
       while ((m = wikiLinkRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Check if an index range falls inside an HTML comment.
+     *
+     * @param {string} text - Line being evaluated.
+     * @param {number} start - Start index of match.
+     * @param {number} end - End index of match.
+     * @returns {boolean} True when the range is within an HTML comment.
+     */
+    function inHtmlComment(text, start, end) {
+      const commentRegex = /<!--.*?-->/g;
+      let m;
+      while ((m = commentRegex.exec(text)) !== null) {
         if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
@@ -166,7 +197,7 @@ function backtickCodeElements(params, onError) {
         if (prefix.includes('http://') || prefix.includes('https://')) {
           continue;
         }
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end)) {
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
           continue;
         }
         if (/^\d+(?:\.\d+)+$/.test(text)) {

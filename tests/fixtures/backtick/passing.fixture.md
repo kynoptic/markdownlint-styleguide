@@ -28,6 +28,8 @@ Wrap it in `Promise.all()` to run in parallel <!-- ✅ -->
 
 Set the `NODE_ENV` variable to `production` <!-- ✅ -->
 Update your path with `export PATH="$PATH:/usr/local/bin"` <!-- ✅ -->
+Set the `PATH` variable to `/usr/local/bin` <!-- ✅ -->
+Set the `HOME` variable to `/home/user` <!-- ✅ -->
 The regex `/^[a-z0-9-]+$/` matches kebab-case strings <!-- ✅ -->
 Reference the `type: module` setting in `package.json` <!-- ✅ -->
 Use `#define PI 3.14` in your header file <!-- ✅ -->
