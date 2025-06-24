@@ -3,6 +3,9 @@
 
 export default {
   testEnvironment: 'node',
-  transform: {}, // Disable babel transforms unless needed
+  transform: {
+    '^.+\\.m?js$': ['babel-jest', { configFile: './babel.config.json' }]
+  },
   moduleNameMapper: {},
+
 };

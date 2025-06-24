@@ -44,7 +44,7 @@ const ignoredTerms = {
 * @param {`import('markdownlint')``.RuleOnError`} onError - Callback to report violations.
 * @returns {void}
  */
-function `backtickCodeElements(params, onError)` {
+function backtickCodeElements(params, onError) {
   if (
     !params ||
     !Array.isArray(`params.lines`) ||
@@ -61,21 +61,21 @@ function `backtickCodeElements(params, onError)` {
     const line = lines[i];
 
     // Detect both ``` and ~~~ as code block fences (ATX or tilde).
-    const fenceMatch = `line.trim()`.`match(/^(`{3,}|~{3,})`/);
+    const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
     if (fenceMatch) {
       inCodeBlock = !inCodeBlock;
       continue;
     }
 
-    if (inCodeBlock || /^\s*#/.`test(line)`) {
+    if (inCodeBlock || /^\s*#/.test(line)) {
       continue;
     }
 
     const codeSpans = [];
     const spanRegex = /`[^`]+`/g;
     let spanMatch;
-    while ((spanMatch = `spanRegex.exec(line)`) !== null) {
-      codeSpans.push([`spanMatch.index`, `spanMatch.index` + spanMatch[0]`.length`]);
+    while ((spanMatch = spanRegex.exec(line)) !== null) {
+      codeSpans.push([spanMatch.index, spanMatch.index + spanMatch[0].length]);
     }
 
     const patterns = [
@@ -95,7 +95,7 @@ function `backtickCodeElements(params, onError)` {
       /\`b(?:export|set)`\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g   // shell variable assignments
     ];
 
-    const flaggedPositions = new `Set()`;
+    const flaggedPositions = new Set();
 
     const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
     const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
@@ -107,11 +107,11 @@ function `backtickCodeElements(params, onError)` {
   * @param {number} end - End index of match.
   * @returns {boolean}
      */
-    function `inMarkdownLink(text, start, end)` {
+    function inMarkdownLink(text, start, end) {
       let m;
       linkRegex.lastIndex = 0;
-      while ((m = `linkRegex.exec(text)`) !== null) {
-        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
+      while ((m = linkRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
       }
@@ -126,11 +126,11 @@ function `backtickCodeElements(params, onError)` {
   * @param {number} end - End index of match.
   * @returns {boolean} True when the range is within a wiki link.
      */
-    function `inWikiLink(text, start, end)` {
+    function inWikiLink(text, start, end) {
       let m;
       wikiLinkRegex.lastIndex = 0;
-      while ((m = `wikiLinkRegex.exec(text)`) !== null) {
-        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
+      while ((m = wikiLinkRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
       }
@@ -149,7 +149,7 @@ function `backtickCodeElements(params, onError)` {
       const commentRegex = /<!--.*?-->/g;
       let m;
       while ((m = `commentRegex.exec(text)`) !== null) {
-        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
+        if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
       }
@@ -184,7 +184,7 @@ function `backtickCodeElements(params, onError)` {
         if (`content.includes('\\')` || `content.includes('^')` || 
             `content.includes('_')` || `content.includes('{')` ||
             `content.includes('=')` || `content.includes(' ')`) {
-          if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
+          if (start >= m.index && end <= m.index + m[0].length) {
             return true;
           }
         }
@@ -193,7 +193,7 @@ function `backtickCodeElements(params, onError)` {
       // Check for block math expressions ($$...$$)
       const blockMathRegex = /\$\$([^\$]|\$[^\$])*\$\$/g;
       while ((m = `blockMathRegex.exec(text)`) !== null) {
-        if (start >= `m.index` && end <= `m.index` + m[0]`.length`) {
+        if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
       }
