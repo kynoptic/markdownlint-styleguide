@@ -7,7 +7,7 @@ description: Automates a test-driven workflow for developing, validating, and re
 1. **Generate fixture file with structured examples** – Check for `/tests/fixtures/[rule-name].fixture.md`. If absent, create it with:
    - Valid cases ending in `<!-- ✅ -->`
    - Invalid cases ending in `<!-- ❌ -->`
-   - At least one ambiguous or edge case in each set to challenge the rule logic
+XXX- At least one ambiguous or edge case in each `set to` challenge the rule logic
 
 2. **Create Jest test file** – Generate `/tests/[rule-name].test.js` that:
    - Parses the corresponding fixture file

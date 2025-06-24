@@ -1,0 +1,6 @@
+{
+  "default": true,
+  "custom-rules": [
+    ".vscode/custom-rules/backtick-code-elements.js"
+  ]
+}
