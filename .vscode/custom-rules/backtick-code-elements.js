@@ -80,11 +80,12 @@ function backtickCodeElements(params, onError) {
       /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
       /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
-      /\b(?:npm|yarn|npx|git|pip|python(?:3)?|node|ls|chmod|curl|wget|java|grep|cat|cp|mv|rm)\b[^`]*/g,
+
                                              // common CLI commands
       /\bimport\s+\w+/g,                     // import statements
       /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
-      /\b[A-Z]+\+[A-Z]\b/g                  // key combos like CTRL+C
+      /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like CTRL+C
+      /\b(?:export|set)\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g   // shell variable assignments
     ];
 
     const flaggedPositions = new Set();
@@ -149,6 +150,62 @@ function backtickCodeElements(params, onError) {
     }
 
     /**
+     * Check if an index range falls inside a LaTeX math expression.
+     * Handles both inline ($...$) and block ($$...$$) math expressions.
+     * Distinguishes between LaTeX math and shell variables like $value.
+     *
+     * @param {string} text - Line being evaluated.
+     * @param {number} start - Start index of match.
+     * @param {number} end - End index of match.
+     * @returns {boolean} True when the range is within a LaTeX math expression.
+     */
+    function inLatexMath(text, start, end) {
+      // Skip if the match contains shell command indicators
+      if (text.substring(start, end).includes('grep ') || 
+          text.substring(start, end).includes('export ') ||
+          text.substring(start, end).includes(' command')) {
+        return false;
+      }
+
+      // Check for inline math expressions ($...$)
+      // This pattern matches text between dollar signs that contain LaTeX-like content
+      const inlineMathRegex = /\$(\s*[a-zA-Z0-9\\{}^_()=+\-*\/><\s]+\s*)\$/g;
+      let m;
+      while ((m = inlineMathRegex.exec(text)) !== null) {
+        // Verify this looks like a math expression (contains LaTeX operators or spaces)
+        const content = m[1];
+        if (content.includes('\\') || content.includes('^') || 
+            content.includes('_') || content.includes('{') ||
+            content.includes('=') || content.includes(' ')) {
+          if (start >= m.index && end <= m.index + m[0].length) {
+            return true;
+          }
+        }
+      }
+
+      // Check for block math expressions ($$...$$)
+      const blockMathRegex = /\$\$([^\$]|\$[^\$])*\$\$/g;
+      while ((m = blockMathRegex.exec(text)) !== null) {
+        if (start >= m.index && end <= m.index + m[0].length) {
+          return true;
+        }
+      }
+
+      // Check if the line starts with a standalone $$ which indicates a math block start
+      if (text.trim() === '$$' || text.trim().startsWith('$$\n')) {
+        return true;
+      }
+
+      // Check if the line contains LaTeX-style math expressions like \sum, \frac, etc.
+      if (text.includes('\\sum') || text.includes('\\frac') || 
+          text.includes('\\int') || text.includes('\\lim')) {
+        return true;
+      }
+
+      return false;
+    }
+
+    /**
      * Heuristically determine if a string looks like a file path.
      *
      * @param {string} str - Text to evaluate.
@@ -197,7 +254,7 @@ function backtickCodeElements(params, onError) {
         if (prefix.includes('http://') || prefix.includes('https://')) {
           continue;
         }
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end) || inLatexMath(line, start, end)) {
           continue;
         }
         if (/^\d+(?:\.\d+)+$/.test(text)) {
@@ -216,8 +273,7 @@ function backtickCodeElements(params, onError) {
           detail: `Wrap "${text}" in backticks.`,
           context: line.trim()
         });
-        // report only first violation per line
-        regex.lastIndex = line.length;
+        // Stop after first reported violation on this line to avoid duplicates
         break;
       }
     }
