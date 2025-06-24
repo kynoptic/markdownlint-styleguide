@@ -46,4 +46,20 @@ describe('backtick-code-elements failing fixture', () => {
       expect(v.errorDetail).toMatch(/^Wrap .+ in backticks\.$/);
     });
   });
+
+  test('flags valid file path with uppercase letters as missing backticks', async () => {
+    const markdown = 'Open My-Dir/my-file.txt for details.';
+    const options = {
+      customRules: [backtickRule],
+      strings: { 'test.md': markdown },
+      resultVersion: 3
+    };
+    const results = await lint(options);
+    const violations = results['test.md'] || [];
+    const ruleViolations = violations.filter(v =>
+      v.ruleNames.includes('backtick-code-elements') ||
+      v.ruleNames.includes('BCE001')
+    );
+    expect(ruleViolations.length).toBeGreaterThan(0);
+  });
 });

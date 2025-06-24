@@ -4,32 +4,36 @@
  * Rule that requires code snippets, file names and directory paths
  * to be wrapped in backticks when used in prose.
  */
-const ignoredTerms = new Set([
-  'Node.js',
-  'npm',
-  'React.js',
-  'CI/CD',
-  'e.g',
-  'e.g.',
-  'i.e',
-  'i.e.',
-  'import/export',
-  'pass/fail',
-  'kg/m',
-  'D.C',
-  'M.D',
-  'HTTP',
-  'HTTPS',
-  'HTML',
-  'CSS',
-  'JSON',
-  'API',
-  'REST',
-  'CLI',
-  'UTC',
-  'github.com',
-  'ulca.edu'
-]);
+/**
+ * Categorized sets of terms to ignore when checking for code elements in prose.
+ * - acronyms: Common technical acronyms (e.g., API, CLI, UTC)
+ * - technical: Terms and abbreviations that are not code (e.g., CI/CD, et al.)
+ * - fileExtensions: Common file extensions that may appear in prose
+ * - domains: Known domains or URLs
+ * - phrases: Common phrases that are not code or file paths
+ */
+/**
+ * Categorized sets of terms to ignore when checking for code elements in prose.
+ * @type {{ acronyms: Set<string>, technical: Set<string>, fileExtensions: Set<string>, domains: Set<string>, phrases: Set<string> }}
+ */
+const ignoredTerms = {
+  acronyms: new Set([
+    'API', 'REST', 'CLI', 'UTC', 'HTTP', 'HTTPS', 'HTML', 'CSS', 'JSON', 'npm'
+  ]),
+  technical: new Set([
+    'Node.js', 'React.js', 'CI/CD', 'e.g', 'e.g.', 'i.e', 'i.e.', 'import/export', 'pass/fail', 'kg/m', 'D.C', 'M.D', 'et al.'
+  ]),
+  fileExtensions: new Set([
+    // Add common file extensions or patterns if needed
+  ]),
+  domains: new Set([
+    'github.com', 'ulca.edu'
+  ]),
+  phrases: new Set([
+    // Add other phrases as needed
+    'set up'
+  ])
+};
 
 /**
  * markdownlint rule enforcing backticks around file paths and commands.
@@ -80,6 +84,7 @@ function backtickCodeElements(params, onError) {
       /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
       /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
+      /\b(?:git|npm|pip|yarn|docker|brew|cargo|pnpm)\s+[a-z][\w-]*/g, // common two-word CLI commands
 
                                              // common CLI commands
       /\bimport\s+\w+/g,                     // import statements
@@ -244,7 +249,11 @@ function backtickCodeElements(params, onError) {
         if (inSpan) {
           continue;
         }
-        if (ignoredTerms.has(text) || ignoredTerms.has(text.replace(/\.$/, ''))) {
+        // Check all ignoredTerms categories
+        function isIgnoredTerm(term) {
+          return Object.values(ignoredTerms).some(set => set.has(term) || set.has(term.replace(/\.$/, '')));
+        }
+        if (isIgnoredTerm(text)) {
           continue;
         }
         const prefix = line.slice(0, start);
