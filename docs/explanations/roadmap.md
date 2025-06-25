@@ -93,7 +93,7 @@ This `no-bare-urls` rule is the perfect blend of high-impact and low-complexity,
 - Implement auto-fix for `backtick-code-elements`
 - Fix Jest test runner regression
 - Run all tests to ensure no regressions
-- Implement auto-fix for `basic-sentence-case-heading`
+- [x] Implement auto-fix for `basic-sentence-case-heading`
 
 ### Phase 3: rule enhancements & configuration
 

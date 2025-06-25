@@ -69,6 +69,10 @@ The rule uses the micromark parser to analyze heading tokens and run a series of
 
 There are currently no configuration options. Future versions may allow custom acronym lengths or additional dictionaries of proper nouns.
 
+### Auto-fix
+
+The rule provides basic auto-fix support. Running `markdownlint` with the `--fix` option converts headings to sentence case when possible.
+
 ## `backtick-code-elements` (BCE001)
 
 The `backtick-code-elements` rule ensures that file names, folder names and simple code snippets are wrapped in backticks when referenced in normal text.
