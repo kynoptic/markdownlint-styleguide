@@ -19,7 +19,7 @@ You make an excellent point. The imperative mood rule is powerful, but its conte
 **Enforce that URLs are always wrapped in a proper Markdown link with descriptive text. The only exception would be in code blocks or for URLs that are meant to be displayed as literal text.**
 
 - **Why it's a great next step:** It's purely structural and requires no complex language analysis. It has a massive impact on readability and accessibility for a very low implementation cost.
-- **Why it's easier:** You don't need to understand the *intent* of a sentence. You simply need to find a pattern (a URL-like string) that isn't already part of a Markdown link or inside a code span/block.
+- **Why it's easier:** You don't need to understand the *intent* of a sentence. You simply need to find a pattern (a URL-like string) that isn't already part of a Markdown link or inside a code `span/block`.
 
 ### The real-world value
 
@@ -37,7 +37,7 @@ This is hard to read, and the long URLs break the flow of the text. It also fail
 
 This is vastly more readable and professional. Screen readers announce "link, deployment guide," which is infinitely more useful.
 
-### High-Level Implementation Strategy (It's much simpler)
+### High-level implementation strategy (it's much simpler)
 
 1. **Iterate through text tokens** – Your rule function will receive tokens from the parser. You only need to look at tokens of type `text`.
 2. **Use a Regex to Find URLs** – In each text token, use a reliable regular expression to find URL-like patterns (those starting with `http://`, `https://`, or even `www.`).
@@ -78,16 +78,16 @@ This `no-bare-urls` rule is the perfect blend of high-impact and low-complexity,
 
 ---
 
-## Current Plan (as of 2025-06-24)
+## Current plan (as of 2025-06-24)
 
-### Phase 1: `backtick-code-elements` Enhancements
+### Phase 1: `backtick-code-elements` enhancements
 
 - Fix Jest ES Module support
 - Refine file path regex
 - Expand `ignoredTerms` and refactor
 - Enhance LaTeX context awareness
 
-### Phase 2: Auto-Fix Implementation
+### Phase 2: auto-fix implementation
 
 - Project maintenance (disable MD013, fix dependencies)
 - Implement auto-fix for `backtick-code-elements`
@@ -95,19 +95,19 @@ This `no-bare-urls` rule is the perfect blend of high-impact and low-complexity,
 - Run all tests to ensure no regressions
 - Implement auto-fix for `basic-sentence-case-heading`
 
-### Phase 3: Rule Enhancements & Configuration
+### Phase 3: rule enhancements & configuration
 
 - Expand `properNouns` and `technicalTerms`
 - Strengthen single-word heading suggestions
 - Make rules configurable
 
-### Phase 4: Finalization
+### Phase 4: finalization
 
 - Review and update documentation
 - Final run of all tests
 - Prepare for final commit and release
 
-### Phase 5: Implement 'no-bare-urls' Rule
+### Phase 5: implement 'no-bare-urls' rule
 
 - Create test assets for `no-bare-urls` rule
 - Implement rule logic to find bare URLs in text tokens, ignoring code blocks and existing links

@@ -4,6 +4,7 @@ import os from 'os';
 import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
+import { applyFixes } from 'markdownlint';
 import backtickRule from '../../.vscode/custom-rules/backtick-code-elements.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,9 +47,13 @@ describe('backtick-code-elements auto-fix functionality', () => {
       fix: true // Enable fix mode
     };
     
-    await lint(options);
-    
-    // Read the fixed content from the temp file
+    const results = await lint(options);
+    const ruleFixes = (results[tempFilePath] || []).filter(v =>
+      v.ruleNames.includes('backtick-code-elements') ||
+      v.ruleNames.includes('BCE001')
+    );
+    const fixed = applyFixes(fixtureContent, ruleFixes);
+    fs.writeFileSync(tempFilePath, fixed, 'utf8');
     const fixedContent = fs.readFileSync(tempFilePath, 'utf8');
     
     // Compare with expected content
@@ -91,13 +96,18 @@ describe('backtick-code-elements auto-fix functionality', () => {
     const minimalTempFilePath = path.join(os.tmpdir(), `autofix-minimal-test-${Date.now()}.md`);
     fs.writeFileSync(minimalTempFilePath, minimalFixtureContent, 'utf8');
 
-    // Run lint with fix enabled
-    await lint({
+    const results = await lint({
       customRules: [backtickRule],
       files: [minimalTempFilePath],
       resultVersion: 3,
       fix: true
     });
+    const minimalFixes = (results[minimalTempFilePath] || []).filter(v =>
+      v.ruleNames.includes('backtick-code-elements') ||
+      v.ruleNames.includes('BCE001')
+    );
+    const fixed = applyFixes(minimalFixtureContent, minimalFixes);
+    fs.writeFileSync(minimalTempFilePath, fixed, 'utf8');
     const fixedContent = fs.readFileSync(minimalTempFilePath, 'utf8');
     expect(fixedContent).toBe(minimalExpectedContent);
 
