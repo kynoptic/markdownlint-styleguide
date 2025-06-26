@@ -32,22 +32,12 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-    // Debug: print block state and line
-    // eslint-disable-next-line no-console
-    console.log(`[DEBUG] line ${lineNumber} | inCodeBlock: ${inCodeBlock} | inMathBlock: ${inMathBlock} | ${line}`);
-    // Print char codes for every line
-    // eslint-disable-next-line no-console
-    console.log(`[DEBUG] Char codes for line ${lineNumber}:`, Array.from(line).map(c => c.charCodeAt(0)));
-    
     // Special flag for lines containing $
     if (line.includes('$')) {
-      // eslint-disable-next-line no-console
-      console.log(`[DEBUG] !!! Line ${lineNumber} contains $: "${line}"`);
       
       // Extra debug for lines containing specific patterns we're looking for
       if (line.includes('$pattern') || line.includes('$value')) {
-        // eslint-disable-next-line no-console
-        console.log(`[DEBUG] !!! FOUND TARGET LINE ${lineNumber}: "${line}"`);
+        
       }
     }
 
@@ -61,8 +51,7 @@ function backtickCodeElements(params, onError) {
     // Detect $$ as math block fences.
     if (line.trim() === '$$') {
       inMathBlock = !inMathBlock;
-      // eslint-disable-next-line no-console
-      console.log(`[DEBUG] Toggling math block state to: ${inMathBlock}`);
+      
       continue;
     }
     
@@ -70,8 +59,7 @@ function backtickCodeElements(params, onError) {
     // NOTE: We skip headings and code blocks entirely but for math blocks
     // we need to check if the line contains code-like patterns outside of math expressions
     if (inCodeBlock || /^\s*#/.test(line)) {
-      // eslint-disable-next-line no-console
-      console.log(`[DEBUG] Skipping line ${lineNumber} due to block state (code block or heading)`);
+      
       continue;
     }
     
@@ -85,12 +73,10 @@ function backtickCodeElements(params, onError) {
       const hasShellPattern = /(?:grep\s+\$\w+|export\s+(?:\w+=)?\$\w+)/.test(line);
       
       if (hasShellPattern) {
-        // eslint-disable-next-line no-console
-        console.log(`[DEBUG] Found shell pattern in math block at line ${lineNumber}: "${line}". Processing anyway.`);
+        
         // Continue processing this line to catch the shell pattern
       } else {
-        // eslint-disable-next-line no-console
-        console.log(`[DEBUG] Skipping line ${lineNumber} due to math block state`);
+        
         continue;
       }
     }
@@ -263,12 +249,9 @@ function backtickCodeElements(params, onError) {
         const start = match.index;
         const end = start + fullMatch.length;
 
-        // eslint-disable-next-line no-console
-        console.log(`[DEBUG] Pattern match: '${fullMatch}' at line ${lineNumber} [${start},${end})`);
+        
         // Skip if inside a code span
         if (codeSpans.some(([s, e]) => start >= s && end <= e)) {
-          // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside code span`);
           continue;
         }
         // Skip if inside a Markdown link, wiki link, or HTML comment
@@ -318,8 +301,7 @@ function backtickCodeElements(params, onError) {
               (fullMatch.includes('grep') || fullMatch.includes('export'))) {
             // This is a shell command - report it and skip further matches on this line
             reportedLines.add(lineNumber);
-            // eslint-disable-next-line no-console
-            console.log(`[DEBUG] Reporting shell command violation: '${fullMatch}' at line ${lineNumber}`);
+            
             onError({
               lineNumber,
               detail: `Wrap command ${fullMatch} in backticks.`,
@@ -334,8 +316,7 @@ function backtickCodeElements(params, onError) {
           } else if (!fullMatch.startsWith('$')) {
             // For non-shell variables, report normally
             reportedLines.add(lineNumber);
-            // eslint-disable-next-line no-console
-            console.log(`[DEBUG] Reporting violation: '${fullMatch}' at line ${lineNumber}`);
+            
             onError({
               lineNumber,
               detail: `Wrap code-like element ${fullMatch} in backticks.`,
