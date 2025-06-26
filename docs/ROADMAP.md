@@ -2,22 +2,18 @@
 
 This document outlines the development plan for `markdownlint-trap`. Our goal is to create a powerful, modern, and maintainable `set of` custom rules for `markdownlint`.
 
-## 🎯 Current focus
+## 🚧 In progress: `backtick-code-elements` enhancements
 
-These are the highest-priority items currently in development.
+This rule needs refinement to reduce false positives and improve its contextual awareness. We are currently working on the following items:
 
-### Enhancements for `backtick-code-elements`
-
-This rule needs refinement to reduce false positives and improve its contextual awareness.
-
-- [ ] Refine the file path detection regular expression.
-- [ ] Expand the `ignoredTerms` list and refactor for better maintainability.
+- [x] Refine the file path detection regular expression (including validation tests).
+- [x] Expand the `ignoredTerms` list and refactor for better maintainability.
 - [ ] Enhance LaTeX context awareness to avoid flagging mathematical expressions.
 - [ ] Implement a safe auto-fix for the rule.
 
-## 🚀 Next up
+## 🎯 Next up
 
-Once the current focus is complete, we will move on to these items.
+These are the highest-priority items once the current work is complete.
 
 - [ ] **Rule configuration**: Allow users to provide their own lists for `properNouns` and `technicalTerms` in the `sentence-case-heading` rule.
 - [ ] **Enhanced documentation**: Add missing JSDoc comments for all public functions and utilities.

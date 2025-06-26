@@ -4,33 +4,8 @@
  * Rule that requires code snippets, file names and directory paths
  * to be wrapped in backticks when used in prose.
  */
-const ignoredTerms = new Set([
-  'Node.js',
-  'npm',
-  'React.js',
-  'CI/CD',
-  'e.g',
-  'e.g.',
-  'i.e',
-  'i.e.',
-  'import/export',
-  'pass/fail',
-  'kg/m',
-  'D.C',
-  'M.D',
-  'HTTP',
-  'HTTPS',
-  'HTML',
-  'CSS',
-  'JSON',
-  'API',
-  'REST',
-  'CLI',
-  'UTC',
-  'github.com',
-  'ulca.edu',
-  'set up'
-]);
+// Import the centralized ignoredTerms Set
+import { ignoredTerms } from '../../src/rules/constants/backtick-ignored-terms.js';
 
 /**
  * markdownlint rule enforcing backticks around file paths and commands.

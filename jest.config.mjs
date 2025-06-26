@@ -1,11 +1,16 @@
-// Jest configuration for ES Modules support in markdownlint-trap
-// See https://jestjs.io/docs/ecmascript-modules for details
+// @ts-check
 
+/**
+ * Jest configuration for ES Modules.
+ * @type {import('@jest/types').Config.InitialOptions}
+ */
 export default {
-  testEnvironment: 'node',
+  // Use babel-jest for transforming JavaScript files.
+  // This ensures that modern JavaScript syntax (like import/export, async/await) is transpiled.
   transform: {
-    '^.+\\.m?js$': ['babel-jest', { configFile: './babel.config.json' }]
+    '^.+\\.js$': 'babel-jest',
   },
-  moduleNameMapper: {},
 
+  // The test environment that will be used for testing. 'node' is suitable for most Node.js projects.
+  testEnvironment: 'node',
 };
