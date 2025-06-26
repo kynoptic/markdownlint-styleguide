@@ -2,7 +2,23 @@
   "config": {
     "default": true,
     "MD013": false,
-    "sentence-case-heading": true,
+    "MD024": false,
+    "MD041": false,
+    "sentence-case-heading": {
+      "properNouns": [
+        "JavaScript",
+        "Jest",
+        "ESLint",
+        "JSDoc",
+        "GitHub",
+        "Diátaxis",
+        "MIT"
+      ],
+      "technicalTerms": [
+        "Node.js",
+        "VS Code"
+      ]
+    },
     "backtick-code-elements": true
   },
   "customRules": [
@@ -12,6 +28,6 @@
   "globs": [
     "**/*.md",
     "!node_modules/**/*",
-      "!tests/**/*.md"
+    "!tests/**/*.md"
   ]
 }
