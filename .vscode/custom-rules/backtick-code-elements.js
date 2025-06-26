@@ -26,10 +26,30 @@ function backtickCodeElements(params, onError) {
   const lines = params.lines;
   let inCodeBlock = false;
   let inMathBlock = false;
+  const reportedLines = new Set();
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
     const line = lines[i];
+
+    // Debug: print block state and line
+    // eslint-disable-next-line no-console
+    console.log(`[DEBUG] line ${lineNumber} | inCodeBlock: ${inCodeBlock} | inMathBlock: ${inMathBlock} | ${line}`);
+    // Print char codes for every line
+    // eslint-disable-next-line no-console
+    console.log(`[DEBUG] Char codes for line ${lineNumber}:`, Array.from(line).map(c => c.charCodeAt(0)));
+    
+    // Special flag for lines containing $
+    if (line.includes('$')) {
+      // eslint-disable-next-line no-console
+      console.log(`[DEBUG] !!! Line ${lineNumber} contains $: "${line}"`);
+      
+      // Extra debug for lines containing specific patterns we're looking for
+      if (line.includes('$pattern') || line.includes('$value')) {
+        // eslint-disable-next-line no-console
+        console.log(`[DEBUG] !!! FOUND TARGET LINE ${lineNumber}: "${line}"`);
+      }
+    }
 
     // Detect both ``` and ~~~ as code block fences (ATX or tilde).
     const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
@@ -41,11 +61,38 @@ function backtickCodeElements(params, onError) {
     // Detect $$ as math block fences.
     if (line.trim() === '$$') {
       inMathBlock = !inMathBlock;
+      // eslint-disable-next-line no-console
+      console.log(`[DEBUG] Toggling math block state to: ${inMathBlock}`);
       continue;
     }
-
-    if (inCodeBlock || inMathBlock || /^\s*#/.test(line)) {
+    
+    // Skip lines that are in a code block, heading, or math block
+    // NOTE: We skip headings and code blocks entirely but for math blocks
+    // we need to check if the line contains code-like patterns outside of math expressions
+    if (inCodeBlock || /^\s*#/.test(line)) {
+      // eslint-disable-next-line no-console
+      console.log(`[DEBUG] Skipping line ${lineNumber} due to block state (code block or heading)`);
       continue;
+    }
+    
+    // For math blocks, we need to be more nuanced - only skip if the line doesn't contain
+    // code-like patterns outside of LaTeX expressions
+    if (inMathBlock) {
+      // Check for shell-like patterns that should still be flagged even in math blocks
+      // This regex matches:
+      // 1. grep/export followed directly by $word: grep $pattern
+      // 2. export with variable assignment: export x=$value
+      const hasShellPattern = /(?:grep\s+\$\w+|export\s+(?:\w+=)?\$\w+)/.test(line);
+      
+      if (hasShellPattern) {
+        // eslint-disable-next-line no-console
+        console.log(`[DEBUG] Found shell pattern in math block at line ${lineNumber}: "${line}". Processing anyway.`);
+        // Continue processing this line to catch the shell pattern
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(`[DEBUG] Skipping line ${lineNumber} due to math block state`);
+        continue;
+      }
     }
 
     const codeSpans = [];
@@ -71,7 +118,8 @@ function backtickCodeElements(params, onError) {
       /\bimport\s+\w+/g,                     // import statements
       /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
       /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like CTRL+C
-      /\b(?:export|set)\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g   // shell variable assignments
+      /\b(?:export|set)\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g,   // shell variable assignments
+      /\$\S+/g // permissive shell variable usage
     ];
 
     const flaggedPositions = new Set();
@@ -146,14 +194,6 @@ function backtickCodeElements(params, onError) {
      * @returns {boolean} True when the range is within a LaTeX math expression.
      */
     function inLatexMath(text, start, end) {
-      // Heuristic to avoid flagging shell variables as math.
-      if (/\$/.test(text) && /\b(?:echo|export|set|grep|sed|awk|env)\b/.test(text)) {
-        const matchedText = text.substring(start, end);
-        if (/^\$?[A-Z0-9_]+$/.test(matchedText)) { // e.g., $VAR or VAR
-          return false;
-        }
-      }
-
       // Check for inline math expressions ($...$)
       const inlineMathRegex = /\$([^$]+?)\$/g;
       let m;
@@ -215,53 +255,101 @@ function backtickCodeElements(params, onError) {
       return /[a-zA-Z]/.test(str);
     }
 
-    for (const regex of patterns) {
-      regex.lastIndex = 0;
+    for (const pattern of patterns) {
+      pattern.lastIndex = 0;
       let match;
-      while ((match = regex.exec(line)) !== null) {
+      while ((match = pattern.exec(line)) !== null) {
+        const fullMatch = match[0];
         const start = match.index;
-        const end = start + match[0].length;
-        const text = match[0];
-        const inSpan = codeSpans.some(([s, e]) => start >= s && end <= e);
-        if (inSpan) {
+        const end = start + fullMatch.length;
+
+        // eslint-disable-next-line no-console
+        console.log(`[DEBUG] Pattern match: '${fullMatch}' at line ${lineNumber} [${start},${end})`);
+        // Skip if inside a code span
+        if (codeSpans.some(([s, e]) => start >= s && end <= e)) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside code span`);
           continue;
         }
-        if (ignoredTerms.has(text) || ignoredTerms.has(text.replace(/\.$/, ''))) {
+        // Skip if inside a Markdown link, wiki link, or HTML comment
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside link or comment`);
           continue;
         }
-        const prefix = line.slice(0, start);
-        if (/\(https?:\/\/[^)]*$/.test(prefix)) {
+        // Skip if in ignored terms
+        if (ignoredTerms.has(fullMatch)) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: in ignored terms`);
           continue;
         }
-        if (prefix.includes('http://') || prefix.includes('https://')) {
+        // Skip if already flagged
+        if (flaggedPositions.has(start)) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: already flagged`);
           continue;
         }
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end) || inLatexMath(line, start, end)) {
+        // Only skip if this match is inside a true LaTeX math region
+        if (inLatexMath(line, start, end)) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside LaTeX math`);
           continue;
         }
-        if (/^\d+(?:\.\d+)+$/.test(text)) {
-          continue;
-        }
-        if (regex === patterns[0] && !isLikelyFilePath(text)) {
-          continue;
-        }
-        const key = `${start}-${end}`;
-        if (flaggedPositions.has(key)) {
-          continue;
-        }
-        flaggedPositions.add(key);
-        onError({
-          lineNumber,
-          detail: `Wrap "${text}" in backticks.`,
-          context: line.trim(),
-          range: [start + 1, text.length],
-          fixInfo: {
-            editColumn: start + 1,
-            deleteCount: text.length,
-            insertText: `\`${text}\``
+        // Skip if inside a URL (e.g., after http:// or https://)
+        const urlRegex = /https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g;
+        let urlMatch;
+        let isInUrl = false;
+        while ((urlMatch = urlRegex.exec(line)) !== null) {
+          if (start >= urlMatch.index && end <= urlMatch.index + urlMatch[0].length) {
+            isInUrl = true;
+            break;
           }
-        });
-        // No break to allow detecting multiple violations per line
+        }
+        if (isInUrl) {
+          // eslint-disable-next-line no-console
+          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside URL`);
+          continue;
+        }
+
+        // Only report one violation per line to avoid duplicate reports
+        if (!reportedLines.has(lineNumber)) {
+          // For shell patterns with $ variables, prioritize reporting the whole command
+          if (fullMatch.includes('$') && fullMatch.includes(' ') && 
+              (fullMatch.includes('grep') || fullMatch.includes('export'))) {
+            // This is a shell command - report it and skip further matches on this line
+            reportedLines.add(lineNumber);
+            // eslint-disable-next-line no-console
+            console.log(`[DEBUG] Reporting shell command violation: '${fullMatch}' at line ${lineNumber}`);
+            onError({
+              lineNumber,
+              detail: `Wrap command ${fullMatch} in backticks.`,
+              context: fullMatch,
+              range: [start + 1, fullMatch.length], // Convert to 1-indexed
+              fixInfo: {
+                editColumn: start + 1,
+                deleteCount: fullMatch.length,
+                insertText: `\`${fullMatch}\``,
+              },
+            });
+          } else if (!fullMatch.startsWith('$')) {
+            // For non-shell variables, report normally
+            reportedLines.add(lineNumber);
+            // eslint-disable-next-line no-console
+            console.log(`[DEBUG] Reporting violation: '${fullMatch}' at line ${lineNumber}`);
+            onError({
+              lineNumber,
+              detail: `Wrap code-like element ${fullMatch} in backticks.`,
+              context: fullMatch,
+              range: [start + 1, fullMatch.length], // Convert to 1-indexed
+              fixInfo: {
+                editColumn: start + 1,
+                deleteCount: fullMatch.length,
+                insertText: `\`${fullMatch}\``,
+              },
+            });
+          }
+        }
+        flaggedPositions.add(start);
       }
     }
   }

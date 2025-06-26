@@ -33,7 +33,6 @@ The project is organized as a markdownlint plugin that provides custom rules for
 
 ## Coding conventions
 
-<!-- markdownlint-disable-next-line sentence-case-heading -->
 ### JavaScript
 
 - **Module system**: ES Modules (import/export)

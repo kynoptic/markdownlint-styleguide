@@ -26,7 +26,12 @@ const defaultTechnicalTerms = Object.freeze({
   COVID: true,
   iOS: true,
   macOS: true,
-  Markdown: true
+  Markdown: true,
+  JavaScript: true,
+  TypeScript: true,
+  React: true,
+  Vue: true,
+  Angular: true
 });
 
 

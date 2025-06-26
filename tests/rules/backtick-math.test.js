@@ -6,6 +6,7 @@
  */
 
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { describe, test, expect } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
@@ -20,6 +21,24 @@ const fixturePath = path.join(
 );
 
 describe('backtick-code-elements math expressions', () => {
+  // Debug - print the fixture path and read the file directly
+  console.log(`[TEST DEBUG] Fixture path: ${fixturePath}`);
+  if (fs.existsSync(fixturePath)) {
+    const fixtureContent = fs.readFileSync(fixturePath, 'utf8');
+    console.log('[TEST DEBUG] Fixture file exists. First 500 chars:');
+    console.log(fixtureContent.substring(0, 500));
+    
+    // Log lines with $pattern and $value
+    const lines = fixtureContent.split('\n');
+    lines.forEach((line, i) => {
+      if (line.includes('$pattern') || line.includes('$value')) {
+        console.log(`[TEST DEBUG] Line ${i + 1} contains target: ${line}`);
+      }
+    });
+  } else {
+    console.log('[TEST DEBUG] Fixture file does not exist!');
+  }
+  
   const fixture = parseFixture(fixturePath);
   
   test('ignores LaTeX math expressions', async () => {
