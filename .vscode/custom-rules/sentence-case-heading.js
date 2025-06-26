@@ -9,29 +9,36 @@
  * Default terms that keep their original casing (e.g., acronyms, brand names).
  * @type {Readonly<Record<string, boolean>>}
  */
-const defaultTechnicalTerms = Object.freeze({
-  HTML: true,
-  CSS: true,
-  JSON: true,
-  API: true,
-  HTTP: true,
-  HTTPS: true,
-  URL: true,
-  SQL: true,
-  XML: true,
-  REST: true,
-  UI: true,
-  UX: true,
-  FBI: true,
-  COVID: true,
-  iOS: true,
-  macOS: true,
-  Markdown: true,
-  JavaScript: true,
-  TypeScript: true,
-  React: true,
-  Vue: true,
-  Angular: true
+const defaultTechnicalTerms = Object.freeze({ // Stored as lowercase key: CorrectCasing
+  html: 'HTML',
+  css: 'CSS',
+  json: 'JSON',
+  api: 'API',
+  http: 'HTTP',
+  https: 'HTTPS',
+  url: 'URL',
+  sql: 'SQL',
+  xml: 'XML',
+  rest: 'REST',
+  ui: 'UI',
+  ux: 'UX',
+  fbi: 'FBI',
+  covid: 'COVID',
+  ios: 'iOS',
+  macos: 'macOS',
+  markdown: 'Markdown',
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  react: 'React',
+  vue: 'Vue',
+  angular: 'Angular',
+  nodejs: 'Node.js',
+  npm: 'npm',
+  yarn: 'Yarn',
+  cli: 'CLI',
+  es6: 'ES6',
+  oauth2: 'OAuth2',
+  vscode: 'VS Code'
 });
 
 
@@ -51,6 +58,29 @@ const defaultProperNouns = Object.freeze({
   glossary: 'Glossary',
   'vs code': 'VS Code',
   vscode: 'VS Code'
+  nasa: 'NASA',
+  'dr. patel': 'Dr. Patel',
+  cdc: 'CDC',
+  ibm: 'IBM',
+  'red hat': 'Red Hat',
+  unesco: 'UNESCO',
+  unicef: 'UNICEF',
+  terraform: 'Terraform',
+  socrates: 'Socrates',
+  google: 'Google',
+  microsoft: 'Microsoft',
+  amazon: 'Amazon',
+  apple: 'Apple',
+  linux: 'Linux',
+  android: 'Android',
+  azure: 'Azure',
+  aws: 'AWS',
+  gcp: 'GCP',
+  kubernetes: 'Kubernetes',
+  docker: 'Docker',
+  git: 'Git',
+  chatgpt: 'ChatGPT',
+  gemini: 'Gemini'
 });
 
 /**
@@ -101,14 +131,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const userProperNouns = config.properNouns || [];
 
   const technicalTerms = { ...defaultTechnicalTerms };
-  if (Array.isArray(userTechnicalTerms)) {
+  if (Array.isArray(userTechnicalTerms)) { // User terms are added with their correct casing
     userTechnicalTerms.forEach((term) => {
       if (typeof term === 'string') {
-        technicalTerms[term] = true;
+        technicalTerms[term.toLowerCase()] = term;
       }
     });
   }
-
+  
   const properNouns = { ...defaultProperNouns };
   if (Array.isArray(userProperNouns)) {
     userProperNouns.forEach((term) => {
@@ -144,14 +174,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const words = processed.split(/\s+/);
     const fixedWords = words.map((w, i) => {
       if (w.startsWith('__P_')) {
-        return w;
+        return w; // Preserved content
       }
       const lower = w.toLowerCase();
       if (properNouns[lower]) {
-        return properNouns[lower];
+        return properNouns[lower]; // Fix proper nouns
       }
-      if (technicalTerms[w]) {
-        return w;
+      if (technicalTerms[lower]) {
+        return technicalTerms[lower]; // Fix technical terms
       }
       if (i === 0) {
         return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
@@ -276,21 +306,6 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
 
-    if (headingText.trim().startsWith('[') || headingText.trim().startsWith('`')) {
-      return;
-    }
-
-    if (
-      headingText.trim().split(/\s+/).length === 1 &&
-      headingText.trim() === headingText.trim().toLowerCase() &&
-      !/[0-9-]/.test(headingText)
-    ) {
-      report(
-        'Single-word heading should be capitalized.', lineNumber, headingText.substring(0, 50), sourceLine
-      );
-      return;
-    }
-
     const codeContentRegex = /`[^`]+`|\([A-Z0-9]+\)/g;
     const matches = [...headingText.matchAll(codeContentRegex)];
     const totalCodeLength = matches.reduce((sum, m) => sum + m[0].length, 0);
@@ -353,32 +368,41 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       firstIndex++;
     }
     if (firstIndex >= words.length) {
-      return;
+      return; // No valid words found
     }
 
+    // Validate the first word's casing
     const firstWord = words[firstIndex];
-    if (!phraseIgnore.has(firstIndex) && !firstWord.startsWith('__PRESERVED_')) {
-      const base = firstWord.split('-')[0];
-      const numericPrefixSkipped = firstIndex > 0 && numeric.test(words[0]);
-      if (numericPrefixSkipped && startsWithYear) {
-        // year-prefixed headings may start with a lowercase word
-      } else if (!isSingleWordHyphen && firstWord[0] !== firstWord[0].toUpperCase()) {
-        report(
-          "Heading's first word should be capitalized.", lineNumber, headingText, sourceLine
-        );
-        return;
-      }
-      if (
-        !technicalTerms[base] &&
-        base.length > 1 &&
-        base.substring(1) !== base.substring(1).toLowerCase() &&
-        !(base.length <= 4 && base === base.toUpperCase()) &&
-        !(base === base.toUpperCase() && /\d/.test(base))
-      ) {
-        report(
-          "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym).", lineNumber, headingText, sourceLine
-        );
-        return;
+    const firstWordLower = firstWord.toLowerCase();
+    const expectedFirstWordCasing = properNouns[firstWordLower] || technicalTerms[firstWordLower];
+
+    if (!phraseIgnore.has(firstIndex) && !firstWord.startsWith('__PRESERVED_')) { // Skip if part of ignored phrase or preserved
+      if (expectedFirstWordCasing) {
+        // If it's a known proper noun or technical term, check if its casing matches the expected one.
+        if (firstWord !== expectedFirstWordCasing) {
+          report(
+            `First word "${firstWord}" should be "${expectedFirstWordCasing}".`,
+            lineNumber,
+            headingText,
+            sourceLine
+          );
+          return;
+        }
+      } else {
+        // For other words, ensure the first letter is capitalized and the rest are lowercase.
+        const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+        if (firstWord !== expectedSentenceCase) {
+          // Allow short acronyms (<= 4 chars, all caps)
+          if (!(firstWord.length <= 4 && firstWord === firstWord.toUpperCase())) {
+            report(
+              "Heading's first word should be capitalized.",
+              lineNumber,
+              headingText,
+              sourceLine
+            );
+            return;
+          }
+        }
       }
     }
 
@@ -395,6 +419,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         continue;
       }
       const word = words[i];
+      const wordLower = word.toLowerCase();
+      const expectedWordCasing = properNouns[wordLower] || technicalTerms[wordLower];
+
       const wordPos = headingText.indexOf(word);
       if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {
         const afterColon = headingText.slice(colonIndex + 1).trimStart();
@@ -413,11 +440,19 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         continue;
       }
 
-      if (properNouns[word.toLowerCase()] && word === word.toLowerCase()) {
-        report(
-          `Word "${word}" in heading should be capitalized.`, lineNumber, headingText, sourceLine
-        );
-        return;
+      if (expectedWordCasing) {
+        // If it's a known proper noun or technical term, check if its casing matches the expected one.
+        if (word !== expectedWordCasing) {
+          report(
+            `Word "${word}" should be "${expectedWordCasing}".`,
+            lineNumber,
+            headingText,
+            sourceLine
+          );
+          return;
+        }
+      } else {
+        // For other words, ensure they are lowercase, unless they are short acronyms or 'I'.
       }
 
       if (word.includes('-')) {
@@ -432,10 +467,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       if (
         word !== word.toLowerCase() &&
-        !(word.length <= 4 && word === word.toUpperCase()) &&
-        word !== 'I' &&
-        !technicalTerms[word] &&
-        !properNouns[word.toLowerCase()] &&
+        !(word.length <= 4 && word === word.toUpperCase()) && // Allow short acronyms
+        word !== 'I' && // Allow the pronoun "I"
+        !expectedWordCasing && // If it's not a known proper noun/technical term
         !word.startsWith('PRESERVED')
       ) {
         report(
