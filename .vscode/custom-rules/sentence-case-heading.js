@@ -5,83 +5,7 @@
  * Extracted helpers improve readability and performance.
  */
 
-/**
- * Default terms that keep their original casing (e.g., acronyms, brand names).
- * @type {Readonly<Record<string, boolean>>}
- */
-const defaultTechnicalTerms = Object.freeze({ // Stored as lowercase key: CorrectCasing
-  html: 'HTML',
-  css: 'CSS',
-  json: 'JSON',
-  api: 'API',
-  http: 'HTTP',
-  https: 'HTTPS',
-  url: 'URL',
-  sql: 'SQL',
-  xml: 'XML',
-  rest: 'REST',
-  ui: 'UI',
-  ux: 'UX',
-  fbi: 'FBI',
-  covid: 'COVID',
-  ios: 'iOS',
-  macos: 'macOS',
-  markdown: 'Markdown',
-  javascript: 'JavaScript',
-  typescript: 'TypeScript',
-  react: 'React',
-  vue: 'Vue',
-  angular: 'Angular',
-  nodejs: 'Node.js',
-  npm: 'npm',
-  yarn: 'Yarn',
-  cli: 'CLI',
-  es6: 'ES6',
-  oauth2: 'OAuth2',
-  vscode: 'VS Code'
-});
-
-
-/**
- * Default proper nouns that must be capitalized when checked.
- * @type {Readonly<Record<string, string>>}
- */
-const defaultProperNouns = Object.freeze({
-  paris: 'Paris',
-  facebook: 'Facebook',
-  github: 'GitHub',
-  zoloft: 'Zoloft',
-  michael: 'Michael',
-  andes: 'Andes',
-  japanese: 'Japanese',
-  windows: 'Windows',
-  glossary: 'Glossary',
-  'vs code': 'VS Code',
-  vscode: 'VS Code'
-  nasa: 'NASA',
-  'dr. patel': 'Dr. Patel',
-  cdc: 'CDC',
-  ibm: 'IBM',
-  'red hat': 'Red Hat',
-  unesco: 'UNESCO',
-  unicef: 'UNICEF',
-  terraform: 'Terraform',
-  socrates: 'Socrates',
-  google: 'Google',
-  microsoft: 'Microsoft',
-  amazon: 'Amazon',
-  apple: 'Apple',
-  linux: 'Linux',
-  android: 'Android',
-  azure: 'Azure',
-  aws: 'AWS',
-  gcp: 'GCP',
-  kubernetes: 'Kubernetes',
-  docker: 'Docker',
-  git: 'Git',
-  chatgpt: 'ChatGPT',
-  gemini: 'Gemini'
-});
+import { specialCasedTerms as defaultSpecialCasedTerms } from './shared-constants.js';
 
 /**
  * Extract the plain heading text from tokens.
@@ -127,23 +51,17 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const tokens = params.parsers.micromark.tokens;
   const lines = params.lines;
   const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || {};
+  // Support both new `specialTerms` and old `technicalTerms`/`properNouns` for user config
+  const userSpecialTerms = config.specialTerms || [];
   const userTechnicalTerms = config.technicalTerms || [];
   const userProperNouns = config.properNouns || [];
+  const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
 
-  const technicalTerms = { ...defaultTechnicalTerms };
-  if (Array.isArray(userTechnicalTerms)) { // User terms are added with their correct casing
-    userTechnicalTerms.forEach((term) => {
+  const specialCasedTerms = { ...defaultSpecialCasedTerms };
+  if (Array.isArray(allUserTerms)) { // User terms are added with their correct casing
+    allUserTerms.forEach((term) => {
       if (typeof term === 'string') {
-        technicalTerms[term.toLowerCase()] = term;
-      }
-    });
-  }
-  
-  const properNouns = { ...defaultProperNouns };
-  if (Array.isArray(userProperNouns)) {
-    userProperNouns.forEach((term) => {
-      if (typeof term === 'string') {
-        properNouns[term.toLowerCase()] = term;
+        specialCasedTerms[term.toLowerCase()] = term;
       }
     });
   }
@@ -177,16 +95,13 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return w; // Preserved content
       }
       const lower = w.toLowerCase();
-      if (properNouns[lower]) {
-        return properNouns[lower]; // Fix proper nouns
-      }
-      if (technicalTerms[lower]) {
-        return technicalTerms[lower]; // Fix technical terms
+      if (specialCasedTerms[lower]) {
+        return specialCasedTerms[lower]; // Fix special-cased terms
       }
       if (i === 0) {
         return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
       }
-      if (w.length <= 4 && w === w.toUpperCase() && technicalTerms[w]) {
+      if (w.length <= 4 && w === w.toUpperCase() && specialCasedTerms[w.toLowerCase()]) {
         return w;
       }
       return w.toLowerCase();
@@ -225,7 +140,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   function getProperPhraseIndices(words) {
     const indices = new Set();
     const lowerWords = words.map((w) => w.toLowerCase());
-    Object.keys(properNouns).forEach((key) => {
+    Object.keys(specialCasedTerms).forEach((key) => {
       if (!key.includes(' ')) {
         return;
       }
@@ -249,7 +164,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @returns {boolean} True if a violation was reported.
    */
   function validateProperPhrases(text, lineNumber) {
-    for (const [phrase, expected] of Object.entries(properNouns)) {
+    for (const [phrase, expected] of Object.entries(specialCasedTerms)) {
       if (!phrase.includes(' ')) {
         continue;
       }
@@ -374,7 +289,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Validate the first word's casing
     const firstWord = words[firstIndex];
     const firstWordLower = firstWord.toLowerCase();
-    const expectedFirstWordCasing = properNouns[firstWordLower] || technicalTerms[firstWordLower];
+    const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
 
     if (!phraseIgnore.has(firstIndex) && !firstWord.startsWith('__PRESERVED_')) { // Skip if part of ignored phrase or preserved
       if (expectedFirstWordCasing) {
@@ -420,7 +335,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
       const word = words[i];
       const wordLower = word.toLowerCase();
-      const expectedWordCasing = properNouns[wordLower] || technicalTerms[wordLower];
+      const expectedWordCasing = specialCasedTerms[wordLower];
 
       const wordPos = headingText.indexOf(word);
       if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {

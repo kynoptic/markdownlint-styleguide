@@ -5,7 +5,7 @@
  * to be wrapped in backticks when used in prose.
  */
 // Import the centralized ignoredTerms Set
-import { ignoredTerms } from '../../src/rules/constants/backtick-ignored-terms.js';
+import { backtickIgnoredTerms as ignoredTerms } from './shared-constants.js';
 
 /**
  * markdownlint rule enforcing backticks around file paths and commands.
