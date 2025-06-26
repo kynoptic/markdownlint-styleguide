@@ -7,7 +7,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] <!-- markdownlint-disable-line SC001 -->
+
+## [`1.2.0`] - 2025-06-26
+
+### Added
+
+- Implement `no-bare-urls` rule with auto-fix, tests, and documentation
+- Add user-configurable proper nouns and technical terms to sentence-case-heading rule
+- Add LaTeX math detection and improve backtick rule handling for shell commands
+- Add file path regex validation and centralize ignored terms for backtick rule
+- Add sentence case auto-fix (#57)
+- Add backtick code element rule with auto-fix tests and fixtures
+- Add Babel configuration
+
+### Fixed
+
+- Improve LaTeX math detection to avoid false positives with shell variables
+- Improve environment variable detection in backtick rule
+- Improve rule robustness for hyphens and tilde fences (#55)
+- Harden custom rule checks (#53)
+- Handle multi-word proper nouns in sentence case rule (#52)
+- Add `npm` to ignored terms and normalize `VS Code` casing
+- Refine path detection heuristics (#41)
+- Remove unnecessary text suffix from code block language identifier
+- Enable markdownlint autofix for `backtick-code-elements` (BCE001) rule
+- Update backtick rule and tests (#56)
+- Update rules and fixtures (#42)
+
+### Changed
+
+- Improved parameter validation for custom rules
+- Enhanced detection of fenced code blocks with tildes
+- Consolidate markdownlint configs and add proper noun exceptions
+- Consolidate special-cased terms into shared constants module
+- Improve technical term handling with case-sensitive dictionary
+- Improve bare URL detection using `markdown-it`
+- Rename `no-bare-urls` rule to `wt-no-bare-urls` and modernize test infrastructure
+- Reorganize ignored terms into categories and add test coverage
+
+### Documentation
+
+- Restructure roadmap with clearer focus areas and prioritized tasks
+- Add markdown formatting conventions (#40)
+- Update agent guidelines (#39)
+- Add folder READMEs (#38)
+- Add missing JSDoc comments (#37)
 
 - Improved parameter validation for custom rules
 - Enhanced detection of fenced code blocks with tildes
