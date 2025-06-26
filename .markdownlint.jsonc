@@ -1,7 +1,47 @@
 {
-  "MD013": false,
+  // This is a JSONC file, which allows for comments.
+
+  // Inherit from the default recommended ruleset as a baseline.
   "default": true,
-  "custom-rules": [
-    ".vscode/custom-rules/backtick-code-elements.js"
-  ]
+
+  // Load the custom rules from this package itself.
+  // This allows the project to lint its own documentation against its own rules.
+  "customRules": [
+    "markdownlint-trap"
+  ],
+
+  // Disable MD013 (line-length) as it can be noisy and is often a matter of
+  // developer preference, especially with long URLs or code snippets.
+  "MD013": false,
+
+  // Disable MD024 (no-duplicate-heading) because it's common to have duplicate
+  // headings in a CHANGELOG (e.g., "Added", "Fixed" in different versions).
+  // Your CHANGELOG.md makes use of this pattern.
+  "MD024": false,
+
+  // Disable MD041 (first-line-h1) to allow for flexibility in document structure,
+  // such as having badges or other content before the main title in README.md.
+  "MD041": false,
+
+  // Configure all rules, including the custom ones.
+  "config": {
+    // Enable and configure the custom 'sentence-case-heading' rule.
+    "sentence-case-heading": {
+      // A list of proper nouns found in your docs that should maintain their casing.
+      "properNouns": [
+        "JavaScript",
+        "Jest",
+        "ESLint",
+        "JSDoc",
+        "GitHub",
+        "Diátaxis",
+        "MIT"
+      ],
+      // A list of technical terms that should maintain their casing.
+      "technicalTerms": [ "Node.js", "VS Code" ]
+    },
+
+    // Enable the custom 'backtick-code-elements' rule.
+    "backtick-code-elements": true
+  }
 }
