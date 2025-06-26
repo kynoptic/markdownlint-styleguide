@@ -15,7 +15,7 @@ This rule needs refinement to reduce false positives and improve its contextual 
 
 These are the highest-priority items once the current work is complete.
 
-- [ ] **Enhanced documentation**: Add missing JSDoc comments for all public functions and utilities.
+- [x] **Enhanced documentation**: Add missing JSDoc comments for all public functions and utilities.
 - [ ] **Project maintenance**:
   - [ ] Resolve any outstanding test runner regressions.
   - [ ] Run all tests to ensure no regressions before release.

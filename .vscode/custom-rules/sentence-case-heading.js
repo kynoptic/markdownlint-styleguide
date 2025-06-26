@@ -5,7 +5,10 @@
  * Extracted helpers improve readability and performance.
  */
 
-// Terms that keep their original casing
+/**
+ * Default terms that keep their original casing (e.g., acronyms, brand names).
+ * @type {Readonly<Record<string, boolean>>}
+ */
 const defaultTechnicalTerms = Object.freeze({
   HTML: true,
   CSS: true,
@@ -27,7 +30,10 @@ const defaultTechnicalTerms = Object.freeze({
 });
 
 
-// Proper nouns that must be capitalized when checked
+/**
+ * Default proper nouns that must be capitalized when checked.
+ * @type {Readonly<Record<string, string>>}
+ */
 const defaultProperNouns = Object.freeze({
   paris: 'Paris',
   facebook: 'Facebook',
@@ -47,6 +53,7 @@ const defaultProperNouns = Object.freeze({
  * @param {import("markdownlint").Token[]} tokens
  * @param {string[]} lines
  * @param {import("markdownlint").Token} token
+ * @returns {string} The extracted heading text.
  */
 function extractHeadingText(tokens, lines, token) {
   const lineNumber = token.startLine;
