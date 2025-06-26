@@ -228,7 +228,13 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
-    if (/^[\d./-]+$/.test(headingText.replace(/\s+/g, ''))) {
+    // If the heading consists only of numbers and symbols after removing markup,
+    // it's likely a non-prose heading (e.g., a version in a changelog)
+    // that should be ignored.
+    const textWithoutMarkup = headingText
+      .replace(/`[^`]+`/g, '')
+      .replace(/\[([^\]]+)\]/g, '$1');
+    if (!/[a-zA-Z]/.test(textWithoutMarkup)) {
       return;
     }
 
