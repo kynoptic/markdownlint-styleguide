@@ -82,24 +82,24 @@ This `no-bare-urls` rule is the perfect blend of high-impact and low-complexity,
 
 ### Phase 1: `backtick-code-elements` enhancements
 
-- Fix Jest ES Module support
-- Refine file path regex
-- Expand `ignoredTerms` and refactor
-- Enhance LaTeX context awareness
+- [x] Fix Jest ES Module support
+- [ ] Refine file path regex
+- [ ] Expand `ignoredTerms` and refactor
+- [ ] Enhance LaTeX context awareness
 
 ### Phase 2: auto-fix implementation
 
-- Project maintenance (disable MD013, fix dependencies)
-- Implement auto-fix for `backtick-code-elements`
-- Fix Jest test runner regression
-- Run all tests to ensure no regressions
+- [ ] Implement Project maintenance (disable MD013, fix dependencies)
+- [ ] Implement auto-fix for `backtick-code-elements`
+- [ ] Fix Jest test runner regression
+- [ ] Run all tests to ensure no regressions
 - [x] Implement auto-fix for `basic-sentence-case-heading`
 
 ### Phase 3: rule enhancements & configuration
 
-- Expand `properNouns` and `technicalTerms`
-- Strengthen single-word heading suggestions
-- Make rules configurable
+- [ ] Expand `properNouns` and `technicalTerms`
+- [ ] Strengthen single-word heading suggestions
+- [ ] Make rules configurable
 
 ### Phase 4: finalization
 
