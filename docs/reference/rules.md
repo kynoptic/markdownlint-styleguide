@@ -67,7 +67,25 @@ The rule uses the micromark parser to analyze heading tokens and run a series of
 
 ### Configuration
 
-There are currently no configuration options. Future versions may allow custom acronym lengths or additional dictionaries of proper nouns.
+You can extend the rule's vocabulary by providing custom lists of technical terms and proper nouns in your markdownlint configuration file (e.g., `.markdownlint.jsonc`).
+
+- `technicalTerms`: An array of strings that should maintain their original casing (e.g., "Node.js", "OAuth2").
+- `properNouns`: An array of strings for proper nouns that should always be capitalized correctly (e.g., "JavaScript", "Python").
+
+#### Example configuration
+
+```jsonc
+// .markdownlint.jsonc
+{
+  "customRules": ["markdownlint-trap"],
+  "config": {
+    "sentence-case-heading": {
+      "technicalTerms": ["SaaS", "IaaS", "PaaS"],
+      "properNouns": ["MyProject", "AnotherName"]
+    }
+  }
+}
+```
 
 ### Auto-fix
 

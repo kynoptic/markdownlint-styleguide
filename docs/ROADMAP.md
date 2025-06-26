@@ -9,13 +9,12 @@ This rule needs refinement to reduce false positives and improve its contextual 
 - [x] Refine the file path detection regular expression (including validation tests).
 - [x] Expand the `ignoredTerms` list and refactor for better maintainability.
 - [x] Enhance LaTeX context awareness to avoid flagging mathematical expressions.
-- [ ] Implement a safe auto-fix for the rule.
+- [x] Implement a safe auto-fix for the rule.
 
 ## 🎯 Next up
 
 These are the highest-priority items once the current work is complete.
 
-- [ ] **Rule configuration**: Allow users to provide their own lists for `properNouns` and `technicalTerms` in the `sentence-case-heading` rule.
 - [ ] **Enhanced documentation**: Add missing JSDoc comments for all public functions and utilities.
 - [ ] **Project maintenance**:
   - [ ] Resolve any outstanding test runner regressions.
@@ -35,6 +34,7 @@ These are important goals that are not yet in the immediate development pipeline
 
 ## ✅ Completed
 
+- [x] **Rule configuration**: Allow users to provide their own lists for `properNouns` and `technicalTerms` in the `sentence-case-heading` rule.
 - [x] **New Rule: `no-bare-urls`**: Implemented a rule to enforce that URLs are wrapped in descriptive Markdown links, complete with auto-fix, context awareness (ignores code and links), and comprehensive tests.
 - [x] **Improved Test Coverage**: Added comprehensive Jest tests and edge case fixtures for all rules.
 - [x] **Simplified Test Structure**: Mapped each fixture to a dedicated test file for improved clarity and maintenance.

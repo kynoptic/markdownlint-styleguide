@@ -6,7 +6,7 @@
  */
 
 // Terms that keep their original casing
-const technicalTerms = Object.freeze({
+const defaultTechnicalTerms = Object.freeze({
   HTML: true,
   CSS: true,
   JSON: true,
@@ -28,7 +28,7 @@ const technicalTerms = Object.freeze({
 
 
 // Proper nouns that must be capitalized when checked
-const properNouns = Object.freeze({
+const defaultProperNouns = Object.freeze({
   paris: 'Paris',
   facebook: 'Facebook',
   github: 'GitHub',
@@ -41,60 +41,6 @@ const properNouns = Object.freeze({
   'vs code': 'VS Code',
   vscode: 'VS Code'
 });
-
-/**
- * Determine indices of words that are part of multi-word proper nouns.
- *
- * @param {string[]} words - Tokenized heading words.
- * @param {Record<string, string>} nouns - Mapping of proper nouns.
- * @returns {Set<number>} Indices that should be ignored during case checks.
- */
-function getProperPhraseIndices(words, nouns) {
-  const indices = new Set();
-  const lowerWords = words.map((w) => w.toLowerCase());
-  Object.keys(nouns).forEach((key) => {
-    if (!key.includes(' ')) {
-      return;
-    }
-    const parts = key.split(' ');
-    for (let i = 0; i <= lowerWords.length - parts.length; i++) {
-      const match = parts.every((p, j) => lowerWords[i + j] === p);
-      if (match) {
-        for (let j = 0; j < parts.length; j++) {
-          indices.add(i + j);
-        }
-      }
-    }
-  });
-  return indices;
-}
-
-/**
- * Validate multi-word proper nouns for correct capitalization.
- *
- * @param {string} text - Original heading text.
- * @param {import('markdownlint').RuleOnError} onError - Callback for violations.
- * @param {number} lineNumber - Line number for error reporting.
- * @returns {boolean} True if a violation was reported.
- */
-function validateProperPhrases(text, onError, lineNumber) {
-  for (const [phrase, expected] of Object.entries(properNouns)) {
-    if (!phrase.includes(' ')) {
-      continue;
-    }
-    const regex = new RegExp(`\\b${phrase}\\b`, 'i');
-    const match = regex.exec(text);
-    if (match && match[0] !== expected) {
-      onError({
-        lineNumber,
-        detail: `Phrase "${match[0]}" should be "${expected}".`,
-        context: text
-      });
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
  * Extract the plain heading text from tokens.
@@ -120,125 +66,6 @@ function extractHeadingText(tokens, lines, token) {
 }
 
 /**
- * Determine if all non-acronym words are uppercase.
- *
- * @param {string[]} words - Words extracted from the heading.
- * @returns {boolean} True when every relevant word is uppercase.
- */
-function isAllCapsHeading(words) {
-  const relevant = words.filter(
-    (w) =>
-      w.length > 1 &&
-      !(w.startsWith('__PRESERVED_') && w.endsWith('__'))
-  );
-  const allCaps = relevant.filter((w) => w === w.toUpperCase());
-  return (
-    relevant.length > 1 &&
-    allCaps.length === relevant.length &&
-    !/\d/.test(relevant.join(''))
-  );
-}
-
-/**
- * Validate a hyphenated word.
- *
- * @param {string} word - Candidate word from the heading.
- * @param {number} lineNumber - Line number for error reporting.
- * @param {string} headingText - Full heading text.
- * @param {import("markdownlint").RuleOnError} onError - Callback to report violations.
- * @returns {boolean} True if a lint error was generated.
- */
-function checkHyphenatedWord(word, lineNumber, headingText, sourceLine, onError) {
-  if (!word.includes('-')) {
-    return false;
-  }
-  const parts = word.split('-');
-  if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
-    report(
-      `Word "${parts[1]}" in heading should be lowercase.`,
-      lineNumber,
-      headingText,
-      sourceLine,
-      onError
-    );
-    return true;
-  }
-  return false;
-}
-
-/**
- * Generate fix information converting a heading to sentence case.
- *
- * @param {string} line - Full heading line from the source.
- * @returns {import('markdownlint').FixInfo | undefined}
- */
-function getFixInfo(line) {
-  const match = /^(#{1,6})(\s+)(.*)$/.exec(line);
-  if (!match) {
-    return undefined;
-  }
-  const prefixLength = match[1].length + match[2].length;
-  let lineText = match[3];
-  const commentIndex = lineText.indexOf('<!--');
-  let text = lineText;
-  if (commentIndex !== -1) {
-    text = lineText.slice(0, commentIndex).trimEnd();
-  }
-
-  const preserved = [];
-  const processed = text.replace(/`[^`]+`/g, (m) => {
-    preserved.push(m);
-    return `__P_${preserved.length - 1}__`;
-  });
-  const words = processed.split(/\s+/);
-  const fixedWords = words.map((w, i) => {
-    if (w.startsWith('__P_')) {
-      return w;
-    }
-    const lower = w.toLowerCase();
-    if (properNouns[lower]) {
-      return properNouns[lower];
-    }
-    if (technicalTerms[w]) {
-      return w;
-    }
-    if (i === 0) {
-      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-    }
-    if (w.length <= 4 && w === w.toUpperCase() && technicalTerms[w]) {
-      return w;
-    }
-    return w.toLowerCase();
-  });
-  let fixed = fixedWords.join(' ');
-  fixed = fixed.replace(/__P_(\d+)__/g, (_, n) => preserved[Number(n)]);
-  return {
-    editColumn: prefixLength + 1,
-    deleteCount: text.length,
-    insertText: fixed
-  };
-}
-
-/**
- * Report a violation with auto-fix information.
- *
- * @param {string} detail - Description of the issue.
- * @param {number} lineNumber - Line number for context.
- * @param {string} headingText - Heading text in question.
- * @param {string} line - Original source line.
- * @param {import('markdownlint').RuleOnError} onError - Callback for reporting.
- */
-function report(detail, lineNumber, headingText, line, onError) {
-  onError({
-    lineNumber,
-    detail,
-    context: headingText,
-    errorContext: headingText,
-    fixInfo: getFixInfo(line)
-  });
-}
-
-/**
  * Main rule implementation.
  * @param {import("markdownlint").RuleParams} params
  * @param {import("markdownlint").RuleOnError} onError
@@ -257,6 +84,165 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
   const tokens = params.parsers.micromark.tokens;
   const lines = params.lines;
+  const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || {};
+  const userTechnicalTerms = config.technicalTerms || [];
+  const userProperNouns = config.properNouns || [];
+
+  const technicalTerms = { ...defaultTechnicalTerms };
+  if (Array.isArray(userTechnicalTerms)) {
+    userTechnicalTerms.forEach((term) => {
+      if (typeof term === 'string') {
+        technicalTerms[term] = true;
+      }
+    });
+  }
+
+  const properNouns = { ...defaultProperNouns };
+  if (Array.isArray(userProperNouns)) {
+    userProperNouns.forEach((term) => {
+      if (typeof term === 'string') {
+        properNouns[term.toLowerCase()] = term;
+      }
+    });
+  }
+
+  /**
+   * Generate fix information converting a heading to sentence case.
+   * @param {string} line - Full heading line from the source.
+   * @returns {import('markdownlint').FixInfo | undefined}
+   */
+  function getFixInfo(line) {
+    const match = /^(#{1,6})(\s+)(.*)$/.exec(line);
+    if (!match) {
+      return undefined;
+    }
+    const prefixLength = match[1].length + match[2].length;
+    let lineText = match[3];
+    const commentIndex = lineText.indexOf('<!--');
+    let text = lineText;
+    if (commentIndex !== -1) {
+      text = lineText.slice(0, commentIndex).trimEnd();
+    }
+
+    const preserved = [];
+    const processed = text.replace(/`[^`]+`/g, (m) => {
+      preserved.push(m);
+      return `__P_${preserved.length - 1}__`;
+    });
+    const words = processed.split(/\s+/);
+    const fixedWords = words.map((w, i) => {
+      if (w.startsWith('__P_')) {
+        return w;
+      }
+      const lower = w.toLowerCase();
+      if (properNouns[lower]) {
+        return properNouns[lower];
+      }
+      if (technicalTerms[w]) {
+        return w;
+      }
+      if (i === 0) {
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      }
+      if (w.length <= 4 && w === w.toUpperCase() && technicalTerms[w]) {
+        return w;
+      }
+      return w.toLowerCase();
+    });
+    let fixed = fixedWords.join(' ');
+    fixed = fixed.replace(/__P_(\d+)__/g, (_, n) => preserved[Number(n)]);
+    return {
+      editColumn: prefixLength + 1,
+      deleteCount: text.length,
+      insertText: fixed
+    };
+  }
+
+  /**
+   * Report a violation with auto-fix information.
+   * @param {string} detail - Description of the issue.
+   * @param {number} lineNumber - Line number for context.
+   * @param {string} headingText - Heading text in question.
+   * @param {string} line - Original source line.
+   */
+  function report(detail, lineNumber, headingText, line) {
+    onError({
+      lineNumber,
+      detail,
+      context: headingText,
+      errorContext: headingText,
+      fixInfo: getFixInfo(line)
+    });
+  }
+
+  /**
+   * Determine indices of words that are part of multi-word proper nouns.
+   * @param {string[]} words - Tokenized heading words.
+   * @returns {Set<number>} Indices that should be ignored during case checks.
+   */
+  function getProperPhraseIndices(words) {
+    const indices = new Set();
+    const lowerWords = words.map((w) => w.toLowerCase());
+    Object.keys(properNouns).forEach((key) => {
+      if (!key.includes(' ')) {
+        return;
+      }
+      const parts = key.split(' ');
+      for (let i = 0; i <= lowerWords.length - parts.length; i++) {
+        const match = parts.every((p, j) => lowerWords[i + j] === p);
+        if (match) {
+          for (let j = 0; j < parts.length; j++) {
+            indices.add(i + j);
+          }
+        }
+      }
+    });
+    return indices;
+  }
+
+  /**
+   * Validate multi-word proper nouns for correct capitalization.
+   * @param {string} text - Original heading text.
+   * @param {number} lineNumber - Line number for error reporting.
+   * @returns {boolean} True if a violation was reported.
+   */
+  function validateProperPhrases(text, lineNumber) {
+    for (const [phrase, expected] of Object.entries(properNouns)) {
+      if (!phrase.includes(' ')) {
+        continue;
+      }
+      const regex = new RegExp(`\\b${phrase}\\b`, 'i');
+      const match = regex.exec(text);
+      if (match && match[0] !== expected) {
+        onError({
+          lineNumber,
+          detail: `Phrase "${match[0]}" should be "${expected}".`,
+          context: text
+        });
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Determine if all non-acronym words are uppercase.
+   * @param {string[]} words - Words extracted from the heading.
+   * @returns {boolean} True when every relevant word is uppercase.
+   */
+  function isAllCapsHeading(words) {
+    const relevant = words.filter(
+      (w) =>
+        w.length > 1 &&
+        !(w.startsWith('__PRESERVED_') && w.endsWith('__'))
+    );
+    const allCaps = relevant.filter((w) => w === w.toUpperCase());
+    return (
+      relevant.length > 1 &&
+      allCaps.length === relevant.length &&
+      !/\d/.test(relevant.join(''))
+    );
+  }
 
   tokens.forEach((token) => {
     if (token.type !== 'atxHeading') {
@@ -288,11 +274,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       !/[0-9-]/.test(headingText)
     ) {
       report(
-        'Single-word heading should be capitalized.',
-        lineNumber,
-        headingText.substring(0, 50),
-        sourceLine,
-        onError
+        'Single-word heading should be capitalized.', lineNumber, headingText.substring(0, 50), sourceLine
       );
       return;
     }
@@ -308,7 +290,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
-    if (validateProperPhrases(headingText, onError, lineNumber)) {
+    if (validateProperPhrases(headingText, lineNumber)) {
       return;
     }
 
@@ -341,7 +323,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     const words = clean.split(/\s+/).filter((w) => w.length > 0);
-    const phraseIgnore = getProperPhraseIndices(words, properNouns);
+    const phraseIgnore = getProperPhraseIndices(words);
     if (words.every((w) => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
       return;
     }
@@ -370,11 +352,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         // year-prefixed headings may start with a lowercase word
       } else if (!isSingleWordHyphen && firstWord[0] !== firstWord[0].toUpperCase()) {
         report(
-          "Heading's first word should be capitalized.",
-          lineNumber,
-          headingText,
-          sourceLine,
-          onError
+          "Heading's first word should be capitalized.", lineNumber, headingText, sourceLine
         );
         return;
       }
@@ -386,11 +364,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         !(base === base.toUpperCase() && /\d/.test(base))
       ) {
         report(
-          "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym).",
-          lineNumber,
-          headingText,
-          sourceLine,
-          onError
+          "Only the first letter of the first word in a heading should be capitalized (unless it's a short acronym).", lineNumber, headingText, sourceLine
         );
         return;
       }
@@ -398,11 +372,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
     if (isAllCapsHeading(words)) {
       report(
-        'Heading should not be in all caps.',
-        lineNumber,
-        headingText,
-        sourceLine,
-        onError
+        'Heading should not be in all caps.', lineNumber, headingText, sourceLine
       );
       return;
     }
@@ -433,13 +403,19 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       if (properNouns[word.toLowerCase()] && word === word.toLowerCase()) {
         report(
-          `Word "${word}" in heading should be capitalized.`,
-          lineNumber,
-          headingText,
-          sourceLine,
-          onError
+          `Word "${word}" in heading should be capitalized.`, lineNumber, headingText, sourceLine
         );
         return;
+      }
+
+      if (word.includes('-')) {
+        const parts = word.split('-');
+        if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
+          report(
+            `Word "${parts[1]}" in heading should be lowercase.`, lineNumber, headingText, sourceLine
+          );
+          return;
+        }
       }
 
       if (
@@ -450,15 +426,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         !properNouns[word.toLowerCase()] &&
         !word.startsWith('PRESERVED')
       ) {
-        if (checkHyphenatedWord(word, lineNumber, headingText, sourceLine, onError)) {
-          return;
-        }
         report(
-          `Word "${word}" in heading should be lowercase.`,
-          lineNumber,
-          headingText,
-          sourceLine,
-          onError
+          `Word "${word}" in heading should be lowercase.`, lineNumber, headingText, sourceLine
         );
         return;
       }
