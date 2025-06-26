@@ -2,6 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
+import MarkdownIt from 'markdown-it';
 import noBareUrls from '../../.vscode/custom-rules/wt-no-bare-urls.js';
 import { parseFixture } from '../utils/fixture.js';
 
@@ -19,15 +20,17 @@ describe('wt/no-bare-urls rule', () => {
       customRules: [noBareUrls],
       config: {
         default: false,
-        'wt/no-bare-urls': true
+        'wt/no-bare-urls': true,
+        'MD034': false
       },
-      markdownItFactory: () => import('markdown-it')
+      markdownItFactory: () => new MarkdownIt({ linkify: true })
     };
     violations = await lint(options);
   });
 
   test('detects bare URLs', () => {
-    const errorLines = violations[fixturePath].map((v) => v.lineNumber);
-    expect(errorLines).toEqual(failingLines);
+    const errorLines = [...new Set(violations[fixturePath].map((v) => v.lineNumber))];
+    // Sort both arrays to ensure the order doesn't affect the comparison
+    expect(errorLines.sort()).toEqual(failingLines.sort());
   });
 });

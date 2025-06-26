@@ -14,7 +14,7 @@ export function parseFixture(filePath) {
       (acc, line, index) => {
         if (line.includes('<!-- ✅ -->')) {
           acc.passingLines.push(index + 1);
-        } else if (line.includes('<!-- ❌ -->')) {
+        } else if (line.includes('<!-- ❌')) {
           acc.failingLines.push(index + 1);
         }
         return acc;

@@ -1,6 +1,6 @@
 /**
  * @file A centralized list of terms to ignore for the `backtick-code-elements` rule.
- * @copyright 2023 Joseph Casciano
+ * @copyright 2023 
  */
 
 // This set contains common abbreviations, acronyms, and technical terms
