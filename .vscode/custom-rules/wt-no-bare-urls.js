@@ -6,8 +6,8 @@
 /**
  * @type {import('markdownlint').Rule}
  */
-module.exports = {
-  names: ["no-bare-urls"],
+export default {
+  names: ["wt/no-bare-urls"],
   description: "Enforce that URLs are always wrapped in a proper Markdown link with descriptive text.",
   tags: ["links", "accessibility"],
   function: function noBareUrls(params, onError) {

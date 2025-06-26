@@ -1,4 +1,22 @@
-# no-bare-urls test fixture
+# Fixture for no-bare-urls rule
+
+This is a valid paragraph.
+
+[This is a valid link](https://example.com). <!-- ✅ -->
+
+<https://www.example.com> is also a valid link. <!-- ✅ -->
+
+A bare URL like http://example.com is not allowed. <!-- ❌ -->
+
+Another one: https://google.com. <!-- ❌ -->
+
+This is `http://in.a.code.block` and is allowed. <!-- ✅ -->
+
+This is in a code fence:
+```
+http://example.com
+```
+<!-- ✅ -->
 
 ## Valid cases (should not trigger the rule)
 

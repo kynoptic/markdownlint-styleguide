@@ -8,6 +8,10 @@
 // false positives from the `backtick-code-elements` rule.
 // The list is case-sensitive.
 export const ignoredTerms = new Set([
+  'set up',
+  'github.com',
+  'ulca.edu',
+  'pass/fail',
   // Common Abbreviations
   'e.g.',
   'i.e.',

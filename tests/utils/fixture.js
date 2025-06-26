@@ -22,3 +22,15 @@ export function parseFixture(filePath) {
       { passingLines: [], failingLines: [] }
     );
 }
+
+// Compatibility export for legacy tests
+export const getFixture = parseFixture;
+
+// Export getPassAndFail for test compatibility
+export function getPassAndFail(fixture) {
+  // Example implementation: scan for special markers or use parseFixture
+  // Here, we assume parseFixture returns { passingLines, failingLines }
+  const { passingLines, failingLines } = parseFixture(fixture);
+  return { pass: passingLines, fail: failingLines };
+}
+
