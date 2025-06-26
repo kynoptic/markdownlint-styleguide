@@ -12,45 +12,44 @@ module.exports = {
   tags: ["links", "accessibility"],
   function: function noBareUrls(params, onError) {
     // Regex to find URL-like patterns: http(s)://... or www....
-    // It captures the URL string, including any trailing punctuation that might be part of the URL
-    // or immediately follow it (like a period at the end of a sentence).
-    // The fixture implies that trailing punctuation should be part of the detected bare URL.
     const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+    let inLink = false;
 
-    params.tokens.forEach((token, index) => {
-      // This rule only applies to plain text tokens.
-      // URLs within inline code (`code_inline` tokens) or fenced code blocks (`fence` tokens)
-      // are implicitly ignored because their token types are not 'text'.
-      if (token.type === 'text') {
-        // Get the full line content for context in the error report.
+    params.tokens.forEach((token) => {
+      // Track whether we are inside a link to ignore URLs that are already linked
+      if (token.type === 'link_open') {
+        inLink = true;
+      } else if (token.type === 'link_close') {
+        inLink = false;
+      }
+
+      // This rule only applies to plain text tokens that are not part of a link.
+      // URLs within code blocks are implicitly ignored as they are not 'text' tokens.
+      if (token.type === 'text' && !inLink) {
         const line = params.lines[token.lineNumber - 1];
-
-        // Check if this text token is part of an autolink (e.g., <http://example.com>).
-        // Autolinks are represented by a 'link_open' token with 'info: "auto"' immediately
-        // preceding the 'text' token that contains the URL.
-        const prevToken = params.tokens[index - 1];
-        if (prevToken && prevToken.type === 'link_open' && prevToken.info === 'auto') {
-          // This text token is part of an autolink, which is an allowed exception.
-          return;
-        }
-
-        // Search for bare URLs within the content of the current text token.
         let match;
         while ((match = urlRegex.exec(token.content)) !== null) {
-          const bareUrl = match[0];
+          let bareUrl = match[0];
 
-          // Calculate the 1-based column number for the start of the bare URL.
-          // token.range[0] is the 1-based start column of the token's content within the line.
-          // match.index is the 0-based start index of the URL within the token's content.
+          // Trim trailing punctuation that is unlikely to be part of the URL itself,
+          // such as a period at the end of a sentence.
+          const trailingChars = /[.,;!?\)\]\}]$/;
+          if (trailingChars.test(bareUrl)) {
+            bareUrl = bareUrl.slice(0, -1);
+          }
+
+          // Re-verify the match isn't empty after trimming
+          if (!bareUrl) continue;
+
           const column = token.range[0] + match.index;
 
-          // Report the error. Auto-fix functionality will be added in a later step.
           onError({
             lineNumber: token.lineNumber,
             detail: `Do not use bare URLs. Wrap "${bareUrl}" in descriptive link text.`,
             context: line,
-            range: [column, bareUrl.length], // Highlight the bare URL
+            range: [column, bareUrl.length],
             fixInfo: {
+              editColumn: column,
               deleteCount: bareUrl.length,
               insertText: `link`
             }

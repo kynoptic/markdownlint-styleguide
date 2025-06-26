@@ -6,16 +6,7 @@ This document outlines the development plan for `markdownlint-trap`. Our goal is
 
 These are the highest-priority items currently in development.
 
-### 1. New Rule: `no-bare-urls`
-
-This rule will enforce that URLs are wrapped in descriptive Markdown links (`[text](url)`), improving readability and accessibility.
-
-- [ ] Implement rule logic to find bare URLs in text.
-- [ ] Correctly ignore URLs inside code blocks, code spans, and existing links.
-- [ ] Implement robust auto-fix functionality to wrap bare URLs.
-- [ ] Create comprehensive test fixtures covering all edge cases.
-
-### 2. Enhancements for `backtick-code-elements`
+### Enhancements for `backtick-code-elements`
 
 This rule needs refinement to reduce false positives and improve its contextual awareness.
 
@@ -28,9 +19,9 @@ This rule needs refinement to reduce false positives and improve its contextual 
 
 Once the current focus is complete, we will move on to these items.
 
-- [ ] **Rule Configuration**: Allow users to provide their own lists for `properNouns` and `technicalTerms` in the `sentence-case-heading` rule.
-- [ ] **Enhanced Documentation**: Add missing JSDoc comments for all public functions and utilities.
-- [ ] **Project Maintenance**:
+- [ ] **Rule configuration**: Allow users to provide their own lists for `properNouns` and `technicalTerms` in the `sentence-case-heading` rule.
+- [ ] **Enhanced documentation**: Add missing JSDoc comments for all public functions and utilities.
+- [ ] **Project maintenance**:
   - [ ] Resolve any outstanding test runner regressions.
   - [ ] Run all tests to ensure no regressions before release.
 
@@ -38,9 +29,9 @@ Once the current focus is complete, we will move on to these items.
 
 These are important goals that are not yet in the immediate development pipeline.
 
-- [ ] **Automated Release Process**: Set up CI scripts to publish to `npm` and automatically generate changelogs.
-- [ ] **VS Code Extension Integration**: Provide clear steps and configuration for bundling these rules into a VS Code extension.
-- [ ] **Rule Enhancements**:
+- [ ] **Automated release process**: Set up CI scripts to publish to `npm` and automatically generate changelogs.
+- [ ] **VS Code extension integration**: Provide clear steps and configuration for bundling these rules into a VS Code extension.
+- [ ] **Rule enhancements**:
   - [ ] Expand the built-in `properNouns` and `technicalTerms` lists.
   - [ ] Strengthen suggestions for single-word headings.
 
@@ -48,6 +39,7 @@ These are important goals that are not yet in the immediate development pipeline
 
 ## ✅ Completed
 
+- [x] **New Rule: `no-bare-urls`**: Implemented a rule to enforce that URLs are wrapped in descriptive Markdown links, complete with auto-fix, context awareness (ignores code and links), and comprehensive tests.
 - [x] **Improved Test Coverage**: Added comprehensive Jest tests and edge case fixtures for all rules.
 - [x] **Simplified Test Structure**: Mapped each fixture to a dedicated test file for improved clarity and maintenance.
 - [x] **Auto-fix for `sentence-case-heading`**: Implemented a safe and effective auto-fix for the heading capitalization rule.
