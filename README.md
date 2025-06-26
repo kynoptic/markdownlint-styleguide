@@ -4,70 +4,85 @@ A collection of custom rules for `markdownlint` that enforce consistent Markdown
 
 ## Key features
 
-- **Sentence case heading rule** (`sentence-case-heading`) – Ensures headings follow sentence case style (only first word capitalized)
-- **Backtick code elements rule** (`backtick-code-elements`) – Enforces backticks around code snippets and paths
-- Test-driven development approach with comprehensive fixture-based testing
-- Detailed error messages to help users understand and fix violations
-- Smart detection of acronyms, proper nouns, and code elements
+- **Sentence Case Headings**: Enforces sentence case for all Markdown headings.
+- **Backticked Code Elements**: Ensures that code and file paths are enclosed in backticks.
+- **Test-Driven**: Developed with a full suite of fixture-based tests.
+- **Detailed Errors**: Provides clear messages to help resolve linting issues.
 
 ## Installation
 
+To install `markdownlint-trap`, run the following command:
+
 ```bash
-npm install markdownlint-trap
+npm install markdownlint-trap --save-dev
 ```
 
 ### Requirements
 
-- Node.js (v`14` or higher)
-- Use `nvm` to load the version from `.nvmrc`:
+- **Node.js**: Version `14` or higher. We recommend using `nvm` to manage Node.js versions:
 
-```bash
-nvm install
-nvm use
-```
+  ```bash
+  nvm install
+  nvm use
+  ```
 
-- markdownlint (v`0.38.0` or compatible)
+- **markdownlint**: Version `0.38.0` or compatible.
 
 ## Usage
 
-### Custom rules
+1. Add the custom rules to your `.markdownlint-cli2.jsonc` configuration file:
 
-Add the custom rules to your `.markdownlint-cli2.jsonc` file:
+    ```json
+    {
+      "customRules": [
+        "markdownlint-trap"
+      ],
+      "config": {
+        "sentence-case-heading": true,
+        "backtick-code-elements": true
+      }
+    }
+    ```
 
-```json
-{
-  "customRules": [
-    "markdownlint-trap"
-  ],
-  "config": {
-    "sentence-case-heading": true,
-    "backtick-code-elements": true
-  }
-}
-```
+2. Run `markdownlint-cli2` on your project:
 
-### Run with custom rules
+    ```bash
+    npx markdownlint-cli2 "**/*.md"
+    ```
 
-```bash
-npx markdownlint-cli2 "**/*.md"
-```
+## Rules
+
+This package includes the following rules:
+
+- `sentence-case-heading`: Enforces sentence case in headings.
+- `backtick-code-elements`: Enforces backticks around code elements.
+
+For detailed documentation on each rule, see [`docs/reference/rules.md`](./docs/reference/rules.md).
 
 ## Testing
 
-Run the tests with:
+To run the test suite, use the following command:
 
 ```bash
 npm test
 ```
 
-Use `DEBUG=markdownlint-trap*` for verbose output.
+For verbose output, use the `DEBUG` environment variable:
 
-## License and attribution
+```bash
+DEBUG=markdownlint-trap* npm test
+```
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+## Project status
+
+This project is under active development. Contributions and feedback are welcome.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Resources
 
-- [`docs/reference/rules.md`](./docs/reference/rules.md) – Detailed rule documentation
-- [`tests/`](./tests/) – Test fixtures and examples
-- [`CHANGELOG.md`](./CHANGELOG.md) – Version history and changes
+- **Changelog**: [`CHANGELOG.md`](./CHANGELOG.md)
+- **Rule Documentation**: [`docs/reference/rules.md`](./docs/reference/rules.md)
+- **Source Code**: [GitHub](https://github.com/your-username/markdownlint-trap)
