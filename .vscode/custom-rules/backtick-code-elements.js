@@ -25,6 +25,7 @@ function backtickCodeElements(params, onError) {
 
   const lines = params.lines;
   let inCodeBlock = false;
+  let inMathBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
@@ -37,7 +38,13 @@ function backtickCodeElements(params, onError) {
       continue;
     }
 
-    if (inCodeBlock || /^\s*#/.test(line)) {
+    // Detect $$ as math block fences.
+    if (line.trim() === '$$') {
+      inMathBlock = !inMathBlock;
+      continue;
+    }
+
+    if (inCodeBlock || inMathBlock || /^\s*#/.test(line)) {
       continue;
     }
 
@@ -139,45 +146,41 @@ function backtickCodeElements(params, onError) {
      * @returns {boolean} True when the range is within a LaTeX math expression.
      */
     function inLatexMath(text, start, end) {
-      // Skip if the match contains shell command indicators
-      if (text.substring(start, end).includes('grep ') || 
-          text.substring(start, end).includes('export ') ||
-          text.substring(start, end).includes(' command')) {
-        return false;
-      }
-
-      // Check for inline math expressions ($...$)
-      // This pattern matches text between dollar signs that contain LaTeX-like content
-      const inlineMathRegex = /\$(\s*[a-zA-Z0-9\\{}^_()=+\-*\/><\s]+\s*)\$/g;
-      let m;
-      while ((m = inlineMathRegex.exec(text)) !== null) {
-        // Verify this looks like a math expression (contains LaTeX operators or spaces)
-        const content = m[1];
-        if (content.includes('\\') || content.includes('^') || 
-            content.includes('_') || content.includes('{') ||
-            content.includes('=') || content.includes(' ')) {
-          if (start >= m.index && end <= m.index + m[0].length) {
-            return true;
-          }
+      // Heuristic to avoid flagging shell variables as math.
+      if (/\$/.test(text) && /\b(?:echo|export|set|grep|sed|awk|env)\b/.test(text)) {
+        const matchedText = text.substring(start, end);
+        if (/^\$?[A-Z0-9_]+$/.test(matchedText)) { // e.g., $VAR or VAR
+          return false;
         }
       }
 
-      // Check for block math expressions ($$...$$)
-      const blockMathRegex = /\$\$([^\$]|\$[^\$])*\$\$/g;
+      // Check for inline math expressions ($...$)
+      const inlineMathRegex = /\$([^$]+?)\$/g;
+      let m;
+      while ((m = inlineMathRegex.exec(text)) !== null) {
+        const content = m[1];
+        const isMathLike =
+          /[\\{}^_]/.test(content) || // Contains LaTeX special characters
+          /[a-zA-Z][+\-*/=<> ]/.test(content) || // Contains variables in equations
+          / [+\-*/=] /.test(content) || // Contains operators with spacing
+          !/^\d+(\.\d+)?$/.test(content.trim()); // Not just a number (price)
+
+        if (isMathLike && start >= m.index && end <= m.index + m[0].length) {
+          return true;
+        }
+      }
+
+      // Check for block math expressions ($$...$$) on a single line
+      const blockMathRegex = /\$\$([^$]|\$[^\$])*\$\$/g;
+      blockMathRegex.lastIndex = 0; // Reset regex state
       while ((m = blockMathRegex.exec(text)) !== null) {
         if (start >= m.index && end <= m.index + m[0].length) {
           return true;
         }
       }
 
-      // Check if the line starts with a standalone $$ which indicates a math block start
-      if (text.trim() === '$$' || text.trim().startsWith('$$\n')) {
-        return true;
-      }
-
-      // Check if the line contains LaTeX-style math expressions like \sum, \frac, etc.
-      if (text.includes('\\sum') || text.includes('\\frac') || 
-          text.includes('\\int') || text.includes('\\lim')) {
+      // If the line contains common LaTeX math functions, it's likely math-related.
+      if (/\\(?:sum|frac|int|lim|sqrt|sin|cos|log|alpha|beta|gamma|delta|theta|pi|sigma)\b/.test(text)) {
         return true;
       }
 

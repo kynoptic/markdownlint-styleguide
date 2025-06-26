@@ -8,7 +8,7 @@ This rule needs refinement to reduce false positives and improve its contextual 
 
 - [x] Refine the file path detection regular expression (including validation tests).
 - [x] Expand the `ignoredTerms` list and refactor for better maintainability.
-- [ ] Enhance LaTeX context awareness to avoid flagging mathematical expressions.
+- [x] Enhance LaTeX context awareness to avoid flagging mathematical expressions.
 - [ ] Implement a safe auto-fix for the rule.
 
 ## 🎯 Next up
