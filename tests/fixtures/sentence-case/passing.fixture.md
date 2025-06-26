@@ -70,11 +70,11 @@ The CDC recommends updated vaccines. <!-- ✅ -->
 
 # COVID-19 timeline <!-- ✅ -->
 ## Appendix A - Glossary <!-- ✅ -->
-### christen-values-table <!-- ✅ -->
-**readme.md is a common filename** <!-- ✅ -->
-*main.tf is used in Terraform projects* <!-- ✅ -->
-- **.gitignore excludes files from versioning** <!-- ✅ -->
-- *index.html is the default file served* <!-- ✅ -->
+### `christen-values-table` <!-- ✅ -->
+**`readme.md` is a common filename** <!-- ✅ -->
+*`main.tf` is used in Terraform projects* <!-- ✅ -->
+- **`.gitignore` excludes files from versioning** <!-- ✅ -->
+- *`index.html` is the default file served* <!-- ✅ -->
 Use snake_case for filenames when possible. <!-- ✅ -->
 
 ## 🎉 Emojis and decorative
