@@ -48,8 +48,6 @@ Reference style link: [Reference][1]. <!-- ✅ -->
 
 Autolink: <http://autolink.net>. <!-- ✅ -->
 
-### URLs with
-
 A URL used as link text is also fine: http://api.example.com. <!-- ❌ -->
 
 ### Non-URLs
