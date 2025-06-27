@@ -7,6 +7,16 @@ import { lint } from 'markdownlint/promise';
 import { applyFixes } from 'markdownlint';
 import backtickRule from '../../.vscode/custom-rules/backtick-code-elements.js';
 
+/**
+ * Normalize fixture markers for comparison.
+ *
+ * @param {string} content - Markdown text to normalize.
+ * @returns {string} Text with failing markers converted to passing markers.
+ */
+function normalizeMarkers(content) {
+  return content.replace(/<!--\s*❌\s*-->/g, '<!-- ✅ -->');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const fixturePath = path.join(
@@ -55,9 +65,11 @@ describe('backtick-code-elements auto-fix functionality', () => {
     const fixed = applyFixes(fixtureContent, ruleFixes);
     fs.writeFileSync(tempFilePath, fixed, 'utf8');
     const fixedContent = fs.readFileSync(tempFilePath, 'utf8');
-    
-    // Compare with expected content
-    expect(fixedContent).toBe(expectedFixedContent);
+
+    // Compare with expected content using normalized markers
+    expect(normalizeMarkers(fixedContent)).toBe(
+      normalizeMarkers(expectedFixedContent)
+    );
   });
 
   test('correctly identifies violations', async () => {
@@ -109,7 +121,9 @@ describe('backtick-code-elements auto-fix functionality', () => {
     const fixed = applyFixes(minimalFixtureContent, minimalFixes);
     fs.writeFileSync(minimalTempFilePath, fixed, 'utf8');
     const fixedContent = fs.readFileSync(minimalTempFilePath, 'utf8');
-    expect(fixedContent).toBe(minimalExpectedContent);
+    expect(normalizeMarkers(fixedContent)).toBe(
+      normalizeMarkers(minimalExpectedContent)
+    );
 
     // Clean up
     if (fs.existsSync(minimalTempFilePath)) {

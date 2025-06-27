@@ -7,6 +7,16 @@ import { lint } from 'markdownlint/promise';
 import { applyFixes } from 'markdownlint';
 import sentenceRule from '../../.vscode/custom-rules/sentence-case-heading.js';
 
+/**
+ * Convert failure markers to passing markers for comparison.
+ *
+ * @param {string} content - Markdown text to normalize.
+ * @returns {string} Text with failure markers replaced.
+ */
+function normalizeMarkers(content) {
+  return content.replace(/<!--\s*❌\s*-->/g, '<!-- ✅ -->');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const fixturePath = path.join(
@@ -52,7 +62,9 @@ describe('sentence-case-heading auto-fix functionality', () => {
     const fixed = applyFixes(fixtureContent, fixes);
     fs.writeFileSync(tempFilePath, fixed, 'utf8');
     const fixedContent = fs.readFileSync(tempFilePath, 'utf8');
-    expect(fixedContent).toBe(expectedFixedContent);
+    expect(normalizeMarkers(fixedContent)).toBe(
+      normalizeMarkers(expectedFixedContent)
+    );
   });
 
   test('identifies violations in fixture', async () => {

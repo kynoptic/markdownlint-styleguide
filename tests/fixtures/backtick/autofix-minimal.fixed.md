@@ -1,7 +1,7 @@
 # Minimal auto-fix fixture
 
-Install `npm install` <!-- ❌ -->
+Install `npm install` <!-- ✅ -->
 
-Go to `src/utils` <!-- ❌ -->
+Go to `src/utils` <!-- ✅ -->
 
-Edit `config.yaml` <!-- ❌ -->
+Edit `config.yaml` <!-- ✅ -->
