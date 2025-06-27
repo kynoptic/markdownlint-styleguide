@@ -466,29 +466,37 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     } else if (token.type === 'paragraph') {
       const lineNumber = token.startLine;
       const sourceLine = lines[lineNumber - 1];
+      // Debug the source line to see what we're working with
+      if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
+        console.log(`Processing line ${lineNumber}: "${sourceLine}"`);
+      }
+
       // Enhanced regex to better match list items with bold text
       // This handles both standalone bold items and those with colons
-      const listMatch = sourceLine.match(/^\s*[-*+]\s+(?:\*\*|__)(.+?)(?:\*\*|__)/);
+      // Using a more permissive regex that should match all bold text in list items
+      const listMatch = sourceLine.match(/^\s*[-*+]\s+(\*\*|__)(.+?)(\*\*|__)/);
 
       if (listMatch) {
-        const originalBoldText = listMatch[1];
+        // listMatch[1] is the opening marker (** or __)
+        // listMatch[2] is the content inside the bold markers
+        // listMatch[3] is the closing marker (** or __)
+        const originalBoldText = listMatch[2];
         // Get the text to validate - either before the colon or the entire text if no colon
         const textToValidate = originalBoldText.includes(':') ? 
           originalBoldText.split(':')[0] : originalBoldText;
+          
+        // Debug the extracted text
+        if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
+          console.log(`Line ${lineNumber}: Extracted bold text: "${originalBoldText}", validating: "${textToValidate}"`);
+        }
         
-        // Force direct validation of bold list items against sentence case rules
-        // Check if the text starts with uppercase and the rest is lowercase
-        const firstChar = textToValidate.charAt(0);
-        const restOfText = textToValidate.slice(1);
-        const isSentenceCase = firstChar === firstChar.toUpperCase() && 
-                              restOfText === restOfText.toLowerCase() || 
-                              isProperNoun(textToValidate) || 
-                              isPreservedTerm(textToValidate);
+        // Instead of trying to validate directly, use the existing validate function
+        // which already has all the logic for sentence case validation
 
         const reportFn = (detail, ln, validatedText, line) => {
           const fixedPart = toSentenceCase(validatedText);
           if (!fixedPart) return;
-
+          
           const restOfBold = originalBoldText.slice(validatedText.length);
           const newBoldText = fixedPart + restOfBold;
 
@@ -508,7 +516,66 @@ function basicSentenceCaseHeadingFunction(params, onError) {
           console.log(`Processing list item at line ${lineNumber}: "${textToValidate}"`); 
         }
         
-        validate(textToValidate, lineNumber, sourceLine, reportFn);
+        // Direct validation for bold list items
+        const words = textToValidate.split(/\s+/);
+        
+        // Check if first word is capitalized correctly
+        if (words.length > 0) {
+          const firstWord = words[0];
+          const wordLower = firstWord.toLowerCase();
+          const expectedCasing = specialCasedTerms[wordLower];
+          
+          // If it's a special term, check if it matches expected casing
+          if (expectedCasing && firstWord !== expectedCasing) {
+            onError({
+              lineNumber,
+              detail: `First word "${firstWord}" should be "${expectedCasing}".`,
+              context: originalBoldText
+            });
+          } 
+          // Otherwise check if first letter is capitalized and rest is lowercase
+          else if (!expectedCasing && firstWord !== firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase()) {
+            // Allow acronyms (all caps, 4 chars or less)
+            if (!(firstWord.length <= 4 && firstWord === firstWord.toUpperCase())) {
+              onError({
+                lineNumber,
+                detail: "Bold text's first word should be capitalized.",
+                context: originalBoldText
+              });
+            }
+          }
+          
+          // Check for all caps
+          const allCaps = words.filter(w => w === w.toUpperCase() && w.length > 1);
+          if (words.length > 1 && allCaps.length === words.length) {
+            onError({
+              lineNumber,
+              detail: 'Bold text should not be in all caps.',
+              context: originalBoldText
+            });
+          }
+          
+          // Check remaining words for proper case
+          for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const wordLower = word.toLowerCase();
+            const expectedCasing = specialCasedTerms[wordLower];
+            
+            // Skip single-letter words, pronouns, and special terms
+            if (word.length <= 1 || word === 'I' || expectedCasing) {
+              continue;
+            }
+            
+            // Words that aren't proper nouns should be lowercase
+            if (word !== wordLower && !(/^[A-Z][a-z]+$/.test(word) && specialCasedTerms[word])) {
+              onError({
+                lineNumber,
+                detail: `Word "${word}" should be lowercase in bold text.`,
+                context: originalBoldText
+              });
+            }
+          }
+        }
       }
     }
   });

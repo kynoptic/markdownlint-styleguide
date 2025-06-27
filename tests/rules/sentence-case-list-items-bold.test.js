@@ -49,10 +49,11 @@ describe('sentence-case-heading list-items-bold fixture', () => {
   test('reports incorrectly formatted list items', () => {
     const violatingLines = violations.map(v => v.lineNumber);
     
-    // Skip this test for now until we fix the issue
+    // Debug output to help diagnose the issue
     if (failingLines.length > 0 && violatingLines.length === 0) {
-      console.warn('⚠️ Test skipped: No violations detected for lines marked as failing');
-      return;
+      console.warn('⚠️ Warning: No violations detected for lines marked as failing');
+      console.log('This should be fixed by updating the rule implementation');
+      // Not returning here so the test will fail if no violations are detected
     }
     
     failingLines.forEach(line => expect(violatingLines).toContain(line));
