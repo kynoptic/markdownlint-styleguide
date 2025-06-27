@@ -5,7 +5,7 @@ This document describes the custom markdownlint rules included in **markdownlint
 
 ## `sentence-case-heading` (SC001)
 
-The `sentence-case-heading` rule enforces sentence case for ATX headings. Only the first word is capitalized, keeping documentation consistent and easy to read.
+The `sentence-case-heading` rule enforces sentence case for ATX headings and for bolded text at the start of a list item. Only the first word is capitalized, keeping documentation consistent and easy to read.
 
 ### Why sentence case?
 
@@ -18,11 +18,12 @@ Sentence case is common in technical writing because it:
 
 ### How the rule works
 
-The rule checks each heading and ensures that:
+The rule checks each heading (and bolded list item lead-in) and ensures that:
 
 1. The first word begins with a capital letter
 2. Remaining words are lower case unless covered by an exception
-3. The heading is not entirely in uppercase
+3. The text is not entirely in uppercase
+4. The check applies to bolded text at the start of a list item (e.g., `- **My item**: ...`)
 
 ### Allowed exceptions
 
@@ -41,6 +42,7 @@ The following elements may remain as they appear:
 # Working with JSON and REST APIs
 # I am using proper sentence case
 # Using the getUserData() function
+- **Correct item**: This list item is correct.
 ```
 
 ### Incorrect examples

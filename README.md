@@ -4,10 +4,10 @@ A collection of custom rules for `markdownlint` that enforce consistent Markdown
 
 ## Key features
 
-- **Sentence Case Headings**: Enforces sentence case for all Markdown headings.
-- **Backticked Code Elements**: Ensures that code and file paths are enclosed in backticks.
-- **Test-Driven**: Developed with a full suite of fixture-based tests.
-- **Detailed Errors**: Provides clear messages to help resolve linting issues.
+- **Sentence case headings**: Enforces sentence case for all Markdown headings and list lead-ins.
+- **Backticked code elements**: Ensures that code and file paths are enclosed in backticks.
+- **Test-driven**: Developed with a full suite of fixture-based tests.
+- **Detailed errors**: Provides clear messages to help resolve linting issues.
 
 ## Installation
 
