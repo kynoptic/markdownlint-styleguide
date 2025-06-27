@@ -257,25 +257,25 @@ function backtickCodeElements(params, onError) {
         // Skip if inside a Markdown link, wiki link, or HTML comment
         if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
           // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside link or comment`);
+
           continue;
         }
         // Skip if in ignored terms
         if (ignoredTerms.has(fullMatch)) {
           // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: in ignored terms`);
+
           continue;
         }
         // Skip if already flagged
         if (flaggedPositions.has(start)) {
           // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: already flagged`);
+
           continue;
         }
         // Only skip if this match is inside a true LaTeX math region
         if (inLatexMath(line, start, end)) {
           // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside LaTeX math`);
+
           continue;
         }
         // Skip if inside a URL (e.g., after http:// or https://)
@@ -290,7 +290,7 @@ function backtickCodeElements(params, onError) {
         }
         if (isInUrl) {
           // eslint-disable-next-line no-console
-          console.log(`[DEBUG] Skipped '${fullMatch}' at line ${lineNumber}: inside URL`);
+
           continue;
         }
 
