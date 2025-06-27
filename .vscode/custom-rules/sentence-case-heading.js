@@ -416,7 +416,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
           );
           return;
         }
-      } else {
+      } else { // Word is not in specialCasedTerms
+        // Acronym detection: Allow short (<= 4 chars) all-uppercase words,
+        // and the pronoun "I", to retain their casing. Otherwise, enforce lowercase.
+        // Longer acronyms or specific brand names should be added to specialCasedTerms.
         // For other words, ensure they are lowercase, unless they are short acronyms or 'I'.
       }
 
