@@ -9,9 +9,9 @@ import { specialCasedTerms as defaultSpecialCasedTerms } from './shared-constant
 
 /**
  * Extract the plain heading text from tokens.
- * @param {import("markdownlint").Token[]} tokens
+ * @param {object[]} tokens
  * @param {string[]} lines
- * @param {import("markdownlint").Token} token
+ * @param {object} token
  * @returns {string} The extracted heading text.
  */
 function extractHeadingText(tokens, lines, token) {
@@ -67,51 +67,57 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   }
 
   /**
-   * Generate fix information converting a heading to sentence case.
-   * @param {string} line - Full heading line from the source.
-   * @returns {import('markdownlint').FixInfo | undefined}
+   * Converts a string to sentence case, respecting preserved segments.
+   * @param {string} text The text to convert.
+   * @returns {string | null} The fixed text, or null if no change is needed.
    */
-  function getFixInfo(line) {
+  function toSentenceCase(text) {
+    const preserved = [];
+    const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\1|(\*|_)(.*?)\1/g;
+    const processed = text
+      .replace(preservedSegmentsRegex, (m) => {
+        preserved.push(m);
+        return `__P_${preserved.length - 1}__`;
+      });
+    const words = processed.split(/\s+/).filter(Boolean);
+    const firstWordIndex = words.findIndex((w) => !w.startsWith('__P_'));
+    if (firstWordIndex === -1) { return null; }
+
+    let firstVisibleWordCased = false;
+    const fixedWords = words.map((w) => {
+      if (w.startsWith('__P_')) return w;
+      const lower = w.toLowerCase();
+      if (specialCasedTerms[lower]) return specialCasedTerms[lower];
+      if (!firstVisibleWordCased) {
+        firstVisibleWordCased = true;
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      }
+      return w.toLowerCase();
+    });
+    let fixed = fixedWords.join(' ');
+
+    fixed = fixed.replace(/__P_(\d+)__/g, (_, idx) => preserved[Number(idx)]);
+
+    return fixed === text ? null : fixed;
+  }
+
+  function getFixInfoForHeading(line, text) {
     const match = /^(#{1,6})(\s+)(.*)$/.exec(line);
     if (!match) {
       return undefined;
     }
     const prefixLength = match[1].length + match[2].length;
-    let lineText = match[3];
-    const commentIndex = lineText.indexOf('<!--');
-    let text = lineText;
-    if (commentIndex !== -1) {
-      text = lineText.slice(0, commentIndex).trimEnd();
-    }
 
     const preserved = [];
-    const processed = text.replace(/`[^`]+`/g, (m) => {
-      preserved.push(m);
-      return `__P_${preserved.length - 1}__`;
-    });
-    const words = processed.split(/\s+/);
-    const fixedWords = words.map((w, i) => {
-      if (w.startsWith('__P_')) {
-        return w; // Preserved content
-      }
-      const lower = w.toLowerCase();
-      if (specialCasedTerms[lower]) {
-        return specialCasedTerms[lower]; // Fix special-cased terms
-      }
-      if (i === 0) {
-        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-      }
-      if (w.length <= 4 && w === w.toUpperCase() && specialCasedTerms[w.toLowerCase()]) {
-        return w;
-      }
-      return w.toLowerCase();
-    });
-    let fixed = fixedWords.join(' ');
-    fixed = fixed.replace(/__P_(\d+)__/g, (_, n) => preserved[Number(n)]);
+    const fixedText = toSentenceCase(text);
+
+    if (!fixedText) {
+      return undefined;
+    }
     return {
       editColumn: prefixLength + 1,
       deleteCount: text.length,
-      insertText: fixed
+      insertText: fixedText
     };
   }
 
@@ -122,13 +128,18 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {string} headingText - Heading text in question.
    * @param {string} line - Original source line.
    */
-  function report(detail, lineNumber, headingText, line) {
+  function reportForHeading(detail, lineNumber, headingText, line) {
+    const commentIndex = line.indexOf('<!--');
+    const headingContent = commentIndex !== -1 ?
+      line.slice(0, commentIndex).trimEnd() :
+      line;
+    const textToFix = headingContent.replace(/^#+\s*/, '');
+
     onError({
       lineNumber,
       detail,
       context: headingText,
-      errorContext: headingText,
-      fixInfo: getFixInfo(line)
+      fixInfo: getFixInfoForHeading(line, textToFix)
     });
   }
 
@@ -201,20 +212,17 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     );
   }
 
-  tokens.forEach((token) => {
-    if (token.type !== 'atxHeading') {
-      return;
-    }
-    const lineNumber = token.startLine;
-    if (lineNumber === 1 && /README\.md$/i.test(params.name || '')) {
-      return;
-    }
-    const sourceLine = lines[lineNumber - 1];
-    let headingText = extractHeadingText(tokens, lines, token);
-    if (!headingText) {
-      return;
-    }
+  /**
+   * Validates a string for sentence case and reports errors.
+   * @param {string} text The text to validate.
+   * @param {number} lineNumber The line number of the text.
+   * @param {string} sourceLine The full source line.
+   * @param {(detail: string, lineNumber: number, text: string, sourceLine: string) => void} reportFn The function to call to report an error.
+   */
+  function validate(text, lineNumber, sourceLine, reportFn) {
+    let headingText = text;
 
+    if (!headingText) { return; }
     // Strip leading emoji or symbol characters before analysis
     headingText = headingText
       .replace(/^[\u{1F000}-\u{1FFFF}\u{2000}-\u{3FFF}\u{FE0F}]+\s*/u, '')
@@ -222,7 +230,6 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (!headingText) {
       return;
     }
-
 
     const codeContentRegex = /`[^`]+`|\([A-Z0-9]+\)/g;
     const matches = [...headingText.matchAll(codeContentRegex)];
@@ -251,7 +258,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         preservedSegments.push(m);
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       })
-      .replace(/\[([^\]]+)\]/g, (m) => {
+      .replace(/\[[^\]]+\]\([^)]+\)|\[[^\]]+\]/g, (m) => {
         preservedSegments.push(m);
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       })
@@ -260,6 +267,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       })
       .replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (m) => {
+        preservedSegments.push(m);
+        return `__PRESERVED_${preservedSegments.length - 1}__`;
+      })
+      .replace(/(\*\*|__)(.*?)\1/g, (m) => { // Bold
+        preservedSegments.push(m);
+        return `__PRESERVED_${preservedSegments.length - 1}__`;
+      })
+      .replace(/(\*|_)(.*?)\1/g, (m) => { // Italic
         preservedSegments.push(m);
         return `__PRESERVED_${preservedSegments.length - 1}__`;
       });
@@ -316,7 +331,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       if (expectedFirstWordCasing) {
         // If it's a known proper noun or technical term, check if its casing matches the expected one.
         if (firstWord !== expectedFirstWordCasing) {
-          report(
+          reportFn(
             `First word "${firstWord}" should be "${expectedFirstWordCasing}".`,
             lineNumber,
             headingText,
@@ -327,7 +342,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       } else if (hyphenExpected) {
         const expected = hyphenExpected + firstWord.slice(hyphenExpected.length);
         if (firstWord !== expected) {
-          report(
+          reportFn(
             `First word "${firstWord}" should be "${expected}".`,
             lineNumber,
             headingText,
@@ -340,8 +355,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
         if (firstWord !== expectedSentenceCase) {
           // Allow short acronyms (<= 4 chars, all caps)
-          if (!(firstWord.length <= 4 && firstWord === firstWord.toUpperCase())) {
-            report(
+          if (!(firstWord.length <= 4 && firstWord.toUpperCase() === firstWord)) {
+            reportFn(
               "Heading's first word should be capitalized.",
               lineNumber,
               headingText,
@@ -354,7 +369,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
     if (isAllCapsHeading(words)) {
-      report(
+      reportFn(
         'Heading should not be in all caps.', lineNumber, headingText, sourceLine
       );
       return;
@@ -393,7 +408,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
           word !== expectedWordCasing &&
           !(expectedWordCasing === 'Markdown' && wordLower === 'markdown')
         ) {
-          report(
+          reportFn(
             `Word "${word}" should be "${expectedWordCasing}".`,
             lineNumber,
             headingText,
@@ -408,7 +423,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       if (word.includes('-')) {
         const parts = word.split('-');
         if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
-          report(
+          reportFn(
             `Word "${parts[1]}" in heading should be lowercase.`, lineNumber, headingText, sourceLine
           );
           return;
@@ -422,10 +437,51 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         !expectedWordCasing && // If it's not a known proper noun/technical term
         !word.startsWith('PRESERVED')
       ) {
-        report(
+        reportFn(
           `Word "${word}" in heading should be lowercase.`, lineNumber, headingText, sourceLine
         );
         return;
+      }
+    }
+  }
+
+  tokens.forEach((token) => {
+    if (token.type === 'atxHeading') {
+      const lineNumber = token.startLine;
+      if (lineNumber === 1 && /README\.md$/i.test(params.name || '')) {
+        return;
+      }
+      const sourceLine = lines[lineNumber - 1];
+      const headingText = extractHeadingText(tokens, lines, token);
+      validate(headingText, lineNumber, sourceLine, reportForHeading);
+    } else if (token.type === 'paragraph') {
+      const lineNumber = token.startLine;
+      const sourceLine = lines[lineNumber - 1];
+      const listMatch = sourceLine.match(/^\s*[-*+]\s+(?:\*\*|__)(.+?)(?:\*\*|__)/);
+
+      if (listMatch) {
+        const originalBoldText = listMatch[1];
+        const textToValidate = originalBoldText.split(':')[0];
+
+        const reportFn = (detail, ln, validatedText, line) => {
+          const fixedPart = toSentenceCase(validatedText);
+          if (!fixedPart) return;
+
+          const restOfBold = originalBoldText.slice(validatedText.length);
+          const newBoldText = fixedPart + restOfBold;
+
+          const fixMatch = line.match(/^(\s*[-*+]\s+(?:\*\*|__))(.+?)(?:(?:\*\*|__).*)$/);
+          if (!fixMatch) return;
+
+          const prefixLength = fixMatch[1].length;
+          onError({
+            lineNumber: ln, detail, context: originalBoldText, 
+            fixInfo: {
+              editColumn: prefixLength + 1, deleteCount: originalBoldText.length, insertText: newBoldText
+            }
+          });
+        };
+        validate(textToValidate, lineNumber, sourceLine, reportFn);
       }
     }
   });
