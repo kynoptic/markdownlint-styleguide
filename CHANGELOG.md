@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD024 -->
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -8,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] <!-- markdownlint-disable-line SC001 -->
+
+## [1.3.0] - 2025-06-27
+
+### Added
+
+- Enhance sentence case validation for bold list items with improved regex and debug logging
+- Enhance file path detection heuristics to reduce false positives from natural language
+- Expand special-cased terms dictionary with tech acronyms and brand names
+- Add sentence case tests and mark fixture coverage as complete
+- Expand shared constants with additional tech terms, brands, and programming languages
+- Add sentence case autofix for headings and list items with improved inline element handling
+
+### Fixed
+
+- Improve regex patterns to avoid false positives for host:port and shell variables
+- Update wt-no-bare-urls fixture and correct heading
+- Update autofix fixture annotation markers
+- Improve version number detection in sentence case heading rule
+
+### Changed
+
+- Update sentence case in README and add test case annotations
+- Add test fixtures explanation with examples and best practices
+- Remove debug logging statements and delete unused test file
+- Update roadmap by removing completed tasks and refining section headers
+- Extend sentence case rule to include bolded list item lead-ins
+- Improve README clarity and organization with expanded sections
+- Wrap filenames in backticks for consistent code formatting
 
 ## [`1.2.0`] - 2025-06-26
 
