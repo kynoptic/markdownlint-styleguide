@@ -19,11 +19,9 @@ This phase focuses on improving the robustness of existing rules and expanding o
 
 ### `sentence-case-heading` (SCH) rule enhancements
 
-- [ ] **Autofix headings and in-line text**: Add autofix for headings and in-line text to ensure sentence case is applied correctly.
 - [ ] **Expand proper noun dictionary**: Research and add more commonly used technical terms, brand names, and acronyms to the default ignored list to reduce false positives.
 - [ ] **Improve acronym detection**: Enhance logic to better distinguish between acronyms (e.g., `API`, `JSON`) and words that should be lowercased in a heading.
-- [ ] **Handle complex in-line elements**: Ensure the rule correctly handles headings that contain links, multiple code spans, or other Markdown syntax.
-
+- [x] **Handle complex in-line elements**: Ensure the rule correctly handles headings that contain links, multiple code spans, or other Markdown syntax.
 
 ### `backtick-code-elements` (BCE) rule enhancements
 
@@ -45,11 +43,10 @@ This phase is dedicated to making the autofix feature more reliable and improvin
 
 ### Autofix improvements
 
-- [ ] **Context-aware autofix for `sentence-case-heading`**: Make the autofix logic for SCH aware of the configured list of proper nouns and acronyms to avoid incorrect capitalization changes.
 - [ ] **Safe autofix for `backtick-code-elements`**: Add safety checks to the BCE autofix to prevent it from wrapping terms that have a high probability of being false positives.
 - [ ] **Configurable autofix for `wt-no-bare-urls`**: Allow users to configure whether bare URLs are wrapped in angle brackets (`<url>`) or converted to a standard Markdown link (`url`).
 
-### Documentation and community usability
+### Documentation and usability
 
 - [ ] **Detailed rule configuration guides**: Create `how-to` guides in the `/docs` directory for each rule, providing clear instructions on how to configure the rule, explaining all configuration options with clear examples.
 - [ ] **Contribution workflow guide**: Write a step-by-step tutorial for adding a new rule, including how to create fixtures, write tests, and document the new functionality.
