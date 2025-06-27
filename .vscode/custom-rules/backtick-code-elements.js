@@ -214,32 +214,42 @@ function backtickCodeElements(params, onError) {
 
     /**
      * Heuristically determine if a string looks like a file path.
+     * This is used to reduce false positives from natural language
+     * that can resemble a path (e.g., "pass/fail", "read/write").
      *
      * @param {string} str - Text to evaluate.
      * @returns {boolean} True if the string resembles a file path.
      */
     function isLikelyFilePath(str) {
+      // Paths must contain a slash.
       if (!str.includes('/')) {
         return false;
       }
-      if (/[A-Z]/.test(str) || /\s/.test(str)) {
+
+      // Paths with spaces are uncommon in un-quoted prose.
+      if (/\s/.test(str)) {
         return false;
       }
+
       const segments = str.split('/');
-      if (segments.length < 2) {
+
+      // Reject if all segments are numeric (e.g., "1/2", "2023/10/15").
+      // Allows for empty segments from leading/trailing slashes.
+      if (segments.every((s) => /^\d+$/.test(s) || s === '')) {
         return false;
       }
+
+      // For simple "a/b" paths without file extensions, be more skeptical.
       if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
+        // Avoids flagging common short phrases like "on/off", "i/o".
         if (segments[0].length <= 2 || segments[1].length <= 2) {
           return false;
         }
       }
-      if (/^\d+$/.test(segments[0])) {
-        return false;
-      }
+
+      // A likely path should contain at least one letter.
       return /[a-zA-Z]/.test(str);
     }
-
 
     for (const pattern of patterns) {
       pattern.lastIndex = 0;
@@ -249,7 +259,12 @@ function backtickCodeElements(params, onError) {
         const start = match.index;
         const end = start + fullMatch.length;
 
-        
+        // For the path pattern, apply extra heuristics to avoid false positives
+        // on natural language like "read/write" or "pass/fail".
+        if (pattern.source.includes('\\/') && !isLikelyFilePath(fullMatch)) {
+          continue;
+        }
+
         // Skip if inside a code span
         if (codeSpans.some(([s, e]) => start >= s && end <= e)) {
           continue;

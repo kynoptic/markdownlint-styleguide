@@ -19,15 +19,15 @@ This phase focuses on improving the robustness of existing rules and expanding o
 
 ### `sentence-case-heading` (SCH) rule enhancements
 
-- [ ] **Expand proper noun dictionary**: Research and add more commonly used technical terms, brand names, and acronyms to the default ignored list to reduce false positives.
-- [ ] **Improve acronym detection**: Enhance logic to better distinguish between acronyms (e.g., `API`, `JSON`) and words that should be lowercased in a heading.
+- [x] **Expand proper noun dictionary**: Research and add more commonly used technical terms, brand names, and acronyms to the default ignored list to reduce false positives.
+- [x] **Improve acronym detection**: Enhance logic to better distinguish between acronyms (e.g., `API`, `JSON`) and words that should be lowercased in a heading.
 - [x] **Handle complex in-line elements**: Ensure the rule correctly handles headings that contain links, multiple code spans, or other Markdown syntax.
 
 ### `backtick-code-elements` (BCE) rule enhancements
 
-- [ ] **Refine heuristics**: Improve the detection algorithm to better differentiate between technical terms that need backticks and similar-looking words in natural language.
-- [ ] **Consolidate ignored terms**: Continue centralizing special-cased terms into a shared, configurable module to simplify maintenance and customization.
-- [ ] **Improve path and URL detection**: Reduce false positives for sentence fragments that resemble file paths or URLs but are not.
+- [x] **Refine heuristics**: Improve the detection algorithm to better differentiate between technical terms that need backticks and similar-looking words in natural language.
+- [x] **Improve path and URL detection**: Reduce false positives for sentence fragments that resemble file paths or URLs but are not.
+- [x] **Consolidate ignored terms**: Continue centralizing special-cased terms into a shared, configurable module to simplify maintenance and customization.
 
 ### Testing infrastructure
 
