@@ -38,9 +38,9 @@ console.log(url);
 
 ### Links
 
-A URL that is already a Markdown link: Example. <!-- ✅ -->
+A URL that is already a Markdown link: [Example](http://example.com). <!-- ✅ -->
 
-Another linked URL: My Website. <!-- ✅ -->
+Another linked URL: [My Website](http://example.com). <!-- ✅ -->
 
 Reference style link: [Reference][1]. <!-- ✅ -->
 

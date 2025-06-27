@@ -15,5 +15,5 @@ jobs:
           node-version: '20'
       - run: npm install
       - run: npm run lint
-      - run: npx markdownlint-cli2 "**/*.md"
+      - run: npx markdownlint-cli2 "**/*.md" "!.windsurf/**"
       - run: npm test

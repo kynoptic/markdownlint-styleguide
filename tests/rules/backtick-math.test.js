@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import { describe, test, expect } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
 import backtickRule from '../../.vscode/custom-rules/backtick-code-elements.js';
-import { parseFixture } from '../utils/fixture.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,8 +38,6 @@ describe('backtick-code-elements math expressions', () => {
   } else {
     console.log('[TEST DEBUG] Fixture file does not exist!');
   }
-  
-  const fixture = parseFixture(fixturePath);
   
   test('ignores LaTeX math expressions', async () => {
     const options = {
