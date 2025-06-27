@@ -84,5 +84,5 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 ## Resources
 
 - **Changelog**: [`CHANGELOG.md`](./CHANGELOG.md)
-- **Rule Documentation**: [`docs/reference/rules.md`](./docs/reference/rules.md)
-- **Source Code**: [GitHub](https://github.com/your-username/markdownlint-trap)
+- **Rule documentation**: [`docs/reference/rules.md`](./docs/reference/rules.md)
+- **Source code**: [GitHub](https://github.com/your-username/markdownlint-trap)
