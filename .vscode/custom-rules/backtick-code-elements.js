@@ -101,10 +101,13 @@ function backtickCodeElements(params, onError) {
 
                                              // common CLI commands
       /\bimport\s+\w+/g,                     // import statements
-      /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
+      // host:port patterns, avoids bible verses like "1:10"
+      /\b(?!\d+:\d+\b)[A-Za-z0-9.-]+:\d+\b/g,
       /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like CTRL+C
       /\b(?:export|set)\s+[A-Za-z_][\w.-]*=\$?[\w.-]+\b/g,   // shell variable assignments
-      /\$\S+/g // permissive shell variable usage
+      // Permissive shell variable usage, avoids prices like $50 or $19.99.
+      // Allows single-digit variables like $1, but not $10 or more.
+      /\$(?!\d{2,}(?:\.\d*)?\b|\d\.\d+)\S+/g
     ];
 
     const flaggedPositions = new Set();
