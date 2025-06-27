@@ -1,3 +1,12 @@
+<!-- markdownlint-disable MD034 -->
+<!-- markdownlint-disable MD035 -->
+<!-- markdownlint-disable MD036 -->
+<!-- markdownlint-disable MD037 -->
+<!-- markdownlint-disable MD038 -->
+<!-- markdownlint-disable MD039 -->
+<!-- markdownlint-disable MD040 -->
+<!-- markdownlint-disable MD041 -->
+
 - **This is a correct item**: with more text. <!-- ✅ -->
 - **API Integration**: Details about the API. <!-- ✅ -->
 - **Version 1.0.0**: Initial release. <!-- ✅ -->
