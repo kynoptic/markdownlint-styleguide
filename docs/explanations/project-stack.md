@@ -35,7 +35,7 @@ The project is organized as a markdownlint plugin that provides custom rules for
 
 ### JavaScript
 
-- **Module system**: ES Modules (import/export)
+- **Module system**: ES Modules (`import/export`)
 - **Type annotations**: JSDoc style comments
 - **Naming convention**:
   - camelCase for variables and functions

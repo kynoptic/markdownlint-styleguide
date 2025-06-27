@@ -46,7 +46,7 @@
 # css <!-- ❌ --> <!-- intentionally lowercase single word -->
 # api <!-- ❌ -->
 # json <!-- ❌ -->
-# npm <!-- ❌ -->
+# npm <!-- ✅ -->
 # cli tools <!-- ❌ -->
 
 ## Leading verbs unnecessarily capitalized

@@ -76,6 +76,7 @@ export const specialCasedTerms = Object.freeze({
   windows: 'Windows',
   yarn: 'Yarn',
   zoloft: 'Zoloft',
+  ai: 'AI',
 
   // Geographic names
   andes: 'Andes',
@@ -87,3 +88,10 @@ export const specialCasedTerms = Object.freeze({
  * @type {Readonly<Set<string>>}
  */
 export const backtickIgnoredTerms = new Set(Object.values(specialCasedTerms));
+backtickIgnoredTerms.add('github.com');
+backtickIgnoredTerms.add('ulca.edu');
+backtickIgnoredTerms.add('pass/fail');
+backtickIgnoredTerms.add('e.g');
+backtickIgnoredTerms.add('i.e');
+backtickIgnoredTerms.add('CI/CD');
+backtickIgnoredTerms.add('Describe/test');

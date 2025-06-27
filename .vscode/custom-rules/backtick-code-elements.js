@@ -26,7 +26,6 @@ function backtickCodeElements(params, onError) {
   const lines = params.lines;
   let inCodeBlock = false;
   let inMathBlock = false;
-  const reportedLines = new Set();
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
@@ -104,7 +103,7 @@ function backtickCodeElements(params, onError) {
       /\bimport\s+\w+/g,                     // import statements
       /\b[A-Za-z0-9.-]+:\d+\b/g,            // host:port patterns
       /\b[A-Z]+\+[A-Z]\b/g,                 // key combos like CTRL+C
-      /\b(?:export|set)\s+[A-Za-z_][\w.-]*(?:=\$?[\w.-]+)?\b/g,   // shell variable assignments
+      /\b(?:export|set)\s+[A-Za-z_][\w.-]*=\$?[\w.-]+\b/g,   // shell variable assignments
       /\$\S+/g // permissive shell variable usage
     ];
 
@@ -241,6 +240,7 @@ function backtickCodeElements(params, onError) {
       return /[a-zA-Z]/.test(str);
     }
 
+
     for (const pattern of patterns) {
       pattern.lastIndex = 0;
       let match;
@@ -294,41 +294,34 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
-        // Only report one violation per line to avoid duplicate reports
-        if (!reportedLines.has(lineNumber)) {
-          // For shell patterns with $ variables, prioritize reporting the whole command
-          if (fullMatch.includes('$') && fullMatch.includes(' ') && 
-              (fullMatch.includes('grep') || fullMatch.includes('export'))) {
-            // This is a shell command - report it and skip further matches on this line
-            reportedLines.add(lineNumber);
-            
-            onError({
-              lineNumber,
-              detail: `Wrap command ${fullMatch} in backticks.`,
-              context: fullMatch,
-              range: [start + 1, fullMatch.length], // Convert to 1-indexed
-              fixInfo: {
-                editColumn: start + 1,
-                deleteCount: fullMatch.length,
-                insertText: `\`${fullMatch}\``,
-              },
-            });
-          } else if (!fullMatch.startsWith('$')) {
-            // For non-shell variables, report normally
-            reportedLines.add(lineNumber);
-            
-            onError({
-              lineNumber,
-              detail: `Wrap code-like element ${fullMatch} in backticks.`,
-              context: fullMatch,
-              range: [start + 1, fullMatch.length], // Convert to 1-indexed
-              fixInfo: {
-                editColumn: start + 1,
-                deleteCount: fullMatch.length,
-                insertText: `\`${fullMatch}\``,
-              },
-            });
-          }
+        // For shell patterns with $ variables, prioritize reporting the whole command
+        if (fullMatch.includes('$') && fullMatch.includes(' ') &&
+            (fullMatch.includes('grep') || fullMatch.includes('export'))) {
+          // This is a shell command - report it and skip further matches on this line
+          onError({
+            lineNumber,
+            detail: `Wrap command ${fullMatch} in backticks.`,
+            context: fullMatch,
+            range: [start + 1, fullMatch.length], // Convert to 1-indexed
+            fixInfo: {
+              editColumn: start + 1,
+              deleteCount: fullMatch.length,
+              insertText: `\`${fullMatch}\``,
+            },
+          });
+        } else if (!fullMatch.startsWith('$')) {
+          // For non-shell variables, report normally
+          onError({
+            lineNumber,
+            detail: `Wrap code-like element ${fullMatch} in backticks.`,
+            context: fullMatch,
+            range: [start + 1, fullMatch.length], // Convert to 1-indexed
+            fixInfo: {
+              editColumn: start + 1,
+              deleteCount: fullMatch.length,
+              insertText: `\`${fullMatch}\``,
+            },
+          });
         }
         flaggedPositions.add(start);
       }

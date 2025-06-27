@@ -121,7 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed test helpers to work with new directory structure
-- Prevented false positives for common abbreviations like "e.g." and "i.e."
+- Prevented false positives for common abbreviations like e.g. and i.e.
 - Corrected sentence-case rule and added comprehensive tests
 - Improved handling of proper nouns and natural language in rules
 - Fixed sentence-case rule for bold text detection
@@ -153,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed false positives for technology names with dot notation (Node.js, React.js) in `backtick-code-elements` rule
+- Fixed false positives for technology names with dot notation (Node.js, `React.js`) in `backtick-code-elements` rule
 - Improved detection of from when used as a preposition in natural language contexts
 - Fixed false positive for short bold phrases used as labels in the `sentence-case` rule
 - Improved sentence-case rule for more accurate bold text detection in paragraphs

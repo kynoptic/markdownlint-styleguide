@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-next-line sentence-case-heading -->
 # `AGENTS.md` – Project guide for AI agents
 
 ## Project overview and goals

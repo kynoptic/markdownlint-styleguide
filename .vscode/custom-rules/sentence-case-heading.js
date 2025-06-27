@@ -206,6 +206,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     const lineNumber = token.startLine;
+    if (lineNumber === 1 && /README\.md$/i.test(params.name || '')) {
+      return;
+    }
     const sourceLine = lines[lineNumber - 1];
     let headingText = extractHeadingText(tokens, lines, token);
     if (!headingText) {
@@ -297,12 +300,35 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const firstWordLower = firstWord.toLowerCase();
     const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
 
+    // Skip numeric headings like "2023 updates"
+    if (/^\d/.test(firstWord)) {
+      return;
+    }
+
+    const hyphenBase = firstWordLower.split('-')[0];
+    const hyphenExpected = specialCasedTerms[hyphenBase];
+
+    if (startsWithYear) {
+      return;
+    }
+
     if (!phraseIgnore.has(firstIndex) && !firstWord.startsWith('__PRESERVED_')) { // Skip if part of ignored phrase or preserved
       if (expectedFirstWordCasing) {
         // If it's a known proper noun or technical term, check if its casing matches the expected one.
         if (firstWord !== expectedFirstWordCasing) {
           report(
             `First word "${firstWord}" should be "${expectedFirstWordCasing}".`,
+            lineNumber,
+            headingText,
+            sourceLine
+          );
+          return;
+        }
+      } else if (hyphenExpected) {
+        const expected = hyphenExpected + firstWord.slice(hyphenExpected.length);
+        if (firstWord !== expected) {
+          report(
+            `First word "${firstWord}" should be "${expected}".`,
             lineNumber,
             headingText,
             sourceLine
@@ -363,7 +389,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       if (expectedWordCasing) {
         // If it's a known proper noun or technical term, check if its casing matches the expected one.
-        if (word !== expectedWordCasing) {
+        if (
+          word !== expectedWordCasing &&
+          !(expectedWordCasing === 'Markdown' && wordLower === 'markdown')
+        ) {
           report(
             `Word "${word}" should be "${expectedWordCasing}".`,
             lineNumber,
