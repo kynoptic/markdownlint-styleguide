@@ -32,7 +32,7 @@ This phase focuses on improving the robustness of existing rules and expanding o
 ### Testing infrastructure
 
 - [ ] **Implement snapshot testing for autofix**: Add Jest snapshot tests for all autofix fixtures. This will make it easier to review the exact changes made by the autofix logic during development.
-- [ ] **Increase fixture coverage**: Add more complex and nuanced test fixtures for all rules, focusing on previously identified edge cases and community-reported issues.
+- [x] **Increase fixture coverage**: Add more complex and nuanced test fixtures for all rules, focusing on previously identified edge cases and community-reported issues.
 - [ ] **Performance benchmarking**: Establish a baseline for rule performance and introduce tests to prevent performance regressions in core rules.
 
 ---
