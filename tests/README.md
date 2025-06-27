@@ -12,11 +12,22 @@ This directory contains test fixtures and test implementations for the markdownl
 tests/
   fixtures/
     backtick/
-      failing/  - Violating examples for the backtick rule
-      passing/  - Valid examples for the backtick rule
+      autofix.fixture.md
+      autofix.fixed.md
+      autofix-minimal.fixture.md
+      autofix-minimal.fixed.md
+      failing.fixture.md
+      passing.fixture.md
+      math.fixture.md
+      file-path-regex-validation.md
+      file-path-regex-validation.json
     sentence-case/
-      failing/  - Violating examples for the sentence-case rule
-      passing/  - Valid examples for the sentence-case rule
+      autofix.fixture.md
+      autofix.fixed.md
+      failing.fixture.md
+      passing.fixture.md
+    backtick-math.fixture.md
+    wt-no-bare-urls.fixture.md
   rules/     - Jest test suites implementing the rule checks
   utils/     - Helper modules shared across tests
 ```
