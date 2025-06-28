@@ -4,8 +4,8 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "prebuild": "rm -rf dist",
-    "build": "babel .vscode/custom-rules --out-dir dist --extensions '.js'",
+    "prebuild": "rm -rf .markdownlint-rules",
+    "build": "babel src/rules --out-dir .markdownlint-rules --extensions '.js'",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint ."
   },
