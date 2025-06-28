@@ -42,3 +42,4 @@ var _default = exports.default = {
     });
   }
 };
+module.exports = exports.default;

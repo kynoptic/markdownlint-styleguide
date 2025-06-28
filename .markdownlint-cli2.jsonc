@@ -22,9 +22,9 @@
     "backtick-code-elements": true
   },
   "customRules": [
-    ".markdownlint-rules/sentence-case-heading.js",
-    ".markdownlint-rules/backtick-code-elements.js",
-    ".markdownlint-rules/wt-no-bare-urls.js"
+    ".markdownlint-rules/rules/sentence-case-heading.cjs",
+    ".markdownlint-rules/rules/backtick-code-elements.cjs",
+    ".markdownlint-rules/rules/wt-no-bare-urls.cjs"
   ],
   "globs": [
     "**/*.md",

@@ -1,5 +1,13 @@
 {
   "presets": [
     ["@babel/preset-env", { "targets": { "node": "current" } }]
+  ],
+  "plugins": [
+    "add-module-exports",
+    ["babel-plugin-transform-rewrite-imports", {
+      "replaceExtensions": {
+        ".js": ".cjs"
+      }
+    }]
   ]
 }

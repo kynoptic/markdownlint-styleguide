@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _sharedConstants = require("./shared-constants.js");
+var _sharedConstants = require("./shared-constants.cjs");
 // @ts-check
 
 /**
@@ -453,3 +453,4 @@ var _default = exports.default = {
   parser: 'micromark',
   function: basicSentenceCaseHeadingFunction
 };
+module.exports = exports.default;
