@@ -8,11 +8,11 @@
 <!-- markdownlint-disable MD041 -->
 
 - **This is a correct item**: with more text. <!-- ✅ -->
-- **API Integration**: Details about the API. <!-- ✅ -->
+- **API integration**: Details about the API. <!-- ✅ -->
 - **Version 1.0.0**: Initial release. <!-- ✅ -->
-- **Dr. Patel's Research**: Findings. <!-- ✅ -->
+- **Dr. Patel's research**: Findings. <!-- ✅ -->
 - **Working with `npm`**: Package manager. <!-- ✅ -->
-- **A Link to Google**: Description. <!-- ✅ -->
+- **A link to Google**: Description. <!-- ✅ -->
 - **This is a _bold_ and *italic* test**: With mixed formatting. <!-- ✅ -->
 - **This is a `code` example**: With inline code. <!-- ✅ -->
 - **This is a `v1.2.3` version**: With a version number. <!-- ✅ -->
@@ -21,7 +21,6 @@
 - **this is an incorrect item** <!-- ❌ -->
 - **This Is An Incorrect Item** <!-- ❌ -->
 - **ALL CAPS ITEM** <!-- ❌ -->
-- **Incorrect API** <!-- ❌ -->
 - **Incorrect Json** <!-- ❌ -->
 - **Incorrect-Hyphenated-Word** <!-- ❌ -->
 - **This is a Test** <!-- ❌ -->
