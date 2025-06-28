@@ -167,15 +167,24 @@ export const casingTerms = {
 };
 
 /**
+ * Additional terms to ignore in the `backtick-code-elements` rule, not covered by casingTerms.
+ * @type {readonly string[]}
+ */
+const additionalBacktickIgnoredTerms = [
+  'github.com',
+  'ulca.edu',
+  'pass/fail',
+  'e.g',
+  'i.e',
+  'CI/CD',
+  'Describe/test'
+];
+/**
  * A set of terms that should be ignored by the `backtick-code-elements` rule.
- * This includes all special-cased terms from the dictionary above.
+ * This includes all special-cased terms from the dictionary above plus a few domain-specific exceptions.
  * @type {Readonly<Set<string>>}
  */
-export const backtickIgnoredTerms = new Set(Object.values(casingTerms));
-backtickIgnoredTerms.add('github.com');
-backtickIgnoredTerms.add('ulca.edu');
-backtickIgnoredTerms.add('pass/fail');
-backtickIgnoredTerms.add('e.g');
-backtickIgnoredTerms.add('i.e');
-backtickIgnoredTerms.add('CI/CD');
-backtickIgnoredTerms.add('Describe/test');
+export const backtickIgnoredTerms = new Set([
+  ...Object.values(casingTerms),
+  ...additionalBacktickIgnoredTerms
+]);
