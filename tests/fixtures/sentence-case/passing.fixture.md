@@ -179,3 +179,5 @@ _Step 4: Clear your cache_ <!-- ✅ -->
 - **Part B - Background context** <!-- ✅ -->
 - _Section 9 - Summary and next steps_ <!-- ✅ -->
   Bullet point 5 explains the limitation. <!-- ✅ -->
+
+# `AGENTS.md` – Project guide for AI agents <!-- ✅ -->

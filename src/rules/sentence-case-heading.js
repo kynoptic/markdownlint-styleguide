@@ -300,18 +300,34 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
+    // Robust early return: if the heading starts with a code span (backticks), skip all sentence-case checks and autofixes
+    // Parse the heading for preserved segments in order
+    let firstNonSpace = headingText.trim().split(/\s+/)[0] || '';
+    // Try to match the first preserved segment in the original heading text
+    if (firstNonSpace.startsWith('`') && firstNonSpace.endsWith('`')) {
+      // Heading starts with a code span, exempt from sentence case
+      return;
+    }
+    // Additional fallback: if all words are preserved segments (code, links, etc.), skip sentence case enforcement
+    if (words.length > 0 && words.every((w) => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
+      return;
+    }
+    // Find the first non-preserved (non-code, non-link, etc.) word to sentence-case
     let firstIndex = 0;
     const numeric = /^[-\d.,/]+$/;
     const startsWithYear = /^\d{4}(?:\D|$)/.test(headingText);
     const isSingleWordHyphen = headingText.trim().split(/\s+/).length === 1 && headingText.includes('-');
     while (
       firstIndex < words.length &&
-      ((words[firstIndex].startsWith('__PRESERVED_') &&
-        words[firstIndex].endsWith('__')) ||
-        numeric.test(words[firstIndex]))
+      (
+        // Skip preserved segments (code spans, links, etc.) at the start
+        (words[firstIndex].startsWith('__PRESERVED_') && words[firstIndex].endsWith('__')) ||
+        numeric.test(words[firstIndex])
+      )
     ) {
       firstIndex++;
     }
+    // If the heading starts with only code spans or links, do not flag for sentence case
     if (firstIndex >= words.length) {
       return; // No valid words found
     }
