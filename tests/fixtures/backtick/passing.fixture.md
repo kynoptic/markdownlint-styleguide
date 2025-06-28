@@ -59,10 +59,10 @@ Toggle `Settings > Editor > Line Wrapping` <!-- ✅ -->
 
 ## Tables and properties
 
-| **Key**      | **Value**         |
-|--------------|------------------|
-| `apiKey`     | `sk-123abc...`   |
-| `timeout`    | `5000`           | <!-- ✅ -->
+| **Key**   | **Value**      |
+| --------- | -------------- | ----------- |
+| `apiKey`  | `sk-123abc...` |
+| `timeout` | `5000`         | <!-- ✅ --> |
 
 Set `priority: high` in the frontmatter <!-- ✅ -->
 

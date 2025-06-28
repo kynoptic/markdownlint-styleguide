@@ -3,131 +3,179 @@
 ## 🧠 General principles
 
 # Simple sentence case <!-- ✅ -->
+
 ## I am a heading <!-- ✅ -->
+
 ### Keywords in markdown <!-- ✅ -->
+
 **This is bolded sentence case** <!-- ✅ -->
-*This is italic sentence case* <!-- ✅ -->
+_This is italic sentence case_ <!-- ✅ -->
+
 - **This bold list item follows sentence case** <!-- ✅ -->
-- *This italic list item follows sentence case* <!-- ✅ -->
-This is a plain paragraph in sentence case. <!-- ✅ -->
+- _This italic list item follows sentence case_ <!-- ✅ -->
+  This is a plain paragraph in sentence case. <!-- ✅ -->
 
 ## 🧾 Code terms and technical references
 
 # CSS modules and their usage <!-- ✅ -->
+
 ## Node.js-based tools <!-- ✅ -->
+
 ### Interacting with the `fs` module <!-- ✅ -->
+
 **CLI tools are essential in workflows** <!-- ✅ -->
-*JSON parsing should be error-tolerant* <!-- ✅ -->
+_JSON parsing should be error-tolerant_ <!-- ✅ -->
+
 - **The `package.json` file defines dependencies** <!-- ✅ -->
-- *Syntax highlighting improves readability* <!-- ✅ -->
-All modern browsers support ES6 modules. <!-- ✅ -->
+- _Syntax highlighting improves readability_ <!-- ✅ -->
+  All modern browsers support ES6 modules. <!-- ✅ -->
 
 ## 💬 How-to and question titles
 
 # What is markdownlint? <!-- ✅ -->
+
 ## How to use `markdownlint-cli2` effectively <!-- ✅ -->
+
 ### Why I think this matters — a brief overview <!-- ✅ -->
+
 **How the FBI approached Facebook** <!-- ✅ -->
-*How not to write a regex* <!-- ✅ -->
+_How not to write a regex_ <!-- ✅ -->
+
 - **What should I do next?** <!-- ✅ -->
-- *How can this be improved?* <!-- ✅ -->
-How to verify config file settings manually. <!-- ✅ -->
+- _How can this be improved?_ <!-- ✅ -->
+  How to verify config file settings manually. <!-- ✅ -->
 
 ## 🌐 Proper nouns, acronyms, and initialisms
 
 # NASA is also fine <!-- ✅ -->
+
 ## API is a common acronym <!-- ✅ -->
+
 ### COVID and long COVID <!-- ✅ -->
+
 **HTML and CSS are standard technologies** <!-- ✅ -->
-*OAuth2 is commonly used for authentication* <!-- ✅ -->
+_OAuth2 is commonly used for authentication_ <!-- ✅ -->
+
 - **IBM acquired Red Hat in 2019** <!-- ✅ -->
-- *UNESCO is an international organization* <!-- ✅ -->
-UNICEF provides aid to children globally. <!-- ✅ -->
+- _UNESCO is an international organization_ <!-- ✅ -->
+  UNICEF provides aid to children globally. <!-- ✅ -->
 
 ## 📅 Dates and numbers
 
 # 2021.07.09 <!-- ✅ -->
+
 ## The 2025-06-05 release notes <!-- ✅ -->
+
 ### Version 3.2.1 API changes <!-- ✅ -->
+
 **Q2 2025 team objectives** <!-- ✅ -->
-*May 2025 financial summary* <!-- ✅ -->
+_May 2025 financial summary_ <!-- ✅ -->
+
 - **The 2024-12 audit is complete** <!-- ✅ -->
-- *2023 saw record-breaking enrollment* <!-- ✅ -->
-[`1.0.0`] - 2025-06-03 was a stable release. <!-- ✅ -->
+- _2023 saw record-breaking enrollment_ <!-- ✅ -->
+  [`1.0.0`] - 2025-06-03 was a stable release. <!-- ✅ -->
 
 ## 🧑‍⚕️ Health and medical context
 
 # Initiating Zoloft and potential side effects <!-- ✅ -->
+
 ## 2023 long COVID radiology report <!-- ✅ -->
+
 ### Long COVID (post-acute sequelae of SARS-CoV-2 infection - PASC) <!-- ✅ -->
+
 **Dr. Patel reviewed the MRI results** <!-- ✅ -->
-*Medication adherence reduces relapse risk* <!-- ✅ -->
+_Medication adherence reduces relapse risk_ <!-- ✅ -->
+
 - **Symptoms include fatigue and brain fog** <!-- ✅ -->
-- *Treatment may include cognitive rehab* <!-- ✅ -->
-The CDC recommends updated vaccines. <!-- ✅ -->
+- _Treatment may include cognitive rehab_ <!-- ✅ -->
+  The CDC recommends updated vaccines. <!-- ✅ -->
 
 ## 🗃 Slugs, file names, and identifiers
 
 # COVID-19 timeline <!-- ✅ -->
+
 ## Appendix A - Glossary <!-- ✅ -->
+
 ### `christen-values-table` <!-- ✅ -->
+
 **`readme.md` is a common filename** <!-- ✅ -->
-*`main.tf` is used in Terraform projects* <!-- ✅ -->
+_`main.tf` is used in Terraform projects_ <!-- ✅ -->
+
 - **`.gitignore` excludes files from versioning** <!-- ✅ -->
-- *`index.html` is the default file served* <!-- ✅ -->
-Use snake_case for filenames when possible. <!-- ✅ -->
+- _`index.html` is the default file served_ <!-- ✅ -->
+  Use snake_case for filenames when possible. <!-- ✅ -->
 
 ## 🎉 Emojis and decorative
 
 # 🎉 Party time <!-- ✅ -->
+
 ## 🚀 Quick start <!-- ✅ -->
+
 ### 😀 <!-- ✅ -->
+
 **🎯 Goal-oriented planning is essential** <!-- ✅ -->
-*📈 Performance trends are up* <!-- ✅ -->
+_📈 Performance trends are up_ <!-- ✅ -->
+
 - **💡 Bright ideas often come late at night** <!-- ✅ -->
-- *🔧 Tools must be configured properly* <!-- ✅ -->
-🎵 Music improves productivity for many. <!-- ✅ -->
+- _🔧 Tools must be configured properly_ <!-- ✅ -->
+  🎵 Music improves productivity for many. <!-- ✅ -->
 
 ## ✨ Modal verbs, negation, idioms
 
 # You shouldn't do this <!-- ✅ -->
+
 ## Could this be avoided? <!-- ✅ -->
+
 ### Here's what not to do <!-- ✅ -->
+
 **You might want to reconsider** <!-- ✅ -->
-*We shouldn't rely on luck alone* <!-- ✅ -->
+_We shouldn't rely on luck alone_ <!-- ✅ -->
+
 - **They can't guarantee results** <!-- ✅ -->
-- *You shouldn't ignore warnings* <!-- ✅ -->
-It may seem risky, but it’s worth trying. <!-- ✅ -->
+- _You shouldn't ignore warnings_ <!-- ✅ -->
+  It may seem risky, but it’s worth trying. <!-- ✅ -->
 
 ## ✂️ Brackets, parentheses, and dashes
 
 # How to handle errors — fast and clean <!-- ✅ -->
+
 ## Performance tips (updated for 2025) <!-- ✅ -->
+
 ### Notes from the meeting (draft) <!-- ✅ -->
+
 **Timeouts (if any) should be logged** <!-- ✅ -->
-*Documentation (PDF) is provided* <!-- ✅ -->
+_Documentation (PDF) is provided_ <!-- ✅ -->
+
 - **Fallback (legacy) mode is available** <!-- ✅ -->
-- *Restart (cold boot) required after crash* <!-- ✅ -->
-Use parentheses sparingly in headings. <!-- ✅ -->
+- _Restart (cold boot) required after crash_ <!-- ✅ -->
+  Use parentheses sparingly in headings. <!-- ✅ -->
 
 ## 🔗 Conjunctions and prepositions
 
 # Git and GitHub for beginners <!-- ✅ -->
+
 ## Working with Markdown in VS Code <!-- ✅ -->
+
 ### Running behind a proxy on Windows <!-- ✅ -->
+
 **Learning by doing is most effective** <!-- ✅ -->
-*Tests without context are misleading* <!-- ✅ -->
+_Tests without context are misleading_ <!-- ✅ -->
+
 - **Writing with clarity and precision matters** <!-- ✅ -->
-- *Collaborate across time and space* <!-- ✅ -->
-Move data from one folder to another. <!-- ✅ -->
+- _Collaborate across time and space_ <!-- ✅ -->
+  Move data from one folder to another. <!-- ✅ -->
 
 ## 🔢 Lists, labels, and bullet-like patterns
 
 # 1. Introduction <!-- ✅ -->
+
 ## Step 2: Configure the server <!-- ✅ -->
+
 ### Appendix A - Glossary <!-- ✅ -->
+
 **3. Restart your device** <!-- ✅ -->
-*Step 4: Clear your cache* <!-- ✅ -->
+_Step 4: Clear your cache_ <!-- ✅ -->
+
 - **Part B - Background context** <!-- ✅ -->
-- *Section 9 - Summary and next steps* <!-- ✅ -->
-Bullet point 5 explains the limitation. <!-- ✅ -->
+- _Section 9 - Summary and next steps_ <!-- ✅ -->
+  Bullet point 5 explains the limitation. <!-- ✅ -->

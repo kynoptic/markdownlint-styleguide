@@ -1,62 +1,62 @@
- [
-   {
-     "lineNumber": 10,
-     "detail": "Consider using backticks for code elements or paths: './src/index.js'",
-     "context": "`./src/index.js`",
-     "range": [8, 14]
-   },
-   {
-     "lineNumber": 11,
-     "detail": "Consider using backticks for code elements or paths: '../data/file.txt'",
-     "context": "`../data/file.txt`",
-     "range": [8, 16]
-   },
-   {
-     "lineNumber": 12,
-     "detail": "Consider using backticks for code elements or paths: 'C:\\Program Files\\App\\config.ini'",
-     "context": "`C:\\Program Files\\App\\config.ini`",
-     "range": [28, 30]
-   },
-   {
-     "lineNumber": 13,
-     "detail": "Consider using backticks for code elements or paths: '/var/log/syslog'",
-     "context": "`/var/log/syslog`",
-     "range": [10, 15]
-   },
-   {
-     "lineNumber": 14,
-     "detail": "Consider using backticks for code elements or paths: '~/Documents/report.pdf'",
-     "context": "`~/Documents/report.pdf`",
-     "range": [10, 22]
-   },
-   {
-     "lineNumber": 15,
-     "detail": "Consider using backticks for code elements or paths: '.\\scripts\\setup.ps1'",
-     "context": "`.\\scripts\\setup.ps1`",
-     "range": [8, 19]
-   },
-   {
-     "lineNumber": 16,
-     "detail": "Consider using backticks for code elements or paths: 'C:\\My Documents\\file with spaces.txt'",
-     "context": "`C:\\My Documents\\file with spaces.txt`",
-     "range": [22, 34]
-   },
-   {
-     "lineNumber": 17,
-     "detail": "Consider using backticks for code elements or paths: '/usr/local/bin/my-script-v1.0.sh'",
-     "context": "`/usr/local/bin/my-script-v1.0.sh`",
-     "range": [21, 32]
-   },
-   {
-     "lineNumber": 18,
-     "detail": "Consider using backticks for code elements or paths: './dist/app.min.js'",
-     "context": "`./dist/app.min.js`",
-     "range": [17, 17]
-   },
-   {
-     "lineNumber": 19,
-     "detail": "Consider using backticks for code elements or paths: 'C:/Users/data/file.csv'",
-     "context": "`C:/Users/data/file.csv`",
-     "range": [20, 22]
-   }
- ]
+[
+  {
+    "lineNumber": 10,
+    "detail": "Consider using backticks for code elements or paths: './src/index.js'",
+    "context": "`./src/index.js`",
+    "range": [8, 14]
+  },
+  {
+    "lineNumber": 11,
+    "detail": "Consider using backticks for code elements or paths: '../data/file.txt'",
+    "context": "`../data/file.txt`",
+    "range": [8, 16]
+  },
+  {
+    "lineNumber": 12,
+    "detail": "Consider using backticks for code elements or paths: 'C:\\Program Files\\App\\config.ini'",
+    "context": "`C:\\Program Files\\App\\config.ini`",
+    "range": [28, 30]
+  },
+  {
+    "lineNumber": 13,
+    "detail": "Consider using backticks for code elements or paths: '/var/log/syslog'",
+    "context": "`/var/log/syslog`",
+    "range": [10, 15]
+  },
+  {
+    "lineNumber": 14,
+    "detail": "Consider using backticks for code elements or paths: '~/Documents/report.pdf'",
+    "context": "`~/Documents/report.pdf`",
+    "range": [10, 22]
+  },
+  {
+    "lineNumber": 15,
+    "detail": "Consider using backticks for code elements or paths: '.\\scripts\\setup.ps1'",
+    "context": "`.\\scripts\\setup.ps1`",
+    "range": [8, 19]
+  },
+  {
+    "lineNumber": 16,
+    "detail": "Consider using backticks for code elements or paths: 'C:\\My Documents\\file with spaces.txt'",
+    "context": "`C:\\My Documents\\file with spaces.txt`",
+    "range": [22, 34]
+  },
+  {
+    "lineNumber": 17,
+    "detail": "Consider using backticks for code elements or paths: '/usr/local/bin/my-script-v1.0.sh'",
+    "context": "`/usr/local/bin/my-script-v1.0.sh`",
+    "range": [21, 32]
+  },
+  {
+    "lineNumber": 18,
+    "detail": "Consider using backticks for code elements or paths: './dist/app.min.js'",
+    "context": "`./dist/app.min.js`",
+    "range": [17, 17]
+  },
+  {
+    "lineNumber": 19,
+    "detail": "Consider using backticks for code elements or paths: 'C:/Users/data/file.csv'",
+    "context": "`C:/Users/data/file.csv`",
+    "range": [20, 22]
+  }
+]

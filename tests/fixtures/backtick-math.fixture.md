@@ -3,6 +3,7 @@
 This is a LaTeX inline math expression: $x^2 + y^2 = z^2$ <!-- ✅ -->
 This is a LaTeX inline math with text: $\text{hello}$ <!-- ✅ -->
 This is a LaTeX block math expression:
+
 $$
 \int_0^1 x^2 dx
 $$ <!-- ✅ -->
@@ -20,8 +21,13 @@ A shell export: export x=$value <!-- ❌ -->
 
 A math block with text:
 $$
-\sum_{i=1}^n i = \frac{n(n+1)}{2}
-$$ <!-- ✅ -->
+
+\sum\_{i=1}^n i = \frac{n(n+1)}{2}
+
+$$
+<!-- ✅ -->
 
 Inline math with punctuation: $a+b$, $c-d$. <!-- ✅ -->
 
+
+$$

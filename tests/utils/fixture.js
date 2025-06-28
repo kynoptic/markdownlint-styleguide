@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from "fs";
 
 /**
  * Read a fixture file and gather expected passing and failing lines.
@@ -8,18 +8,18 @@ import fs from 'fs';
  */
 export function parseFixture(filePath) {
   return fs
-    .readFileSync(filePath, 'utf8')
-    .split('\n')
+    .readFileSync(filePath, "utf8")
+    .split("\n")
     .reduce(
       (acc, line, index) => {
-        if (line.includes('<!-- ✅ -->')) {
+        if (line.includes("<!-- ✅ -->")) {
           acc.passingLines.push(index + 1);
-        } else if (line.includes('<!-- ❌')) {
+        } else if (line.includes("<!-- ❌")) {
           acc.failingLines.push(index + 1);
         }
         return acc;
       },
-      { passingLines: [], failingLines: [] }
+      { passingLines: [], failingLines: [] },
     );
 }
 
@@ -33,4 +33,3 @@ export function getPassAndFail(fixture) {
   const { passingLines, failingLines } = parseFixture(fixture);
   return { pass: passingLines, fail: failingLines };
 }
-

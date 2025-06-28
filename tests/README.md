@@ -60,11 +60,12 @@ Test fixtures use HTML comments to mark passing and failing examples:
 
 ```markdown
 # This is a correct heading <!-- ✅ -->
+
 # This Is Not Correct <!-- ❌ -->
 ```
 
 ## Related modules
 
-* **[`../.vscode/custom-rules/`](../.vscode/custom-rules/)** – Implementation of the custom rules being tested
-* **[`../docs/`](../docs/)** – Documentation for the rules
-* **[`../README.md`](../README.md)** – Project overview
+- **[`../.vscode/custom-rules/`](../.vscode/custom-rules/)** – Implementation of the custom rules being tested
+- **[`../docs/`](../docs/)** – Documentation for the rules
+- **[`../README.md`](../README.md)** – Project overview

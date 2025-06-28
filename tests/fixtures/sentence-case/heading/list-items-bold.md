@@ -13,7 +13,7 @@
 - **Dr. Patel's research**: Findings. <!-- ✅ -->
 - **Working with `npm`**: Package manager. <!-- ✅ -->
 - **A link to Google**: Description. <!-- ✅ -->
-- **This is a _bold_ and *italic* test**: With mixed formatting. <!-- ✅ -->
+- **This is a _bold_ and _italic_ test**: With mixed formatting. <!-- ✅ -->
 - **This is a `code` example**: With inline code. <!-- ✅ -->
 - **This is a `v1.2.3` version**: With a version number. <!-- ✅ -->
 - **This is a 2023-10-26 date**: With a date. <!-- ✅ -->
@@ -27,6 +27,6 @@
 - **This is a test with `CODE`** <!-- ❌ -->
 - **This is a test with LINK** <!-- ❌ -->
 - **This is a test with _ITALIC_** <!-- ❌ -->
-- **This is a test with *BOLD*** <!-- ❌ -->
+- **This is a test with _BOLD_** <!-- ❌ -->
 - **This is a test with 2023-10-26 Date** <!-- ❌ -->
 - **This is a test with V1.0.0 Version** <!-- ❌ -->

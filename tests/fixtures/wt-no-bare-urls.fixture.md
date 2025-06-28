@@ -13,9 +13,11 @@ Another one: https://google.com. <!-- ❌ -->
 This is `http://in.a.code.block` and is allowed. <!-- ✅ -->
 
 This is in a code fence:
+
 ```
 http://example.com
 ```
+
 <!-- ✅ -->
 
 ## Valid cases (should not trigger the rule)
