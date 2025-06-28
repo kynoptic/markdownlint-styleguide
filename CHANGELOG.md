@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Exempt bracketed headings (e.g., `[Unreleased]`) from sentence-case validation.
+
 ## [1.5.0] - 2025-06-28
 
 ### Added
@@ -21,10 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrate rules to CommonJS and reorganize directory structure
 - Extract additional backtick ignored terms into separate constant array
 - Standardize markdown list style to dashes and update build config
-
-### Fixed
-
-- Exempt bracketed headings (e.g., `[Unreleased]`) from sentence-case validation.
 
 ### Test
 
