@@ -6,21 +6,14 @@
     "MD041": false,
     "MD029": { "style": "ordered" },
     "MD004": { "style": "dash" },
-    "sentence-case-heading": {
-      "properNouns": [
-        "JavaScript",
-        "Jest",
-        "ESLint",
-        "JSDoc",
-        "GitHub",
-        "Diátaxis",
-        "MIT"
-      ],
-      "technicalTerms": [
-        "Node.js",
-        "VS Code"
-      ]
-    },
+    // "sentence-case-heading": {
+    //   // Uncomment and customize these arrays to override or extend the defaults
+    //   // All default terms are defined in src/rules/shared-constants.js as a unified casingTerms object
+    //   "properNouns": ["JavaScript", "GitHub", "YourCustomProperNoun"],
+    //   "technicalTerms": ["Node.js", "VS Code", "YourCustomTechTerm"]
+    // },
+    // NOTE: The arrays above are just examples. The actual defaults are maintained in 
+    // src/rules/shared-constants.js for better maintainability and reuse across rules.
     "backtick-code-elements": true
   },
   "customRules": [

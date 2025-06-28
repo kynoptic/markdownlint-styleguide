@@ -6,13 +6,13 @@
  */
 
 /**
- * A dictionary of terms that have a specific, required capitalization.
- * This includes technical terms, acronyms, and proper nouns.
+ * A unified dictionary of all terms with specific casing requirements.
+ * Includes proper nouns, technical terms, acronyms, and brand names.
  * The key is the lowercase version of the term for easy lookup, and the value is the correct casing.
- * This is used by the `sentence-case-heading` rule.
- * @type {Readonly<Record<string, string>>}
+ * Used by all rules that need to enforce or recognize special casing.
+ * @type {Record<string, string>}
  */
-export const specialCasedTerms = Object.freeze({
+export const casingTerms = {
   // Technical Terms & Acronyms
   api: 'API',
   aws: 'AWS',
@@ -53,14 +53,17 @@ export const specialCasedTerms = Object.freeze({
   angular: 'Angular',
   'c#': 'C#',
   'c++': 'C++',
+  eslint: 'ESLint',
   go: 'Go',
   java: 'Java',
   javascript: 'JavaScript',
+  jest: 'Jest',
+  jsdoc: 'JSDoc',
   kotlin: 'Kotlin',
-  nodejs: 'Node.js',
+  'node.js': 'Node.js',
   php: 'PHP',
   python: 'Python',
-  'react.js': 'React.js', // Common variant
+  'react.js': 'React.js',
   react: 'React',
   ruby: 'Ruby',
   rust: 'Rust',
@@ -68,12 +71,14 @@ export const specialCasedTerms = Object.freeze({
   swift: 'Swift',
   typescript: 'TypeScript',
   vue: 'Vue',
+  webpack: 'Webpack',
 
   // Databases
   mongodb: 'MongoDB',
   mysql: 'MySQL',
   postgresql: 'PostgreSQL',
   redis: 'Redis',
+  'sql server': 'SQL Server',
 
   // Proper Nouns & Brand Names
   '2fa': '2FA',
@@ -85,7 +90,12 @@ export const specialCasedTerms = Object.freeze({
   apple: 'Apple',
   azure: 'Azure',
   chatgpt: 'ChatGPT',
+  codeberg: 'Codeberg',
+  confluence: 'Confluence',
   covid: 'COVID',
+  debian: 'Debian',
+  devops: 'DevOps',
+  diátaxis: 'Diátaxis',
   docker: 'Docker',
   'dr. patel': 'Dr. Patel',
   facebook: 'Facebook',
@@ -94,11 +104,12 @@ export const specialCasedTerms = Object.freeze({
   git: 'Git',
   github: 'GitHub',
   gitlab: 'GitLab',
-  codeberg: 'Codeberg',
   glossary: 'Glossary',
   'google cloud': 'Google Cloud',
   google: 'Google',
   hipaa: 'HIPAA',
+  html: 'HTML',
+  iaas: 'IaaS',
   ios: 'iOS',
   japanese: 'Japanese',
   jenkins: 'Jenkins',
@@ -112,11 +123,14 @@ export const specialCasedTerms = Object.freeze({
   michael: 'Michael',
   microsoft: 'Microsoft',
   npm: 'npm',
+  paas: 'PaaS',
   paris: 'Paris',
   'pci dss': 'PCI DSS',
   postman: 'Postman',
   prettier: 'Prettier',
   'red hat': 'Red Hat',
+  'rest api': 'REST API',
+  saas: 'SaaS',
   salesforce: 'Salesforce',
   scrum: 'Scrum',
   slack: 'Slack',
@@ -132,6 +146,8 @@ export const specialCasedTerms = Object.freeze({
   windows: 'Windows',
   yarn: 'Yarn',
   zoloft: 'Zoloft',
+
+  // Multi-word terms
   'amazon web services': 'Amazon Web Services',
   'api gateway': 'API Gateway',
   'artificial intelligence': 'Artificial Intelligence',
@@ -144,28 +160,18 @@ export const specialCasedTerms = Object.freeze({
   'load balancer': 'Load Balancer',
   'natural language processing': 'Natural Language Processing',
   'microsoft azure': 'Microsoft Azure',
-  devops: 'DevOps',
-  eslint: 'ESLint',
-  webpack: 'Webpack',
-  confluence: 'Confluence',
-  debian: 'Debian',
-  html: 'HTML', // To correct 'Html' in fixtures
-  iaas: 'IaaS', // From docs example
-  paas: 'PaaS', // From docs example
-  'rest api': 'REST API',
-  saas: 'SaaS', // From docs example
-  'sql server': 'SQL Server',
-
+  
   // Geographic names
   andes: 'Andes',
-});
+  mit: 'MIT',
+};
 
 /**
  * A set of terms that should be ignored by the `backtick-code-elements` rule.
  * This includes all special-cased terms from the dictionary above.
  * @type {Readonly<Set<string>>}
  */
-export const backtickIgnoredTerms = new Set(Object.values(specialCasedTerms));
+export const backtickIgnoredTerms = new Set(Object.values(casingTerms));
 backtickIgnoredTerms.add('github.com');
 backtickIgnoredTerms.add('ulca.edu');
 backtickIgnoredTerms.add('pass/fail');

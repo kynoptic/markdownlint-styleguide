@@ -5,7 +5,7 @@
  * Extracted helpers improve readability and performance.
  */
 
-import { specialCasedTerms as defaultSpecialCasedTerms } from './shared-constants.js';
+import { casingTerms as defaultCasingTerms } from './shared-constants.js';
 
 /**
  * Extract the plain heading text from tokens.
@@ -57,7 +57,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const userProperNouns = config.properNouns || [];
   const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
 
-  const specialCasedTerms = { ...defaultSpecialCasedTerms };
+  const specialCasedTerms = { ...defaultCasingTerms };
   if (Array.isArray(allUserTerms)) { // User terms are added with their correct casing
     allUserTerms.forEach((term) => {
       if (typeof term === 'string') {
