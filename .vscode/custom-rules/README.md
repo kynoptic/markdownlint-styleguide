@@ -1,22 +1,17 @@
-# `/.vscode/custom-rules`
+# Source code for custom rules
 
-## Purpose
+This directory contains the source code for the custom `markdownlint` rules used in this project.
 
-Store the project's custom markdownlint rules for local development and testing.
+## Important notes
 
-## Contents
+*   **Module format:** All rules are written using modern ES Modules (ESM) syntax (`import`/`export`).
+*   **Not for direct use:** These source files are **not** directly consumable by the `markdownlint` VS Code extension or `markdownlint-cli2`, which expect CommonJS modules.
+*   **Build required:** Before these rules can be used, they must be transpiled into CommonJS format. Run the following command from the project root:
 
-### Files
+    ```bash
+    npm run build
+    ```
 
-* **[`backtick-code-elements.js`](./backtick-code-elements.js)** – Enforces backticks around code snippets.
-* **[`sentence-case-heading.js`](./sentence-case-heading.js)** – Requires headings to use sentence case.
+This will place the compiled, ready-to-use rule files into the `dist/` directory.
 
-## Usage
-
-Point markdownlint at this directory using the `customRules` option or `import` the files into your own configuration.
-
-## Related modules
-
-* [`../../src/`](../../src/) – Exports these rules as a single array.
-* [`../../docs/reference/rules.md`](../../docs/reference/rules.md) – Rule descriptions and examples.
-* [`../../README.md`](../../README.md) – Project overview.
+For more details on the development workflow and how to use the compiled rules, please see the main [README.md](../../README.md).
