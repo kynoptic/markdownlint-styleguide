@@ -22,8 +22,9 @@
     "backtick-code-elements": true
   },
   "customRules": [
-    ".vscode/custom-rules/sentence-case-heading.js",
-    ".vscode/custom-rules/backtick-code-elements.js"
+    "dist/sentence-case-heading.js",
+    "dist/backtick-code-elements.js",
+    "dist/wt-no-bare-urls.js"
   ],
   "globs": [
     "**/*.md",
