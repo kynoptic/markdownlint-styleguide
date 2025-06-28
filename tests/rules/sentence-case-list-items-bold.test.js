@@ -2,7 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
-import sentenceRule from '../../.vscode/custom-rules/sentence-case-heading.js';
+import sentenceRule from '../../src/rules/sentence-case-heading.js';
 import { parseFixture } from '../utils/fixture.js';
 import fs from 'fs';
 

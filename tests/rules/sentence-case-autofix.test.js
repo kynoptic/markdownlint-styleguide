@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
 import { applyFixes } from 'markdownlint';
-import sentenceRule from '../../.vscode/custom-rules/sentence-case-heading.js';
+import sentenceRule from '../../src/rules/sentence-case-heading.js';
 
 /**
  * Convert failure markers to passing markers for comparison.

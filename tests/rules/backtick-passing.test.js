@@ -2,7 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
-import backtickRule from '../../.vscode/custom-rules/backtick-code-elements.js';
+import backtickRule from '../../src/rules/backtick-code-elements.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

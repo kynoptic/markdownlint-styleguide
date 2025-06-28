@@ -2,7 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, test, expect } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
-import sentenceRule from '../../.vscode/custom-rules/sentence-case-heading.js';
+import sentenceRule from '../../src/rules/sentence-case-heading.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

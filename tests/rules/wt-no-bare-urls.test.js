@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
 import MarkdownIt from 'markdown-it';
-import noBareUrls from '../../.vscode/custom-rules/wt-no-bare-urls.js';
+import noBareUrls from '../../src/rules/wt-no-bare-urls.js';
 import { parseFixture } from '../utils/fixture.js';
 
 const __filename = fileURLToPath(import.meta.url);

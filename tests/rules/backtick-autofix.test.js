@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
 import { applyFixes } from 'markdownlint';
-import backtickRule from '../../.vscode/custom-rules/backtick-code-elements.js';
+import backtickRule from '../../src/rules/backtick-code-elements.js';
 
 /**
  * Normalize fixture markers for comparison.
