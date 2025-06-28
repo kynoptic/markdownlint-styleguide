@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.specialCasedTerms = exports.backtickIgnoredTerms = void 0;
+exports.casingTerms = exports.backtickIgnoredTerms = void 0;
 // @ts-check
 
 /**
@@ -12,13 +12,13 @@ exports.specialCasedTerms = exports.backtickIgnoredTerms = void 0;
  */
 
 /**
- * A dictionary of terms that have a specific, required capitalization.
- * This includes technical terms, acronyms, and proper nouns.
+ * A unified dictionary of all terms with specific casing requirements.
+ * Includes proper nouns, technical terms, acronyms, and brand names.
  * The key is the lowercase version of the term for easy lookup, and the value is the correct casing.
- * This is used by the `sentence-case-heading` rule.
- * @type {Readonly<Record<string, string>>}
+ * Used by all rules that need to enforce or recognize special casing.
+ * @type {Record<string, string>}
  */
-const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
+const casingTerms = exports.casingTerms = {
   // Technical Terms & Acronyms
   api: 'API',
   aws: 'AWS',
@@ -58,15 +58,17 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   angular: 'Angular',
   'c#': 'C#',
   'c++': 'C++',
+  eslint: 'ESLint',
   go: 'Go',
   java: 'Java',
   javascript: 'JavaScript',
+  jest: 'Jest',
+  jsdoc: 'JSDoc',
   kotlin: 'Kotlin',
-  nodejs: 'Node.js',
+  'node.js': 'Node.js',
   php: 'PHP',
   python: 'Python',
   'react.js': 'React.js',
-  // Common variant
   react: 'React',
   ruby: 'Ruby',
   rust: 'Rust',
@@ -74,11 +76,13 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   swift: 'Swift',
   typescript: 'TypeScript',
   vue: 'Vue',
+  webpack: 'Webpack',
   // Databases
   mongodb: 'MongoDB',
   mysql: 'MySQL',
   postgresql: 'PostgreSQL',
   redis: 'Redis',
+  'sql server': 'SQL Server',
   // Proper Nouns & Brand Names
   '2fa': '2FA',
   adobe: 'Adobe',
@@ -89,7 +93,12 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   apple: 'Apple',
   azure: 'Azure',
   chatgpt: 'ChatGPT',
+  codeberg: 'Codeberg',
+  confluence: 'Confluence',
   covid: 'COVID',
+  debian: 'Debian',
+  devops: 'DevOps',
+  diátaxis: 'Diátaxis',
   docker: 'Docker',
   'dr. patel': 'Dr. Patel',
   facebook: 'Facebook',
@@ -102,6 +111,8 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   'google cloud': 'Google Cloud',
   google: 'Google',
   hipaa: 'HIPAA',
+  html: 'HTML',
+  iaas: 'IaaS',
   ios: 'iOS',
   japanese: 'Japanese',
   jenkins: 'Jenkins',
@@ -115,11 +126,14 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   michael: 'Michael',
   microsoft: 'Microsoft',
   npm: 'npm',
+  paas: 'PaaS',
   paris: 'Paris',
   'pci dss': 'PCI DSS',
   postman: 'Postman',
   prettier: 'Prettier',
   'red hat': 'Red Hat',
+  'rest api': 'REST API',
+  saas: 'SaaS',
   salesforce: 'Salesforce',
   scrum: 'Scrum',
   slack: 'Slack',
@@ -135,6 +149,7 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   windows: 'Windows',
   yarn: 'Yarn',
   zoloft: 'Zoloft',
+  // Multi-word terms
   'amazon web services': 'Amazon Web Services',
   'api gateway': 'API Gateway',
   'artificial intelligence': 'Artificial Intelligence',
@@ -147,35 +162,19 @@ const specialCasedTerms = exports.specialCasedTerms = Object.freeze({
   'load balancer': 'Load Balancer',
   'natural language processing': 'Natural Language Processing',
   'microsoft azure': 'Microsoft Azure',
-  devops: 'DevOps',
-  eslint: 'ESLint',
-  webpack: 'Webpack',
-  confluence: 'Confluence',
-  debian: 'Debian',
-  html: 'HTML',
-  // To correct 'Html' in fixtures
-  iaas: 'IaaS',
-  // From docs example
-  paas: 'PaaS',
-  // From docs example
-  'rest api': 'REST API',
-  saas: 'SaaS',
-  // From docs example
-  'sql server': 'SQL Server',
   // Geographic names
-  andes: 'Andes'
-});
+  andes: 'Andes',
+  mit: 'MIT'
+};
 
 /**
+ * Additional terms to ignore in the `backtick-code-elements` rule, not covered by casingTerms.
+ * @type {readonly string[]}
+ */
+const additionalBacktickIgnoredTerms = ['github.com', 'ulca.edu', 'pass/fail', 'e.g', 'i.e', 'CI/CD', 'Describe/test'];
+/**
  * A set of terms that should be ignored by the `backtick-code-elements` rule.
- * This includes all special-cased terms from the dictionary above.
+ * This includes all special-cased terms from the dictionary above plus a few domain-specific exceptions.
  * @type {Readonly<Set<string>>}
  */
-const backtickIgnoredTerms = exports.backtickIgnoredTerms = new Set(Object.values(specialCasedTerms));
-backtickIgnoredTerms.add('github.com');
-backtickIgnoredTerms.add('ulca.edu');
-backtickIgnoredTerms.add('pass/fail');
-backtickIgnoredTerms.add('e.g');
-backtickIgnoredTerms.add('i.e');
-backtickIgnoredTerms.add('CI/CD');
-backtickIgnoredTerms.add('Describe/test');
+const backtickIgnoredTerms = exports.backtickIgnoredTerms = new Set([...Object.values(casingTerms), ...additionalBacktickIgnoredTerms]);
