@@ -25,19 +25,21 @@ This project uses ES Modules (ESM) for its source code, but the `markdownlint` V
 
 **Source files:** The original, human-readable rule definitions are located in `src/rules/`.
 
-**Build process:** To transpile the ESM source files into CommonJS, run the following command:
+**Build process:** The project is configured to automatically build the rules before each commit using a pre-commit hook powered by [Husky](https://typicode.github.io/husky/). This ensures that the compiled rules in the `.markdownlint-rules/` directory are always in sync with the source code.
+
+The build process involves these steps:
+
+1. Babel transpiles the ESM files from `src/rules/`.
+2. The compiled, CommonJS-compatible files (with a `.cjs` extension) are placed into the `.markdownlint-rules/` directory.
+3. The updated files in `.markdownlint-rules/` are automatically added to the commit.
+
+To run the build manually, you can still use:
 
 ```bash
 npm run build
 ```
 
-This command will:
-
-1. Delete the old `.markdownlint-rules/` directory.
-2. Run Babel to transpile the files from `src/rules/`.
-3. Place the compiled, CommonJS-compatible files (with a `.cjs` extension) into the `.markdownlint-rules/` directory.
-
-The `.markdownlint-rules/` directory is the artifact that should be distributed or copied to other projects. It is ignored by Git.
+The `.markdownlint-rules/` directory contains the distributable artifacts that can be copied to other projects and is now tracked by Git.
 
 ## Key features
 

@@ -55,7 +55,7 @@ This phase is dedicated to making the autofix feature more reliable and improvin
 ### Build and contribution workflow
 
 - [ ] **Fix build process for CommonJS compatibility**: Update the build script to output `.cjs` files instead of `.js` to ensure Node.js correctly interprets them as CommonJS modules, resolving runtime errors when using `markdownlint-cli2` locally.
-- [ ] **Implement `pre-commit/pre-publish` hooks**: Automate build, linting, and testing tasks using `pre-commit` or `pre-publish` hooks to ensure code quality and consistency before changes are merged or released.
+- [x] **Implement `pre-commit/pre-publish` hooks**: A Husky-powered pre-commit hook now automatically runs the build and stages `.markdownlint-rules/` before each commit, ensuring the distributable rules are always in sync with the source code.
 
 ---
 
