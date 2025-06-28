@@ -199,6 +199,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {Function} reportFn The function to call to report an error.
    */
   function validate(headingText, lineNumber, sourceLine, reportFn) {
+    // Exempt headings enclosed in brackets (e.g., [Unreleased])
+    if (headingText.startsWith('[') && headingText.endsWith(']')) {
+      return;
+    }
     if (!headingText || headingText.trim().length === 0) {
       return;
     }

@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract additional backtick ignored terms into separate constant array
 - Standardize markdown list style to dashes and update build config
 
+### Fixed
+
+- Exempt bracketed headings (e.g., `[Unreleased]`) from sentence-case validation.
+
 ### Test
 
 - Add fixture files for backticks and sentence case false positives
