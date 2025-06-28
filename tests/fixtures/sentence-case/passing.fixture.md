@@ -181,3 +181,5 @@ _Step 4: Clear your cache_ <!-- ✅ -->
   Bullet point 5 explains the limitation. <!-- ✅ -->
 
 # `AGENTS.md` – Project guide for AI agents <!-- ✅ -->
+
+## [Unreleased] <!-- ✅ -->
