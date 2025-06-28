@@ -10,20 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.0] - 2025-06-28
 
 ### Added
+
 - Add support for custom rules in `.markdownlint-rules/` for easier extension and sharing.
 - Add a build script to automate bundling and distribution of custom rules.
 
 ### Changed
+
 - Move all test files to a new `features/` directory for improved organization and clarity.
 - Improve validation of bold list items and sentence case in headings, ensuring more consistent and accurate linting results.
-- Update import paths and project structure to align with modern ESM and markdownlint plugin conventions.
+- Update `import paths` and project structure to align with modern ESM and markdownlint plugin conventions.
 
 ### Documentation
+
 - Update documentation to explain the ESM build process and new usage instructions for custom rules and tests.
 
 ### Maintenance
-- Clean up and reformat test codebase for readability and maintainability.
 
+- Clean up and reformat test codebase for readability and maintainability.
 
 ## [1.3.0] - 2025-06-27
 

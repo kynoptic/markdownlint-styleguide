@@ -12,7 +12,7 @@ Test fixtures are Markdown files located in the `tests/fixtures/` directory. The
 
 For example, for the `backtick-code-elements` rule, you'll find:
 
-```
+```text
 tests/
   fixtures/
     backtick-code-elements/
@@ -35,7 +35,7 @@ Lines without these markers are ignored by the test runner for the purpose of ch
 
 The test runner reads these markers and compares the actual linting results against the expected outcomes. If a `✅` line triggers an error, or an `❌` line *doesn't* trigger an error, the test will fail.
 
-### Example fixture (__p_0__)
+### Example fixture (**p_0**)
 
 ```markdown
 # This Is Not Correct ❌ Heading should be sentence case

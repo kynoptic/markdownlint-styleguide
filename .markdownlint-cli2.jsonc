@@ -4,6 +4,8 @@
     "MD013": false,
     "MD024": false,
     "MD041": false,
+    "MD029": { "style": "ordered" },
+    "MD004": { "style": "dash" },
     "sentence-case-heading": {
       "properNouns": [
         "JavaScript",

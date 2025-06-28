@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "rm -rf .markdownlint-rules",
-    "build": "babel src --out-dir .markdownlint-rules --extensions '.js,.mjs' --out-file-extension .cjs --copy-files",
+    "build": "BABEL_ENV=build babel src --out-dir .markdownlint-rules --extensions '.js,.mjs' --out-file-extension .cjs --copy-files",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "eslint ."
   },

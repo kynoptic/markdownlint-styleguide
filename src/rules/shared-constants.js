@@ -94,6 +94,7 @@ export const specialCasedTerms = Object.freeze({
   git: 'Git',
   github: 'GitHub',
   gitlab: 'GitLab',
+  codeberg: 'Codeberg',
   glossary: 'Glossary',
   'google cloud': 'Google Cloud',
   google: 'Google',
