@@ -5,7 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] <!-- markdownlint-disable-line SC001 -->
+## [Unreleased]: https://github.com/org/repo/compare/v1.5.0...HEAD
+## [1.5.0]: https://github.com/org/repo/compare/v1.4.0...v1.5.0
+
+## [1.5.0] - 2025-06-28
+
+### Added
+- Add Husky pre-commit hook to automate rule compilation and staging
+- Exempt headings that start with code spans from sentence case rules
+
+### Changed
+- Improve sentence-case-heading rule and consolidate casing terms dictionary
+- Consolidate special casing terms into unified casingTerms dictionary with expanded entries
+- Migrate rules to CommonJS and reorganize directory structure
+- Extract additional backtick ignored terms into separate constant array
+- Standardize markdown list style to dashes and update build config
+
+### Test
+- Add fixture files for backticks and sentence case false positives
+
+### Documentation
+- Update roadmap with build process fixes and revise planned rules
+- Update changelog formatting and simplify release notes for v1.4.0
 
 ## [1.4.0] - 2025-06-28
 
