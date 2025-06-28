@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] <!-- markdownlint-disable-line SC001 -->
 
+## [1.4.0] - 2025-06-28
+
+### Added
+- feat: migrate custom rules from dist/ to .markdownlint-rules/ directory
+- feat: add build script and move custom rules to dist directory
+
+### Changed
+- refactor: migrate tests from rules/ to features/ directory and apply prettier formatting
+- refactor: reimplement bold text validation using recursive token traversal
+- refactor: improve sentence case validation for bold list items using recursive token processing
+- refactor: update import paths from .vscode/custom-rules to src/rules directory
+
+### Documentation
+- docs: update project documentation with ESM build process and usage instructions
+
+### Maintenance
+- chore: release version 1.3.0 with sentence case improvements and expanded test coverage
+
+
 ## [1.3.0] - 2025-06-27
 
 ### Added
