@@ -1,0 +1,299 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 1`] = `
+{
+  "fixed": "Use the \`package.json\` file to configure dependencies.
+",
+  "hasChanges": true,
+  "original": "Use the package.json file to configure dependencies.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 2`] = `
+{
+  "fixed": "Run \`npm install\` to install packages.
+",
+  "hasChanges": true,
+  "original": "Run npm install to install packages.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 3`] = `
+{
+  "fixed": "The src/\`index.js\` file contains the main logic.
+",
+  "hasChanges": true,
+  "original": "The src/index.js file contains the main logic.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 4`] = `
+{
+  "fixed": "Set the \`NODE_ENV\` variable to production.
+",
+  "hasChanges": true,
+  "original": "Set the NODE_ENV variable to production.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 5`] = `
+{
+  "fixed": "Check the \`README.md\` for installation instructions.
+",
+  "hasChanges": true,
+  "original": "Check the README.md for installation instructions.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 6`] = `
+{
+  "fixed": "Navigate to the /\`usr/local/bin\` directory.
+",
+  "hasChanges": true,
+  "original": "Navigate to the /usr/local/bin directory.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 7`] = `
+{
+  "fixed": "Execute the \`git status\` command to check changes.
+",
+  "hasChanges": true,
+  "original": "Execute the git status command to check changes.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 8`] = `
+{
+  "fixed": "The \`.gitignore\` file excludes temporary files.
+",
+  "hasChanges": true,
+  "original": "The .gitignore file excludes temporary files.",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations edge cases with no changes 1`] = `
+{
+  "backtickFixed": "# This is already correct
+",
+  "backtickHasChanges": true,
+  "original": "# This is already correct",
+  "sentenceFixed": "# This is already correct
+",
+  "sentenceHasChanges": true,
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations edge cases with no changes 2`] = `
+{
+  "backtickFixed": "Use the \`package.json\` file correctly.
+",
+  "backtickHasChanges": true,
+  "original": "Use the \`package.json\` file correctly.",
+  "sentenceFixed": "Use the \`package.json\` file correctly.
+",
+  "sentenceHasChanges": true,
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations edge cases with no changes 3`] = `
+{
+  "backtickFixed": "## API documentation
+",
+  "backtickHasChanges": true,
+  "original": "## API documentation",
+  "sentenceFixed": "## API documentation
+",
+  "sentenceHasChanges": true,
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations edge cases with no changes 4`] = `
+{
+  "backtickFixed": "### Working with Node.js properly
+",
+  "backtickHasChanges": true,
+  "original": "### Working with Node.js properly",
+  "sentenceFixed": "### Working with Node.js properly
+",
+  "sentenceHasChanges": true,
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 1`] = `
+{
+  "fixed": "# This is a title case heading
+",
+  "hasChanges": true,
+  "original": "# This Is A Title Case Heading",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 2`] = `
+{
+  "fixed": "## API Documentation for users
+",
+  "hasChanges": true,
+  "original": "## API Documentation For Users",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 3`] = `
+{
+  "fixed": "### Working with Node.js and express
+",
+  "hasChanges": true,
+  "original": "### Working With Node.js And Express",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 4`] = `
+{
+  "fixed": "# 1. getting started with development
+",
+  "hasChanges": true,
+  "original": "# 1. Getting Started With Development",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 5`] = `
+{
+  "fixed": "## 2. API rate limiting best practices
+",
+  "hasChanges": true,
+  "original": "## 2. API Rate Limiting Best Practices",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 6`] = `
+{
+  "fixed": "# CSS and HTML best practices
+",
+  "hasChanges": true,
+  "original": "# CSS and HTML best practices",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 7`] = `
+{
+  "fixed": "## Using JSON with REST apis
+",
+  "hasChanges": true,
+  "original": "## Using JSON with REST APIs",
+}
+`;
+
+exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 8`] = `
+{
+  "fixed": "### The HTTP and HTTPS protocols
+",
+  "hasChanges": true,
+  "original": "### The HTTP and HTTPS protocols",
+}
+`;
+
+exports[`Autofix snapshot tests backtick-code-elements rule backtick-code-elements autofix snapshot 1`] = `
+{
+  "fixed": "# Auto-fix fixture for backtick-code-elements
+
+## Multiple code elements on the same line
+
+Run \`npm install\` to set up your project and then install debug@latest. <!-- ❌ -->
+
+## File paths and commands
+
+Look in the \`src/utils\` directory and run \`git clone\` <https://github.com/user/repo.git> <!-- ❌ -->
+
+## Multiple elements spread across the document
+
+Edit \`config.yaml\` in the settings/ folder <!-- ❌ -->
+
+Run ./\`build.sh\` to compile the project <!-- ❌ -->
+
+Add \`import os\` at the top of your script <!-- ❌ -->
+
+## Nested code elements (should only fix outer ones)
+
+The command \`echo PATH=/usr/bin\` sets your path variable to /\`usr/bin\` <!-- ❌ -->
+
+## Elements after punctuation
+
+Open \`readme.md\`, \`config.ini\`, and \`.env\` for configuration. <!-- ❌ -->
+",
+  "hasChanges": true,
+  "original": "# Auto-fix fixture for backtick-code-elements
+
+## Multiple code elements on the same line
+
+Run npm install to set up your project and then install debug@latest. <!-- ❌ -->
+
+## File paths and commands
+
+Look in the src/utils directory and run git clone https://github.com/user/repo.git <!-- ❌ -->
+
+## Multiple elements spread across the document
+
+Edit config.yaml in the settings/ folder <!-- ❌ -->
+
+Run ./build.sh to compile the project <!-- ❌ -->
+
+Add import os at the top of your script <!-- ❌ -->
+
+## Nested code elements (should only fix outer ones)
+
+The command \`echo PATH=/usr/bin\` sets your path variable to /usr/bin <!-- ❌ -->
+
+## Elements after punctuation
+
+Open readme.md, config.ini, and .env for configuration. <!-- ❌ -->
+",
+}
+`;
+
+exports[`Autofix snapshot tests backtick-code-elements rule backtick-code-elements-minimal autofix snapshot 1`] = `
+{
+  "fixed": "# Minimal auto-fix fixture
+
+Install \`npm install\` <!-- ❌ -->
+
+Go to \`src/utils\` <!-- ❌ -->
+
+Edit \`config.yaml\` <!-- ❌ -->
+",
+  "hasChanges": true,
+  "original": "# Minimal auto-fix fixture
+
+Install npm install <!-- ❌ -->
+
+Go to src/utils <!-- ❌ -->
+
+Edit config.yaml <!-- ❌ -->
+",
+}
+`;
+
+exports[`Autofix snapshot tests sentence-case-heading rule sentence-case-heading autofix snapshot 1`] = `
+{
+  "fixed": "# Auto-fix fixture for sentence-case-heading
+
+# This heading should be fixed <!-- ❌ -->
+
+# Another heading should also fail <!-- ❌ -->
+
+# Single word heading <!-- ❌ -->
+
+# Heading with \`Code\` example <!-- ❌ -->
+",
+  "hasChanges": true,
+  "original": "# Auto-fix fixture for sentence-case-heading
+
+# this heading should be fixed <!-- ❌ -->
+
+# Another Heading Should Also Fail <!-- ❌ -->
+
+# SINGLE WORD HEADING <!-- ❌ -->
+
+# heading with \`Code\` Example <!-- ❌ -->
+",
+}
+`;

@@ -19,6 +19,23 @@ Tests use Jest with fixture-based validation. To run a specific test:
 npm test -- tests/features/sentence-case-failing.test.js
 ```
 
+### Snapshot testing
+
+Update snapshots after intentional autofix changes:
+
+```bash
+npm test -- --updateSnapshot
+```
+
+### Integration testing
+
+Test rules against real-world patterns and performance:
+
+```bash
+npm run test:integration     # All integration tests
+npm run test:performance     # Performance tests only
+```
+
 ## Project architecture
 
 This is a custom markdownlint rule library that provides three main rules for enforcing documentation standards:
@@ -51,6 +68,8 @@ Each rule follows the markdownlint API pattern:
 - Fixture-based testing using `tests/utils/fixture.js`
 - Test fixtures use special comments: `<!-- ✅ -->` (passing) and `<!-- ❌ -->` (failing)
 - Tests validate both rule detection and autofix functionality
+- **Snapshot testing**: `autofix-snapshots.test.js` captures exact autofix transformations for regression detection
+- **Integration testing**: `tests/integration/` contains real-world pattern tests and performance benchmarks
 
 ### Key files
 
