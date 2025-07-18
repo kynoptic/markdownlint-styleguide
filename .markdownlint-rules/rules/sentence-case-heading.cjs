@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _sharedConstants = require("./shared-constants.cjs");
+var _autofixSafety = require("./autofix-safety.cjs");
 // @ts-check
 
 /**
@@ -104,11 +105,17 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (!fixedText) {
       return undefined;
     }
-    return {
+    const originalFixInfo = {
       editColumn: prefixLength + 1,
       deleteCount: text.length,
       insertText: fixedText
     };
+
+    // Apply safety checks to the fix
+    const safetyConfig = params.config?.autofix?.safety || {};
+    return (0, _autofixSafety.createSafeFixInfo)(originalFixInfo, 'sentence-case', text, fixedText, {
+      line
+    }, safetyConfig);
   }
 
   /**

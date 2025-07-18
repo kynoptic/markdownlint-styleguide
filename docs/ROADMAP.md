@@ -32,9 +32,9 @@ This phase focuses on improving the robustness of existing rules and expanding o
 
 ### Testing infrastructure
 
-- [ ] **Implement snapshot testing for autofix**: Add Jest snapshot tests for all autofix fixtures. This will make it easier to review the exact changes made by the autofix logic during development.
+- [x] **Implement snapshot testing for autofix**: Add Jest snapshot tests for all autofix fixtures. This will make it easier to review the exact changes made by the autofix logic during development.
 - [x] **Increase fixture coverage**: Add more complex and nuanced test fixtures for all rules, focusing on previously identified edge cases and community-reported issues.
-- [ ] **Integration testing**: Test rules against real-world repositories to identify edge cases and validate rule behavior at scale.
+- [x] **Integration testing**: Test rules against real-world repositories to identify edge cases and validate rule behavior at scale.
 
 ---
 
@@ -70,7 +70,6 @@ Looking further ahead, we plan to expand the rule set and improve integration wi
 
 - [ ] **Autofix safety improvements**: Add safety checks across all rules to prevent autofix in ambiguous cases and reduce false positive corrections.
 - [ ] **Rule configuration validation**: Validate user-provided configuration objects to catch configuration errors early and provide helpful error messages.
-- [ ] **Implement snapshot testing for autofix**: Add Jest snapshot tests for all autofix fixtures.
 - [ ] **Improve error messages**: Refine the error messages reported by rules to be more descriptive and provide clearer instructions on how to fix the issue.
 
 ### Priority 2 (Near-term)
@@ -78,7 +77,6 @@ Looking further ahead, we plan to expand the rule set and improve integration wi
 - [ ] **`no-dead-internal-links`**: A rule to check for broken relative links to other Markdown files or headings within the repository.
 - [ ] **Detailed rule configuration guides**: Create `how-to` guides in the `/docs` directory for each rule.
 - [ ] **Multi-language acronym support**: Support for non-English technical terms and acronyms in sentence case rules.
-- [ ] **Integration testing**: Test rules against real-world repositories to identify edge cases and validate rule behavior at scale.
 
 ### Priority 3 (Future)
 

@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _sharedConstants = require("./shared-constants.cjs");
+var _autofixSafety = require("./autofix-safety.cjs");
 // @ts-check
 
 /**
