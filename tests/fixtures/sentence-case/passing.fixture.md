@@ -169,6 +169,10 @@ _Tests without context are misleading_ <!-- ✅ -->
 
 # 1. Introduction <!-- ✅ -->
 
+## 2. Article weighting algorithm <!-- ✅ -->
+
+## 3. API rate limiting <!-- ✅ -->
+
 ## Step 2: Configure the server <!-- ✅ -->
 
 ### Appendix A - Glossary <!-- ✅ -->

@@ -123,3 +123,11 @@
 # Q2 2025 Team Objectives <!-- ❌ -->
 
 # May 2025 Financial Summary <!-- ❌ -->
+
+## Numbered headings with incorrect casing
+
+# 1. article weighting algorithm <!-- ❌ -->
+
+# 2. Data Processing Pipeline <!-- ❌ -->
+
+# 3. API Rate Limiting <!-- ❌ -->

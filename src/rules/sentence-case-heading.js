@@ -321,12 +321,18 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const numeric = /^[-\d.,/]+$/;
     const startsWithYear = /^\d{4}(?:\D|$)/.test(headingText);
     const isSingleWordHyphen = headingText.trim().split(/\s+/).length === 1 && headingText.includes('-');
+    
+    // Check if this is a numbered heading (starts with number followed by period)
+    const isNumberedHeading = /^\d+\.\s/.test(headingText);
+    
     while (
       firstIndex < words.length &&
       (
         // Skip preserved segments (code spans, links, etc.) at the start
         (words[firstIndex].startsWith('__PRESERVED_') && words[firstIndex].endsWith('__')) ||
-        numeric.test(words[firstIndex])
+        numeric.test(words[firstIndex]) ||
+        // Skip numbered list prefixes (e.g., "1.")
+        (isNumberedHeading && /^\d+\.$/.test(words[firstIndex]))
       )
     ) {
       firstIndex++;
