@@ -6,6 +6,7 @@
  */
 
 import { casingTerms as defaultCasingTerms } from './shared-constants.js';
+import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
  * Extract the plain heading text from tokens.
@@ -114,11 +115,16 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (!fixedText) {
       return undefined;
     }
-    return {
+    
+    const originalFixInfo = {
       editColumn: prefixLength + 1,
       deleteCount: text.length,
       insertText: fixedText
     };
+
+    // Apply safety checks to the fix
+    const safetyConfig = params.config?.autofix?.safety || {};
+    return createSafeFixInfo(originalFixInfo, 'sentence-case', text, fixedText, { line }, safetyConfig);
   }
 
   /**
