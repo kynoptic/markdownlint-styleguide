@@ -6,6 +6,7 @@
  */
 // Import the centralized ignoredTerms Set
 import { backtickIgnoredTerms as ignoredTerms } from './shared-constants.js';
+import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
  * markdownlint rule enforcing backticks around file paths and commands.
