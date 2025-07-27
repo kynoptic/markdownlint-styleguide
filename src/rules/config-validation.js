@@ -205,3 +205,24 @@ export function logValidationErrors(ruleName, errors, logger) {
     console.error(errorMessage);
   }
 }
+
+/**
+ * Creates a logger function that integrates with markdownlint's onError callback.
+ * This allows configuration validation errors to be reported through the same
+ * mechanism as rule violations, providing better integration with the host tool.
+ * 
+ * @param {import("markdownlint").RuleOnError} onError - markdownlint's error callback
+ * @param {string} ruleName - Name of the rule for context
+ * @returns {Function} Logger function that can be passed to logValidationErrors
+ */
+export function createMarkdownlintLogger(onError, ruleName) {
+  return function(message) {
+    // Report configuration errors as rule violations with special formatting
+    onError({
+      lineNumber: 1,
+      detail: `Configuration Error: ${message}`,
+      context: `Rule: ${ruleName}`,
+      range: null // No specific range for config errors
+    });
+  };
+}
