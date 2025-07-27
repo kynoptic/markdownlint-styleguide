@@ -136,13 +136,11 @@ describe('sentence-case-heading configuration validation', () => {
         technicalTerms: 'not an array'
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Configuration validation failed for rule "sentence-case-heading"')
-      );
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('technicalTerms must be an array of strings')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('Configuration validation failed for rule "sentence-case-heading"');
+      expect(configErrors[0].detail).toContain('technicalTerms must be an array of strings');
     });
 
     test('logs error for non-array properNouns', () => {
@@ -150,10 +148,10 @@ describe('sentence-case-heading configuration validation', () => {
         properNouns: { invalid: 'object' }
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('properNouns must be an array of strings')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('properNouns must be an array of strings');
     });
 
     test('logs error for non-array specialTerms', () => {
@@ -161,10 +159,10 @@ describe('sentence-case-heading configuration validation', () => {
         specialTerms: 123
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('specialTerms must be an array of strings')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('specialTerms must be an array of strings');
     });
 
     test('logs error for array with non-string elements', () => {
@@ -172,10 +170,10 @@ describe('sentence-case-heading configuration validation', () => {
         technicalTerms: ['valid', 123, 'alsovalid']
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('technicalTerms[1] must be a string, got number')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('technicalTerms[1] must be a string, got number');
     });
 
     test('logs error for array with empty string elements', () => {
@@ -183,10 +181,10 @@ describe('sentence-case-heading configuration validation', () => {
         technicalTerms: ['valid', '', 'alsovalid']
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('technicalTerms[1] cannot be empty or whitespace-only')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('technicalTerms[1] cannot be empty or whitespace-only');
     });
 
     test('logs error for array with whitespace-only elements', () => {
@@ -194,10 +192,10 @@ describe('sentence-case-heading configuration validation', () => {
         properNouns: ['valid', '   \t\n   ', 'alsovalid']
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('properNouns[1] cannot be empty or whitespace-only')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('properNouns[1] cannot be empty or whitespace-only');
     });
 
     test('logs error for unknown configuration fields', () => {
@@ -207,13 +205,11 @@ describe('sentence-case-heading configuration validation', () => {
         anotherUnknown: 123
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Unknown configuration option "unknownField"')
-      );
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Unknown configuration option "anotherUnknown"')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('Unknown configuration option "unknownField"');
+      expect(configErrors[0].detail).toContain('Unknown configuration option "anotherUnknown"');
     });
 
     test('logs multiple errors for multiple invalid fields', () => {
@@ -223,16 +219,12 @@ describe('sentence-case-heading configuration validation', () => {
         unknownField: 'unknown'
       };
 
-      runRuleWithConfig(config);
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('technicalTerms must be an array of strings')
-      );
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('properNouns must be an array of strings')
-      );
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Unknown configuration option "unknownField"')
-      );
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('technicalTerms must be an array of strings');
+      expect(configErrors[0].detail).toContain('properNouns must be an array of strings');
+      expect(configErrors[0].detail).toContain('Unknown configuration option "unknownField"');
     });
   });
 
@@ -248,10 +240,10 @@ describe('sentence-case-heading configuration validation', () => {
       // Rule should continue working despite invalid config
       expect(errors.length).toBeGreaterThan(0); // Should find violations in the test heading
       
-      // Should have logged validation errors
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('technicalTerms must be an array of strings')
-      );
+      // Should have reported configuration error through onError
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('technicalTerms must be an array of strings');
     });
 
     test('uses valid parts of configuration when some parts are invalid', () => {
@@ -264,9 +256,9 @@ describe('sentence-case-heading configuration validation', () => {
       const markdown = '# TestTerm should be preserved';
       const errors = runRuleWithConfig(config, markdown);
       
-      // The valid configuration should still be applied
-      // (TestTerm should be preserved, so fewer errors than without the config)
-      expect(mockConsoleError).toHaveBeenCalled(); // Validation error logged
+      // Should have reported configuration error through onError
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors.length).toBeGreaterThan(0); // Validation error logged
     });
 
     test('works normally when configuration is completely invalid', () => {
@@ -281,10 +273,10 @@ describe('sentence-case-heading configuration validation', () => {
       // Rule should still function with default behavior
       expect(Array.isArray(errors)).toBe(true);
       
-      // Should have logged all validation errors
-      expect(mockConsoleError).toHaveBeenCalledWith(
-        expect.stringContaining('Configuration validation failed')
-      );
+      // Should have reported configuration errors through onError
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('Configuration validation failed');
     });
   });
 
@@ -313,8 +305,9 @@ describe('sentence-case-heading configuration validation', () => {
       const markdown = '# Test Heading';
       const errors = runRuleWithConfig(config, markdown);
       
-      // Should log validation error
-      expect(mockConsoleError).toHaveBeenCalled();
+      // Should report configuration error through onError
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors.length).toBeGreaterThan(0);
       
       // Should still process the heading with default behavior
       expect(Array.isArray(errors)).toBe(true);

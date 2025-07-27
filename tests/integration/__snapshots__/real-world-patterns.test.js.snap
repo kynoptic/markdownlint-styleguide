@@ -892,7 +892,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "errorRange": null,
         "fixInfo": null,
         "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -909,7 +909,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Error handling",
         },
         "lineNumber": 48,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -926,7 +926,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Error response format",
         },
         "lineNumber": 58,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1293,7 +1293,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Project name",
         },
         "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1310,7 +1310,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "🚀 quick start",
         },
         "lineNumber": 6,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1497,7 +1497,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Getting started with next.js",
         },
         "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1514,7 +1514,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Installation and setup",
         },
         "lineNumber": 3,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1527,7 +1527,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "errorRange": null,
         "fixInfo": null,
         "lineNumber": 13,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1544,7 +1544,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Static generation vs server-side rendering",
         },
         "lineNumber": 21,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1647,7 +1647,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "errorRange": null,
         "fixInfo": null,
         "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1664,7 +1664,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Components and props",
         },
         "lineNumber": 3,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1681,7 +1681,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Functional vs class components",
         },
         "lineNumber": 13,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1698,7 +1698,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "State management",
         },
         "lineNumber": 18,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1715,7 +1715,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Usestate hook",
         },
         "lineNumber": 20,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1732,7 +1732,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Useeffect hook",
         },
         "lineNumber": 40,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -1749,7 +1749,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Best practices",
         },
         "lineNumber": 48,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2030,7 +2030,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Building a REST API with Node.js and express",
         },
         "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2047,7 +2047,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Table of contents",
         },
         "lineNumber": 3,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2064,7 +2064,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Setting up the project",
         },
         "lineNumber": 11,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2081,7 +2081,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Creating the server",
         },
         "lineNumber": 28,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2098,7 +2098,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Environment variables",
         },
         "lineNumber": 53,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2115,7 +2115,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Database integration",
         },
         "lineNumber": 66,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2132,7 +2132,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Testing your API",
         },
         "lineNumber": 97,
-        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
           "sentence-case-heading",
@@ -2222,7 +2222,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ap
     "errorRange": null,
     "fixInfo": null,
     "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2239,7 +2239,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ap
       "insertText": "Error handling",
     },
     "lineNumber": 48,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2256,7 +2256,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ap
       "insertText": "Error response format",
     },
     "lineNumber": 58,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2382,7 +2382,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests gi
       "insertText": "Project name",
     },
     "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2399,7 +2399,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests gi
       "insertText": "🚀 quick start",
     },
     "lineNumber": 6,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2441,7 +2441,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ne
       "insertText": "Getting started with next.js",
     },
     "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2458,7 +2458,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ne
       "insertText": "Installation and setup",
     },
     "lineNumber": 3,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2471,7 +2471,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ne
     "errorRange": null,
     "fixInfo": null,
     "lineNumber": 13,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2488,7 +2488,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ne
       "insertText": "Static generation vs server-side rendering",
     },
     "lineNumber": 21,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2526,7 +2526,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
     "errorRange": null,
     "fixInfo": null,
     "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2543,7 +2543,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "Components and props",
     },
     "lineNumber": 3,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2560,7 +2560,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "Functional vs class components",
     },
     "lineNumber": 13,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2577,7 +2577,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "State management",
     },
     "lineNumber": 18,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2594,7 +2594,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "Usestate hook",
     },
     "lineNumber": 20,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2611,7 +2611,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "Useeffect hook",
     },
     "lineNumber": 40,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2628,7 +2628,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
       "insertText": "Best practices",
     },
     "lineNumber": 48,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2699,7 +2699,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Building a REST API with Node.js and express",
     },
     "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2716,7 +2716,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Table of contents",
     },
     "lineNumber": 3,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2733,7 +2733,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Setting up the project",
     },
     "lineNumber": 11,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2750,7 +2750,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Creating the server",
     },
     "lineNumber": 28,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2767,7 +2767,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Environment variables",
     },
     "lineNumber": 53,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2784,7 +2784,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Database integration",
     },
     "lineNumber": 66,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",
@@ -2801,7 +2801,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Testing your API",
     },
     "lineNumber": 97,
-    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [
       "sentence-case-heading",

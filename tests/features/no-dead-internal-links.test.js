@@ -9,7 +9,9 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { lint } from 'markdownlint/promise';
-import noDeadInternalLinksRule, { clearCaches, getCacheStats } from '../../src/rules/no-dead-internal-links.js';
+import noDeadInternalLinksRule, { _forTesting } from '../../src/rules/no-dead-internal-links.js';
+
+const { clearCaches, getCacheStats } = _forTesting;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
