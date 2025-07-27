@@ -7,6 +7,7 @@ exports.default = void 0;
 var _sharedConstants = require("./shared-constants.cjs");
 var _autofixSafety = require("./autofix-safety.cjs");
 var _configValidation = require("./config-validation.cjs");
+var _sharedUtils = require("./shared-utils.cjs");
 // @ts-check
 
 /**
@@ -119,7 +120,8 @@ function backtickCodeElements(params, onError) {
   };
   const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'backtick-code-elements');
   if (!validationResult.isValid) {
-    (0, _configValidation.logValidationErrors)('backtick-code-elements', validationResult.errors);
+    const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'backtick-code-elements');
+    (0, _configValidation.logValidationErrors)('backtick-code-elements', validationResult.errors, logger);
     // Continue execution with default values to prevent crashes
   }
 
@@ -137,10 +139,10 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-    // Detect both ``` and ~~~ as code block fences (ATX or tilde).
-    const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
-    if (fenceMatch) {
-      inCodeBlock = !inCodeBlock;
+    // Update code block state using shared utility
+    const codeBlockUpdate = (0, _sharedUtils.updateCodeBlockState)(line, inCodeBlock);
+    if (codeBlockUpdate.updated) {
+      inCodeBlock = codeBlockUpdate.inCodeBlock;
       continue;
     }
 
@@ -166,12 +168,7 @@ function backtickCodeElements(params, onError) {
         continue;
       }
     }
-    const codeSpans = [];
-    const spanRegex = /`[^`]+`/g;
-    let spanMatch;
-    while ((spanMatch = spanRegex.exec(line)) !== null) {
-      codeSpans.push([spanMatch.index, spanMatch.index + spanMatch[0].length]);
-    }
+    const codeSpans = (0, _sharedUtils.getInlineCodeSpans)(line);
     const patterns = [/\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g,
     // directory or file path
     /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g,
@@ -357,7 +354,7 @@ function backtickCodeElements(params, onError) {
         }
 
         // Skip if inside a code span
-        if (codeSpans.some(([s, e]) => start >= s && end <= e)) {
+        if ((0, _sharedUtils.isInCodeSpan)(codeSpans, start, end)) {
           continue;
         }
         // Skip if inside a Markdown link, wiki link, or HTML comment

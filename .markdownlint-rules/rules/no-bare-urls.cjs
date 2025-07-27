@@ -105,7 +105,8 @@ var _default = exports.default = {
     };
     const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-bare-urls-trap');
     if (!validationResult.isValid) {
-      (0, _configValidation.logValidationErrors)('no-bare-urls-trap', validationResult.errors);
+      const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'no-bare-urls-trap');
+      (0, _configValidation.logValidationErrors)('no-bare-urls-trap', validationResult.errors, logger);
       // Continue execution with default values to prevent crashes
     }
 

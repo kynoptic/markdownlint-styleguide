@@ -68,7 +68,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   };
   const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'sentence-case-heading');
   if (!validationResult.isValid) {
-    (0, _configValidation.logValidationErrors)('sentence-case-heading', validationResult.errors);
+    const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'sentence-case-heading');
+    (0, _configValidation.logValidationErrors)('sentence-case-heading', validationResult.errors, logger);
     // Continue execution with empty arrays to prevent crashes
   }
 
@@ -493,6 +494,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @returns {boolean} True if there's a violation.
    */
   function validateBoldListItem(boldText) {
+    // First check exemptions on the original text before any cleaning
+    const textWithoutMarkup = boldText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
+
+    // Skip if should be exempted
+    if (shouldExemptFromValidation(boldText, textWithoutMarkup)) {
+      return false;
+    }
+
     // Strip leading symbols
     const cleanedText = stripLeadingSymbols(boldText);
     if (!cleanedText) {
@@ -522,11 +531,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
     }
 
-    // Get text without markup for analysis
-    const textWithoutMarkup = cleanedText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
+    // Get text without markup for further analysis
+    const cleanedTextWithoutMarkup = cleanedText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
 
-    // Skip if should be exempted
-    if (shouldExemptFromValidation(cleanedText, textWithoutMarkup)) {
+    // Skip if should be exempted after cleaning
+    if (shouldExemptFromValidation(cleanedText, cleanedTextWithoutMarkup)) {
       return false;
     }
     const {
@@ -615,6 +624,84 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   }
 
   /**
+   * Prepares text for validation by cleaning and preserving markup.
+   * @param {string} headingText The original heading text.
+   * @returns {{cleanedText: string, textWithoutMarkup: string, processed: string, words: string[]} | null} Prepared text data or null if invalid.
+   */
+  function prepareTextForValidation(headingText) {
+    // First check exemptions on the original text before any cleaning
+    const textWithoutMarkup = headingText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
+    if (shouldExemptFromValidation(headingText, textWithoutMarkup)) {
+      return null;
+    }
+
+    // Now clean the text for further processing
+    const cleanedText = stripLeadingSymbols(headingText);
+    if (!cleanedText) {
+      return null;
+    }
+    const {
+      processed
+    } = preserveMarkupSegments(cleanedText);
+    const clean = processed.replace(/[#*_~!+={}|:;"<>,.?\\]/g, ' ').trim();
+    if (!clean || /^\d+[\d./-]*$/.test(clean)) {
+      return null;
+    }
+    const words = clean.split(/\s+/).filter(w => w.length > 0);
+
+    // Skip if all words are preserved segments - this means the heading is all markup
+    if (words.every(w => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
+      return null;
+    }
+
+    // Also check if we can find a valid first word for validation
+    const firstValidIndex = findFirstValidationWord(words, cleanedText);
+    if (firstValidIndex === -1) {
+      return null; // No valid words to validate
+    }
+    return {
+      cleanedText,
+      textWithoutMarkup,
+      processed,
+      words
+    };
+  }
+
+  /**
+   * Performs comprehensive word validation for a heading.
+   * @param {string[]} words Array of words to validate.
+   * @param {string} cleanedText The cleaned heading text.
+   * @param {Set<number>} phraseIgnore Indices to ignore during validation.
+   * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
+   */
+  function performWordValidation(words, cleanedText, phraseIgnore) {
+    const firstIndex = findFirstValidationWord(words, cleanedText);
+    if (firstIndex === -1) {
+      return {
+        isValid: true
+      };
+    }
+
+    // Validate first word
+    const firstWord = words[firstIndex];
+    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+    if (!firstWordResult.isValid) {
+      return firstWordResult;
+    }
+
+    // Check for all caps heading
+    if (isAllCapsHeading(words)) {
+      return {
+        isValid: false,
+        errorMessage: 'Heading should not be in all caps.'
+      };
+    }
+
+    // Validate subsequent words
+    return validateSubsequentWords(words, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+  }
+
+  /**
    * Validates a string for sentence case and reports errors.
    * @param {string} headingText The text to validate.
    * @param {number} lineNumber The line number of the text.
@@ -627,66 +714,26 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
 
-    // Strip leading symbols and check basic exemptions
-    const cleanedText = stripLeadingSymbols(headingText);
-    if (!cleanedText) {
+    // Prepare text for validation
+    const preparedText = prepareTextForValidation(headingText);
+    if (!preparedText) {
       return;
     }
-
-    // Get text without markup for content analysis
-    const textWithoutMarkup = cleanedText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
-
-    // Check if should be exempted from validation
-    if (shouldExemptFromValidation(cleanedText, textWithoutMarkup)) {
-      return;
-    }
+    const {
+      cleanedText,
+      words
+    } = preparedText;
 
     // Check for multi-word proper phrase violations first
     if (validateProperPhrases(cleanedText, lineNumber)) {
       return;
     }
 
-    // Preserve markup segments and get clean words
-    const {
-      processed
-    } = preserveMarkupSegments(cleanedText);
-    const clean = processed.replace(/[#*_~!+={}|:;"<>,.?\\]/g, ' ').trim();
-    if (!clean || /^\d+[\d./-]*$/.test(clean)) {
-      return;
-    }
-    const words = clean.split(/\s+/).filter(w => w.length > 0);
+    // Perform comprehensive word validation
     const phraseIgnore = getProperPhraseIndices(words);
-
-    // Skip if all words are preserved segments
-    if (words.every(w => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {
-      return;
-    }
-
-    // Find first word to validate
-    const firstIndex = findFirstValidationWord(words, cleanedText);
-    if (firstIndex === -1) {
-      return; // No valid words found
-    }
-
-    // Validate first word
-    const firstWord = words[firstIndex];
-    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
-    if (!firstWordResult.isValid) {
-      reportFn(firstWordResult.errorMessage, lineNumber, cleanedText, sourceLine);
-      return;
-    }
-
-    // Check for all caps heading
-    if (isAllCapsHeading(words)) {
-      reportFn('Heading should not be in all caps.', lineNumber, cleanedText, sourceLine);
-      return;
-    }
-
-    // Validate subsequent words
-    const subsequentWordsResult = validateSubsequentWords(words, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
-    if (!subsequentWordsResult.isValid) {
-      reportFn(subsequentWordsResult.errorMessage, lineNumber, cleanedText, sourceLine);
-      return;
+    const validationResult = performWordValidation(words, cleanedText, phraseIgnore);
+    if (!validationResult.isValid) {
+      reportFn(validationResult.errorMessage, lineNumber, cleanedText, sourceLine);
     }
   }
 

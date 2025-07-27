@@ -3,9 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clearCaches = clearCaches;
-exports.default = void 0;
-exports.getCacheStats = getCacheStats;
+exports.default = exports._forTesting = void 0;
 var _fs = _interopRequireDefault(require("fs"));
 var _path = _interopRequireDefault(require("path"));
 var _configValidation = require("./config-validation.cjs");
@@ -183,7 +181,8 @@ function noDeadInternalLinks(params, onError) {
   };
   const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-dead-internal-links');
   if (!validationResult.isValid) {
-    (0, _configValidation.logValidationErrors)('no-dead-internal-links', validationResult.errors);
+    const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'no-dead-internal-links');
+    (0, _configValidation.logValidationErrors)('no-dead-internal-links', validationResult.errors, logger);
     // Continue execution with default values to prevent crashes
   }
 
@@ -316,7 +315,7 @@ function noDeadInternalLinks(params, onError) {
  * Clear performance caches. Useful for testing or manual cache management.
  * PERFORMANCE: Cache clearing is not typically needed in normal usage since
  * markdownlint runs are typically short-lived and caches are beneficial.
- * @public
+ * @private
  */
 function clearCaches() {
   fileExistenceCache.clear();
@@ -327,7 +326,7 @@ function clearCaches() {
 /**
  * Get cache statistics for performance monitoring.
  * @returns {Object} Cache size information
- * @public
+ * @private
  */
 function getCacheStats() {
   return {
@@ -345,4 +344,8 @@ var _default = exports.default = {
   parser: 'micromark',
   function: noDeadInternalLinks,
   fixable: false
+}; // Test-only exports for internal cache management and monitoring
+const _forTesting = exports._forTesting = {
+  clearCaches,
+  getCacheStats
 };
