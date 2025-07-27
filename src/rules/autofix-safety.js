@@ -34,7 +34,7 @@ const DEFAULT_SAFETY_CONFIG = {
  * @param {Object} context - Additional context
  * @returns {number} Confidence score between 0 and 1
  */
-export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
+export function calculateSentenceCaseConfidence(original, fixed, context = {}) { // eslint-disable-line no-unused-vars
   if (!original || !fixed || original === fixed) {
     return 0;
   }
@@ -136,13 +136,42 @@ export function calculateBacktickConfidence(original, context = {}) {
   }
 
   // Lower confidence for common English words and natural language phrases
-  const commonWords = ['i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
-  const naturalLanguagePhrases = ['read/write', 'pass/fail', 'on/off', 'in/out', 'up/down', 'left/right', 'true/false', 'yes/no'];
+  const commonWords = [
+    'i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+    'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
+    'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+    'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how',
+    'all', 'any', 'some', 'many', 'much', 'few', 'little', 'most', 'more', 'less',
+    'one', 'two', 'three', 'first', 'last', 'next', 'previous', 'before', 'after'
+  ];
   
+  const naturalLanguagePhrases = [
+    'read/write', 'pass/fail', 'on/off', 'in/out', 'up/down', 'left/right', 'true/false', 'yes/no',
+    'black/white', 'day/night', 'hot/cold', 'big/small', 'fast/slow', 'high/low', 'old/new',
+    'start/stop', 'begin/end', 'open/close', 'save/load', 'push/pull', 'give/take',
+    'buy/sell', 'win/lose', 'love/hate', 'good/bad', 'right/wrong', 'rich/poor',
+    'male/female', 'young/old', 'early/late', 'easy/hard', 'safe/dangerous'
+  ];
+
+  // Additional patterns that commonly cause false positives
+  const problematicPatterns = [
+    /^[a-z]{1,3}$/, // Very short lowercase words (e.g., 'is', 'or', 'in')
+    /^(go|do|be|if|it|my|we|he|she|you|us|me|him|her|our|his|its|who|what|why|how|when|where)$/i, // Common English words
+    /^(one|two|three|four|five|six|seven|eight|nine|ten)$/i, // Number words
+    /^(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)$/i, // Color words
+    /^(big|small|large|tiny|huge|mini|max|min)$/i, // Size words
+    /^(new|old|fresh|stale|young|ancient|modern|classic)$/i, // Age/time words
+    /^(good|bad|nice|cool|hot|cold|warm|best|worst|better|worse)$/i, // Quality words
+    /^(quick|slow|fast|rapid|swift|delayed|instant)$/i, // Speed words
+    /^(easy|hard|simple|complex|basic|advanced|tough|difficult)$/i, // Complexity words
+  ];
+
   if (commonWords.includes(original.toLowerCase())) {
-    confidence -= 0.6; // Strong penalty for common words
+    confidence -= 0.7; // Strong penalty for common words
   } else if (naturalLanguagePhrases.includes(original.toLowerCase())) {
-    confidence -= 0.8; // Very strong penalty for natural language phrases
+    confidence -= 0.9; // Very strong penalty for natural language phrases
+  } else if (problematicPatterns.some(pattern => pattern.test(original))) {
+    confidence -= 0.5; // Moderate penalty for problematic patterns
   }
 
   // Lower confidence for very short terms that could be ambiguous
@@ -155,7 +184,130 @@ export function calculateBacktickConfidence(original, context = {}) {
     confidence -= 0.2;
   }
 
+  // Context-aware safety checks
+  if (context && context.line) {
+    const line = context.line.toLowerCase();
+    
+    // Lower confidence if the text appears in obviously natural language contexts
+    const naturalLanguageIndicators = [
+      'is a', 'are a', 'was a', 'were a', 'this is', 'that is', 'it is', 'he is', 'she is',
+      'would be', 'could be', 'should be', 'might be', 'must be',
+      'i think', 'i believe', 'in my opinion', 'personally', 'generally',
+      'for example', 'such as', 'like this', 'as follows', 'namely',
+      'however', 'therefore', 'moreover', 'furthermore', 'nevertheless',
+      'note that', 'remember that', 'keep in mind', 'be aware', 'make sure'
+    ];
+    
+    if (naturalLanguageIndicators.some(indicator => line.includes(indicator))) {
+      confidence -= 0.3;
+    }
+    
+    // Lower confidence if the term appears multiple times in normal prose
+    const termCount = (line.match(new RegExp(`\\b${original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')) || []).length;
+    if (termCount > 1) {
+      confidence -= 0.2;
+    }
+    
+    // Higher confidence if the text appears in technical contexts
+    const technicalIndicators = [
+      'install', 'configure', 'setup', 'deploy', 'build', 'compile', 'run', 'execute',
+      'command', 'script', 'function', 'method', 'class', 'variable', 'parameter',
+      'api', 'endpoint', 'request', 'response', 'server', 'client', 'database',
+      'repository', 'branch', 'commit', 'merge', 'push', 'pull', 'clone', 'fork'
+    ];
+    
+    if (technicalIndicators.some(indicator => line.includes(indicator))) {
+      confidence += 0.2;
+    }
+  }
+
   return Math.max(0, Math.min(1, confidence));
+}
+
+/**
+ * Advanced pattern matching to detect if a term is likely code vs natural language.
+ * @param {string} text - Text to analyze
+ * @param {Object} context - Additional context including surrounding text
+ * @returns {Object} Analysis result with confidence and reasoning
+ */
+export function analyzeCodeVsNaturalLanguage(text, context = {}) {
+  const analysis = {
+    isLikelyCode: false,
+    confidence: 0.5,
+    reasons: [],
+    shouldAutofix: false
+  };
+
+  // Immediate disqualifiers for common natural language
+  const definitelyNotCode = [
+    /^(a|an|the|and|or|but|if|then|else|when|where|why|how|who|what|which|that|this|these|those|here|there|now|today|yesterday|tomorrow)$/i,
+    /^(i|you|he|she|it|we|they|me|him|her|us|them|my|your|his|her|its|our|their)$/i,
+    /^(is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|could|should|may|might|can|must|shall)$/i,
+    /^(good|bad|big|small|new|old|first|last|next|previous|best|worst|better|worse|more|less|most|least)$/i,
+    /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|hundred|thousand)$/i
+  ];
+
+  if (definitelyNotCode.some(pattern => pattern.test(text))) {
+    analysis.confidence = 0.1;
+    analysis.reasons.push('Matches common English word pattern');
+    return analysis;
+  }
+
+  // Strong code indicators
+  const strongCodeIndicators = [
+    /\.(js|ts|jsx|tsx|py|java|c|cpp|cs|go|rs|rb|php|pl|sh|bash|zsh|fish|ps1|bat|cmd|sql|html|css|scss|sass|less|xml|json|yaml|yml|toml|ini|cfg|conf|config|env)$/i,
+    /^[A-Z_][A-Z0-9_]*$/, // ENVIRONMENT_VARIABLES
+    /^(npm|yarn|pip|git|docker|kubectl|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo)\s/,
+    /\(.*\)$/, // Function calls
+    /^import\s+/,
+    /^from\s+.*import/,
+    /^\$[A-Z_]+$/, // Shell variables
+    /^--[a-z-]+$/, // Command flags
+    /\/.*\//, // Paths with slashes
+    /^\.[a-zA-Z]/ // Dotfiles
+  ];
+
+  const strongMatches = strongCodeIndicators.filter(pattern => pattern.test(text));
+  if (strongMatches.length > 0) {
+    analysis.confidence += 0.4;
+    analysis.reasons.push(`Strong code pattern: ${strongMatches.length} matches`);
+  }
+
+  // Moderate code indicators
+  const moderateCodeIndicators = [
+    /[A-Z]{2,}/, // Contains acronyms
+    /_/, // Contains underscores
+    /\d/, // Contains numbers
+    /^[a-z]+[A-Z]/, // camelCase
+    /^[A-Z][a-z]+[A-Z]/, // PascalCase
+    /^[a-z-]{4,}$/ // kebab-case (only if longer than 3 chars)
+  ];
+
+  const moderateMatches = moderateCodeIndicators.filter(pattern => pattern.test(text));
+  if (moderateMatches.length > 0) {
+    analysis.confidence += 0.1 * moderateMatches.length;
+    analysis.reasons.push(`Moderate code patterns: ${moderateMatches.length} matches`);
+  }
+
+  // Context-based analysis
+  if (context.line) {
+    const line = context.line.toLowerCase();
+    
+    if (/(command|execute|run|install|configure|setup|deploy|build|compile)/.test(line)) {
+      analysis.confidence += 0.2;
+      analysis.reasons.push('Technical context detected');
+    }
+    
+    if (/(example|like|such as|for instance|namely)/.test(line)) {
+      analysis.confidence -= 0.3;
+      analysis.reasons.push('Example/illustration context detected');
+    }
+  }
+
+  analysis.isLikelyCode = analysis.confidence > 0.5;
+  analysis.shouldAutofix = analysis.confidence > 0.6;
+  
+  return analysis;
 }
 
 /**
@@ -216,7 +368,19 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
     return null;
   }
 
+  // Use the existing safety check system for all rules
   const safetyCheck = shouldApplyAutofix(ruleType, original, fixed, context, config);
+  
+  // For backtick rules, also run the advanced analysis for additional insights
+  let advancedAnalysis = null;
+  if (ruleType === 'backtick') {
+    advancedAnalysis = analyzeCodeVsNaturalLanguage(original, context);
+    
+    // If the advanced analysis strongly indicates this is NOT code, override the decision
+    if (advancedAnalysis.confidence < 0.3) {
+      return null;
+    }
+  }
   
   if (!safetyCheck.safe) {
     // Return null to disable autofix for unsafe changes
@@ -229,7 +393,8 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
     _safety: {
       confidence: safetyCheck.confidence,
       reason: safetyCheck.reason,
-      ruleType
+      ruleType,
+      advancedAnalysis
     }
   };
 }
