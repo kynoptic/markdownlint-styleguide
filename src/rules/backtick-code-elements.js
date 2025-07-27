@@ -7,6 +7,12 @@
 // Import the centralized ignoredTerms Set
 import { backtickIgnoredTerms as ignoredTerms } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
+import { 
+  validateStringArray, 
+  validateBoolean,
+  validateConfig, 
+  logValidationErrors 
+} from './config-validation.js';
 
 /**
  * Generate a contextual error message based on the type of violation detected.
@@ -14,7 +20,7 @@ import { createSafeFixInfo } from './autofix-safety.js';
  * @param {string} line - The full line context
  * @returns {string} A descriptive error message
  */
-function generateContextualErrorMessage(text, line) {
+function generateContextualErrorMessage(text, line) { // eslint-disable-line no-unused-vars
   // Shell commands with arguments (highest priority)
   if (/^(git|npm|pip|yarn|docker|brew|cargo|pnpm|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo|su|ps|top|htop|kill|killall|systemctl|service|crontab|tar|gzip|zip|unzip|cat|head|tail|less|more|vim|nano|emacs|code|ping|traceroute|nslookup|dig|netstat|ss)\s/.test(text)) {
     return `Command '${text}' should be wrapped in backticks to distinguish it from regular text`;
@@ -106,6 +112,29 @@ function backtickCodeElements(params, onError) {
     return;
   }
 
+  const config = params.config?.['backtick-code-elements'] || params.config?.BCE001 || {};
+
+  // Validate configuration
+  const configSchema = {
+    ignoredTerms: validateStringArray,
+    skipCodeBlocks: validateBoolean,
+    skipMathBlocks: validateBoolean
+  };
+
+  const validationResult = validateConfig(config, configSchema, 'backtick-code-elements');
+  if (!validationResult.isValid) {
+    logValidationErrors('backtick-code-elements', validationResult.errors);
+    // Continue execution with default values to prevent crashes
+  }
+
+  // Extract configuration with defaults
+  const userIgnoredTerms = Array.isArray(config.ignoredTerms) ? config.ignoredTerms : [];
+  const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true;
+  const skipMathBlocks = typeof config.skipMathBlocks === 'boolean' ? config.skipMathBlocks : true;
+
+  // Combine default ignored terms with user-provided ones
+  const allIgnoredTerms = new Set([...ignoredTerms, ...userIgnoredTerms]);
+
   const lines = params.lines;
   let inCodeBlock = false;
   let inMathBlock = false;
@@ -128,16 +157,13 @@ function backtickCodeElements(params, onError) {
       continue;
     }
     
-    // Skip lines that are in a code block, heading, or math block
-    // NOTE: We skip headings and code blocks entirely but for math blocks
-    // we need to check if the line contains code-like patterns outside of math expressions
-    if (inCodeBlock || /^\s*#/.test(line)) {
+    // Skip lines that are in a code block or heading based on configuration
+    if ((skipCodeBlocks && inCodeBlock) || /^\s*#/.test(line)) {
       continue;
     }
     
-    // For math blocks, we need to be more nuanced - only skip if the line doesn't contain
-    // code-like patterns outside of LaTeX expressions
-    if (inMathBlock) {
+    // For math blocks, respect configuration but with nuanced handling
+    if (skipMathBlocks && inMathBlock) {
       // Check for shell-like patterns that should still be flagged even in math blocks
       // This regex matches:
       // 1. grep/export followed directly by $word: grep $pattern
@@ -345,8 +371,8 @@ function backtickCodeElements(params, onError) {
         if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
           continue;
         }
-        // Skip if in ignored terms
-        if (ignoredTerms.has(fullMatch)) {
+        // Skip if in ignored terms (default + user-configured)
+        if (allIgnoredTerms.has(fullMatch)) {
           continue;
         }
         // Skip if already flagged
