@@ -10,7 +10,28 @@ Enforces sentence case for all ATX headings. The first word of a heading must be
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `properNouns` | `string[]` | `[]` | A list of proper nouns to ignore. |
+| `specialTerms` | `string[]` | `[]` | A list of terms with specific capitalization (e.g., proper nouns, brand names, technical terms). |
+| `technicalTerms` | `string[]` | `[]` | **Deprecated:** Use `specialTerms` instead. |
+| `properNouns` | `string[]` | `[]` | **Deprecated:** Use `specialTerms` instead. |
+
+**Migration Guide:** If you're using the deprecated `technicalTerms` or `properNouns` options, combine them into a single `specialTerms` array:
+
+```javascript
+// Old configuration (deprecated)
+{
+  "sentence-case-heading": {
+    "technicalTerms": ["API", "JavaScript"],
+    "properNouns": ["GitHub", "OAuth"]
+  }
+}
+
+// New configuration (recommended)
+{
+  "sentence-case-heading": {
+    "specialTerms": ["API", "JavaScript", "GitHub", "OAuth"]
+  }
+}
+```
 
 ### Examples
 
@@ -144,7 +165,7 @@ The rule provides intelligent auto-fix support with safety validation:
 
 Running `markdownlint` with the `--fix` option will automatically wrap appropriate code elements in backticks while preserving cases where manual review is needed.
 
-## `wt/no-bare-urls`
+## `no-bare-urls-trap` (BU001)
 
 Prevents bare URLs from appearing in markdown content. URLs must be properly formatted as markdown links or autolinks to improve accessibility and provide better user experience.
 

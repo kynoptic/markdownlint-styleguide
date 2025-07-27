@@ -320,4 +320,70 @@ describe('sentence-case-heading configuration validation', () => {
       expect(Array.isArray(errors)).toBe(true);
     });
   });
+
+  describe('deprecation warnings', () => {
+    test('shows warning for deprecated technicalTerms configuration', () => {
+      // Capture console.warn
+      const originalWarn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => {
+        warnings.push(args.join(' '));
+      };
+
+      try {
+        const config = {
+          technicalTerms: ["API", "JavaScript"]
+        };
+
+        const markdown = '# Test heading';
+        runRuleWithConfig(config, markdown);
+
+        expect(warnings.some(w => w.includes('technicalTerms" is deprecated'))).toBe(true);
+      } finally {
+        console.warn = originalWarn;
+      }
+    });
+
+    test('shows warning for deprecated properNouns configuration', () => {
+      const originalWarn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => {
+        warnings.push(args.join(' '));
+      };
+
+      try {
+        const config = {
+          properNouns: ["GitHub", "OAuth"]
+        };
+
+        const markdown = '# Test heading';
+        runRuleWithConfig(config, markdown);
+
+        expect(warnings.some(w => w.includes('properNouns" is deprecated'))).toBe(true);
+      } finally {
+        console.warn = originalWarn;
+      }
+    });
+
+    test('does not show warnings for modern specialTerms configuration', () => {
+      const originalWarn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => {
+        warnings.push(args.join(' '));
+      };
+
+      try {
+        const config = {
+          specialTerms: ["API", "GitHub"]
+        };
+
+        const markdown = '# Test heading';
+        runRuleWithConfig(config, markdown);
+
+        expect(warnings.some(w => w.includes('deprecated'))).toBe(false);
+      } finally {
+        console.warn = originalWarn;
+      }
+    });
+  });
 });
