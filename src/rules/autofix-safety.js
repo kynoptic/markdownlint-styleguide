@@ -6,6 +6,95 @@
  */
 
 /**
+ * Set of command keywords for efficient lookup
+ * @type {Set<string>}
+ */
+const COMMAND_KEYWORDS = new Set([
+  'npm', 'yarn', 'git', 'docker', 'kubectl', 'curl', 'wget', 'ssh', 'scp', 'rsync',
+  'grep', 'sed', 'awk', 'find', 'ls', 'cd', 'mkdir', 'rm', 'cp', 'mv', 'chmod',
+  'chown', 'sudo', 'su', 'ps', 'top', 'htop', 'kill', 'killall', 'systemctl',
+  'service', 'crontab', 'tar', 'gzip', 'zip', 'unzip', 'cat', 'head', 'tail',
+  'less', 'more', 'vim', 'nano', 'emacs', 'code', 'open', 'explorer', 'ping',
+  'traceroute', 'nslookup', 'dig', 'netstat', 'ss', 'iptables', 'ufw', 'tcpdump',
+  'wireshark', 'nmap', 'john', 'hashcat', 'hydra', 'metasploit', 'burp', 'owasp',
+  'nikto', 'sqlmap', 'aircrack', 'reaver'
+]);
+
+/**
+ * Set of file extension keywords for efficient lookup
+ * @type {Set<string>}
+ */
+const FILE_EXTENSION_KEYWORDS = new Set([
+  'js', 'ts', 'jsx', 'tsx', 'py', 'java', 'c', 'cpp', 'cs', 'go', 'rs', 'rb',
+  'php', 'pl', 'sh', 'bash', 'zsh', 'fish', 'ps1', 'bat', 'cmd', 'sql', 'html',
+  'css', 'scss', 'sass', 'less', 'xml', 'json', 'yaml', 'yml', 'toml', 'ini',
+  'cfg', 'conf', 'config', 'env', 'gitignore', 'dockerignore', 'editorconfig',
+  'prettierrc', 'eslintrc', 'babelrc', 'tsconfigjson', 'packagejson', 'composerjson',
+  'gemfile', 'requirements.txt', 'pipfile', 'cargo.toml', 'go.mod', 'pom.xml',
+  'build.gradle', 'webpack.config.js', 'rollup.config.js', 'vite.config.js',
+  'next.config.js', 'nuxt.config.js', 'vue.config.js', 'angular.json',
+  'tsconfig.json', 'jest.config.js', 'cypress.json', 'playwright.config.js',
+  'storybook', 'readme.md', 'changelog.md', 'license', 'contributing.md',
+  'code_of_conduct.md', 'security.md', 'pull_request_template.md',
+  'issue_template.md', 'funding.yml', 'dependabot.yml', 'codeql.yml', 'ci.yml',
+  'cd.yml', 'deploy.yml', 'release.yml', 'test.yml', 'build.yml', 'lint.yml',
+  'format.yml', 'security.yml', 'audit.yml', 'update.yml', 'backup.yml',
+  'restore.yml', 'migrate.yml', 'seed.yml', 'rollback.yml', 'status.yml',
+  'health.yml', 'monitor.yml', 'alert.yml', 'log.yml', 'trace.yml', 'debug.yml',
+  'profile.yml', 'benchmark.yml', 'load.yml', 'stress.yml', 'smoke.yml',
+  'integration.yml', 'unit.yml', 'e2e.yml', 'acceptance.yml', 'contract.yml',
+  'mutation.yml', 'property.yml', 'snapshot.yml', 'visual.yml', 'accessibility.yml',
+  'performance.yml', 'compliance.yml', 'governance.yml', 'risk.yml', 'review.yml',
+  'approval.yml', 'merge.yml', 'conflict.yml', 'rebase.yml', 'cherry-pick.yml',
+  'tag.yml', 'branch.yml', 'commit.yml', 'push.yml', 'pull.yml', 'fetch.yml',
+  'clone.yml', 'fork.yml', 'star.yml', 'watch.yml', 'follow.yml', 'sponsor.yml',
+  'donate.yml', 'support.yml', 'contact.yml', 'feedback.yml', 'report.yml',
+  'request.yml', 'suggestion.yml', 'idea.yml', 'proposal.yml', 'rfc.yml',
+  'adr.yml', 'decision.yml', 'meeting.yml', 'agenda.yml', 'minutes.yml',
+  'action.yml', 'task.yml', 'todo.yml', 'done.yml', 'progress.yml', 'news.yml',
+  'announcement.yml', 'version.yml', 'migration.yml', 'upgrade.yml', 'downgrade.yml',
+  'patch.yml', 'hotfix.yml', 'bugfix.yml', 'feature.yml', 'enhancement.yml',
+  'improvement.yml', 'optimization.yml', 'refactor.yml', 'cleanup.yml',
+  'maintenance.yml', 'deprecation.yml', 'removal.yml', 'addition.yml',
+  'modification.yml', 'change.yml', 'fix.yml', 'repair.yml', 'recover.yml',
+  'archive.yml', 'export.yml', 'import.yml', 'sync.yml', 'transfer.yml',
+  'copy.yml', 'move.yml', 'delete.yml', 'remove.yml', 'purge.yml', 'clean.yml',
+  'clear.yml', 'reset.yml', 'restart.yml', 'reload.yml', 'refresh.yml',
+  'renew.yml', 'regenerate.yml', 'rebuild.yml', 'recreate.yml', 'redeploy.yml',
+  'republish.yml', 'reprocess.yml', 'rerun.yml', 'retry.yml', 'resume.yml',
+  'pause.yml', 'stop.yml', 'start.yml', 'enable.yml', 'disable.yml',
+  'activate.yml', 'deactivate.yml', 'install.yml', 'uninstall.yml', 'setup.yml',
+  'configure.yml', 'initialize.yml', 'finalize.yml', 'complete.yml', 'finish.yml',
+  'end.yml', 'close.yml', 'launch.yml', 'execute.yml', 'run.yml', 'invoke.yml',
+  'call.yml', 'trigger.yml', 'schedule.yml', 'queue.yml', 'process.yml',
+  'handle.yml', 'manage.yml', 'control.yml', 'observe.yml', 'track.yml',
+  'measure.yml', 'analyze.yml', 'evaluate.yml', 'assess.yml', 'validate.yml',
+  'verify.yml', 'confirm.yml', 'approve.yml', 'reject.yml', 'accept.yml',
+  'decline.yml', 'allow.yml', 'deny.yml', 'grant.yml', 'revoke.yml',
+  'assign.yml', 'unassign.yml', 'allocate.yml', 'deallocate.yml', 'reserve.yml',
+  'release.yml', 'lock.yml', 'unlock.yml', 'secure.yml', 'unsecure.yml',
+  'protect.yml', 'unprotect.yml', 'encrypt.yml', 'decrypt.yml', 'sign.yml',
+  'authenticate.yml', 'authorize.yml', 'login.yml', 'logout.yml', 'signin.yml',
+  'signout.yml', 'register.yml', 'unregister.yml', 'subscribe.yml',
+  'unsubscribe.yml', 'join.yml', 'leave.yml', 'enter.yml', 'exit.yml',
+  'connect.yml', 'disconnect.yml', 'link.yml', 'unlink.yml', 'bind.yml',
+  'unbind.yml', 'attach.yml', 'detach.yml', 'mount.yml', 'unmount.yml',
+  'load.yml', 'unload.yml', 'save.yml', 'persist.yml', 'store.yml',
+  'retrieve.yml', 'fetch.yml', 'get.yml', 'set.yml', 'put.yml', 'post.yml',
+  'patch.yml', 'head.yml', 'options.yml', 'trace.yml'
+]);
+
+/**
+ * Extract file extension from a filename or path
+ * @param {string} filename - The filename or path
+ * @returns {string} The file extension (without the dot)
+ */
+function getFileExtension(filename) {
+  const match = filename.match(/\.([^.]+)$/);
+  return match ? match[1].toLowerCase() : '';
+}
+
+/**
  * Configuration for autofix safety checks.
  * @typedef {Object} AutofixSafetyConfig
  * @property {boolean} enabled - Whether safety checks are enabled
@@ -39,33 +128,37 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
     return 0;
   }
 
-  let confidence = 0.5; // Base confidence
+  let confidence = 0.5; // Base confidence: neutral starting point
 
-  // Higher confidence for simple first-word capitalization
+  // +0.3: High confidence boost for simple first-word capitalization
+  // This is the most common and safest sentence case change
   const words = original.split(/\s+/);
   if (words.length > 0) {
     const firstWord = words[0];
     const expectedFirstWord = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
     
     if (fixed.startsWith(expectedFirstWord)) {
-      confidence += 0.3;
+      confidence += 0.3; // Strong indicator of correct sentence case fix
     }
   }
 
-  // Higher confidence if only case changes (no word additions/removals)
+  // +0.2: Moderate confidence boost if only case changes (no word additions/removals)
+  // Purely case-based changes are safer than structural changes
   if (original.toLowerCase() === fixed.toLowerCase()) {
-    confidence += 0.2;
+    confidence += 0.2; // Safe transformation - only case changes
   }
 
-  // Lower confidence for complex changes
+  // -0.2: Moderate confidence penalty for structural changes
+  // Word count changes indicate more complex transformations that could be wrong
   const originalWords = original.split(/\s+/);
   const fixedWords = fixed.split(/\s+/);
   
   if (originalWords.length !== fixedWords.length) {
-    confidence -= 0.2;
+    confidence -= 0.2; // Structural changes are riskier
   }
 
-  // Lower confidence if many words are changed
+  // -0.3: Strong confidence penalty if many words are changed
+  // If >50% of words change, the transformation is likely too aggressive
   let changedWords = 0;
   for (let i = 0; i < Math.min(originalWords.length, fixedWords.length); i++) {
     if (originalWords[i].toLowerCase() !== fixedWords[i].toLowerCase()) {
@@ -74,15 +167,16 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
   }
   
   if (changedWords > originalWords.length * 0.5) {
-    confidence -= 0.3;
+    confidence -= 0.3; // Heavy penalty for extensive changes (likely over-correction)
   }
 
-  // Check for technical terms and proper nouns
+  // +0.1 per technical term (max +0.3): Slight confidence boost for technical content
+  // Technical content often has specific capitalization rules that should be preserved
   const technicalTermPattern = /\b(API|URL|HTML|CSS|JSON|XML|HTTP|HTTPS|SDK|CLI|GUI|UI|UX|SQL|NoSQL|REST|GraphQL|JWT|OAuth|CSRF|XSS|CORS|DNS|CDN|VPN|SSL|TLS|SSH|FTP|SMTP|POP|IMAP|TCP|UDP|IP|IPv4|IPv6|MAC|VLAN|LAN|WAN|WiFi|Bluetooth|USB|HDMI|GPU|CPU|RAM|SSD|HDD|OS|iOS|Android|Windows|Linux|macOS|Unix|AWS|Azure|GCP|Docker|Kubernetes|Git|GitHub|GitLab|npm|yarn|pip|conda|Maven|Gradle|Webpack|Rollup|Vite|React|Vue|Angular|Next|Nuxt|Express|Django|Flask|Rails|Laravel|Spring|Hibernate|MongoDB|PostgreSQL|MySQL|Redis|Elasticsearch|Kafka|RabbitMQ|Jenkins|CircleCI|GitHub Actions|Travis|Azure DevOps|Terraform|Ansible|Puppet|Chef|Vagrant|VMware|VirtualBox|Hyper-V|KVM|Xen|Node\.js|Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Swift|Kotlin|Scala|Ruby|PHP|Perl|R|MATLAB|Stata|SAS|SPSS|Tableau|PowerBI|Excel|Word|PowerPoint|Outlook|Teams|Slack|Discord|Zoom|WebEx|Skype|WhatsApp|Telegram|Signal|Firefox|Chrome|Safari|Edge|Opera|Brave|Tor|VPN|Proxy|Firewall|Antivirus|Malware|Ransomware|Phishing|Spear-phishing|Social engineering|Two-factor authentication|Multi-factor authentication|Single sign-on|Identity and access management|Role-based access control|Attribute-based access control|Discretionary access control|Mandatory access control|Bell-LaPadula|Biba|Clark-Wilson|Chinese Wall|Take-Grant|HRU|RBAC|ABAC|DAC|MAC|BLP|Biba|CW|TG|HRU)\b/gi;
   
   const technicalMatches = (original.match(technicalTermPattern) || []).length;
   if (technicalMatches > 0) {
-    confidence += 0.1 * Math.min(technicalMatches, 3);
+    confidence += 0.1 * Math.min(technicalMatches, 3); // Small boost per technical term, capped at 3
   }
 
   return Math.max(0, Math.min(1, confidence));
@@ -99,40 +193,49 @@ export function calculateBacktickConfidence(original, context = {}) {
     return 0;
   }
 
-  let confidence = 0.5; // Base confidence
+  let confidence = 0.5; // Base confidence: neutral starting point
 
-  // Higher confidence for clear file paths
+  // FILE PATH CONFIDENCE BOOSTS
+  // +0.4: Very high confidence for files with extensions (e.g., "src/utils/file.js")
+  // File paths with extensions are almost certainly code references
   if (original.includes('/') && /\.[a-zA-Z0-9]+$/.test(original)) {
-    confidence += 0.4; // Files with extensions
+    confidence += 0.4; // Strong indicator: file path with extension
   } else if (original.includes('/') && original.split('/').length > 2) {
-    confidence += 0.3; // Multi-segment paths
+    // +0.3: High confidence for deep directory paths (e.g., "src/components/ui")
+    confidence += 0.3; // Multi-segment paths are likely code references
   } else if (original.includes('/')) {
-    confidence += 0.1; // Simple paths like src/utils
+    // +0.1: Small confidence boost for simple paths (e.g., "src/utils")
+    confidence += 0.1; // Simple paths could be code or natural language
   }
 
-  // Higher confidence for common file names
+  // +0.3: High confidence for standalone filenames with common extensions
+  // Patterns like "package.json", "index.js", "README.md" are clearly code files
   if (/^[a-zA-Z0-9._-]+\.(json|js|ts|py|md|txt|yml|yaml|xml|html|css|scss|sh|sql|env|cfg|conf|ini|toml|lock|log)$/i.test(original)) {
-    confidence += 0.3;
+    confidence += 0.3; // Standalone filenames are strong code indicators
   }
 
-  // Higher confidence for import statements
+  // +0.2: Moderate confidence for import statements
+  // Anything starting with "import" is clearly code syntax
   if (/^import\s+\w+/.test(original)) {
-    confidence += 0.2;
+    confidence += 0.2; // Import statements are definitively code
   }
 
-  // Higher confidence for clear commands
-  if (/^(npm|yarn|git|docker|kubectl|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo|su|ps|top|htop|kill|killall|systemctl|service|crontab|tar|gzip|zip|unzip|cat|head|tail|less|more|vim|nano|emacs|code|open|explorer|ping|traceroute|nslookup|dig|netstat|ss|iptables|ufw|tcpdump|wireshark|nmap|john|hashcat|hydra|metasploit|burp|owasp|nikto|sqlmap|aircrack|reaver|hashcat|john|hydra|metasploit|burp|owasp|nikto|sqlmap|aircrack|reaver)\s/.test(original)) {
-    confidence += 0.3;
+  // +0.3: High confidence for command-line tools
+  // First word matches known command tools (git, npm, docker, etc.)
+  if (COMMAND_KEYWORDS.has(original.split(/\s+/)[0]?.toLowerCase())) {
+    confidence += 0.3; // Command tools are strong code indicators
   }
 
-  // Higher confidence for environment variables
+  // +0.2: Moderate confidence for environment variables
+  // ALL_CAPS_WITH_UNDERSCORES pattern typically indicates env vars
   if (/^[A-Z_][A-Z0-9_]*$/.test(original) && original.length > 2) {
-    confidence += 0.2;
+    confidence += 0.2; // Environment variable pattern
   }
 
-  // Higher confidence for code-like patterns
-  if (/\.(js|ts|jsx|tsx|py|java|c|cpp|cs|go|rs|rb|php|pl|sh|bash|zsh|fish|ps1|bat|cmd|sql|html|css|scss|sass|less|xml|json|yaml|yml|toml|ini|cfg|conf|config|env|gitignore|dockerignore|editorconfig|prettierrc|eslintrc|babelrc|tsconfigjson|packagejson|composerjson|gemfile|requirements\.txt|pipfile|cargo\.toml|go\.mod|pom\.xml|build\.gradle|webpack\.config\.js|rollup\.config\.js|vite\.config\.js|next\.config\.js|nuxt\.config\.js|vue\.config\.js|angular\.json|tsconfig\.json|jest\.config\.js|cypress\.json|playwright\.config\.js|storybook|readme\.md|changelog\.md|license|contributing\.md|code_of_conduct\.md|security\.md|pull_request_template\.md|issue_template\.md|funding\.yml|dependabot\.yml|codeql\.yml|ci\.yml|cd\.yml|deploy\.yml|release\.yml|test\.yml|build\.yml|lint\.yml|format\.yml|security\.yml|audit\.yml|update\.yml|backup\.yml|restore\.yml|migrate\.yml|seed\.yml|rollback\.yml|status\.yml|health\.yml|monitor\.yml|alert\.yml|log\.yml|trace\.yml|debug\.yml|profile\.yml|benchmark\.yml|load\.yml|stress\.yml|smoke\.yml|integration\.yml|unit\.yml|e2e\.yml|acceptance\.yml|contract\.yml|mutation\.yml|property\.yml|snapshot\.yml|visual\.yml|accessibility\.yml|performance\.yml|security\.yml|compliance\.yml|governance\.yml|risk\.yml|audit\.yml|review\.yml|approval\.yml|merge\.yml|conflict\.yml|rebase\.yml|cherry-pick\.yml|tag\.yml|branch\.yml|commit\.yml|push\.yml|pull\.yml|fetch\.yml|clone\.yml|fork\.yml|star\.yml|watch\.yml|follow\.yml|sponsor\.yml|donate\.yml|support\.yml|contact\.yml|feedback\.yml|report\.yml|request\.yml|suggestion\.yml|idea\.yml|proposal\.yml|rfc\.yml|adr\.yml|decision\.yml|meeting\.yml|agenda\.yml|minutes\.yml|action\.yml|task\.yml|todo\.yml|done\.yml|progress\.yml|status\.yml|update\.yml|news\.yml|announcement\.yml|release\.yml|changelog\.yml|version\.yml|migration\.yml|upgrade\.yml|downgrade\.yml|patch\.yml|hotfix\.yml|bugfix\.yml|feature\.yml|enhancement\.yml|improvement\.yml|optimization\.yml|refactor\.yml|cleanup\.yml|maintenance\.yml|deprecation\.yml|removal\.yml|addition\.yml|modification\.yml|update\.yml|change\.yml|fix\.yml|repair\.yml|restore\.yml|recover\.yml|backup\.yml|archive\.yml|export\.yml|import\.yml|sync\.yml|transfer\.yml|copy\.yml|move\.yml|delete\.yml|remove\.yml|purge\.yml|clean\.yml|clear\.yml|reset\.yml|restart\.yml|reload\.yml|refresh\.yml|renew\.yml|regenerate\.yml|rebuild\.yml|recreate\.yml|redeploy\.yml|republish\.yml|reprocess\.yml|rerun\.yml|retry\.yml|resume\.yml|pause\.yml|stop\.yml|start\.yml|enable\.yml|disable\.yml|activate\.yml|deactivate\.yml|install\.yml|uninstall\.yml|setup\.yml|configure\.yml|initialize\.yml|finalize\.yml|complete\.yml|finish\.yml|end\.yml|close\.yml|open\.yml|launch\.yml|execute\.yml|run\.yml|invoke\.yml|call\.yml|trigger\.yml|schedule\.yml|queue\.yml|process\.yml|handle\.yml|manage\.yml|control\.yml|monitor\.yml|observe\.yml|track\.yml|measure\.yml|analyze\.yml|evaluate\.yml|assess\.yml|validate\.yml|verify\.yml|confirm\.yml|approve\.yml|reject\.yml|accept\.yml|decline\.yml|allow\.yml|deny\.yml|grant\.yml|revoke\.yml|assign\.yml|unassign\.yml|allocate\.yml|deallocate\.yml|reserve\.yml|release\.yml|lock\.yml|unlock\.yml|secure\.yml|unsecure\.yml|protect\.yml|unprotect\.yml|encrypt\.yml|decrypt\.yml|sign\.yml|verify\.yml|authenticate\.yml|authorize\.yml|login\.yml|logout\.yml|signin\.yml|signout\.yml|register\.yml|unregister\.yml|subscribe\.yml|unsubscribe\.yml|join\.yml|leave\.yml|enter\.yml|exit\.yml|connect\.yml|disconnect\.yml|link\.yml|unlink\.yml|bind\.yml|unbind\.yml|attach\.yml|detach\.yml|mount\.yml|unmount\.yml|load\.yml|unload\.yml|save\.yml|persist\.yml|store\.yml|retrieve\.yml|fetch\.yml|get\.yml|set\.yml|put\.yml|post\.yml|patch\.yml|delete\.yml|head\.yml|options\.yml|trace\.yml|connect\.yml)$/.test(original)) {
-    confidence += 0.2;
+  // +0.2: Moderate confidence for file extensions
+  // Single words that match common file extensions
+  if (FILE_EXTENSION_KEYWORDS.has(getFileExtension(original))) {
+    confidence += 0.2; // File extension references
   }
 
   // Lower confidence for common English words and natural language phrases
@@ -166,29 +269,42 @@ export function calculateBacktickConfidence(original, context = {}) {
     /^(easy|hard|simple|complex|basic|advanced|tough|difficult)$/i, // Complexity words
   ];
 
+  // CONFIDENCE PENALTIES FOR NATURAL LANGUAGE
+  // These penalties help avoid false positives by heavily penalizing common English
+  
   if (commonWords.includes(original.toLowerCase())) {
-    confidence -= 0.7; // Strong penalty for common words
+    // -0.7: Strong penalty for very common English words (is, the, and, etc.)
+    // These words are almost never appropriate for backticks
+    confidence -= 0.7; // Heavy penalty: common English words rarely need backticks
   } else if (naturalLanguagePhrases.includes(original.toLowerCase())) {
-    confidence -= 0.9; // Very strong penalty for natural language phrases
+    // -0.9: Very strong penalty for natural language phrases (pass/fail, on/off, etc.)
+    // These compound phrases are descriptive, not code
+    confidence -= 0.9; // Severe penalty: natural language phrases shouldn't be code
   } else if (problematicPatterns.some(pattern => pattern.test(original))) {
-    confidence -= 0.5; // Moderate penalty for problematic patterns
+    // -0.5: Moderate penalty for patterns that commonly cause false positives
+    // Short words, colors, numbers, etc. that could be either
+    confidence -= 0.5; // Moderate penalty: ambiguous patterns
   }
 
-  // Lower confidence for very short terms that could be ambiguous
+  // -0.3: Moderate penalty for very short terms (≤2 chars)
+  // Short terms like "is", "or", "it" are usually English, not code
   if (original.length <= 2) {
-    confidence -= 0.3;
+    confidence -= 0.3; // Short terms are usually natural language
   }
 
-  // Lower confidence for terms that contain only letters (no technical indicators)
+  // -0.2: Small penalty for short letter-only words without technical indicators
+  // Words like "test", "user", "data" could be either code or English
   if (/^[a-zA-Z]+$/.test(original) && original.length < 5) {
-    confidence -= 0.2;
+    confidence -= 0.2; // Short letter-only words are ambiguous
   }
 
-  // Context-aware safety checks
+  // CONTEXT-AWARE ADJUSTMENTS
+  // Analyze the surrounding line content to make smarter decisions
   if (context && context.line) {
     const line = context.line.toLowerCase();
     
-    // Lower confidence if the text appears in obviously natural language contexts
+    // -0.3: Moderate penalty for natural language context
+    // If the line contains phrases that indicate natural language discussion
     const naturalLanguageIndicators = [
       'is a', 'are a', 'was a', 'were a', 'this is', 'that is', 'it is', 'he is', 'she is',
       'would be', 'could be', 'should be', 'might be', 'must be',
@@ -199,16 +315,18 @@ export function calculateBacktickConfidence(original, context = {}) {
     ];
     
     if (naturalLanguageIndicators.some(indicator => line.includes(indicator))) {
-      confidence -= 0.3;
+      confidence -= 0.3; // Natural language context reduces code likelihood
     }
     
-    // Lower confidence if the term appears multiple times in normal prose
+    // -0.2: Small penalty for repeated terms in prose
+    // If the same term appears multiple times in one line, it's likely natural language
     const termCount = (line.match(new RegExp(`\\b${original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')) || []).length;
     if (termCount > 1) {
-      confidence -= 0.2;
+      confidence -= 0.2; // Repeated terms suggest natural language usage
     }
     
-    // Higher confidence if the text appears in technical contexts
+    // +0.2: Moderate confidence boost for technical context
+    // If the line contains technical keywords, increase code likelihood
     const technicalIndicators = [
       'install', 'configure', 'setup', 'deploy', 'build', 'compile', 'run', 'execute',
       'command', 'script', 'function', 'method', 'class', 'variable', 'parameter',
@@ -217,7 +335,7 @@ export function calculateBacktickConfidence(original, context = {}) {
     ];
     
     if (technicalIndicators.some(indicator => line.includes(indicator))) {
-      confidence += 0.2;
+      confidence += 0.2; // Technical context increases code likelihood
     }
   }
 
@@ -255,9 +373,9 @@ export function analyzeCodeVsNaturalLanguage(text, context = {}) {
 
   // Strong code indicators
   const strongCodeIndicators = [
-    /\.(js|ts|jsx|tsx|py|java|c|cpp|cs|go|rs|rb|php|pl|sh|bash|zsh|fish|ps1|bat|cmd|sql|html|css|scss|sass|less|xml|json|yaml|yml|toml|ini|cfg|conf|config|env)$/i,
+    new RegExp(`\\.(${Array.from(FILE_EXTENSION_KEYWORDS).join('|')})$`, 'i'),
     /^[A-Z_][A-Z0-9_]*$/, // ENVIRONMENT_VARIABLES
-    /^(npm|yarn|pip|git|docker|kubectl|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo)\s/,
+    new RegExp(`^(${Array.from(COMMAND_KEYWORDS).join('|')})\\s`),
     /\(.*\)$/, // Function calls
     /^import\s+/,
     /^from\s+.*import/,
