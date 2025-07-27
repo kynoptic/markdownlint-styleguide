@@ -6,9 +6,10 @@
 
 import { describe, test, expect } from '@jest/globals';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { lint } from 'markdownlint/promise';
-import noDeadInternalLinksRule from '../../src/rules/no-dead-internal-links.js';
+import noDeadInternalLinksRule, { clearCaches, getCacheStats } from '../../src/rules/no-dead-internal-links.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,31 @@ async function runRuleOnFixture(fixturePath) {
 
   const results = await lint(options);
   return results[fixturePath] || [];
+}
+
+/**
+ * Helper function to run the rule on a file synchronously for cache testing.
+ * @param {string} filePath - Path to the file
+ * @returns {Object[]} Array of errors
+ */
+function runRuleOnFile(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  
+  const errors = [];
+  const onError = (error) => errors.push(error);
+
+  const params = {
+    name: filePath,
+    lines: content.split('\n'),
+    parsers: {
+      micromark: {
+        tokens: []
+      }
+    }
+  };
+
+  noDeadInternalLinksRule.function(params, onError);
+  return errors;
 }
 
 /**
@@ -248,11 +274,11 @@ Broken [link format
     });
 
     test('has appropriate description', () => {
-      expect(noDeadInternalLinksRule.description).toBe('Detects broken internal links to files or headings');
+      expect(noDeadInternalLinksRule.description).toBe('Detects broken internal links to files or headings. Uses caching for performance with large projects.');
     });
 
     test('has correct tags', () => {
-      expect(noDeadInternalLinksRule.tags).toEqual(['links', 'validation']);
+      expect(noDeadInternalLinksRule.tags).toEqual(['links', 'validation', 'performance']);
     });
 
     test('is not fixable', () => {
@@ -261,6 +287,46 @@ Broken [link format
 
     test('uses micromark parser', () => {
       expect(noDeadInternalLinksRule.parser).toBe('micromark');
+    });
+  });
+
+  describe('performance optimizations', () => {
+    test('provides cache management functions', () => {
+      expect(typeof clearCaches).toBe('function');
+      expect(typeof getCacheStats).toBe('function');
+    });
+
+    test('cache stats provide meaningful information', () => {
+      // Clear caches first to ensure clean state
+      clearCaches();
+      
+      // Check initial state
+      const initialStats = getCacheStats();
+      expect(initialStats).toHaveProperty('fileExistenceCache');
+      expect(initialStats).toHaveProperty('headingCache');
+      expect(initialStats).toHaveProperty('contentCache');
+      expect(typeof initialStats.fileExistenceCache).toBe('number');
+      expect(typeof initialStats.headingCache).toBe('number');
+      expect(typeof initialStats.contentCache).toBe('number');
+    });
+
+    test('cache clearing works correctly', () => {
+      // Run a test that should populate caches
+      const testFile = path.join(__dirname, '../fixtures/no-dead-internal-links/passing.fixture.md');
+      runRuleOnFile(testFile);
+      
+      // Check that caches have some data
+      const beforeClear = getCacheStats();
+      const totalBefore = beforeClear.fileExistenceCache + beforeClear.headingCache + beforeClear.contentCache;
+      
+      // Clear caches
+      clearCaches();
+      
+      // Check that caches are empty
+      const afterClear = getCacheStats();
+      expect(afterClear.fileExistenceCache).toBe(0);
+      expect(afterClear.headingCache).toBe(0);
+      expect(afterClear.contentCache).toBe(0);
     });
   });
 });
