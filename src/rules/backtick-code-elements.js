@@ -9,6 +9,88 @@ import { backtickIgnoredTerms as ignoredTerms } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
+ * Generate a contextual error message based on the type of violation detected.
+ * @param {string} text - The text that triggered the violation
+ * @param {string} line - The full line context
+ * @returns {string} A descriptive error message
+ */
+function generateContextualErrorMessage(text, line) {
+  // Shell commands with arguments (highest priority)
+  if (/^(git|npm|pip|yarn|docker|brew|cargo|pnpm|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo|su|ps|top|htop|kill|killall|systemctl|service|crontab|tar|gzip|zip|unzip|cat|head|tail|less|more|vim|nano|emacs|code|ping|traceroute|nslookup|dig|netstat|ss)\s/.test(text)) {
+    return `Command '${text}' should be wrapped in backticks to distinguish it from regular text`;
+  }
+
+  // Shell commands with $ variables
+  if (text.includes('$') && (text.includes('grep') || text.includes('export') || text.includes('set'))) {
+    return `Shell command '${text}' should be wrapped in backticks to show it's a code example`;
+  }
+
+  // File paths (containing forward slashes)
+  if (text.includes('/')) {
+    if (/\.[a-zA-Z0-9]+$/.test(text)) {
+      return `File path '${text}' should be wrapped in backticks for clarity and to distinguish it from regular text`;
+    } else if (/\/$/.test(text)) {
+      return `Directory path '${text}' should be wrapped in backticks to show it's a file system location`;
+    } else {
+      return `Path '${text}' should be wrapped in backticks to indicate it's a file system reference`;
+    }
+  }
+
+  // File names with extensions
+  if (/^[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{1,5}$/.test(text)) {
+    return `Filename '${text}' should be wrapped in backticks to distinguish it from regular text`;
+  }
+
+  // Dotfiles (starting with .)
+  if (/^\.[a-zA-Z]/.test(text)) {
+    return `Configuration file '${text}' should be wrapped in backticks to show it's a filename`;
+  }
+
+  // Environment variables (ALL_CAPS with underscores)
+  if (/^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(text) || /^(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)$/.test(text)) {
+    return `Environment variable '${text}' should be wrapped in backticks to indicate it's a system variable`;
+  }
+
+  // Shell variables (starting with $)
+  if (/^\$/.test(text)) {
+    return `Shell variable '${text}' should be wrapped in backticks to show it's a variable reference`;
+  }
+
+  // Command line flags (starting with - or --)
+  if (/^--?[a-zA-Z]/.test(text)) {
+    return `Command flag '${text}' should be wrapped in backticks to show it's a command option`;
+  }
+
+  // Function calls (text with parentheses)
+  if (/\([^)]*\)$/.test(text)) {
+    return `Function call '${text}' should be wrapped in backticks to show it's code`;
+  }
+
+  // Import statements
+  if (/^import\s+/.test(text)) {
+    return `Import statement '${text}' should be wrapped in backticks to show it's code`;
+  }
+
+  // Key combinations (CTRL+C, ALT+TAB, etc.)
+  if (/^[A-Z]+\+[A-Z]+$/.test(text)) {
+    return `Key combination '${text}' should be wrapped in backticks to distinguish it from regular text`;
+  }
+
+  // Host:port patterns
+  if (/^[A-Za-z0-9.-]+:\d+$/.test(text)) {
+    return `Network address '${text}' should be wrapped in backticks to show it's a technical reference`;
+  }
+
+  // Variable assignments (export VAR=value, set VAR=value)
+  if (/^(?:export|set)\s+/.test(text)) {
+    return `Variable assignment '${text}' should be wrapped in backticks to show it's a shell command`;
+  }
+
+  // Default fallback message
+  return `Code-like element '${text}' should be wrapped in backticks for better readability`;
+}
+
+/**
  * markdownlint rule enforcing backticks around file paths and commands.
  *
  * @param {import('markdownlint').RuleParams} params - Parsed Markdown input.
@@ -32,14 +114,6 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-    // Special flag for lines containing $
-    if (line.includes('$')) {
-      
-      // Extra debug for lines containing specific patterns we're looking for
-      if (line.includes('$pattern') || line.includes('$value')) {
-        
-      }
-    }
 
     // Detect both ``` and ~~~ as code block fences (ATX or tilde).
     const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
@@ -51,7 +125,6 @@ function backtickCodeElements(params, onError) {
     // Detect $$ as math block fences.
     if (line.trim() === '$$') {
       inMathBlock = !inMathBlock;
-      
       continue;
     }
     
@@ -59,7 +132,6 @@ function backtickCodeElements(params, onError) {
     // NOTE: We skip headings and code blocks entirely but for math blocks
     // we need to check if the line contains code-like patterns outside of math expressions
     if (inCodeBlock || /^\s*#/.test(line)) {
-      
       continue;
     }
     
@@ -72,11 +144,7 @@ function backtickCodeElements(params, onError) {
       // 2. export with variable assignment: export x=$value
       const hasShellPattern = /(?:grep\s+\$\w+|export\s+(?:\w+=)?\$\w+)/.test(line);
       
-      if (hasShellPattern) {
-        
-        // Continue processing this line to catch the shell pattern
-      } else {
-        
+      if (!hasShellPattern) {
         continue;
       }
     }
@@ -275,26 +343,18 @@ function backtickCodeElements(params, onError) {
         }
         // Skip if inside a Markdown link, wiki link, or HTML comment
         if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
-          // eslint-disable-next-line no-console
-
           continue;
         }
         // Skip if in ignored terms
         if (ignoredTerms.has(fullMatch)) {
-          // eslint-disable-next-line no-console
-
           continue;
         }
         // Skip if already flagged
         if (flaggedPositions.has(start)) {
-          // eslint-disable-next-line no-console
-
           continue;
         }
         // Only skip if this match is inside a true LaTeX math region
         if (inLatexMath(line, start, end)) {
-          // eslint-disable-next-line no-console
-
           continue;
         }
         // Skip if inside a URL (e.g., after http:// or https://)
@@ -308,8 +368,6 @@ function backtickCodeElements(params, onError) {
           }
         }
         if (isInUrl) {
-          // eslint-disable-next-line no-console
-
           continue;
         }
 
@@ -317,29 +375,49 @@ function backtickCodeElements(params, onError) {
         if (fullMatch.includes('$') && fullMatch.includes(' ') &&
             (fullMatch.includes('grep') || fullMatch.includes('export'))) {
           // This is a shell command - report it and skip further matches on this line
+          const originalFixInfo = {
+            editColumn: start + 1,
+            deleteCount: fullMatch.length,
+            insertText: `\`${fullMatch}\``,
+          };
+          
+          const safeFixInfo = createSafeFixInfo(
+            originalFixInfo,
+            'backtick',
+            fullMatch,
+            `\`${fullMatch}\``,
+            { type: 'shell-command', line }
+          );
+          
           onError({
             lineNumber,
-            detail: `Wrap command ${fullMatch} in backticks.`,
+            detail: generateContextualErrorMessage(fullMatch, line),
             context: fullMatch,
             range: [start + 1, fullMatch.length], // Convert to 1-indexed
-            fixInfo: {
-              editColumn: start + 1,
-              deleteCount: fullMatch.length,
-              insertText: `\`${fullMatch}\``,
-            },
+            fixInfo: safeFixInfo,
           });
         } else if (!fullMatch.startsWith('$')) {
           // For non-shell variables, report normally
+          const originalFixInfo = {
+            editColumn: start + 1,
+            deleteCount: fullMatch.length,
+            insertText: `\`${fullMatch}\``,
+          };
+          
+          const safeFixInfo = createSafeFixInfo(
+            originalFixInfo,
+            'backtick',
+            fullMatch,
+            `\`${fullMatch}\``,
+            { type: 'code-element', line }
+          );
+          
           onError({
             lineNumber,
-            detail: `Wrap code-like element ${fullMatch} in backticks.`,
+            detail: generateContextualErrorMessage(fullMatch, line),
             context: fullMatch,
             range: [start + 1, fullMatch.length], // Convert to 1-indexed
-            fixInfo: {
-              editColumn: start + 1,
-              deleteCount: fullMatch.length,
-              insertText: `\`${fullMatch}\``,
-            },
+            fixInfo: safeFixInfo,
           });
         }
         flaggedPositions.add(start);
