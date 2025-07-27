@@ -92,17 +92,11 @@ describe('Performance Tests', () => {
     expect(largeContent.length).toBeGreaterThan(50000); // At least 50KB
     expect(largeContent.split('\n').length).toBeGreaterThan(1000); // At least 1000 lines
     
-    console.log(`Generated test content: ${largeContent.length} characters, ${largeContent.split('\n').length} lines`);
   });
 
   test('sentence-case-heading performance', async () => {
     const results = await measureRulePerformance(sentenceRule, largeContent, 'sentence-case-heading');
     
-    console.log(`\nSentence Case Heading Performance:`);
-    console.log(`Duration: ${results.duration.toFixed(2)}ms`);
-    console.log(`Content: ${results.contentLength} chars, ${results.contentLines} lines`);
-    console.log(`Violations found: ${results.violations}`);
-    console.log(`Performance: ${(results.contentLength / results.duration * 1000).toFixed(0)} chars/second`);
     
     // Performance assertions
     expect(results.duration).toBeLessThan(PERFORMANCE_THRESHOLD);
@@ -112,11 +106,6 @@ describe('Performance Tests', () => {
   test('backtick-code-elements performance', async () => {
     const results = await measureRulePerformance(backtickRule, largeContent, 'backtick-code-elements');
     
-    console.log(`\nBacktick Code Elements Performance:`);
-    console.log(`Duration: ${results.duration.toFixed(2)}ms`);
-    console.log(`Content: ${results.contentLength} chars, ${results.contentLines} lines`);
-    console.log(`Violations found: ${results.violations}`);
-    console.log(`Performance: ${(results.contentLength / results.duration * 1000).toFixed(0)} chars/second`);
     
     expect(results.duration).toBeLessThan(PERFORMANCE_THRESHOLD);
     expect(results.violations).toBeGreaterThan(0);
@@ -126,12 +115,7 @@ describe('Performance Tests', () => {
     const sentenceResults = await measureRulePerformance(sentenceRule, largeContent, 'sentence-case-heading');
     const backtickResults = await measureRulePerformance(backtickRule, largeContent, 'backtick-code-elements');
     
-    console.log(`\nPerformance Comparison:`);
-    console.log(`Sentence rule: ${sentenceResults.duration.toFixed(2)}ms`);
-    console.log(`Backtick rule: ${backtickResults.duration.toFixed(2)}ms`);
-    
     const totalDuration = sentenceResults.duration + backtickResults.duration;
-    console.log(`Combined duration: ${totalDuration.toFixed(2)}ms`);
     
     // Both rules together should still be reasonable
     expect(totalDuration).toBeLessThan(PERFORMANCE_THRESHOLD * 2);
@@ -149,10 +133,6 @@ describe('Performance Tests', () => {
     const memEnd = process.memoryUsage();
     const memDiff = memEnd.heapUsed - memStart.heapUsed;
     
-    console.log(`\nMemory Usage:`);
-    console.log(`Starting heap: ${(memStart.heapUsed / 1024 / 1024).toFixed(2)} MB`);
-    console.log(`Ending heap: ${(memEnd.heapUsed / 1024 / 1024).toFixed(2)} MB`);
-    console.log(`Difference: ${(memDiff / 1024 / 1024).toFixed(2)} MB`);
     
     // Memory usage shouldn't grow excessively (allow some variance)
     expect(memDiff).toBeLessThan(50 * 1024 * 1024); // Less than 50MB growth

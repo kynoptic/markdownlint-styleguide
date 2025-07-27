@@ -181,26 +181,11 @@ describe.skip('Integration Tests - Curated Repositories', () => {
 
       test('sentence-case-heading rule analysis', async () => {
         if (markdownFiles.length === 0) {
-          console.log(`Skipping ${repo.name} - no markdown files found`);
           return;
         }
 
         const results = await testRuleAgainstFiles(sentenceRule, markdownFiles, 'sentence-case-heading');
         
-        // Log results for analysis
-        console.log(`\n${repo.name} - Sentence Case Results:`);
-        console.log(`Files tested: ${results.totalFiles}`);
-        console.log(`Files with violations: ${results.filesWithViolations}`);
-        console.log(`Total violations: ${results.totalViolations}`);
-        console.log(`Error rate: ${(results.filesWithViolations / results.totalFiles * 100).toFixed(1)}%`);
-        
-        if (results.violations.length > 0) {
-          console.log('Sample violations:');
-          results.violations.slice(0, 3).forEach(v => {
-            console.log(`  ${v.file}: ${v.violations.length} violations`);
-          });
-        }
-
         // These are discovery tests - we don't assert specific numbers
         // but we do want to ensure the rule doesn't crash
         expect(results.errors.length).toBe(0);
@@ -209,39 +194,19 @@ describe.skip('Integration Tests - Curated Repositories', () => {
 
       test('backtick-code-elements rule analysis', async () => {
         if (markdownFiles.length === 0) {
-          console.log(`Skipping ${repo.name} - no markdown files found`);
           return;
         }
 
         const results = await testRuleAgainstFiles(backtickRule, markdownFiles, 'backtick-code-elements');
         
-        console.log(`\n${repo.name} - Backtick Code Elements Results:`);
-        console.log(`Files tested: ${results.totalFiles}`);
-        console.log(`Files with violations: ${results.filesWithViolations}`);
-        console.log(`Total violations: ${results.totalViolations}`);
-        console.log(`Error rate: ${(results.filesWithViolations / results.totalFiles * 100).toFixed(1)}%`);
-        
-        if (results.violations.length > 0) {
-          console.log('Sample violations:');
-          results.violations.slice(0, 3).forEach(v => {
-            console.log(`  ${v.file}: ${v.violations.length} violations`);
-          });
-        }
-
         expect(results.errors.length).toBe(0);
         expect(results.totalFiles).toBeGreaterThan(0);
       }, TIMEOUT);
 
       test('integration summary', () => {
         if (markdownFiles.length === 0) {
-          console.log(`${repo.name}: No files tested - likely repository access issue`);
           return;
         }
-
-        console.log(`\n${repo.name} Integration Summary:`);
-        console.log(`Description: ${repo.description}`);
-        console.log(`Files analyzed: ${markdownFiles.length}`);
-        console.log(`Repository: ${repo.url}`);
         
         // This test always passes - it's for reporting
         expect(true).toBe(true);

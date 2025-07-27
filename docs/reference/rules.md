@@ -231,23 +231,6 @@ Choose the format that best fits your content:
 - Use autolinks when the URL itself is the important information
 - Use reference style for multiple references to the same URL
 
-## `no-dead-internal-links`
-
-Checks for dead internal links.
-
-### Examples
-
-**Passing:**
-
-```markdown
-[link](./README.md)
-```
-
-**Failing:**
-
-```markdown
-[link](./DOES_NOT_EXIST.md)
-```
 
 ## `no-literal-ampersand` (NLA001)
 
