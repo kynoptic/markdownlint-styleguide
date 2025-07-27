@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _configValidation = require("./config-validation.cjs");
 // @ts-check
 
 /**
@@ -15,19 +16,22 @@ exports.default = void 0;
  * Check if a character position is inside a code block, inline code, or other special context.
  * @param {string} line - The line content
  * @param {number} position - Character position to check
+ * @param {boolean} skipInlineCode - Whether to skip inline code contexts
  * @returns {boolean} True if position should be ignored
  */
-function isInSpecialContext(line, position) {
-  // Check if inside inline code (backticks)
-  let backtickCount = 0;
-  for (let i = 0; i < position; i++) {
-    if (line[i] === '`') {
-      backtickCount++;
+function isInSpecialContext(line, position, skipInlineCode = true) {
+  // Check if inside inline code (backticks) based on configuration
+  if (skipInlineCode) {
+    let backtickCount = 0;
+    for (let i = 0; i < position; i++) {
+      if (line[i] === '`') {
+        backtickCount++;
+      }
     }
-  }
-  // If odd number of backticks before position, we're inside inline code
-  if (backtickCount % 2 === 1) {
-    return true;
+    // If odd number of backticks before position, we're inside inline code
+    if (backtickCount % 2 === 1) {
+      return true;
+    }
   }
 
   // Check if inside HTML tag or entity
@@ -74,12 +78,22 @@ function isInSpecialContext(line, position) {
  * Check if an ampersand should be flagged as a violation.
  * @param {string} line - The line content
  * @param {number} position - Position of the ampersand
+ * @param {boolean} skipInlineCode - Whether to skip inline code contexts
+ * @param {string[]} exceptions - Array of exception patterns
  * @returns {boolean} True if this ampersand should be flagged
  */
-function shouldFlagAmpersand(line, position) {
+function shouldFlagAmpersand(line, position, skipInlineCode = true, exceptions = []) {
   // Skip if in special context
-  if (isInSpecialContext(line, position)) {
+  if (isInSpecialContext(line, position, skipInlineCode)) {
     return false;
+  }
+
+  // Check if this ampersand matches any exception patterns
+  for (const exception of exceptions) {
+    const regex = new RegExp(exception.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    if (regex.test(line)) {
+      return false;
+    }
   }
 
   // Get characters before and after the ampersand
@@ -138,6 +152,24 @@ function noLiteralAmpersand(params, onError) {
   if (!params || !params.lines || typeof onError !== 'function') {
     return;
   }
+  const config = params.config?.['no-literal-ampersand'] || params.config?.NLA001 || {};
+
+  // Validate configuration
+  const configSchema = {
+    exceptions: _configValidation.validateStringArray,
+    skipCodeBlocks: _configValidation.validateBoolean,
+    skipInlineCode: _configValidation.validateBoolean
+  };
+  const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-literal-ampersand');
+  if (!validationResult.isValid) {
+    (0, _configValidation.logValidationErrors)('no-literal-ampersand', validationResult.errors);
+    // Continue execution with default values to prevent crashes
+  }
+
+  // Extract configuration with defaults
+  const exceptions = Array.isArray(config.exceptions) ? config.exceptions : [];
+  const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true;
+  const skipInlineCode = typeof config.skipInlineCode === 'boolean' ? config.skipInlineCode : true;
   const lines = params.lines;
   const codeBlockLines = getCodeBlockLines(lines);
   for (let i = 0; i < lines.length; i++) {
@@ -149,15 +181,15 @@ function noLiteralAmpersand(params, onError) {
       continue;
     }
 
-    // Skip lines in code blocks
-    if (codeBlockLines[i]) {
+    // Skip lines in code blocks based on configuration
+    if (skipCodeBlocks && codeBlockLines[i]) {
       continue;
     }
 
     // Find all ampersands in the line
     for (let pos = 0; pos < line.length; pos++) {
       if (line[pos] === '&') {
-        if (shouldFlagAmpersand(line, pos)) {
+        if (shouldFlagAmpersand(line, pos, skipInlineCode, exceptions)) {
           // Always provide fix for ampersand replacement since it's a safe operation
           const fixInfo = {
             editColumn: pos + 1,

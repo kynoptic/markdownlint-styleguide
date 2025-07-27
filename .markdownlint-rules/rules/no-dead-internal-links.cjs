@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _fs = _interopRequireDefault(require("fs"));
 var _path = _interopRequireDefault(require("path"));
+var _configValidation = require("./config-validation.cjs");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 // @ts-check
 
@@ -104,6 +105,24 @@ function noDeadInternalLinks(params, onError) {
   if (!params || !params.lines || typeof onError !== 'function') {
     return;
   }
+  const config = params.config?.['no-dead-internal-links'] || params.config?.DL001 || {};
+
+  // Validate configuration
+  const configSchema = {
+    ignoredPaths: _configValidation.validateStringArray,
+    checkAnchors: _configValidation.validateBoolean,
+    allowedExtensions: _configValidation.validateStringArray
+  };
+  const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-dead-internal-links');
+  if (!validationResult.isValid) {
+    (0, _configValidation.logValidationErrors)('no-dead-internal-links', validationResult.errors);
+    // Continue execution with default values to prevent crashes
+  }
+
+  // Extract configuration with defaults
+  const ignoredPaths = Array.isArray(config.ignoredPaths) ? config.ignoredPaths : [];
+  const checkAnchors = typeof config.checkAnchors === 'boolean' ? config.checkAnchors : true;
+  const allowedExtensions = Array.isArray(config.allowedExtensions) ? config.allowedExtensions : ['.md', '.markdown'];
   const lines = params.lines;
   const currentFile = params.name || '';
 
@@ -133,17 +152,19 @@ function noDeadInternalLinks(params, onError) {
 
       // Skip links that start with # (same-page anchors)
       if (linkUrl.startsWith('#')) {
-        // Could validate these against current file's headings
-        const anchor = linkUrl.substring(1);
-        if (anchor && currentFile) {
-          const currentFileHeadings = extractHeadings(params.lines.join('\n'));
-          if (!currentFileHeadings.includes(anchor)) {
-            onError({
-              lineNumber,
-              detail: `Heading anchor "#${anchor}" not found in current file`,
-              context: match[0],
-              range: [columnStart, match[0].length]
-            });
+        // Validate these against current file's headings if configured
+        if (checkAnchors) {
+          const anchor = linkUrl.substring(1);
+          if (anchor && currentFile) {
+            const currentFileHeadings = extractHeadings(params.lines.join('\n'));
+            if (!currentFileHeadings.includes(anchor)) {
+              onError({
+                lineNumber,
+                detail: `Heading anchor "#${anchor}" not found in current file`,
+                context: match[0],
+                range: [columnStart, match[0].length]
+              });
+            }
           }
         }
         continue;
@@ -152,6 +173,11 @@ function noDeadInternalLinks(params, onError) {
       // Parse the link URL to separate file path and anchor
       const [filePath, anchor] = linkUrl.split('#');
       if (filePath) {
+        // Check if this path should be ignored
+        if (ignoredPaths.some(ignored => filePath.includes(ignored))) {
+          continue;
+        }
+
         // Resolve the relative path
         const resolvedPath = resolvePath(currentFile, filePath);
 
@@ -166,9 +192,14 @@ function noDeadInternalLinks(params, onError) {
         } else {
           exists = fileExists(resolvedPath);
 
-          // If not found and doesn't have extension, try with .md
+          // If not found and doesn't have extension, try with allowed extensions
           if (!exists && !_path.default.extname(filePath)) {
-            exists = fileExists(resolvedPath + '.md');
+            for (const ext of allowedExtensions) {
+              if (fileExists(resolvedPath + ext)) {
+                exists = true;
+                break;
+              }
+            }
           }
         }
         if (!exists) {
@@ -178,11 +209,17 @@ function noDeadInternalLinks(params, onError) {
             context: match[0],
             range: [columnStart, match[0].length]
           });
-        } else if (anchor) {
+        } else if (anchor && checkAnchors) {
           // If file exists and there's an anchor, validate the anchor
           let targetFile = resolvedPath;
-          if (!_path.default.extname(filePath) && fileExists(resolvedPath + '.md')) {
-            targetFile = resolvedPath + '.md';
+          if (!_path.default.extname(filePath)) {
+            // Try to find the file with an allowed extension
+            for (const ext of allowedExtensions) {
+              if (fileExists(resolvedPath + ext)) {
+                targetFile = resolvedPath + ext;
+                break;
+              }
+            }
           }
           if (!anchorExists(targetFile, anchor)) {
             onError({

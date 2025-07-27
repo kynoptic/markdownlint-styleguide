@@ -1,0 +1,2812 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests api documentation patterns: backtick-api 1`] = `
+[
+  {
+    "errorContext": "\`\`\`json",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 22,
+    },
+    "lineNumber": 22,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`json",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 40,
+    },
+    "lineNumber": 40,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "- limit (optional): Number of ...",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+    },
+    "lineNumber": 18,
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      3,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 4,
+      "insertText": "
+",
+    },
+    "lineNumber": 67,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests github documentation patterns: backtick-github 1`] = `
+[
+  {
+    "errorContext": "feature/amazing-feature",
+    "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
+    "errorRange": [
+      45,
+      23,
+    ],
+    "fixInfo": {
+      "deleteCount": 23,
+      "editColumn": 45,
+      "insertText": "\`feature/amazing-feature\`",
+    },
+    "lineNumber": 46,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "-b",
+    "errorDetail": "Command flag '-b' should be wrapped in backticks to show it's a command option",
+    "errorRange": [
+      42,
+      2,
+    ],
+    "fixInfo": null,
+    "lineNumber": 46,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "git checkout",
+    "errorDetail": "Command 'git checkout' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      29,
+      12,
+    ],
+    "fixInfo": {
+      "deleteCount": 12,
+      "editColumn": 29,
+      "insertText": "\`git checkout\`",
+    },
+    "lineNumber": 46,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "-m",
+    "errorDetail": "Command flag '-m' should be wrapped in backticks to show it's a command option",
+    "errorRange": [
+      36,
+      2,
+    ],
+    "fixInfo": null,
+    "lineNumber": 47,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "git commit",
+    "errorDetail": "Command 'git commit' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      25,
+      10,
+    ],
+    "fixInfo": {
+      "deleteCount": 10,
+      "editColumn": 25,
+      "insertText": "\`git commit\`",
+    },
+    "lineNumber": 47,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "feature/amazing-feature",
+    "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
+    "errorRange": [
+      40,
+      23,
+    ],
+    "fixInfo": {
+      "deleteCount": 23,
+      "editColumn": 40,
+      "insertText": "\`feature/amazing-feature\`",
+    },
+    "lineNumber": 48,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "git push",
+    "errorDetail": "Command 'git push' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      24,
+      8,
+    ],
+    "fixInfo": {
+      "deleteCount": 8,
+      "editColumn": 24,
+      "insertText": "\`git push\`",
+    },
+    "lineNumber": 48,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": "Expected: 80; Actual: 93",
+    "errorRange": [
+      81,
+      13,
+    ],
+    "fixInfo": null,
+    "lineNumber": 53,
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
+    "ruleNames": [
+      "MD013",
+      "line-length",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 17,
+    },
+    "lineNumber": 17,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 23,
+    },
+    "lineNumber": 23,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 28,
+    },
+    "lineNumber": 28,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 33,
+    },
+    "lineNumber": 33,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      93,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 94,
+      "insertText": "
+",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests nextjs documentation patterns: backtick-nextjs 1`] = `
+[
+  {
+    "errorContext": "Next.js",
+    "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      21,
+      7,
+    ],
+    "fixInfo": {
+      "deleteCount": 7,
+      "editColumn": 21,
+      "insertText": "\`Next.js\`",
+    },
+    "lineNumber": 5,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "pages/api",
+    "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
+    "errorRange": [
+      26,
+      9,
+    ],
+    "fixInfo": {
+      "deleteCount": 9,
+      "editColumn": 26,
+      "insertText": "\`pages/api\`",
+    },
+    "lineNumber": 15,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "pages/api/hello.js",
+    "errorDetail": "File path 'pages/api/hello.js' should be wrapped in backticks for clarity and to distinguish it from regular text",
+    "errorRange": [
+      22,
+      18,
+    ],
+    "fixInfo": {
+      "deleteCount": 18,
+      "editColumn": 22,
+      "insertText": "\`pages/api/hello.js\`",
+    },
+    "lineNumber": 17,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "hello.js",
+    "errorDetail": "Filename 'hello.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      32,
+      8,
+    ],
+    "fixInfo": {
+      "deleteCount": 8,
+      "editColumn": 32,
+      "insertText": "\`hello.js\`",
+    },
+    "lineNumber": 17,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "Next.js",
+    "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      1,
+      7,
+    ],
+    "fixInfo": {
+      "deleteCount": 7,
+      "editColumn": 1,
+      "insertText": "\`Next.js\`",
+    },
+    "lineNumber": 23,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "next.config.js",
+    "errorDetail": "Filename 'next.config.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      11,
+      14,
+    ],
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 11,
+      "insertText": "\`next.config.js\`",
+    },
+    "lineNumber": 31,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      3,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 4,
+      "insertText": "
+",
+    },
+    "lineNumber": 39,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests react documentation patterns: backtick-react 1`] = `
+[
+  {
+    "errorContext": "this.state",
+    "errorDetail": "Filename 'this.state' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      29,
+      10,
+    ],
+    "fixInfo": {
+      "deleteCount": 10,
+      "editColumn": 29,
+      "insertText": "\`this.state\`",
+    },
+    "lineNumber": 16,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "React.memo",
+    "errorDetail": "Filename 'React.memo' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      7,
+      10,
+    ],
+    "fixInfo": {
+      "deleteCount": 10,
+      "editColumn": 7,
+      "insertText": "\`React.memo\`",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      45,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 46,
+      "insertText": "
+",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests tutorial documentation patterns: backtick-tutorial 1`] = `
+[
+  {
+    "errorContext": "app.js",
+    "errorDetail": "Filename 'app.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      11,
+      6,
+    ],
+    "fixInfo": {
+      "deleteCount": 6,
+      "editColumn": 11,
+      "insertText": "\`app.js\`",
+    },
+    "lineNumber": 30,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": ".env",
+    "errorDetail": "Configuration file '.env' should be wrapped in backticks to show it's a filename",
+    "errorRange": [
+      10,
+      4,
+    ],
+    "fixInfo": {
+      "deleteCount": 4,
+      "editColumn": 10,
+      "insertText": "\`.env\`",
+    },
+    "lineNumber": 55,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": ".env",
+    "errorDetail": "Configuration file '.env' should be wrapped in backticks to show it's a filename",
+    "errorRange": [
+      34,
+      4,
+    ],
+    "fixInfo": {
+      "deleteCount": 4,
+      "editColumn": 34,
+      "insertText": "\`.env\`",
+    },
+    "lineNumber": 64,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "models/User.js",
+    "errorDetail": "File path 'models/User.js' should be wrapped in backticks for clarity and to distinguish it from regular text",
+    "errorRange": [
+      13,
+      14,
+    ],
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 13,
+      "insertText": "\`models/User.js\`",
+    },
+    "lineNumber": 71,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "User.js",
+    "errorDetail": "Filename 'User.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      20,
+      7,
+    ],
+    "fixInfo": {
+      "deleteCount": 7,
+      "editColumn": 20,
+      "insertText": "\`User.js\`",
+    },
+    "lineNumber": 71,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "-g",
+    "errorDetail": "Command flag '-g' should be wrapped in backticks to show it's a command option",
+    "errorRange": [
+      38,
+      2,
+    ],
+    "fixInfo": null,
+    "lineNumber": 115,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "npm install",
+    "errorDetail": "Command 'npm install' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      26,
+      11,
+    ],
+    "fixInfo": {
+      "deleteCount": 11,
+      "editColumn": 26,
+      "insertText": "\`npm install\`",
+    },
+    "lineNumber": 115,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "app.js",
+    "errorDetail": "Filename 'app.js' should be wrapped in backticks to distinguish it from regular text",
+    "errorRange": [
+      30,
+      6,
+    ],
+    "fixInfo": {
+      "deleteCount": 6,
+      "editColumn": 30,
+      "insertText": "\`app.js\`",
+    },
+    "lineNumber": 116,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": null,
+    "lineNumber": 57,
+    "ruleDescription": "Fenced code blocks should have a language specified",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
+    "ruleNames": [
+      "MD040",
+      "fenced-code-language",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      30,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 31,
+      "insertText": "
+",
+    },
+    "lineNumber": 152,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "[Authentication & Authorization](#authentication--authorization)",
+    "errorDetail": null,
+    "errorRange": [
+      4,
+      64,
+    ],
+    "fixInfo": null,
+    "lineNumber": 8,
+    "ruleDescription": "Link fragments should be valid",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
+    "ruleNames": [
+      "MD051",
+      "link-fragments",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all rules against all patterns: combined-rule-analysis 1`] = `
+{
+  "api": {
+    "backtickViolations": [
+      {
+        "errorContext": "\`\`\`json",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 22,
+        },
+        "lineNumber": 22,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`json",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 40,
+        },
+        "lineNumber": 40,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "- limit (optional): Number of ...",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+        },
+        "lineNumber": 18,
+        "ruleDescription": "Lists should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
+        "ruleNames": [
+          "MD032",
+          "blanks-around-lists",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          3,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 4,
+          "insertText": "
+",
+        },
+        "lineNumber": 67,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+    ],
+    "meta": {
+      "contentLength": 1004,
+      "contentLines": 67,
+    },
+    "sentenceViolations": [
+      {
+        "errorContext": "\`\`\`json",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 22,
+        },
+        "lineNumber": 22,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`json",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 40,
+        },
+        "lineNumber": 40,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "- limit (optional): Number of ...",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+        },
+        "lineNumber": 18,
+        "ruleDescription": "Lists should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
+        "ruleNames": [
+          "MD032",
+          "blanks-around-lists",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          3,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 4,
+          "insertText": "
+",
+        },
+        "lineNumber": 67,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "REST API Documentation",
+        "errorDetail": "Word "Documentation" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": null,
+        "lineNumber": 1,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Error Handling",
+        "errorDetail": "Word "Handling" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 4,
+          "insertText": "Error handling",
+        },
+        "lineNumber": 48,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Error Response Format",
+        "errorDetail": "Word "Response" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 21,
+          "editColumn": 5,
+          "insertText": "Error response format",
+        },
+        "lineNumber": 58,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+    ],
+  },
+  "github": {
+    "backtickViolations": [
+      {
+        "errorContext": "feature/amazing-feature",
+        "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
+        "errorRange": [
+          45,
+          23,
+        ],
+        "fixInfo": {
+          "deleteCount": 23,
+          "editColumn": 45,
+          "insertText": "\`feature/amazing-feature\`",
+        },
+        "lineNumber": 46,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "-b",
+        "errorDetail": "Command flag '-b' should be wrapped in backticks to show it's a command option",
+        "errorRange": [
+          42,
+          2,
+        ],
+        "fixInfo": null,
+        "lineNumber": 46,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "git checkout",
+        "errorDetail": "Command 'git checkout' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          29,
+          12,
+        ],
+        "fixInfo": {
+          "deleteCount": 12,
+          "editColumn": 29,
+          "insertText": "\`git checkout\`",
+        },
+        "lineNumber": 46,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "-m",
+        "errorDetail": "Command flag '-m' should be wrapped in backticks to show it's a command option",
+        "errorRange": [
+          36,
+          2,
+        ],
+        "fixInfo": null,
+        "lineNumber": 47,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "git commit",
+        "errorDetail": "Command 'git commit' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          25,
+          10,
+        ],
+        "fixInfo": {
+          "deleteCount": 10,
+          "editColumn": 25,
+          "insertText": "\`git commit\`",
+        },
+        "lineNumber": 47,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "feature/amazing-feature",
+        "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
+        "errorRange": [
+          40,
+          23,
+        ],
+        "fixInfo": {
+          "deleteCount": 23,
+          "editColumn": 40,
+          "insertText": "\`feature/amazing-feature\`",
+        },
+        "lineNumber": 48,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "git push",
+        "errorDetail": "Command 'git push' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          24,
+          8,
+        ],
+        "fixInfo": {
+          "deleteCount": 8,
+          "editColumn": 24,
+          "insertText": "\`git push\`",
+        },
+        "lineNumber": 48,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": "Expected: 80; Actual: 93",
+        "errorRange": [
+          81,
+          13,
+        ],
+        "fixInfo": null,
+        "lineNumber": 53,
+        "ruleDescription": "Line length",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
+        "ruleNames": [
+          "MD013",
+          "line-length",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 17,
+        },
+        "lineNumber": 17,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 23,
+        },
+        "lineNumber": 23,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 28,
+        },
+        "lineNumber": 28,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 33,
+        },
+        "lineNumber": 33,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          93,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 94,
+          "insertText": "
+",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+    ],
+    "meta": {
+      "contentLength": 1096,
+      "contentLines": 53,
+    },
+    "sentenceViolations": [
+      {
+        "errorContext": null,
+        "errorDetail": "Expected: 80; Actual: 93",
+        "errorRange": [
+          81,
+          13,
+        ],
+        "fixInfo": null,
+        "lineNumber": 53,
+        "ruleDescription": "Line length",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
+        "ruleNames": [
+          "MD013",
+          "line-length",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 17,
+        },
+        "lineNumber": 17,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 23,
+        },
+        "lineNumber": 23,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 28,
+        },
+        "lineNumber": 28,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`bash",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": {
+          "insertText": "
+",
+          "lineNumber": 33,
+        },
+        "lineNumber": 33,
+        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+        "ruleNames": [
+          "MD031",
+          "blanks-around-fences",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          93,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 94,
+          "insertText": "
+",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "Project Name",
+        "errorDetail": "Word "Name" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 12,
+          "editColumn": 3,
+          "insertText": "Project name",
+        },
+        "lineNumber": 1,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Quick Start",
+        "errorDetail": "Word "Start" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 4,
+          "insertText": "🚀 quick start",
+        },
+        "lineNumber": 6,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+    ],
+  },
+  "nextjs": {
+    "backtickViolations": [
+      {
+        "errorContext": "Next.js",
+        "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          21,
+          7,
+        ],
+        "fixInfo": {
+          "deleteCount": 7,
+          "editColumn": 21,
+          "insertText": "\`Next.js\`",
+        },
+        "lineNumber": 5,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "pages/api",
+        "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
+        "errorRange": [
+          26,
+          9,
+        ],
+        "fixInfo": {
+          "deleteCount": 9,
+          "editColumn": 26,
+          "insertText": "\`pages/api\`",
+        },
+        "lineNumber": 15,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "pages/api/hello.js",
+        "errorDetail": "File path 'pages/api/hello.js' should be wrapped in backticks for clarity and to distinguish it from regular text",
+        "errorRange": [
+          22,
+          18,
+        ],
+        "fixInfo": {
+          "deleteCount": 18,
+          "editColumn": 22,
+          "insertText": "\`pages/api/hello.js\`",
+        },
+        "lineNumber": 17,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "hello.js",
+        "errorDetail": "Filename 'hello.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          32,
+          8,
+        ],
+        "fixInfo": {
+          "deleteCount": 8,
+          "editColumn": 32,
+          "insertText": "\`hello.js\`",
+        },
+        "lineNumber": 17,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "Next.js",
+        "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          1,
+          7,
+        ],
+        "fixInfo": {
+          "deleteCount": 7,
+          "editColumn": 1,
+          "insertText": "\`Next.js\`",
+        },
+        "lineNumber": 23,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "next.config.js",
+        "errorDetail": "Filename 'next.config.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          11,
+          14,
+        ],
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 11,
+          "insertText": "\`next.config.js\`",
+        },
+        "lineNumber": 31,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          3,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 4,
+          "insertText": "
+",
+        },
+        "lineNumber": 39,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+    ],
+    "meta": {
+      "contentLength": 893,
+      "contentLines": 39,
+    },
+    "sentenceViolations": [
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          3,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 4,
+          "insertText": "
+",
+        },
+        "lineNumber": 39,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "Getting Started with Next.js",
+        "errorDetail": "Word "Started" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 28,
+          "editColumn": 3,
+          "insertText": "Getting started with next.js",
+        },
+        "lineNumber": 1,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Installation and Setup",
+        "errorDetail": "Word "Setup" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 22,
+          "editColumn": 4,
+          "insertText": "Installation and setup",
+        },
+        "lineNumber": 3,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "API Routes",
+        "errorDetail": "Word "Routes" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": null,
+        "lineNumber": 13,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Static Generation vs Server-side Rendering",
+        "errorDetail": "Word "Generation" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 42,
+          "editColumn": 5,
+          "insertText": "Static generation vs server-side rendering",
+        },
+        "lineNumber": 21,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+    ],
+  },
+  "react": {
+    "backtickViolations": [
+      {
+        "errorContext": "this.state",
+        "errorDetail": "Filename 'this.state' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          29,
+          10,
+        ],
+        "fixInfo": {
+          "deleteCount": 10,
+          "editColumn": 29,
+          "insertText": "\`this.state\`",
+        },
+        "lineNumber": 16,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "React.memo",
+        "errorDetail": "Filename 'React.memo' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          7,
+          10,
+        ],
+        "fixInfo": {
+          "deleteCount": 10,
+          "editColumn": 7,
+          "insertText": "\`React.memo\`",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          45,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 46,
+          "insertText": "
+",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+    ],
+    "meta": {
+      "contentLength": 1077,
+      "contentLines": 53,
+    },
+    "sentenceViolations": [
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          45,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 46,
+          "insertText": "
+",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "React Documentation",
+        "errorDetail": "Word "Documentation" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": null,
+        "lineNumber": 1,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Components and Props",
+        "errorDetail": "Word "Props" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 20,
+          "editColumn": 4,
+          "insertText": "Components and props",
+        },
+        "lineNumber": 3,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Functional vs Class Components",
+        "errorDetail": "Word "Class" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 30,
+          "editColumn": 5,
+          "insertText": "Functional vs class components",
+        },
+        "lineNumber": 13,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "State Management",
+        "errorDetail": "Word "Management" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 16,
+          "editColumn": 4,
+          "insertText": "State management",
+        },
+        "lineNumber": 18,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "useState Hook",
+        "errorDetail": "Heading's first word should be capitalized.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 13,
+          "editColumn": 5,
+          "insertText": "Usestate hook",
+        },
+        "lineNumber": 20,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "useEffect Hook",
+        "errorDetail": "Heading's first word should be capitalized.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 5,
+          "insertText": "Useeffect hook",
+        },
+        "lineNumber": 40,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Best Practices",
+        "errorDetail": "Word "Practices" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 4,
+          "insertText": "Best practices",
+        },
+        "lineNumber": 48,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+    ],
+  },
+  "tutorial": {
+    "backtickViolations": [
+      {
+        "errorContext": "app.js",
+        "errorDetail": "Filename 'app.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          11,
+          6,
+        ],
+        "fixInfo": {
+          "deleteCount": 6,
+          "editColumn": 11,
+          "insertText": "\`app.js\`",
+        },
+        "lineNumber": 30,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": ".env",
+        "errorDetail": "Configuration file '.env' should be wrapped in backticks to show it's a filename",
+        "errorRange": [
+          10,
+          4,
+        ],
+        "fixInfo": {
+          "deleteCount": 4,
+          "editColumn": 10,
+          "insertText": "\`.env\`",
+        },
+        "lineNumber": 55,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": ".env",
+        "errorDetail": "Configuration file '.env' should be wrapped in backticks to show it's a filename",
+        "errorRange": [
+          34,
+          4,
+        ],
+        "fixInfo": {
+          "deleteCount": 4,
+          "editColumn": 34,
+          "insertText": "\`.env\`",
+        },
+        "lineNumber": 64,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "models/User.js",
+        "errorDetail": "File path 'models/User.js' should be wrapped in backticks for clarity and to distinguish it from regular text",
+        "errorRange": [
+          13,
+          14,
+        ],
+        "fixInfo": {
+          "deleteCount": 14,
+          "editColumn": 13,
+          "insertText": "\`models/User.js\`",
+        },
+        "lineNumber": 71,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "User.js",
+        "errorDetail": "Filename 'User.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          20,
+          7,
+        ],
+        "fixInfo": {
+          "deleteCount": 7,
+          "editColumn": 20,
+          "insertText": "\`User.js\`",
+        },
+        "lineNumber": 71,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "-g",
+        "errorDetail": "Command flag '-g' should be wrapped in backticks to show it's a command option",
+        "errorRange": [
+          38,
+          2,
+        ],
+        "fixInfo": null,
+        "lineNumber": 115,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "npm install",
+        "errorDetail": "Command 'npm install' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          26,
+          11,
+        ],
+        "fixInfo": {
+          "deleteCount": 11,
+          "editColumn": 26,
+          "insertText": "\`npm install\`",
+        },
+        "lineNumber": 115,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "app.js",
+        "errorDetail": "Filename 'app.js' should be wrapped in backticks to distinguish it from regular text",
+        "errorRange": [
+          30,
+          6,
+        ],
+        "fixInfo": {
+          "deleteCount": 6,
+          "editColumn": 30,
+          "insertText": "\`app.js\`",
+        },
+        "lineNumber": 116,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "\`\`\`",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": null,
+        "lineNumber": 57,
+        "ruleDescription": "Fenced code blocks should have a language specified",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
+        "ruleNames": [
+          "MD040",
+          "fenced-code-language",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          30,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 31,
+          "insertText": "
+",
+        },
+        "lineNumber": 152,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "[Authentication & Authorization](#authentication--authorization)",
+        "errorDetail": null,
+        "errorRange": [
+          4,
+          64,
+        ],
+        "fixInfo": null,
+        "lineNumber": 8,
+        "ruleDescription": "Link fragments should be valid",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
+        "ruleNames": [
+          "MD051",
+          "link-fragments",
+        ],
+      },
+    ],
+    "meta": {
+      "contentLength": 2702,
+      "contentLines": 152,
+    },
+    "sentenceViolations": [
+      {
+        "errorContext": "\`\`\`",
+        "errorDetail": null,
+        "errorRange": null,
+        "fixInfo": null,
+        "lineNumber": 57,
+        "ruleDescription": "Fenced code blocks should have a language specified",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
+        "ruleNames": [
+          "MD040",
+          "fenced-code-language",
+        ],
+      },
+      {
+        "errorContext": null,
+        "errorDetail": null,
+        "errorRange": [
+          30,
+          1,
+        ],
+        "fixInfo": {
+          "editColumn": 31,
+          "insertText": "
+",
+        },
+        "lineNumber": 152,
+        "ruleDescription": "Files should end with a single newline character",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+        "ruleNames": [
+          "MD047",
+          "single-trailing-newline",
+        ],
+      },
+      {
+        "errorContext": "[Authentication & Authorization](#authentication--authorization)",
+        "errorDetail": null,
+        "errorRange": [
+          4,
+          64,
+        ],
+        "fixInfo": null,
+        "lineNumber": 8,
+        "ruleDescription": "Link fragments should be valid",
+        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
+        "ruleNames": [
+          "MD051",
+          "link-fragments",
+        ],
+      },
+      {
+        "errorContext": "Building a REST API with Node.js and Express",
+        "errorDetail": "Word "Node" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 44,
+          "editColumn": 3,
+          "insertText": "Building a REST API with Node.js and express",
+        },
+        "lineNumber": 1,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Table of Contents",
+        "errorDetail": "Word "Contents" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 17,
+          "editColumn": 4,
+          "insertText": "Table of contents",
+        },
+        "lineNumber": 3,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Setting Up the Project",
+        "errorDetail": "Word "Up" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 22,
+          "editColumn": 4,
+          "insertText": "Setting up the project",
+        },
+        "lineNumber": 11,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Creating the Server",
+        "errorDetail": "Word "Server" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 19,
+          "editColumn": 4,
+          "insertText": "Creating the server",
+        },
+        "lineNumber": 28,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Environment Variables",
+        "errorDetail": "Word "Variables" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 21,
+          "editColumn": 5,
+          "insertText": "Environment variables",
+        },
+        "lineNumber": 53,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Database Integration",
+        "errorDetail": "Word "Integration" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 20,
+          "editColumn": 4,
+          "insertText": "Database integration",
+        },
+        "lineNumber": 66,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+      {
+        "errorContext": "Testing Your API",
+        "errorDetail": "Word "Your" in heading should be lowercase.",
+        "errorRange": null,
+        "fixInfo": {
+          "deleteCount": 16,
+          "editColumn": 4,
+          "insertText": "Testing your API",
+        },
+        "lineNumber": 97,
+        "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+        "ruleInformation": null,
+        "ruleNames": [
+          "sentence-case-heading",
+          "SC001",
+        ],
+      },
+    ],
+  },
+}
+`;
+
+exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests api documentation patterns: sentence-case-api 1`] = `
+[
+  {
+    "errorContext": "\`\`\`json",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 22,
+    },
+    "lineNumber": 22,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`json",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 40,
+    },
+    "lineNumber": 40,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "- limit (optional): Number of ...",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+    },
+    "lineNumber": 18,
+    "ruleDescription": "Lists should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
+    "ruleNames": [
+      "MD032",
+      "blanks-around-lists",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      3,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 4,
+      "insertText": "
+",
+    },
+    "lineNumber": 67,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "REST API Documentation",
+    "errorDetail": "Word "Documentation" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": null,
+    "lineNumber": 1,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Error Handling",
+    "errorDetail": "Word "Handling" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 4,
+      "insertText": "Error handling",
+    },
+    "lineNumber": 48,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Error Response Format",
+    "errorDetail": "Word "Response" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 21,
+      "editColumn": 5,
+      "insertText": "Error response format",
+    },
+    "lineNumber": 58,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests github documentation patterns: sentence-case-github 1`] = `
+[
+  {
+    "errorContext": null,
+    "errorDetail": "Expected: 80; Actual: 93",
+    "errorRange": [
+      81,
+      13,
+    ],
+    "fixInfo": null,
+    "lineNumber": 53,
+    "ruleDescription": "Line length",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
+    "ruleNames": [
+      "MD013",
+      "line-length",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 17,
+    },
+    "lineNumber": 17,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 23,
+    },
+    "lineNumber": 23,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 28,
+    },
+    "lineNumber": 28,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": "\`\`\`bash",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": {
+      "insertText": "
+",
+      "lineNumber": 33,
+    },
+    "lineNumber": 33,
+    "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
+    "ruleNames": [
+      "MD031",
+      "blanks-around-fences",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      93,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 94,
+      "insertText": "
+",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "Project Name",
+    "errorDetail": "Word "Name" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 12,
+      "editColumn": 3,
+      "insertText": "Project name",
+    },
+    "lineNumber": 1,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Quick Start",
+    "errorDetail": "Word "Start" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 4,
+      "insertText": "🚀 quick start",
+    },
+    "lineNumber": 6,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests nextjs documentation patterns: sentence-case-nextjs 1`] = `
+[
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      3,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 4,
+      "insertText": "
+",
+    },
+    "lineNumber": 39,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "Getting Started with Next.js",
+    "errorDetail": "Word "Started" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 28,
+      "editColumn": 3,
+      "insertText": "Getting started with next.js",
+    },
+    "lineNumber": 1,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Installation and Setup",
+    "errorDetail": "Word "Setup" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 22,
+      "editColumn": 4,
+      "insertText": "Installation and setup",
+    },
+    "lineNumber": 3,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "API Routes",
+    "errorDetail": "Word "Routes" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": null,
+    "lineNumber": 13,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Static Generation vs Server-side Rendering",
+    "errorDetail": "Word "Generation" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 42,
+      "editColumn": 5,
+      "insertText": "Static generation vs server-side rendering",
+    },
+    "lineNumber": 21,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests react documentation patterns: sentence-case-react 1`] = `
+[
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      45,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 46,
+      "insertText": "
+",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "React Documentation",
+    "errorDetail": "Word "Documentation" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": null,
+    "lineNumber": 1,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Components and Props",
+    "errorDetail": "Word "Props" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 20,
+      "editColumn": 4,
+      "insertText": "Components and props",
+    },
+    "lineNumber": 3,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Functional vs Class Components",
+    "errorDetail": "Word "Class" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 30,
+      "editColumn": 5,
+      "insertText": "Functional vs class components",
+    },
+    "lineNumber": 13,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "State Management",
+    "errorDetail": "Word "Management" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 16,
+      "editColumn": 4,
+      "insertText": "State management",
+    },
+    "lineNumber": 18,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "useState Hook",
+    "errorDetail": "Heading's first word should be capitalized.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 13,
+      "editColumn": 5,
+      "insertText": "Usestate hook",
+    },
+    "lineNumber": 20,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "useEffect Hook",
+    "errorDetail": "Heading's first word should be capitalized.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 5,
+      "insertText": "Useeffect hook",
+    },
+    "lineNumber": 40,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Best Practices",
+    "errorDetail": "Word "Practices" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 14,
+      "editColumn": 4,
+      "insertText": "Best practices",
+    },
+    "lineNumber": 48,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+]
+`;
+
+exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tutorial documentation patterns: sentence-case-tutorial 1`] = `
+[
+  {
+    "errorContext": "\`\`\`",
+    "errorDetail": null,
+    "errorRange": null,
+    "fixInfo": null,
+    "lineNumber": 57,
+    "ruleDescription": "Fenced code blocks should have a language specified",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
+    "ruleNames": [
+      "MD040",
+      "fenced-code-language",
+    ],
+  },
+  {
+    "errorContext": null,
+    "errorDetail": null,
+    "errorRange": [
+      30,
+      1,
+    ],
+    "fixInfo": {
+      "editColumn": 31,
+      "insertText": "
+",
+    },
+    "lineNumber": 152,
+    "ruleDescription": "Files should end with a single newline character",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
+    "ruleNames": [
+      "MD047",
+      "single-trailing-newline",
+    ],
+  },
+  {
+    "errorContext": "[Authentication & Authorization](#authentication--authorization)",
+    "errorDetail": null,
+    "errorRange": [
+      4,
+      64,
+    ],
+    "fixInfo": null,
+    "lineNumber": 8,
+    "ruleDescription": "Link fragments should be valid",
+    "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
+    "ruleNames": [
+      "MD051",
+      "link-fragments",
+    ],
+  },
+  {
+    "errorContext": "Building a REST API with Node.js and Express",
+    "errorDetail": "Word "Node" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 44,
+      "editColumn": 3,
+      "insertText": "Building a REST API with Node.js and express",
+    },
+    "lineNumber": 1,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Table of Contents",
+    "errorDetail": "Word "Contents" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 17,
+      "editColumn": 4,
+      "insertText": "Table of contents",
+    },
+    "lineNumber": 3,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Setting Up the Project",
+    "errorDetail": "Word "Up" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 22,
+      "editColumn": 4,
+      "insertText": "Setting up the project",
+    },
+    "lineNumber": 11,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Creating the Server",
+    "errorDetail": "Word "Server" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 19,
+      "editColumn": 4,
+      "insertText": "Creating the server",
+    },
+    "lineNumber": 28,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Environment Variables",
+    "errorDetail": "Word "Variables" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 21,
+      "editColumn": 5,
+      "insertText": "Environment variables",
+    },
+    "lineNumber": 53,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Database Integration",
+    "errorDetail": "Word "Integration" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 20,
+      "editColumn": 4,
+      "insertText": "Database integration",
+    },
+    "lineNumber": 66,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+  {
+    "errorContext": "Testing Your API",
+    "errorDetail": "Word "Your" in heading should be lowercase.",
+    "errorRange": null,
+    "fixInfo": {
+      "deleteCount": 16,
+      "editColumn": 4,
+      "insertText": "Testing your API",
+    },
+    "lineNumber": 97,
+    "ruleDescription": "Ensures ATX (\`# \`) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I".",
+    "ruleInformation": null,
+    "ruleNames": [
+      "sentence-case-heading",
+      "SC001",
+    ],
+  },
+]
+`;

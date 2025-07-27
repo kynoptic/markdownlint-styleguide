@@ -388,7 +388,7 @@ You now have a basic REST API setup! Next steps:
 };
 
 /**
- * Test a rule against real-world content
+ * Test a rule against real-world content and return full lint results
  */
 async function testRuleAgainstContent(rule, content, ruleName) {
   const results = await lint({
@@ -406,112 +406,62 @@ async function testRuleAgainstContent(rule, content, ruleName) {
     violations: ruleViolations,
     violationCount: ruleViolations.length,
     contentLength: content.length,
-    contentLines: content.split('\n').length
+    contentLines: content.split('\n').length,
+    fullResults: results.content // Include full results for snapshot testing
   };
 }
 
 describe('Real-World Pattern Tests', () => {
-  describe('Sentence Case Heading Rule', () => {
+  describe('Sentence Case Heading Rule - Snapshot Tests', () => {
     for (const [source, content] of Object.entries(REAL_WORLD_PATTERNS)) {
       test(`${source} documentation patterns`, async () => {
         const results = await testRuleAgainstContent(sentenceRule, content, 'sentence-case-heading');
         
-        console.log(`\nSentence Case - ${source}:`);
-        console.log(`Content: ${results.contentLength} chars, ${results.contentLines} lines`);
-        console.log(`Violations: ${results.violationCount}`);
+        // Snapshot the full lint results to catch any unintended changes
+        expect(results.fullResults).toMatchSnapshot(`sentence-case-${source}`);
         
-        if (results.violations.length > 0) {
-          console.log('Sample violations:');
-          results.violations.slice(0, 3).forEach(v => {
-            console.log(`  Line ${v.lineNumber}: ${v.errorDetail || v.errorContext}`);
-          });
-        }
-
-        // These tests discover patterns - no strict assertions on violation counts
-        expect(results.violationCount).toBeGreaterThanOrEqual(0);
+        // Basic sanity checks
         expect(results.contentLength).toBeGreaterThan(0);
+        expect(Array.isArray(results.fullResults)).toBe(true);
       });
     }
   });
 
-  describe('Backtick Code Elements Rule', () => {
+  describe('Backtick Code Elements Rule - Snapshot Tests', () => {
     for (const [source, content] of Object.entries(REAL_WORLD_PATTERNS)) {
       test(`${source} documentation patterns`, async () => {
         const results = await testRuleAgainstContent(backtickRule, content, 'backtick-code-elements');
         
-        console.log(`\nBacktick Code Elements - ${source}:`);
-        console.log(`Content: ${results.contentLength} chars, ${results.contentLines} lines`);
-        console.log(`Violations: ${results.violationCount}`);
+        // Snapshot the full lint results to catch any unintended changes
+        expect(results.fullResults).toMatchSnapshot(`backtick-${source}`);
         
-        if (results.violations.length > 0) {
-          console.log('Sample violations:');
-          results.violations.slice(0, 3).forEach(v => {
-            console.log(`  Line ${v.lineNumber}: ${v.errorDetail || v.errorContext}`);
-          });
-        }
-
-        expect(results.violationCount).toBeGreaterThanOrEqual(0);
+        // Basic sanity checks
         expect(results.contentLength).toBeGreaterThan(0);
+        expect(Array.isArray(results.fullResults)).toBe(true);
       });
     }
   });
 
-  describe('Pattern Analysis', () => {
-    test('violation distribution analysis', async () => {
-      const results = {};
+  describe('Combined Rule Analysis - Snapshot Tests', () => {
+    test('all rules against all patterns', async () => {
+      const combinedResults = {};
       
       for (const [source, content] of Object.entries(REAL_WORLD_PATTERNS)) {
         const sentenceResults = await testRuleAgainstContent(sentenceRule, content, 'sentence-case-heading');
         const backtickResults = await testRuleAgainstContent(backtickRule, content, 'backtick-code-elements');
         
-        results[source] = {
-          sentenceViolations: sentenceResults.violationCount,
-          backtickViolations: backtickResults.violationCount,
-          contentLength: content.length
+        combinedResults[source] = {
+          sentenceViolations: sentenceResults.fullResults,
+          backtickViolations: backtickResults.fullResults,
+          meta: {
+            contentLength: content.length,
+            contentLines: content.split('\n').length
+          }
         };
       }
       
-      console.log('\n=== Pattern Analysis Summary ===');
-      for (const [source, data] of Object.entries(results)) {
-        console.log(`${source}:`);
-        console.log(`  Sentence violations: ${data.sentenceViolations}`);
-        console.log(`  Backtick violations: ${data.backtickViolations}`);
-        console.log(`  Content length: ${data.contentLength} chars`);
-        console.log(`  Sentence density: ${(data.sentenceViolations / data.contentLength * 1000).toFixed(2)} violations/1000 chars`);
-        console.log(`  Backtick density: ${(data.backtickViolations / data.contentLength * 1000).toFixed(2)} violations/1000 chars`);
-      }
-      
-      // This test always passes - it's for analysis
-      expect(Object.keys(results).length).toBe(Object.keys(REAL_WORLD_PATTERNS).length);
-    });
-
-    test('common violation patterns', async () => {
-      const allViolations = {
-        sentence: [],
-        backtick: []
-      };
-      
-      for (const [source, content] of Object.entries(REAL_WORLD_PATTERNS)) {
-        const sentenceResults = await testRuleAgainstContent(sentenceRule, content, 'sentence-case-heading');
-        const backtickResults = await testRuleAgainstContent(backtickRule, content, 'backtick-code-elements');
-        
-        allViolations.sentence.push(...sentenceResults.violations);
-        allViolations.backtick.push(...backtickResults.violations);
-      }
-      
-      console.log('\n=== Common Violation Patterns ===');
-      console.log(`Total sentence violations: ${allViolations.sentence.length}`);
-      console.log(`Total backtick violations: ${allViolations.backtick.length}`);
-      
-      // Analyze common contexts
-      const sentenceContexts = allViolations.sentence.map(v => v.errorContext).filter(Boolean);
-      const backtickContexts = allViolations.backtick.map(v => v.errorContext).filter(Boolean);
-      
-      console.log(`\nSentence rule contexts: ${sentenceContexts.length}`);
-      console.log(`Backtick rule contexts: ${backtickContexts.length}`);
-      
-      expect(allViolations.sentence.length).toBeGreaterThanOrEqual(0);
-      expect(allViolations.backtick.length).toBeGreaterThanOrEqual(0);
+      // Snapshot the combined analysis to detect any behavioral changes
+      expect(combinedResults).toMatchSnapshot('combined-rule-analysis');
     });
   });
 });
