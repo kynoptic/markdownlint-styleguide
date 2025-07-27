@@ -1,75 +1,63 @@
 # markdownlint-trap
 
-A collection of custom `markdownlint` rules designed to enforce specific documentation standards and best practices.
+A collection of custom `markdownlint` rules designed to enforce specific documentation standards and best practices. These rules help maintain consistent, professional, and accessible documentation across your projects.
 
-## Custom rules
+## Why use markdownlint-trap?
 
-This repository contains the following custom rules:
+- **Consistent style**: Enforces sentence case headings and proper code formatting
+- **Better accessibility**: Ensures URLs are properly formatted and links work correctly
+- **Professional appearance**: Maintains readable, well-structured documentation
+- **Automated fixes**: Most rules provide auto-fix functionality to save time
 
-- **`sentence-case-heading` (SC001):** Enforces sentence case for all ATX headings (`#`). The first word must be capitalized, and the rest of the heading should be lowercase, with exceptions for acronyms, proper nouns, and the pronoun "I".
-- **`backtick-code-elements` (BCE001):** Requires that code-like elements such as file names, directory paths, commands, and environment variables are enclosed in backticks.
-- **`wt/no-bare-urls`:** Ensures that all URLs are enclosed in angle brackets (`<...>`) to prevent them from being rendered as raw, un-clickable links.
+## Quick start
 
-## Usage
+1. **Install the package:**
 
-To use these custom rules in another project, follow these steps:
+   ```bash
+   npm install markdownlint-trap --save-dev
+   ```
 
-1. **Copy the Rules:** Copy the compiled `.markdownlint-rules/` directory from this project into your target project's root.
-2. **Copy the Configuration:** Copy the `.markdownlint-cli2.jsonc` file into your target project's root. This file is already configured to use the compiled `.cjs` rules from the `.markdownlint-rules/` directory.
+2. **Add to your markdownlint config** (`.markdownlint-cli2.jsonc`):
 
-Your `markdownlint` tool will now run these custom rules alongside the default ones.
+   ```json
+   {
+     "customRules": ["markdownlint-trap"]
+   }
+   ```
 
-## Development
+3. **Run on your files:**
 
-This project uses ES Modules (ESM) for its source code, but the `markdownlint` VS Code extension and `markdownlint-cli2` expect rules to be in CommonJS format. To handle this, we use Babel to transpile the source code into `.cjs` files.
+   ```bash
+   npx markdownlint-cli2 "**/*.md"
+   ```
 
-**Source files:** The original, human-readable rule definitions are located in `src/rules/`.
+## Table of contents
 
-**Build process:** The project is configured to automatically build the rules before each commit using a pre-commit hook powered by [Husky](https://typicode.github.io/husky/). This ensures that the compiled rules in the `.markdownlint-rules/` directory are always in sync with the source code.
-
-The build process involves these steps:
-
-1. Babel transpiles the ESM files from `src/rules/`.
-2. The compiled, CommonJS-compatible files (with a `.cjs` extension) are placed into the `.markdownlint-rules/` directory.
-3. The updated files in `.markdownlint-rules/` are automatically added to the commit.
-
-To run the build manually, you can still use:
-
-```bash
-npm run build
-```
-
-The `.markdownlint-rules/` directory contains the distributable artifacts that can be copied to other projects and is now tracked by Git.
-
-## Key features
-
-- Sentence case headings: Enforces sentence case for all Markdown headings and list lead-ins.
-- Backticked code elements: Ensures that code and file paths are enclosed in backticks.
-- Test-driven: Developed with a full suite of fixture-based tests.
-- Detailed errors: Provides clear messages to help resolve linting issues.
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Rules overview](#rules-overview)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
-To install `markdownlint-trap`, run the following command:
+### Requirements
+
+- **Node.js**: Version 14 or higher
+- **markdownlint-cli2**: Recommended for best experience
+
+### Install via npm
 
 ```bash
 npm install markdownlint-trap --save-dev
 ```
 
-### Requirements
+## Configuration
 
-- Node.js: Version `14` or higher. We recommend using `nvm` to manage Node.js versions:
+### Basic configuration
 
-  ```bash
-  nvm install
-  nvm use
-  ```
-
-- markdownlint: Version `0.38.0` or compatible.
-
-## Usage
-
-1. Add the custom rules to your `.markdownlint-cli2.jsonc` configuration file:
+Create or update your `.markdownlint-cli2.jsonc` file:
 
 ```json
 {
@@ -78,50 +66,145 @@ npm install markdownlint-trap --save-dev
   ],
   "config": {
     "sentence-case-heading": true,
-    "backtick-code-elements": true
+    "backtick-code-elements": true,
+    "wt/no-bare-urls": true,
+    "no-dead-internal-links": true,
+    "no-literal-ampersand": true
   }
 }
 ```
 
-1. Run `markdownlint-cli2` on your project:
+### Advanced configuration
+
+Individual rules can be customized. For example:
+
+```json
+{
+  "customRules": ["markdownlint-trap"],
+  "config": {
+    "sentence-case-heading": {
+      "properNouns": ["GitHub", "JavaScript", "TypeScript"],
+      "technicalTerms": ["API", "CLI", "SDK"]
+    },
+    "backtick-code-elements": true,
+    "no-dead-internal-links": true
+  }
+}
+```
+
+### Running the linter
+
+After configuration, run markdownlint on your project:
 
 ```bash
+# Lint all markdown files
 npx markdownlint-cli2 "**/*.md"
+
+# Lint specific files
+npx markdownlint-cli2 README.md docs/*.md
+
+# Auto-fix issues where possible
+npx markdownlint-cli2 --fix "**/*.md"
 ```
 
-## Rules
+## Rules overview
 
-This package includes the following rules:
+This package includes five custom rules designed to improve documentation quality:
 
-- `sentence-case-heading`: Enforces sentence case in headings.
-- `backtick-code-elements`: Enforces backticks around code elements.
+| Rule | ID | Auto-fix | Purpose |
+|------|----|-----------| --------|
+| `sentence-case-heading` | SC001 | ✅ | Enforces sentence case for headings |
+| `backtick-code-elements` | BCE001 | ✅ | Wraps code elements in backticks |
+| `wt/no-bare-urls` | WT001 | ❌ | Prevents bare URLs in content |
+| `no-dead-internal-links` | DL001 | ❌ | Detects broken internal links |
+| `no-literal-ampersand` | NLA001 | ✅ | Replaces `&` with "and" |
 
-For detailed documentation on each rule, see [`docs/reference/rules.md`](./docs/reference/rules.md).
+### Rule details
 
-## Testing
+**🔤 sentence-case-heading** - Keeps headings consistent and readable
 
-To run the test suite, use the following command:
+- Enforces sentence case: "Getting started" ✅ vs "Getting Started" ❌
+- Respects proper nouns and technical terms
+- Configurable with custom word lists
+
+**💻 backtick-code-elements** - Makes code references clear
+
+- Wraps file paths, commands, and variables in backticks
+- `npm install` ✅ vs `npm install` ❌
+- Improves visual distinction between code and prose
+
+**🔗 wt/no-bare-urls** - Ensures accessible links
+
+- Requires proper link formatting: `[GitHub](https://github.com)` ✅
+- Prevents bare URLs: <https://github.com> ❌
+- Improves accessibility for screen readers
+
+**🔍 no-dead-internal-links** - Maintains working documentation
+
+- Validates internal file links and anchors
+- Catches broken references during builds
+- Supports relative paths and heading anchors
+
+**✏️ no-literal-ampersand** - Professional writing style
+
+- Replaces standalone `&` with "and" in prose
+- "Dogs and cats" ✅ vs "Dogs & cats" ❌
+- Ignores ampersands in code contexts
+
+For complete documentation and configuration options, see the [rules reference](./docs/reference/rules.md).
+
+## Examples
+
+### Before markdownlint-trap
+
+```markdown
+# Getting Started With Our API
+
+Install the package using npm install my-package.
+
+Visit https://example.com for docs & tutorials.
+
+Check the [configuration guide](missing-file.md) for setup.
+```
+
+### After markdownlint-trap
+
+```markdown
+# Getting started with our API
+
+Install the package using `npm install my-package`.
+
+Visit [our documentation](https://example.com) for docs and tutorials.
+
+Check the [configuration guide](docs/config.md) for setup.
+```
+
+## Contributing
+
+We welcome contributions from the community! Whether you're fixing bugs, adding new rules, or improving documentation, your help is appreciated.
+
+### Quick contribution guide
+
+1. **Fork and clone** the repository
+2. **Install dependencies**: `npm install`
+3. **Make your changes** and add tests
+4. **Run tests**: `npm test && npm run lint`
+5. **Submit a pull request**
+
+For detailed setup instructions, development workflow, and coding guidelines, see our [Contributing Guide](./CONTRIBUTING.md).
+
+### Development commands
 
 ```bash
-npm test
+npm run build    # Transpile source to CommonJS
+npm test         # Run all tests
+npm run lint     # Check code style
 ```
-
-For verbose output, use the `DEBUG` environment variable:
-
-```bash
-DEBUG=markdownlint-trap* npm test
-```
-
-## Project status
-
-This project is under active development. Contributions and feedback are welcome.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
-## Resources
+---
 
-- Changelog: [`CHANGELOG.md`](./CHANGELOG.md)
-- Rule documentation: [`docs/reference/rules.md`](./docs/reference/rules.md)
-- Source code: [GitHub](https://github.com/your-username/markdownlint-trap)
+**Questions or issues?** Please [open an issue](https://github.com/your-username/markdownlint-trap/issues) on GitHub.
