@@ -66,7 +66,7 @@ describe("backtick-code-elements math expressions", () => {
     );
 
     ruleViolations.forEach((v) => {
-      expect(v.errorDetail).toMatch(/^Wrap .+ in backticks\.$/);
+      expect(v.errorDetail).toMatch(/should be wrapped in backticks/);
     });
   });
 });

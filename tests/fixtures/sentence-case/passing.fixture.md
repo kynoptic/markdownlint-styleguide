@@ -51,6 +51,8 @@ _How not to write a regex_ <!-- ✅ -->
 
 ## API is a common acronym <!-- ✅ -->
 
+### URLs should remain uppercase <!-- ✅ -->
+
 ### COVID and long COVID <!-- ✅ -->
 
 **HTML and CSS are standard technologies** <!-- ✅ -->

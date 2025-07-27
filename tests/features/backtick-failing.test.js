@@ -61,7 +61,7 @@ describe("backtick-code-elements failing fixture", () => {
         v.ruleNames.includes("BCE001"),
     );
     ruleViolations.forEach((v) => {
-      expect(v.errorDetail).toMatch(/^Wrap .+ in backticks\.$/);
+      expect(v.errorDetail).toMatch(/should be wrapped in backticks/);
     });
   });
 
