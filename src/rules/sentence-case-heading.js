@@ -7,6 +7,11 @@
 
 import { casingTerms as defaultCasingTerms } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
+import { 
+  validateStringArray, 
+  validateConfig, 
+  logValidationErrors 
+} from './config-validation.js';
 
 /**
  * Extract the plain heading text from tokens.
@@ -52,10 +57,25 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const tokens = params.parsers.micromark.tokens;
   const lines = params.lines;
   const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || {};
+
+  // Validate configuration
+  const configSchema = {
+    specialTerms: validateStringArray,
+    technicalTerms: validateStringArray,
+    properNouns: validateStringArray
+  };
+
+  const validationResult = validateConfig(config, configSchema, 'sentence-case-heading');
+  if (!validationResult.isValid) {
+    logValidationErrors('sentence-case-heading', validationResult.errors);
+    // Continue execution with empty arrays to prevent crashes
+  }
+
   // Support both new `specialTerms` and old `technicalTerms`/`properNouns` for user config
-  const userSpecialTerms = config.specialTerms || [];
-  const userTechnicalTerms = config.technicalTerms || [];
-  const userProperNouns = config.properNouns || [];
+  // Only use valid arrays; fall back to empty arrays for invalid config
+  const userSpecialTerms = Array.isArray(config.specialTerms) ? config.specialTerms : [];
+  const userTechnicalTerms = Array.isArray(config.technicalTerms) ? config.technicalTerms : [];
+  const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
   const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
 
   const specialCasedTerms = { ...defaultCasingTerms };
