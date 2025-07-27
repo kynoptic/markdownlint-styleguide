@@ -67,7 +67,7 @@ Create or update your `.markdownlint-cli2.jsonc` file:
   "config": {
     "sentence-case-heading": true,
     "backtick-code-elements": true,
-    "wt/no-bare-urls": true,
+    "no-bare-urls-trap": true,
     "no-dead-internal-links": true,
     "no-literal-ampersand": true
   }
@@ -115,7 +115,7 @@ This package includes five custom rules designed to improve documentation qualit
 |------|----|-----------| --------|
 | `sentence-case-heading` | SC001 | ✅ | Enforces sentence case for headings |
 | `backtick-code-elements` | BCE001 | ✅ | Wraps code elements in backticks |
-| `wt/no-bare-urls` | WT001 | ❌ | Prevents bare URLs in content |
+| `no-bare-urls-trap` | BU001 | ❌ | Prevents bare URLs in content |
 | `no-dead-internal-links` | DL001 | ❌ | Detects broken internal links |
 | `no-literal-ampersand` | NLA001 | ✅ | Replaces `&` with "and" |
 
@@ -133,7 +133,7 @@ This package includes five custom rules designed to improve documentation qualit
 - `npm install` ✅ vs `npm install` ❌
 - Improves visual distinction between code and prose
 
-**🔗 wt/no-bare-urls** - Ensures accessible links
+**🔗 no-bare-urls-trap** - Ensures accessible links
 
 - Requires proper link formatting: `[GitHub](https://github.com)` ✅
 - Prevents bare URLs: <https://github.com> ❌

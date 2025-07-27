@@ -11,7 +11,7 @@ import { lint } from 'markdownlint/promise';
 import { execSync } from 'child_process';
 import sentenceRule from '../../src/rules/sentence-case-heading.js';
 import backtickRule from '../../src/rules/backtick-code-elements.js';
-import wtNoBareurlsRule from '../../src/rules/wt-no-bare-urls.js';
+import noBareUrlsRule from '../../src/rules/no-bare-urls.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
