@@ -9,11 +9,13 @@ import {
   validateStringArray, 
   validateBoolean,
   validateConfig, 
-  logValidationErrors 
+  logValidationErrors,
+  createMarkdownlintLogger 
 } from './config-validation.js';
+import { getCodeBlockLines, isInInlineCode } from './shared-utils.js';
 
 /**
- * Check if a character position is inside a code block, inline code, or other special context.
+ * Check if a character position is inside inline code or other special context.
  * @param {string} line - The line content
  * @param {number} position - Character position to check
  * @param {boolean} skipInlineCode - Whether to skip inline code contexts
@@ -21,17 +23,8 @@ import {
  */
 function isInSpecialContext(line, position, skipInlineCode = true) {
   // Check if inside inline code (backticks) based on configuration
-  if (skipInlineCode) {
-    let backtickCount = 0;
-    for (let i = 0; i < position; i++) {
-      if (line[i] === '`') {
-        backtickCount++;
-      }
-    }
-    // If odd number of backticks before position, we're inside inline code
-    if (backtickCount % 2 === 1) {
-      return true;
-    }
+  if (skipInlineCode && isInInlineCode(line, position)) {
+    return true;
   }
 
   // Check if inside HTML tag or entity
@@ -110,46 +103,6 @@ function shouldFlagAmpersand(line, position, skipInlineCode = true, exceptions =
   return isStandalone;
 }
 
-/**
- * Track code block state across lines
- * @param {string[]} lines - All lines in the document
- * @returns {boolean[]} Array indicating which lines are in code blocks
- */
-function getCodeBlockLines(lines) {
-  const inCodeBlock = new Array(lines.length).fill(false);
-  let currentCodeBlockType = null;
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-    
-    // Check for fenced code blocks
-    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
-      const fenceType = trimmed.startsWith('```') ? '```' : '~~~';
-      
-      if (currentCodeBlockType === null) {
-        // Starting a code block
-        currentCodeBlockType = fenceType;
-        inCodeBlock[i] = true;
-      } else if (currentCodeBlockType === fenceType) {
-        // Ending a code block
-        inCodeBlock[i] = true;
-        currentCodeBlockType = null;
-      } else {
-        // Different fence type while in code block
-        inCodeBlock[i] = true;
-      }
-    } else if (currentCodeBlockType !== null) {
-      // Inside a fenced code block
-      inCodeBlock[i] = true;
-    } else if (/^ {4}/.test(line) || /^\t/.test(line)) {
-      // Indented code block
-      inCodeBlock[i] = true;
-    }
-  }
-  
-  return inCodeBlock;
-}
 
 /**
  * Main rule implementation.
@@ -172,7 +125,8 @@ function noLiteralAmpersand(params, onError) {
 
   const validationResult = validateConfig(config, configSchema, 'no-literal-ampersand');
   if (!validationResult.isValid) {
-    logValidationErrors('no-literal-ampersand', validationResult.errors);
+    const logger = createMarkdownlintLogger(onError, 'no-literal-ampersand');
+    logValidationErrors('no-literal-ampersand', validationResult.errors, logger);
     // Continue execution with default values to prevent crashes
   }
 

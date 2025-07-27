@@ -7,7 +7,8 @@ import {
   validateStringArray, 
   validateBoolean,
   validateConfig, 
-  logValidationErrors 
+  logValidationErrors,
+  createMarkdownlintLogger 
 } from './config-validation.js';
 
 /**
@@ -108,7 +109,8 @@ export default {
 
       const validationResult = validateConfig(config, configSchema, 'no-bare-urls-trap');
       if (!validationResult.isValid) {
-        logValidationErrors('no-bare-urls-trap', validationResult.errors);
+        const logger = createMarkdownlintLogger(onError, 'no-bare-urls-trap');
+        logValidationErrors('no-bare-urls-trap', validationResult.errors, logger);
         // Continue execution with default values to prevent crashes
       }
 

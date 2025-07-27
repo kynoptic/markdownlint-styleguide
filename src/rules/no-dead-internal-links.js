@@ -17,7 +17,8 @@ import {
   validateStringArray, 
   validateBoolean,
   validateConfig, 
-  logValidationErrors 
+  logValidationErrors,
+  createMarkdownlintLogger 
 } from './config-validation.js';
 
 // Performance optimization: Cache for file existence and heading extraction
@@ -190,7 +191,8 @@ function noDeadInternalLinks(params, onError) {
 
   const validationResult = validateConfig(config, configSchema, 'no-dead-internal-links');
   if (!validationResult.isValid) {
-    logValidationErrors('no-dead-internal-links', validationResult.errors);
+    const logger = createMarkdownlintLogger(onError, 'no-dead-internal-links');
+    logValidationErrors('no-dead-internal-links', validationResult.errors, logger);
     // Continue execution with default values to prevent crashes
   }
 
@@ -330,9 +332,9 @@ function noDeadInternalLinks(params, onError) {
  * Clear performance caches. Useful for testing or manual cache management.
  * PERFORMANCE: Cache clearing is not typically needed in normal usage since
  * markdownlint runs are typically short-lived and caches are beneficial.
- * @public
+ * @private
  */
-export function clearCaches() {
+function clearCaches() {
   fileExistenceCache.clear();
   headingCache.clear();
   contentCache.clear();
@@ -341,9 +343,9 @@ export function clearCaches() {
 /**
  * Get cache statistics for performance monitoring.
  * @returns {Object} Cache size information
- * @public
+ * @private
  */
-export function getCacheStats() {
+function getCacheStats() {
   return {
     fileExistenceCache: fileExistenceCache.size,
     headingCache: headingCache.size,
@@ -359,4 +361,10 @@ export default {
   parser: 'micromark',
   function: noDeadInternalLinks,
   fixable: false
+};
+
+// Test-only exports for internal cache management and monitoring
+export const _forTesting = {
+  clearCaches,
+  getCacheStats
 };

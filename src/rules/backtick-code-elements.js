@@ -11,8 +11,10 @@ import {
   validateStringArray, 
   validateBoolean,
   validateConfig, 
-  logValidationErrors 
+  logValidationErrors,
+  createMarkdownlintLogger 
 } from './config-validation.js';
+import { updateCodeBlockState, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
 
 /**
  * Generate a contextual error message based on the type of violation detected.
@@ -123,7 +125,8 @@ function backtickCodeElements(params, onError) {
 
   const validationResult = validateConfig(config, configSchema, 'backtick-code-elements');
   if (!validationResult.isValid) {
-    logValidationErrors('backtick-code-elements', validationResult.errors);
+    const logger = createMarkdownlintLogger(onError, 'backtick-code-elements');
+    logValidationErrors('backtick-code-elements', validationResult.errors, logger);
     // Continue execution with default values to prevent crashes
   }
 
@@ -143,11 +146,10 @@ function backtickCodeElements(params, onError) {
     const lineNumber = i + 1;
     const line = lines[i];
 
-
-    // Detect both ``` and ~~~ as code block fences (ATX or tilde).
-    const fenceMatch = line.trim().match(/^(`{3,}|~{3,})/);
-    if (fenceMatch) {
-      inCodeBlock = !inCodeBlock;
+    // Update code block state using shared utility
+    const codeBlockUpdate = updateCodeBlockState(line, inCodeBlock);
+    if (codeBlockUpdate.updated) {
+      inCodeBlock = codeBlockUpdate.inCodeBlock;
       continue;
     }
 
@@ -175,12 +177,7 @@ function backtickCodeElements(params, onError) {
       }
     }
 
-    const codeSpans = [];
-    const spanRegex = /`[^`]+`/g;
-    let spanMatch;
-    while ((spanMatch = spanRegex.exec(line)) !== null) {
-      codeSpans.push([spanMatch.index, spanMatch.index + spanMatch[0].length]);
-    }
+    const codeSpans = getInlineCodeSpans(line);
 
     const patterns = [
       /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
@@ -364,7 +361,7 @@ function backtickCodeElements(params, onError) {
         }
 
         // Skip if inside a code span
-        if (codeSpans.some(([s, e]) => start >= s && end <= e)) {
+        if (isInCodeSpan(codeSpans, start, end)) {
           continue;
         }
         // Skip if inside a Markdown link, wiki link, or HTML comment
