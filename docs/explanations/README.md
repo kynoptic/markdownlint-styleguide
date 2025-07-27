@@ -1,8 +1,7 @@
-# `/docs/explanations`
+# Explanations
 
-Background material and conceptual overviews for the project.
+This section provides background material and conceptual overviews for the project.
 
-## Files
-
-- [`project-stack.md`](./project-stack.md) – Overview of the project's technology stack and architecture.
-- [`roadmap.md`](./roadmap.md) – Planned improvements and future work.
+- [Project architecture](./architecture.md)
+- [Test fixtures](./test-fixtures.md)
+- [Roadmap](./ROADMAP.md)

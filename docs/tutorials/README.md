@@ -1,4 +1,5 @@
-# `/docs/tutorials`
+# Tutorials
 
-Tutorial-style guides for learning how to use and extend **markdownlint-trap**.
-Currently no tutorials are available.
+This section provides tutorials for learning how to use and extend the `markdownlint-trap` project.
+
+There are currently no tutorials available. Please check back later.
