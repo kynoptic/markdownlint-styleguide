@@ -51,6 +51,7 @@ const casingTerms = exports.casingTerms = {
   unesco: 'UNESCO',
   unicef: 'UNICEF',
   url: 'URL',
+  urls: 'URLs',
   ux: 'UX',
   vpn: 'VPN',
   xml: 'XML',

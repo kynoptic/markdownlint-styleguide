@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _sharedConstants = require("./shared-constants.cjs");
 var _autofixSafety = require("./autofix-safety.cjs");
+var _configValidation = require("./config-validation.cjs");
 // @ts-check
 
 /**
@@ -45,10 +46,24 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const tokens = params.parsers.micromark.tokens;
   const lines = params.lines;
   const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || {};
+
+  // Validate configuration
+  const configSchema = {
+    specialTerms: _configValidation.validateStringArray,
+    technicalTerms: _configValidation.validateStringArray,
+    properNouns: _configValidation.validateStringArray
+  };
+  const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'sentence-case-heading');
+  if (!validationResult.isValid) {
+    (0, _configValidation.logValidationErrors)('sentence-case-heading', validationResult.errors);
+    // Continue execution with empty arrays to prevent crashes
+  }
+
   // Support both new `specialTerms` and old `technicalTerms`/`properNouns` for user config
-  const userSpecialTerms = config.specialTerms || [];
-  const userTechnicalTerms = config.technicalTerms || [];
-  const userProperNouns = config.properNouns || [];
+  // Only use valid arrays; fall back to empty arrays for invalid config
+  const userSpecialTerms = Array.isArray(config.specialTerms) ? config.specialTerms : [];
+  const userTechnicalTerms = Array.isArray(config.technicalTerms) ? config.technicalTerms : [];
+  const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
   const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
   const specialCasedTerms = {
     ..._sharedConstants.casingTerms

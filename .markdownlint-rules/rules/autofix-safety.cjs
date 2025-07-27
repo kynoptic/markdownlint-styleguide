@@ -30,7 +30,7 @@ exports.shouldApplyAutofix = shouldApplyAutofix;
  */
 const DEFAULT_SAFETY_CONFIG = {
   enabled: true,
-  confidenceThreshold: 0.8,
+  confidenceThreshold: 0.5,
   safeWords: ['npm', 'api', 'url', 'html', 'css', 'json', 'xml', 'http', 'https'],
   unsafeWords: ['i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'],
   requireManualReview: false
@@ -105,9 +105,21 @@ function calculateBacktickConfidence(original, context = {}) {
 
   // Higher confidence for clear file paths
   if (original.includes('/') && /\.[a-zA-Z0-9]+$/.test(original)) {
-    confidence += 0.3; // Files with extensions
+    confidence += 0.4; // Files with extensions
   } else if (original.includes('/') && original.split('/').length > 2) {
-    confidence += 0.2; // Multi-segment paths
+    confidence += 0.3; // Multi-segment paths
+  } else if (original.includes('/')) {
+    confidence += 0.1; // Simple paths like src/utils
+  }
+
+  // Higher confidence for common file names
+  if (/^[a-zA-Z0-9._-]+\.(json|js|ts|py|md|txt|yml|yaml|xml|html|css|scss|sh|sql|env|cfg|conf|ini|toml|lock|log)$/i.test(original)) {
+    confidence += 0.3;
+  }
+
+  // Higher confidence for import statements
+  if (/^import\s+\w+/.test(original)) {
+    confidence += 0.2;
   }
 
   // Higher confidence for clear commands
@@ -125,10 +137,13 @@ function calculateBacktickConfidence(original, context = {}) {
     confidence += 0.2;
   }
 
-  // Lower confidence for common English words
-  const commonWords = ['i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'under', 'over', 'across', 'around', 'behind', 'beside', 'beyond', 'inside', 'outside', 'within', 'without', 'toward', 'towards', 'until', 'since', 'while', 'although', 'though', 'because', 'if', 'unless', 'when', 'where', 'why', 'how', 'what', 'which', 'who', 'whom', 'whose', 'this', 'that', 'these', 'those', 'here', 'there', 'now', 'then', 'today', 'tomorrow', 'yesterday', 'always', 'never', 'sometimes', 'often', 'usually', 'rarely', 'seldom', 'frequently', 'occasionally', 'regularly', 'constantly', 'continuously', 'repeatedly', 'again', 'still', 'yet', 'already', 'just', 'only', 'even', 'also', 'too', 'very', 'quite', 'rather', 'pretty', 'fairly', 'really', 'truly', 'actually', 'certainly', 'definitely', 'probably', 'possibly', 'maybe', 'perhaps', 'surely', 'clearly', 'obviously', 'apparently', 'seemingly', 'supposedly', 'allegedly', 'reportedly', 'presumably', 'undoubtedly', 'unquestionably', 'indubitably', 'definitely', 'absolutely', 'completely', 'entirely', 'totally', 'fully', 'partly', 'partially', 'somewhat', 'slightly', 'barely', 'hardly', 'scarcely', 'nearly', 'almost', 'approximately', 'roughly', 'about', 'around', 'exactly', 'precisely', 'specifically', 'particularly', 'especially', 'notably', 'remarkably', 'significantly', 'considerably', 'substantially', 'dramatically', 'drastically', 'extremely', 'incredibly', 'amazingly', 'surprisingly', 'unexpectedly', 'unfortunately', 'fortunately', 'luckily', 'unluckily', 'hopefully', 'thankfully', 'regrettably', 'sadly', 'happily', 'gladly', 'eagerly', 'reluctantly', 'willingly', 'unwillingly', 'voluntarily', 'involuntarily', 'intentionally', 'unintentionally', 'deliberately', 'accidentally', 'mistakenly', 'correctly', 'incorrectly', 'properly', 'improperly', 'appropriately', 'inappropriately', 'suitably', 'unsuitably', 'adequately', 'inadequately', 'sufficiently', 'insufficiently', 'effectively', 'ineffectively', 'efficiently', 'inefficiently', 'successfully', 'unsuccessfully', 'satisfactorily', 'unsatisfactorily', 'acceptably', 'unacceptably', 'reasonably', 'unreasonably', 'logically', 'illogically', 'rationally', 'irrationally', 'sensibly', 'insensibly', 'wisely', 'unwisely', 'foolishly', 'smartly', 'cleverly', 'stupidly', 'intelligently', 'unintelligently', 'thoughtfully', 'thoughtlessly', 'carefully', 'carelessly', 'cautiously', 'recklessly', 'safely', 'unsafely', 'dangerously', 'securely', 'insecurely', 'privately', 'publicly', 'openly', 'secretly', 'quietly', 'loudly', 'softly', 'gently', 'harshly', 'roughly', 'smoothly', 'easily', 'difficultly', 'simply', 'complexly', 'quickly', 'slowly', 'fast', 'slow', 'rapidly', 'gradually', 'suddenly', 'immediately', 'instantly', 'shortly', 'soon', 'late', 'early', 'on', 'time', 'punctually', 'promptly', 'timely', 'untimely', 'temporarily', 'permanently', 'briefly', 'momentarily', 'instantly', 'eternally', 'forever', 'never', 'always', 'sometimes', 'occasionally', 'frequently', 'rarely', 'seldom', 'regularly', 'irregularly', 'consistently', 'inconsistently', 'constantly', 'continuously', 'intermittently', 'periodically', 'cyclically', 'seasonally', 'annually', 'monthly', 'weekly', 'daily', 'hourly', 'minutely', 'secondly', 'firstly', 'lastly', 'finally', 'initially', 'originally', 'previously', 'formerly', 'currently', 'presently', 'recently', 'lately', 'newly', 'freshly', 'recently', 'just', 'already', 'yet', 'still', 'again', 'once', 'twice', 'thrice', 'multiple', 'several', 'many', 'few', 'some', 'any', 'all', 'every', 'each', 'either', 'neither', 'both', 'none', 'nothing', 'everything', 'anything', 'something', 'someone', 'anyone', 'everyone', 'no', 'one', 'somebody', 'anybody', 'everybody', 'nobody', 'somewhere', 'anywhere', 'everywhere', 'nowhere', 'wherever', 'whenever', 'whatever', 'whichever', 'whoever', 'whomever', 'however', 'therefore', 'thus', 'hence', 'consequently', 'accordingly', 'so', 'then', 'now', 'well', 'oh', 'ah', 'yes', 'no', 'okay', 'ok', 'sure', 'right', 'wrong', 'correct', 'incorrect', 'true', 'false', 'real', 'fake', 'actual', 'virtual', 'genuine', 'artificial', 'natural', 'synthetic', 'organic', 'inorganic', 'living', 'dead', 'alive', 'deceased', 'born', 'died', 'live', 'die', 'exist', 'be', 'have', 'do', 'say', 'get', 'make', 'go', 'know', 'take', 'see', 'come', 'think', 'look', 'want', 'give', 'use', 'find', 'tell', 'ask', 'work', 'seem', 'feel', 'try', 'leave', 'call', 'good', 'new', 'first', 'last', 'long', 'great', 'little', 'own', 'other', 'old', 'right', 'big', 'high', 'different', 'small', 'large', 'next', 'early', 'young', 'important', 'few', 'public', 'bad', 'same', 'able'];
+  // Lower confidence for common English words and natural language phrases
+  const commonWords = ['i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'];
+  const naturalLanguagePhrases = ['read/write', 'pass/fail', 'on/off', 'in/out', 'up/down', 'left/right', 'true/false', 'yes/no'];
   if (commonWords.includes(original.toLowerCase())) {
-    confidence -= 0.4;
+    confidence -= 0.6; // Strong penalty for common words
+  } else if (naturalLanguagePhrases.includes(original.toLowerCase())) {
+    confidence -= 0.8; // Very strong penalty for natural language phrases
   }
 
   // Lower confidence for very short terms that could be ambiguous
