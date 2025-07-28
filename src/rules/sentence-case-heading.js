@@ -80,8 +80,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   };
 
   const validationResult = validateConfig(config, configSchema, 'sentence-case-heading');
+  const logger = createMarkdownlintLogger(onError, 'sentence-case-heading');
+  
   if (!validationResult.isValid) {
-    const logger = createMarkdownlintLogger(onError, 'sentence-case-heading');
     logValidationErrors('sentence-case-heading', validationResult.errors, logger);
     // Continue execution with empty arrays to prevent crashes
   }
@@ -93,8 +94,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
   
   // Show deprecation warnings for old configuration keys
-  // Use console.warn for now since tests expect this and deprecation warnings 
-  // are different from configuration errors
+  // These remain as console.warn since they are deprecation warnings, not configuration errors
   if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0) {
     console.warn('⚠️  Configuration warning [sentence-case-heading]: "technicalTerms" is deprecated. Please use "specialTerms" instead.');
   }

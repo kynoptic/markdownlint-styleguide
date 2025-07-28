@@ -13,6 +13,7 @@ import {
   createMarkdownlintLogger 
 } from './config-validation.js';
 import { getCodeBlockLines, isInInlineCode } from './shared-utils.js';
+import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
  * Check if a character position is inside inline code or other special context.
@@ -157,18 +158,19 @@ function noLiteralAmpersand(params, onError) {
       if (line[pos] === '&') {
         if (shouldFlagAmpersand(line, pos, skipInlineCode, exceptions)) {
           // Always provide fix for ampersand replacement since it's a safe operation
-          const fixInfo = {
+          const basicFixInfo = {
             editColumn: pos + 1,
             deleteCount: 1,
             insertText: 'and'
           };
+          const safeFixInfo = createSafeFixInfo(basicFixInfo, params.lines, lineNumber, 'no-literal-ampersand');
 
           onError({
             lineNumber,
             detail: 'Use "and" instead of literal ampersand (&)',
             context: `"${line.trim()}"`,
             range: [pos + 1, 1], // +1 for 1-based column
-            fixInfo: fixInfo
+            fixInfo: safeFixInfo
           });
         }
       }

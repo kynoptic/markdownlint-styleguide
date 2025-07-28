@@ -10,6 +10,7 @@ import {
   logValidationErrors,
   createMarkdownlintLogger 
 } from './config-validation.js';
+import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
  * @typedef {import("markdownlint").Rule} Rule
@@ -135,13 +136,14 @@ export default {
             }
             
             // Create autofix that wraps the URL in angle brackets
-            const fixInfo = createAutoFix(child, token, childIndex, params.lines);
+            const basicFixInfo = createAutoFix(child, token, childIndex, params.lines);
+            const safeFixInfo = createSafeFixInfo(basicFixInfo, params.lines, child.lineNumber, 'no-bare-url');
             
             onError({ 
               lineNumber: child.lineNumber, 
               detail: "Bare URL used.", 
               context: href,
-              fixInfo
+              fixInfo: safeFixInfo
             });
           }
         });
