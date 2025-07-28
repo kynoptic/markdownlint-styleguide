@@ -6,6 +6,7 @@
     "MD041": false,
     "MD029": { "style": "ordered" },
     "MD004": { "style": "dash" },
+    "MD036": false,
     // "sentence-case-heading": {
     //   // Uncomment and customize these arrays to override or extend the defaults
     //   // All default terms are defined in src/rules/shared-constants.js as a unified casingTerms object
