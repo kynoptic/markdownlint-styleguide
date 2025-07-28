@@ -17,3 +17,5 @@ jobs:
       - run: npm run lint
       - run: npx markdownlint-cli2 "**/*.md" "!.windsurf/**"
       - run: npm test
+      - run: npm run test:performance
+        name: Run performance tests

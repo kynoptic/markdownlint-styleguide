@@ -8,7 +8,8 @@
     "build": "BABEL_ENV=build babel src --out-dir .markdownlint-rules --extensions '.js,.mjs' --out-file-extension .cjs --copy-files",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration",
-    "test:performance": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration/performance.test.js",
+    "test:performance": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.performance.mjs",
+    "test:performance:gc": "node --expose-gc --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.performance.mjs",
     "test:integration:external": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration/curated-repos.test.js --verbose",
     "lint": "eslint .",
     "prepare": "husky"
