@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(markdownlint-cli2:*)",
+      "Bash(git reset:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npx markdownlint-cli2:*)"
+    ],
+    "deny": []
+  }
+}
