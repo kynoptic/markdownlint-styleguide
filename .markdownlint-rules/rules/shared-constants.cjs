@@ -123,6 +123,7 @@ const casingTerms = exports.casingTerms = {
   linux: 'Linux',
   macos: 'macOS',
   markdown: 'Markdown',
+  'markdownlint-cli2': 'markdownlint-cli2',
   'machine learning': 'Machine Learning',
   michael: 'Michael',
   microsoft: 'Microsoft',
