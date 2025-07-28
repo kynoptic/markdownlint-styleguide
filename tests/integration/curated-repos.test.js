@@ -11,7 +11,7 @@ import { lint } from 'markdownlint/promise';
 import { execSync } from 'child_process';
 import sentenceRule from '../../src/rules/sentence-case-heading.js';
 import backtickRule from '../../src/rules/backtick-code-elements.js';
-import noBareUrlsRule from '../../src/rules/no-bare-urls.js';
+// import noBareUrlsRule from '../../src/rules/no-bare-urls.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -80,7 +80,7 @@ function findMarkdownFiles(repoPath, patterns, maxFiles = 50) {
   
   for (const pattern of patterns) {
     try {
-      const globPattern = path.join(repoPath, pattern);
+      // const globPattern = path.join(repoPath, pattern);
       const command = `find "${repoPath}" -name "*.md" -type f | head -${maxFiles}`;
       const output = execSync(command, { encoding: 'utf8', timeout: 5000 });
       const files = output.trim().split('\n').filter(Boolean);

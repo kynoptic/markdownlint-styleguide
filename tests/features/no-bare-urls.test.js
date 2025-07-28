@@ -28,7 +28,7 @@ describe("no-bare-urls-trap rule", () => {
       customRules: [noBareUrls],
       config: {
         default: false,
-        "no-bare-urls-trap": true,
+        "no-bare-url": true,
         MD034: false,
       },
       markdownItFactory: () => new MarkdownIt({ linkify: true }),
@@ -96,7 +96,7 @@ describe("no-bare-urls-trap rule", () => {
         customRules: [noBareUrls],
         config: {
           default: false,
-          "no-bare-urls-trap": true,
+          "no-bare-url": true,
         },
         markdownItFactory: () => new MarkdownIt({ linkify: true }),
       };

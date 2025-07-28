@@ -85,6 +85,71 @@ const FILE_EXTENSION_KEYWORDS = new Set([
 ]);
 
 /**
+ * Common English words that are rarely appropriate for backticks
+ * @type {string[]}
+ */
+const COMMON_WORDS = [
+  'i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
+  'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+  'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how',
+  'all', 'any', 'some', 'many', 'much', 'few', 'little', 'most', 'more', 'less',
+  'one', 'two', 'three', 'first', 'last', 'next', 'previous', 'before', 'after'
+];
+
+/**
+ * Natural language phrases that should not be wrapped in backticks
+ * @type {string[]}
+ */
+const NATURAL_LANGUAGE_PHRASES = [
+  'read/write', 'pass/fail', 'on/off', 'in/out', 'up/down', 'left/right', 'true/false', 'yes/no',
+  'black/white', 'day/night', 'hot/cold', 'big/small', 'fast/slow', 'high/low', 'old/new',
+  'start/stop', 'begin/end', 'open/close', 'save/load', 'push/pull', 'give/take',
+  'buy/sell', 'win/lose', 'love/hate', 'good/bad', 'right/wrong', 'rich/poor',
+  'male/female', 'young/old', 'early/late', 'easy/hard', 'safe/dangerous'
+];
+
+/**
+ * Regex patterns that commonly cause false positives for code detection
+ * @type {RegExp[]}
+ */
+const PROBLEMATIC_PATTERNS = [
+  /^[a-z]{1,3}$/, // Very short lowercase words (e.g., 'is', 'or', 'in')
+  /^(go|do|be|if|it|my|we|he|she|you|us|me|him|her|our|his|its|who|what|why|how|when|where)$/i, // Common English words
+  /^(one|two|three|four|five|six|seven|eight|nine|ten)$/i, // Number words
+  /^(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)$/i, // Color words
+  /^(big|small|large|tiny|huge|mini|max|min)$/i, // Size words
+  /^(new|old|fresh|stale|young|ancient|modern|classic)$/i, // Age/time words
+  /^(good|bad|nice|cool|hot|cold|warm|best|worst|better|worse)$/i, // Quality words
+  /^(quick|slow|fast|rapid|swift|delayed|instant)$/i, // Speed words
+  /^(easy|hard|simple|complex|basic|advanced|tough|difficult)$/i, // Complexity words
+];
+
+/**
+ * Natural language context indicators that suggest non-code content
+ * @type {string[]}
+ */
+const NATURAL_LANGUAGE_INDICATORS = [
+  'is a', 'are a', 'was a', 'were a', 'this is', 'that is', 'it is', 'he is', 'she is',
+  'would be', 'could be', 'should be', 'might be', 'must be',
+  'i think', 'i believe', 'in my opinion', 'personally', 'generally',
+  'for example', 'such as', 'like this', 'as follows', 'namely',
+  'however', 'therefore', 'moreover', 'furthermore', 'nevertheless',
+  'note that', 'remember that', 'keep in mind', 'be aware', 'make sure'
+];
+
+/**
+ * Technical context indicators that suggest code content
+ * @type {string[]}
+ */
+const TECHNICAL_INDICATORS = [
+  'install', 'configure', 'setup', 'deploy', 'build', 'compile', 'run', 'execute',
+  'command', 'script', 'function', 'method', 'class', 'variable', 'parameter',
+  'api', 'endpoint', 'request', 'response', 'server', 'client', 'database',
+  'repository', 'branch', 'commit', 'merge', 'push', 'pull', 'clone', 'fork'
+];
+
+/**
  * Extract file extension from a filename or path
  * @param {string} filename - The filename or path
  * @returns {string} The file extension (without the dot)
@@ -183,6 +248,118 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
 }
 
 /**
+ * Get confidence boost for file path patterns.
+ * @param {string} text - Text to analyze
+ * @returns {number} Confidence boost (0-0.4)
+ */
+function getFilePathConfidence(text) {
+  if (text.includes('/') && /\.[a-zA-Z0-9]+$/.test(text)) {
+    return 0.4; // Strong indicator: file path with extension
+  } else if (text.includes('/') && text.split('/').length > 2) {
+    return 0.3; // Multi-segment paths are likely code references
+  } else if (text.includes('/')) {
+    return 0.1; // Simple paths could be code or natural language
+  }
+  return 0;
+}
+
+/**
+ * Get confidence boost for command-like patterns.
+ * @param {string} text - Text to analyze
+ * @returns {number} Confidence boost (0-0.3)
+ */
+function getCommandConfidence(text) {
+  let confidence = 0;
+  
+  // Standalone filenames with common extensions
+  if (/^[a-zA-Z0-9._-]+\.(json|js|ts|py|md|txt|yml|yaml|xml|html|css|scss|sh|sql|env|cfg|conf|ini|toml|lock|log)$/i.test(text)) {
+    confidence += 0.3; // Standalone filenames are strong code indicators
+  }
+  
+  // Import statements
+  if (/^import\s+\w+/.test(text)) {
+    confidence += 0.2; // Import statements are definitively code
+  }
+  
+  // Command-line tools
+  if (COMMAND_KEYWORDS.has(text.split(/\s+/)[0]?.toLowerCase())) {
+    confidence += 0.3; // Command tools are strong code indicators
+  }
+  
+  // Environment variables
+  if (/^[A-Z_][A-Z0-9_]*$/.test(text) && text.length > 2) {
+    confidence += 0.2; // Environment variable pattern
+  }
+  
+  // File extensions
+  if (FILE_EXTENSION_KEYWORDS.has(getFileExtension(text))) {
+    confidence += 0.2; // File extension references
+  }
+  
+  return Math.min(confidence, 0.3); // Cap at 0.3 to avoid over-boosting
+}
+
+/**
+ * Get confidence penalty for natural language patterns.
+ * @param {string} text - Text to analyze
+ * @returns {number} Confidence penalty (0-0.9)
+ */
+function getNaturalLanguagePenalty(text) {
+  if (COMMON_WORDS.includes(text.toLowerCase())) {
+    return 0.7; // Heavy penalty: common English words rarely need backticks
+  } else if (NATURAL_LANGUAGE_PHRASES.includes(text.toLowerCase())) {
+    return 0.9; // Severe penalty: natural language phrases shouldn't be code
+  } else if (PROBLEMATIC_PATTERNS.some(pattern => pattern.test(text))) {
+    return 0.5; // Moderate penalty: ambiguous patterns
+  }
+  
+  let penalty = 0;
+  
+  // Very short terms
+  if (text.length <= 2) {
+    penalty += 0.3; // Short terms are usually natural language
+  }
+  
+  // Short letter-only words
+  if (/^[a-zA-Z]+$/.test(text) && text.length < 5) {
+    penalty += 0.2; // Short letter-only words are ambiguous
+  }
+  
+  return penalty;
+}
+
+/**
+ * Get context-aware confidence adjustments.
+ * @param {string} text - Text to analyze
+ * @param {Object} context - Context with line information
+ * @returns {number} Confidence adjustment (-0.5 to +0.2)
+ */
+function getContextAdjustment(text, context) {
+  if (!context || !context.line) {
+    return 0;
+  }
+  
+  const line = context.line.toLowerCase();
+  let adjustment = 0;
+  
+  if (NATURAL_LANGUAGE_INDICATORS.some(indicator => line.includes(indicator))) {
+    adjustment -= 0.3; // Natural language context reduces code likelihood
+  }
+  
+  // Repeated terms in prose
+  const termCount = (line.match(new RegExp(`\\b${text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')) || []).length;
+  if (termCount > 1) {
+    adjustment -= 0.2; // Repeated terms suggest natural language usage
+  }
+  
+  if (TECHNICAL_INDICATORS.some(indicator => line.includes(indicator))) {
+    adjustment += 0.2; // Technical context increases code likelihood
+  }
+  
+  return adjustment;
+}
+
+/**
  * Calculate confidence score for a backtick autofix.
  * @param {string} original - Original text to be wrapped
  * @param {Object} context - Additional context
@@ -195,149 +372,12 @@ export function calculateBacktickConfidence(original, context = {}) {
 
   let confidence = 0.5; // Base confidence: neutral starting point
 
-  // FILE PATH CONFIDENCE BOOSTS
-  // +0.4: Very high confidence for files with extensions (e.g., "src/utils/file.js")
-  // File paths with extensions are almost certainly code references
-  if (original.includes('/') && /\.[a-zA-Z0-9]+$/.test(original)) {
-    confidence += 0.4; // Strong indicator: file path with extension
-  } else if (original.includes('/') && original.split('/').length > 2) {
-    // +0.3: High confidence for deep directory paths (e.g., "src/components/ui")
-    confidence += 0.3; // Multi-segment paths are likely code references
-  } else if (original.includes('/')) {
-    // +0.1: Small confidence boost for simple paths (e.g., "src/utils")
-    confidence += 0.1; // Simple paths could be code or natural language
-  }
+  // Apply various confidence adjustments
+  confidence += getFilePathConfidence(original);
+  confidence += getCommandConfidence(original);
+  confidence -= getNaturalLanguagePenalty(original);
+  confidence += getContextAdjustment(original, context);
 
-  // +0.3: High confidence for standalone filenames with common extensions
-  // Patterns like "package.json", "index.js", "README.md" are clearly code files
-  if (/^[a-zA-Z0-9._-]+\.(json|js|ts|py|md|txt|yml|yaml|xml|html|css|scss|sh|sql|env|cfg|conf|ini|toml|lock|log)$/i.test(original)) {
-    confidence += 0.3; // Standalone filenames are strong code indicators
-  }
-
-  // +0.2: Moderate confidence for import statements
-  // Anything starting with "import" is clearly code syntax
-  if (/^import\s+\w+/.test(original)) {
-    confidence += 0.2; // Import statements are definitively code
-  }
-
-  // +0.3: High confidence for command-line tools
-  // First word matches known command tools (git, npm, docker, etc.)
-  if (COMMAND_KEYWORDS.has(original.split(/\s+/)[0]?.toLowerCase())) {
-    confidence += 0.3; // Command tools are strong code indicators
-  }
-
-  // +0.2: Moderate confidence for environment variables
-  // ALL_CAPS_WITH_UNDERSCORES pattern typically indicates env vars
-  if (/^[A-Z_][A-Z0-9_]*$/.test(original) && original.length > 2) {
-    confidence += 0.2; // Environment variable pattern
-  }
-
-  // +0.2: Moderate confidence for file extensions
-  // Single words that match common file extensions
-  if (FILE_EXTENSION_KEYWORDS.has(getFileExtension(original))) {
-    confidence += 0.2; // File extension references
-  }
-
-  // Lower confidence for common English words and natural language phrases
-  const commonWords = [
-    'i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-    'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
-    'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
-    'this', 'that', 'these', 'those', 'here', 'there', 'where', 'when', 'why', 'how',
-    'all', 'any', 'some', 'many', 'much', 'few', 'little', 'most', 'more', 'less',
-    'one', 'two', 'three', 'first', 'last', 'next', 'previous', 'before', 'after'
-  ];
-  
-  const naturalLanguagePhrases = [
-    'read/write', 'pass/fail', 'on/off', 'in/out', 'up/down', 'left/right', 'true/false', 'yes/no',
-    'black/white', 'day/night', 'hot/cold', 'big/small', 'fast/slow', 'high/low', 'old/new',
-    'start/stop', 'begin/end', 'open/close', 'save/load', 'push/pull', 'give/take',
-    'buy/sell', 'win/lose', 'love/hate', 'good/bad', 'right/wrong', 'rich/poor',
-    'male/female', 'young/old', 'early/late', 'easy/hard', 'safe/dangerous'
-  ];
-
-  // Additional patterns that commonly cause false positives
-  const problematicPatterns = [
-    /^[a-z]{1,3}$/, // Very short lowercase words (e.g., 'is', 'or', 'in')
-    /^(go|do|be|if|it|my|we|he|she|you|us|me|him|her|our|his|its|who|what|why|how|when|where)$/i, // Common English words
-    /^(one|two|three|four|five|six|seven|eight|nine|ten)$/i, // Number words
-    /^(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)$/i, // Color words
-    /^(big|small|large|tiny|huge|mini|max|min)$/i, // Size words
-    /^(new|old|fresh|stale|young|ancient|modern|classic)$/i, // Age/time words
-    /^(good|bad|nice|cool|hot|cold|warm|best|worst|better|worse)$/i, // Quality words
-    /^(quick|slow|fast|rapid|swift|delayed|instant)$/i, // Speed words
-    /^(easy|hard|simple|complex|basic|advanced|tough|difficult)$/i, // Complexity words
-  ];
-
-  // CONFIDENCE PENALTIES FOR NATURAL LANGUAGE
-  // These penalties help avoid false positives by heavily penalizing common English
-  
-  if (commonWords.includes(original.toLowerCase())) {
-    // -0.7: Strong penalty for very common English words (is, the, and, etc.)
-    // These words are almost never appropriate for backticks
-    confidence -= 0.7; // Heavy penalty: common English words rarely need backticks
-  } else if (naturalLanguagePhrases.includes(original.toLowerCase())) {
-    // -0.9: Very strong penalty for natural language phrases (pass/fail, on/off, etc.)
-    // These compound phrases are descriptive, not code
-    confidence -= 0.9; // Severe penalty: natural language phrases shouldn't be code
-  } else if (problematicPatterns.some(pattern => pattern.test(original))) {
-    // -0.5: Moderate penalty for patterns that commonly cause false positives
-    // Short words, colors, numbers, etc. that could be either
-    confidence -= 0.5; // Moderate penalty: ambiguous patterns
-  }
-
-  // -0.3: Moderate penalty for very short terms (≤2 chars)
-  // Short terms like "is", "or", "it" are usually English, not code
-  if (original.length <= 2) {
-    confidence -= 0.3; // Short terms are usually natural language
-  }
-
-  // -0.2: Small penalty for short letter-only words without technical indicators
-  // Words like "test", "user", "data" could be either code or English
-  if (/^[a-zA-Z]+$/.test(original) && original.length < 5) {
-    confidence -= 0.2; // Short letter-only words are ambiguous
-  }
-
-  // CONTEXT-AWARE ADJUSTMENTS
-  // Analyze the surrounding line content to make smarter decisions
-  if (context && context.line) {
-    const line = context.line.toLowerCase();
-    
-    // -0.3: Moderate penalty for natural language context
-    // If the line contains phrases that indicate natural language discussion
-    const naturalLanguageIndicators = [
-      'is a', 'are a', 'was a', 'were a', 'this is', 'that is', 'it is', 'he is', 'she is',
-      'would be', 'could be', 'should be', 'might be', 'must be',
-      'i think', 'i believe', 'in my opinion', 'personally', 'generally',
-      'for example', 'such as', 'like this', 'as follows', 'namely',
-      'however', 'therefore', 'moreover', 'furthermore', 'nevertheless',
-      'note that', 'remember that', 'keep in mind', 'be aware', 'make sure'
-    ];
-    
-    if (naturalLanguageIndicators.some(indicator => line.includes(indicator))) {
-      confidence -= 0.3; // Natural language context reduces code likelihood
-    }
-    
-    // -0.2: Small penalty for repeated terms in prose
-    // If the same term appears multiple times in one line, it's likely natural language
-    const termCount = (line.match(new RegExp(`\\b${original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')) || []).length;
-    if (termCount > 1) {
-      confidence -= 0.2; // Repeated terms suggest natural language usage
-    }
-    
-    // +0.2: Moderate confidence boost for technical context
-    // If the line contains technical keywords, increase code likelihood
-    const technicalIndicators = [
-      'install', 'configure', 'setup', 'deploy', 'build', 'compile', 'run', 'execute',
-      'command', 'script', 'function', 'method', 'class', 'variable', 'parameter',
-      'api', 'endpoint', 'request', 'response', 'server', 'client', 'database',
-      'repository', 'branch', 'commit', 'merge', 'push', 'pull', 'clone', 'fork'
-    ];
-    
-    if (technicalIndicators.some(indicator => line.includes(indicator))) {
-      confidence += 0.2; // Technical context increases code likelihood
-    }
-  }
 
   return Math.max(0, Math.min(1, confidence));
 }

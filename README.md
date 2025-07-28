@@ -44,7 +44,7 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 
 ### Requirements
 
-- **Node.js**: Version 14 or higher
+- **Node.js**: Version 18 or higher
 - **markdownlint-cli2**: Recommended for best experience
 
 ### Install via npm

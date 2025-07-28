@@ -144,7 +144,7 @@ const casingTerms = exports.casingTerms = {
   swagger: 'Swagger',
   terraform: 'Terraform',
   ubuntu: 'Ubuntu',
-  'user experience': 'User Experience',
+  'user experience': 'User experience',
   'user interface': 'User Interface',
   'vs code': 'VS Code',
   vscode: 'VS Code',

@@ -320,6 +320,7 @@ Broken [link format
       // Check that caches have some data
       const beforeClear = getCacheStats();
       const totalBefore = beforeClear.fileExistenceCache + beforeClear.headingCache + beforeClear.contentCache;
+      expect(totalBefore).toBeGreaterThan(0);
       
       // Clear caches
       clearCaches();

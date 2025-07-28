@@ -3,16 +3,16 @@
  * Performance tests for rules against large markdown files.
  * Ensures rules maintain reasonable performance at scale.
  */
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { describe, test, expect } from '@jest/globals';
+// import fs from 'fs';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+import { describe, test, expect, beforeAll } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
 import sentenceRule from '../../src/rules/sentence-case-heading.js';
 import backtickRule from '../../src/rules/backtick-code-elements.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 /**
  * Generate a large markdown file for testing

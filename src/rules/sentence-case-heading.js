@@ -93,6 +93,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
   
   // Show deprecation warnings for old configuration keys
+  // Use console.warn for now since tests expect this and deprecation warnings 
+  // are different from configuration errors
   if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0) {
     console.warn('⚠️  Configuration warning [sentence-case-heading]: "technicalTerms" is deprecated. Please use "specialTerms" instead.');
   }
@@ -607,13 +609,17 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     
     // For bold list items, flag these violations:
     
-    // 1. All lowercase start (should start with capital)
+    // 1. Check if first word is a known technical term (allow lowercase if it's a proper term)
     const firstWord = processedWords[firstWordIndex];
-    if (/^[a-z]/.test(firstWord)) {
+    const firstWordLower = firstWord.toLowerCase();
+    const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
+    
+    // 2. All lowercase start (should start with capital), unless it's a known technical term
+    if (/^[a-z]/.test(firstWord) && !expectedFirstWordCasing) {
       return true;
     }
     
-    // 2. All caps (unless it's a short acronym or single word)
+    // 3. All caps (unless it's a short acronym or single word)
     if (processedWords.length > 1) {
       const nonPreservedWords = processedWords.filter(w => !w.startsWith('__PRESERVED_'));
       if (nonPreservedWords.length > 1 && nonPreservedWords.every(w => w === w.toUpperCase() && w.length > 1)) {
@@ -621,7 +627,32 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
     }
     
-    // 3. Title case with common words (multiple words with unnecessary capitals)
+    // 4. Check for multi-word proper phrases first (must run before title case check)
+    // Also track which word positions are part of approved phrases
+    const approvedPhraseWordIndices = new Set();
+    for (const [phrase, expected] of Object.entries(specialCasedTerms)) {
+      if (!phrase.includes(' ')) {
+        continue;
+      }
+      const regex = new RegExp(`\\b${phrase}\\b`, 'i');
+      const match = regex.exec(cleanedText);
+      if (match) {
+        if (match[0] !== expected) {
+          return true;
+        }
+        // Track which words are part of this approved phrase
+        const phraseWords = match[0].split(/\s+/);
+        let wordIndex = 0;
+        for (let i = 0; i < processedWords.length; i++) {
+          if (wordIndex < phraseWords.length && processedWords[i] === phraseWords[wordIndex]) {
+            approvedPhraseWordIndices.add(i);
+            wordIndex++;
+          }
+        }
+      }
+    }
+    
+    // 5. Title case with common words (multiple words with unnecessary capitals)
     if (processedWords.length >= 2) {
       const titleCasePattern = /^[A-Z][a-z]*(?:\s+[A-Z][a-z]*){1,}/;
       if (titleCasePattern.test(cleanedText.trim())) {
@@ -633,7 +664,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
     }
     
-    // 4. Check for specific technical term violations and other capitalization issues
+    // 6. Check for specific technical term violations and other capitalization issues
     for (let i = 0; i < processedWords.length; i++) {
       const word = processedWords[i];
       if (word.startsWith('__PRESERVED_')) continue;
@@ -647,7 +678,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
       
       // Check for incorrectly capitalized words that should be lowercase or special cased
-      if (i > 0) { // Skip first word (already checked)
+      if (i > 0 && !approvedPhraseWordIndices.has(i)) { // Skip first word and approved phrase words
         // Words like "Test", "Date", "Version" should be lowercase unless they're proper nouns
         if (/^[A-Z][a-z]+$/.test(word) && !expectedCasing) {
           const commonWords = ['Test', 'Date', 'Version', 'Link', 'Code', 'Bold', 'Italic'];

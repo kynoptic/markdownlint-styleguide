@@ -289,6 +289,7 @@ describe('sentence-case-heading configuration validation', () => {
       // This heading should not trigger an error because MyCustomAPI is in our config
       const markdown = '# Using MyCustomAPI for data';
       const errors = runRuleWithConfig(config, markdown);
+      expect(errors).toEqual([]);
       
       // Should not report validation errors
       expect(mockConsoleError).not.toHaveBeenCalled();

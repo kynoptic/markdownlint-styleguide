@@ -16,6 +16,150 @@ var _sharedUtils = require("./shared-utils.cjs");
  */
 // Import the centralized ignoredTerms Set
 
+// Regex patterns used by helper functions
+const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
+const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
+
+/**
+ * Determine if an index range is within a Markdown link or image.
+ *
+ * @param {string} text - Line being evaluated.
+ * @param {number} start - Start index of match.
+ * @param {number} end - End index of match.
+ * @returns {boolean}
+ */
+function inMarkdownLink(text, start, end) {
+  let m;
+  linkRegex.lastIndex = 0;
+  while ((m = linkRegex.exec(text)) !== null) {
+    if (start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if an index range falls inside a wiki-style link.
+ *
+ * @param {string} text - Line being evaluated.
+ * @param {number} start - Start index of match.
+ * @param {number} end - End index of match.
+ * @returns {boolean} True when the range is within a wiki link.
+ */
+function inWikiLink(text, start, end) {
+  let m;
+  wikiLinkRegex.lastIndex = 0;
+  while ((m = wikiLinkRegex.exec(text)) !== null) {
+    if (start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if an index range falls inside an HTML comment.
+ *
+ * @param {string} text - Line being evaluated.
+ * @param {number} start - Start index of match.
+ * @param {number} end - End index of match.
+ * @returns {boolean} True when the range is within an HTML comment.
+ */
+function inHtmlComment(text, start, end) {
+  const commentRegex = /<!--.*?-->/g;
+  let m;
+  while ((m = commentRegex.exec(text)) !== null) {
+    if (start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if an index range falls inside a LaTeX math expression.
+ * Handles both inline ($...$) and block ($$...$$) math expressions.
+ * Distinguishes between LaTeX math and shell variables like $value.
+ *
+ * @param {string} text - Line being evaluated.
+ * @param {number} start - Start index of match.
+ * @param {number} end - End index of match.
+ * @returns {boolean} True when the range is within a LaTeX math expression.
+ */
+function inLatexMath(text, start, end) {
+  // Check for inline math expressions ($...$)
+  const inlineMathRegex = /\$([^$]+?)\$/g;
+  let m;
+  while ((m = inlineMathRegex.exec(text)) !== null) {
+    const content = m[1];
+    const isMathLike = /[\\{}^_]/.test(content) ||
+    // Contains LaTeX special characters
+    /[a-zA-Z][+\-*/=<> ]/.test(content) ||
+    // Contains variables in equations
+    / [+\-*/=] /.test(content) ||
+    // Contains operators with spacing
+    !/^\d+(\.\d+)?$/.test(content.trim()); // Not just a number (price)
+
+    if (isMathLike && start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+
+  // Check for block math expressions ($$...$$) on a single line
+  const blockMathRegex = /\$\$([^$]|\$[^$])*\$\$/g;
+  blockMathRegex.lastIndex = 0; // Reset regex state
+  while ((m = blockMathRegex.exec(text)) !== null) {
+    if (start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+
+  // If the line contains common LaTeX math functions, it's likely math-related.
+  if (/\\(?:sum|frac|int|lim|sqrt|sin|cos|log|alpha|beta|gamma|delta|theta|pi|sigma)\b/.test(text)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Heuristically determine if a string looks like a file path.
+ * This is used to reduce false positives from natural language
+ * that can resemble a path (e.g., "pass/fail", "read/write").
+ *
+ * @param {string} str - Text to evaluate.
+ * @returns {boolean} True if the string resembles a file path.
+ */
+function isLikelyFilePath(str) {
+  // Paths must contain a slash.
+  if (!str.includes('/')) {
+    return false;
+  }
+
+  // Paths with spaces are uncommon in un-quoted prose.
+  if (/\s/.test(str)) {
+    return false;
+  }
+  const segments = str.split('/');
+
+  // Reject if all segments are numeric (e.g., "1/2", "2023/10/15").
+  // Allows for empty segments from leading/trailing slashes.
+  if (segments.every(s => /^\d+$/.test(s) || s === '')) {
+    return false;
+  }
+
+  // For simple "a/b" paths without file extensions, be more skeptical.
+  if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
+    // Avoids flagging common short phrases like "on/off", "i/o".
+    if (segments[0].length <= 2 || segments[1].length <= 2) {
+      return false;
+    }
+  }
+
+  // A likely path should contain at least one letter.
+  return /[a-zA-Z]/.test(str);
+}
+
 /**
  * Patterns for contextual error message generation.
  * Each pattern contains a regex and corresponding message template.
@@ -197,147 +341,6 @@ function backtickCodeElements(params, onError) {
     // Allows single-digit variables like $1, but not $10 or more.
     /\$(?!\d{2,}(?:\.\d*)?\b|\d\.\d+)\S+/g];
     const flaggedPositions = new Set();
-    const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
-    const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
-    /**
-     * Determine if an index range is within a Markdown link or image.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean}
-     */
-    function inMarkdownLink(text, start, end) {
-      let m;
-      linkRegex.lastIndex = 0;
-      while ((m = linkRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Check if an index range falls inside a wiki-style link.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within a wiki link.
-     */
-    function inWikiLink(text, start, end) {
-      let m;
-      wikiLinkRegex.lastIndex = 0;
-      while ((m = wikiLinkRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Check if an index range falls inside an HTML comment.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within an HTML comment.
-     */
-    function inHtmlComment(text, start, end) {
-      const commentRegex = /<!--.*?-->/g;
-      let m;
-      while ((m = commentRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Check if an index range falls inside a LaTeX math expression.
-     * Handles both inline ($...$) and block ($$...$$) math expressions.
-     * Distinguishes between LaTeX math and shell variables like $value.
-     *
-     * @param {string} text - Line being evaluated.
-     * @param {number} start - Start index of match.
-     * @param {number} end - End index of match.
-     * @returns {boolean} True when the range is within a LaTeX math expression.
-     */
-    function inLatexMath(text, start, end) {
-      // Check for inline math expressions ($...$)
-      const inlineMathRegex = /\$([^$]+?)\$/g;
-      let m;
-      while ((m = inlineMathRegex.exec(text)) !== null) {
-        const content = m[1];
-        const isMathLike = /[\\{}^_]/.test(content) ||
-        // Contains LaTeX special characters
-        /[a-zA-Z][+\-*/=<> ]/.test(content) ||
-        // Contains variables in equations
-        / [+\-*/=] /.test(content) ||
-        // Contains operators with spacing
-        !/^\d+(\.\d+)?$/.test(content.trim()); // Not just a number (price)
-
-        if (isMathLike && start >= m.index && end <= m.index + m[0].length) {
-          return true;
-        }
-      }
-
-      // Check for block math expressions ($$...$$) on a single line
-      const blockMathRegex = /\$\$([^$]|\$[^\$])*\$\$/g;
-      blockMathRegex.lastIndex = 0; // Reset regex state
-      while ((m = blockMathRegex.exec(text)) !== null) {
-        if (start >= m.index && end <= m.index + m[0].length) {
-          return true;
-        }
-      }
-
-      // If the line contains common LaTeX math functions, it's likely math-related.
-      if (/\\(?:sum|frac|int|lim|sqrt|sin|cos|log|alpha|beta|gamma|delta|theta|pi|sigma)\b/.test(text)) {
-        return true;
-      }
-      return false;
-    }
-
-    /**
-     * Heuristically determine if a string looks like a file path.
-     * This is used to reduce false positives from natural language
-     * that can resemble a path (e.g., "pass/fail", "read/write").
-     *
-     * @param {string} str - Text to evaluate.
-     * @returns {boolean} True if the string resembles a file path.
-     */
-    function isLikelyFilePath(str) {
-      // Paths must contain a slash.
-      if (!str.includes('/')) {
-        return false;
-      }
-
-      // Paths with spaces are uncommon in un-quoted prose.
-      if (/\s/.test(str)) {
-        return false;
-      }
-      const segments = str.split('/');
-
-      // Reject if all segments are numeric (e.g., "1/2", "2023/10/15").
-      // Allows for empty segments from leading/trailing slashes.
-      if (segments.every(s => /^\d+$/.test(s) || s === '')) {
-        return false;
-      }
-
-      // For simple "a/b" paths without file extensions, be more skeptical.
-      if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
-        // Avoids flagging common short phrases like "on/off", "i/o".
-        if (segments[0].length <= 2 || segments[1].length <= 2) {
-          return false;
-        }
-      }
-
-      // A likely path should contain at least one letter.
-      return /[a-zA-Z]/.test(str);
-    }
     for (const pattern of patterns) {
       pattern.lastIndex = 0;
       let match;
