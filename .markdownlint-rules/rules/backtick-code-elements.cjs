@@ -17,6 +17,60 @@ var _sharedUtils = require("./shared-utils.cjs");
 // Import the centralized ignoredTerms Set
 
 /**
+ * Patterns for contextual error message generation.
+ * Each pattern contains a regex and corresponding message template.
+ */
+const ERROR_MESSAGE_PATTERNS = [{
+  pattern: /^(git|npm|pip|yarn|docker|brew|cargo|pnpm|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo|su|ps|top|htop|kill|killall|systemctl|service|crontab|tar|gzip|zip|unzip|cat|head|tail|less|more|vim|nano|emacs|code|ping|traceroute|nslookup|dig|netstat|ss)\s/,
+  message: text => `Command '${text}' should be wrapped in backticks to distinguish it from regular text`
+}, {
+  pattern: text => text.includes('$') && (text.includes('grep') || text.includes('export') || text.includes('set')),
+  message: text => `Shell command '${text}' should be wrapped in backticks to show it's a code example`
+}, {
+  pattern: text => text.includes('/') && /\.[a-zA-Z0-9]+$/.test(text),
+  message: text => `File path '${text}' should be wrapped in backticks for clarity and to distinguish it from regular text`
+}, {
+  pattern: text => text.includes('/') && /\/$/.test(text),
+  message: text => `Directory path '${text}' should be wrapped in backticks to show it's a file system location`
+}, {
+  pattern: text => text.includes('/'),
+  message: text => `Path '${text}' should be wrapped in backticks to indicate it's a file system reference`
+}, {
+  pattern: /^[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{1,5}$/,
+  message: text => `Filename '${text}' should be wrapped in backticks to distinguish it from regular text`
+}, {
+  pattern: /^\.[a-zA-Z]/,
+  message: text => `Configuration file '${text}' should be wrapped in backticks to show it's a filename`
+}, {
+  pattern: /^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/,
+  message: text => `Environment variable '${text}' should be wrapped in backticks to indicate it's a system variable`
+}, {
+  pattern: /^(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)$/,
+  message: text => `Environment variable '${text}' should be wrapped in backticks to indicate it's a system variable`
+}, {
+  pattern: /^\$/,
+  message: text => `Shell variable '${text}' should be wrapped in backticks to show it's a variable reference`
+}, {
+  pattern: /^--?[a-zA-Z]/,
+  message: text => `Command flag '${text}' should be wrapped in backticks to show it's a command option`
+}, {
+  pattern: /\([^)]*\)$/,
+  message: text => `Function call '${text}' should be wrapped in backticks to show it's code`
+}, {
+  pattern: /^import\s+/,
+  message: text => `Import statement '${text}' should be wrapped in backticks to show it's code`
+}, {
+  pattern: /^[A-Z]+\+[A-Z]+$/,
+  message: text => `Key combination '${text}' should be wrapped in backticks to distinguish it from regular text`
+}, {
+  pattern: /^[A-Za-z0-9.-]+:\d+$/,
+  message: text => `Network address '${text}' should be wrapped in backticks to show it's a technical reference`
+}, {
+  pattern: /^(?:export|set)\s+/,
+  message: text => `Variable assignment '${text}' should be wrapped in backticks to show it's a shell command`
+}];
+
+/**
  * Generate a contextual error message based on the type of violation detected.
  * @param {string} text - The text that triggered the violation
  * @param {string} line - The full line context
@@ -24,75 +78,20 @@ var _sharedUtils = require("./shared-utils.cjs");
  */
 function generateContextualErrorMessage(text, line) {
   // eslint-disable-line no-unused-vars
-  // Shell commands with arguments (highest priority)
-  if (/^(git|npm|pip|yarn|docker|brew|cargo|pnpm|curl|wget|ssh|scp|rsync|grep|sed|awk|find|ls|cd|mkdir|rm|cp|mv|chmod|chown|sudo|su|ps|top|htop|kill|killall|systemctl|service|crontab|tar|gzip|zip|unzip|cat|head|tail|less|more|vim|nano|emacs|code|ping|traceroute|nslookup|dig|netstat|ss)\s/.test(text)) {
-    return `Command '${text}' should be wrapped in backticks to distinguish it from regular text`;
-  }
-
-  // Shell commands with $ variables
-  if (text.includes('$') && (text.includes('grep') || text.includes('export') || text.includes('set'))) {
-    return `Shell command '${text}' should be wrapped in backticks to show it's a code example`;
-  }
-
-  // File paths (containing forward slashes)
-  if (text.includes('/')) {
-    if (/\.[a-zA-Z0-9]+$/.test(text)) {
-      return `File path '${text}' should be wrapped in backticks for clarity and to distinguish it from regular text`;
-    } else if (/\/$/.test(text)) {
-      return `Directory path '${text}' should be wrapped in backticks to show it's a file system location`;
-    } else {
-      return `Path '${text}' should be wrapped in backticks to indicate it's a file system reference`;
+  // Iterate through patterns to find the first match
+  for (const {
+    pattern,
+    message
+  } of ERROR_MESSAGE_PATTERNS) {
+    let matches = false;
+    if (typeof pattern === 'function') {
+      matches = pattern(text);
+    } else if (pattern instanceof RegExp) {
+      matches = pattern.test(text);
     }
-  }
-
-  // File names with extensions
-  if (/^[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{1,5}$/.test(text)) {
-    return `Filename '${text}' should be wrapped in backticks to distinguish it from regular text`;
-  }
-
-  // Dotfiles (starting with .)
-  if (/^\.[a-zA-Z]/.test(text)) {
-    return `Configuration file '${text}' should be wrapped in backticks to show it's a filename`;
-  }
-
-  // Environment variables (ALL_CAPS with underscores)
-  if (/^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(text) || /^(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)$/.test(text)) {
-    return `Environment variable '${text}' should be wrapped in backticks to indicate it's a system variable`;
-  }
-
-  // Shell variables (starting with $)
-  if (/^\$/.test(text)) {
-    return `Shell variable '${text}' should be wrapped in backticks to show it's a variable reference`;
-  }
-
-  // Command line flags (starting with - or --)
-  if (/^--?[a-zA-Z]/.test(text)) {
-    return `Command flag '${text}' should be wrapped in backticks to show it's a command option`;
-  }
-
-  // Function calls (text with parentheses)
-  if (/\([^)]*\)$/.test(text)) {
-    return `Function call '${text}' should be wrapped in backticks to show it's code`;
-  }
-
-  // Import statements
-  if (/^import\s+/.test(text)) {
-    return `Import statement '${text}' should be wrapped in backticks to show it's code`;
-  }
-
-  // Key combinations (CTRL+C, ALT+TAB, etc.)
-  if (/^[A-Z]+\+[A-Z]+$/.test(text)) {
-    return `Key combination '${text}' should be wrapped in backticks to distinguish it from regular text`;
-  }
-
-  // Host:port patterns
-  if (/^[A-Za-z0-9.-]+:\d+$/.test(text)) {
-    return `Network address '${text}' should be wrapped in backticks to show it's a technical reference`;
-  }
-
-  // Variable assignments (export VAR=value, set VAR=value)
-  if (/^(?:export|set)\s+/.test(text)) {
-    return `Variable assignment '${text}' should be wrapped in backticks to show it's a shell command`;
+    if (matches) {
+      return message(text);
+    }
   }
 
   // Default fallback message

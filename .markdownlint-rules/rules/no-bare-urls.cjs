@@ -81,7 +81,7 @@ function createAutoFix(linkToken, parentToken, childIndex, lines) {
 
 /** @type {Rule} */
 var _default = exports.default = {
-  names: ["no-bare-urls-trap", "BU001"],
+  names: ["no-bare-url", "BU001"],
   description: "Bare URL used. Surround with < and >.",
   tags: ["links", "url"],
   information: new URL("https://github.com/davidanson/markdownlint/blob/main/doc/md034.md"),
@@ -96,17 +96,17 @@ var _default = exports.default = {
     // The fix is to wrap the URL in angle brackets, e.g., <http://example.com>.
     // Note: Ensure markdown-it is configured with { linkify: true } in your test setup.
 
-    const config = params.config?.['no-bare-urls-trap'] || params.config?.BU001 || {};
+    const config = params.config?.['no-bare-url'] || params.config?.BU001 || {};
 
     // Validate configuration
     const configSchema = {
       allowedDomains: _configValidation.validateStringArray,
       skipCodeBlocks: _configValidation.validateBoolean
     };
-    const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-bare-urls-trap');
+    const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-bare-url');
     if (!validationResult.isValid) {
-      const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'no-bare-urls-trap');
-      (0, _configValidation.logValidationErrors)('no-bare-urls-trap', validationResult.errors, logger);
+      const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'no-bare-url');
+      (0, _configValidation.logValidationErrors)('no-bare-url', validationResult.errors, logger);
       // Continue execution with default values to prevent crashes
     }
 
