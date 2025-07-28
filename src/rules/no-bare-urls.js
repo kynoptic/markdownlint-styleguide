@@ -84,7 +84,7 @@ function createAutoFix(linkToken, parentToken, childIndex, lines) {
 
 /** @type {Rule} */
 export default {
-  names: ["no-bare-urls-trap", "BU001"],
+  names: ["no-bare-url", "BU001"],
   description: "Bare URL used. Surround with < and >.",
   tags: ["links", "url"],
   information: new URL("https://github.com/davidanson/markdownlint/blob/main/doc/md034.md"),
@@ -99,7 +99,7 @@ export default {
       // The fix is to wrap the URL in angle brackets, e.g., <http://example.com>.
       // Note: Ensure markdown-it is configured with { linkify: true } in your test setup.
       
-      const config = params.config?.['no-bare-urls-trap'] || params.config?.BU001 || {};
+      const config = params.config?.['no-bare-url'] || params.config?.BU001 || {};
 
       // Validate configuration
       const configSchema = {
@@ -107,10 +107,10 @@ export default {
         skipCodeBlocks: validateBoolean
       };
 
-      const validationResult = validateConfig(config, configSchema, 'no-bare-urls-trap');
+      const validationResult = validateConfig(config, configSchema, 'no-bare-url');
       if (!validationResult.isValid) {
-        const logger = createMarkdownlintLogger(onError, 'no-bare-urls-trap');
-        logValidationErrors('no-bare-urls-trap', validationResult.errors, logger);
+        const logger = createMarkdownlintLogger(onError, 'no-bare-url');
+        logValidationErrors('no-bare-url', validationResult.errors, logger);
         // Continue execution with default values to prevent crashes
       }
 
