@@ -125,7 +125,7 @@ Validates that internal links point to existing files
 - **Type:** `string[]`
 - **Default:** `[]`
 - **Description:** File paths to ignore when checking internal links
-- **Example:** `[\"node_modules/**\", \"dist/**\"]`
+- **Example:** `["node_modules/\*\*", "dist/\*\*"]`
 
 #### `checkAnchors`
 
@@ -210,15 +210,13 @@ Enforces sentence case in headings while allowing specific exceptions
 
 ✅ **Valid:**
 
-- # Getting started with APIs
-
-- # Working with JavaScript and HTML
+- `# Getting started with APIs`
+- `# Working with JavaScript and HTML`
 
 ❌ **Invalid:**
 
-- # Getting Started With APIs
-
-- # Working With JavaScript And HTML
+- `# Getting Started With APIs`
+- `# Working With JavaScript And HTML`
 
 **Configuration options:**
 
