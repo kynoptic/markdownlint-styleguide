@@ -369,27 +369,58 @@ function basicSentenceCaseHeadingFunction(params, onError) {
           };
         }
       } else {
-        // For bold text, don't allow arbitrary all-caps words (unlike headings)
-        if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word)) {
-          // Special case: allow 'I' pronoun
-          if (word !== 'I') {
-            return {
-              isValid: false,
-              errorMessage: `Word "${word}" in bold text should be lowercase.`
-            };
-          }
+        // For bold text, apply sentence case rules but be more permissive than headings
+        const isFirstWord = i === firstIndex;
+        
+        // Allow 'I' pronoun
+        if (word === 'I') {
+          continue;
         }
         
-        // Check for incorrectly capitalized words (be more permissive for bold text)
-        // Allow certain common section words but flag general title case
-        const allowedSectionWords = ['Background', 'Context', 'Overview', 'Summary', 'Introduction', 'Conclusion'];
-        const isAllowedSectionWord = allowedSectionWords.includes(word);
+        // Allow short acronyms (4 chars or less, all caps)
+        if (word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word)) {
+          continue;
+        }
         
-        if (word !== word.toLowerCase() && word !== 'I' && !expectedWordCasing && !isAllowedSectionWord) {
-          return {
-            isValid: false,
-            errorMessage: `Word "${word}" in bold text should be lowercase.`
-          };
+        // Allow single letters (section identifiers like "Part B")
+        if (word.length === 1) {
+          continue;
+        }
+        
+        // For the first word in bold text, it should be capitalized (sentence case)
+        if (isFirstWord) {
+          const expectedCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+          if (word !== expectedCase && !(word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word))) {
+            return {
+              isValid: false,
+              errorMessage: `First word "${word}" in bold text should be properly capitalized.`
+            };
+          }
+        } else {
+          // For non-first words, be selective about what can be capitalized
+          // Allow common section words and descriptive words that are often capitalized
+          const allowedCapitalizedWords = [
+            'Background', 'Context', 'Overview', 'Summary', 'Introduction', 'Conclusion',
+            'Step', 'Part', 'Section', 'Appendix', 'Chapter', 'Notes', 'References'
+          ];
+          
+          if (!allowedCapitalizedWords.includes(word)) {
+            // Check for all-caps violations
+            if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word)) {
+              return {
+                isValid: false,
+                errorMessage: `Word "${word}" in bold text should not be in all caps.`
+              };
+            }
+            
+            // Check for general capitalization violations
+            if (word !== word.toLowerCase()) {
+              return {
+                isValid: false,
+                errorMessage: `Word "${word}" in bold text should be lowercase.`
+              };
+            }
+          }
         }
       }
       
@@ -918,12 +949,47 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     
+    // Skip lines that contain both ** and backticks to avoid complex parsing issues
+    // This is a conservative approach to avoid false positives with ** inside code
+    if (line.includes('`') && line.includes('**')) {
+      // Only check if there are ** patterns outside of backticks
+      const tempLine = line.replace(/`[^`]*`/g, ''); // Remove all code spans
+      if (!tempLine.includes('**')) {
+        return; // No bold text outside of code spans
+      }
+    }
+    
     // Extract bold text using regex
-    const boldMatches = line.matchAll(/\*\*([^*]+)\*\*/g);
+    const boldMatches = line.matchAll(/\*\*([^*]+?)\*\*/g);
     
     for (const match of boldMatches) {
+      const matchStart = match.index;
+      const matchEnd = match.index + match[0].length;
+      
+      // Check if this match is inside backticks (code span)
+      // Find all code spans in the line and see if our match overlaps
+      let isInsideCode = false;
+      const codeSpanRegex = /`[^`]*`/g;
+      let codeSpanMatch;
+      
+      while ((codeSpanMatch = codeSpanRegex.exec(line)) !== null) {
+        const codeStart = codeSpanMatch.index;
+        const codeEnd = codeStart + codeSpanMatch[0].length;
+        
+        // Check if the bold match overlaps with this code span
+        if (matchStart >= codeStart && matchEnd <= codeEnd) {
+          isInsideCode = true;
+          break;
+        }
+      }
+      
+      if (isInsideCode) {
+        continue; // Skip bold text that's inside code spans
+      }
+      
       const boldText = match[1].trim();
       if (!boldText) continue;
+      
       
       // If the bold text has a colon, only validate the part before the colon
       const textToValidate = boldText.includes(':') ? 
