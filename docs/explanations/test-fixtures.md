@@ -28,8 +28,8 @@ tests/
 
 Each line in a test fixture can be marked to indicate whether it's expected to pass or fail a specific rule. This is done using special markers in HTML comments:
 
-- `<!-- ✅ -->`: Indicates that the line is expected to **pass** (i.e., no lint error should be reported for this line by the rule being tested).
-- `<!-- ❌ -->`: Indicates that the line is expected to **fail** (i.e., a lint error *should* be reported for this line by the rule being tested).
+- `<!-- ✅ -->`: Indicates that the line is expected to **Pass** (i.e., no lint error should be reported for this line by the rule being tested).
+- `<!-- ❌ -->`: Indicates that the line is expected to **Fail** (i.e., a lint error *should* be reported for this line by the rule being tested).
 
 Lines without these markers are ignored by the test runner for the purpose of checking rule violations. This allows you to include comments, context, or other Markdown that isn't directly part of the test case.
 

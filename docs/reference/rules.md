@@ -152,7 +152,7 @@ When a violation is detected, the rule provides contextual error messages:
 
 - "Filename '`package.json`' should be wrapped in backticks to distinguish it from regular text"
 - "Command '`npm install`' should be wrapped in backticks to distinguish it from regular text"
-- "File path 'src/components/`Button.js`' should be wrapped in backticks for clarity and to distinguish it from regular text"
+- "File path '`src/components`/`Button.js`' should be wrapped in backticks for clarity and to distinguish it from regular text"
 - "Environment variable '`NODE_ENV`' should be wrapped in backticks to indicate it's a system variable"
 
 ### Auto-fix
@@ -251,7 +251,6 @@ Choose the format that best fits your content:
 - Use descriptive links when the link text should be meaningful
 - Use autolinks when the URL itself is the important information
 - Use reference style for multiple references to the same URL
-
 
 ## `no-literal-ampersand` (NLA001)
 
