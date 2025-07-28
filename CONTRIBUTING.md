@@ -10,7 +10,7 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 
 ### Prerequisites
 
-- Node.js v14+
+- Node.js v18+
 - npm (included with Node.js)
 
 ### Installation
@@ -18,7 +18,7 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/markdownlint-trap.git
+    git clone https://github.com/kynoptic/markdownlint-trap.git
     cd markdownlint-trap
     ```
 
@@ -41,6 +41,15 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 - `npm run lint`: Run ESLint on the codebase.
 - `npx markdownlint-cli2 "**/*.md"`: Lint markdown files.
 - `DEBUG=markdownlint-trap* npm test`: Run tests with debug output.
+
+### Test execution environment
+
+Tests run against the **raw ESM source code** in `src/`, not the transpiled CommonJS output. Jest uses `babel-jest` to transform the ESM modules on-the-fly during test execution, allowing tests to `import directly` from `src/rules/*.js` files. This means:
+
+- No build step is required before running tests
+- Tests validate the actual source code behavior
+- Changes to `src/` files are immediately testable
+- The transpiled `.markdownlint-rules/` directory is only used for distribution
 
 ## Project architecture
 
@@ -84,7 +93,7 @@ For more details, see the [project architecture documentation](./docs/explanatio
 
 ## Coding guidelines
 
-- Use ES modules compatible with Node.js v14+.
+- Use ES modules compatible with Node.js v18+.
 - Document all functions with JSDoc comments.
 - Follow existing coding style and conventions.
 - Write clear, descriptive commit messages following conventional commit format.
