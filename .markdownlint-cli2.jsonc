@@ -19,7 +19,7 @@
   "customRules": [
     ".markdownlint-rules/rules/sentence-case-heading.cjs",
     ".markdownlint-rules/rules/backtick-code-elements.cjs",
-    ".markdownlint-rules/rules/wt-no-bare-urls.cjs"
+    ".markdownlint-rules/rules/no-bare-urls.cjs"
   ],
   "globs": [
     "**/*.md",
