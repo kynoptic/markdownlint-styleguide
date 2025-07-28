@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _configValidation = require("./config-validation.cjs");
+var _autofixSafety = require("./autofix-safety.cjs");
 /**
  * @fileoverview Rule to enforce that URLs are always wrapped in a proper Markdown link.
  * @author 
@@ -131,12 +132,13 @@ var _default = exports.default = {
           }
 
           // Create autofix that wraps the URL in angle brackets
-          const fixInfo = createAutoFix(child, token, childIndex, params.lines);
+          const basicFixInfo = createAutoFix(child, token, childIndex, params.lines);
+          const safeFixInfo = (0, _autofixSafety.createSafeFixInfo)(basicFixInfo, params.lines, child.lineNumber, 'no-bare-url');
           onError({
             lineNumber: child.lineNumber,
             detail: "Bare URL used.",
             context: href,
-            fixInfo
+            fixInfo: safeFixInfo
           });
         }
       });

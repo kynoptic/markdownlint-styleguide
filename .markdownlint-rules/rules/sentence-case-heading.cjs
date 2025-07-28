@@ -67,8 +67,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     properNouns: _configValidation.validateStringArray
   };
   const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'sentence-case-heading');
+  const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'sentence-case-heading');
   if (!validationResult.isValid) {
-    const logger = (0, _configValidation.createMarkdownlintLogger)(onError, 'sentence-case-heading');
     (0, _configValidation.logValidationErrors)('sentence-case-heading', validationResult.errors, logger);
     // Continue execution with empty arrays to prevent crashes
   }
@@ -80,8 +80,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
 
   // Show deprecation warnings for old configuration keys
-  // Use console.warn for now since tests expect this and deprecation warnings 
-  // are different from configuration errors
+  // These remain as console.warn since they are deprecation warnings, not configuration errors
   if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0) {
     console.warn('⚠️  Configuration warning [sentence-case-heading]: "technicalTerms" is deprecated. Please use "specialTerms" instead.');
   }
@@ -157,6 +156,34 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   }
 
   /**
+   * Generate fix information for bold text.
+   * @param {string} line The source line containing the bold text.
+   * @param {string} originalBoldText The original bold text to fix.
+   * @param {string} fixedBoldText The corrected bold text.
+   * @returns {object|undefined} Fix information or undefined if no fix available.
+   */
+  function getFixInfoForBoldText(line, originalBoldText, fixedBoldText) {
+    // Find the position of the bold text within the line
+    const boldPattern = `**${originalBoldText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}**`;
+    const boldIndex = line.indexOf(boldPattern);
+    if (boldIndex === -1) {
+      return undefined;
+    }
+    const originalFixInfo = {
+      editColumn: boldIndex + 3,
+      // After the opening **
+      deleteCount: originalBoldText.length,
+      insertText: fixedBoldText
+    };
+
+    // Apply safety checks to the fix
+    const safetyConfig = params.config?.autofix?.safety || {};
+    return (0, _autofixSafety.createSafeFixInfo)(originalFixInfo, 'sentence-case', originalBoldText, fixedBoldText, {
+      line
+    }, safetyConfig);
+  }
+
+  /**
    * Report a violation with auto-fix information.
    * @param {string} detail - Description of the issue.
    * @param {number} lineNumber - Line number for context.
@@ -173,6 +200,223 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       context: headingText,
       fixInfo: getFixInfoForHeading(line, textToFix)
     });
+  }
+
+  /**
+   * Report a violation for bold text with auto-fix information.
+   * @param {string} detail - Description of the issue.
+   * @param {number} lineNumber - Line number for context.
+   * @param {string} boldText - Bold text in question.
+   * @param {string} line - Original source line.
+   */
+  function reportForBoldText(detail, lineNumber, boldText, line) {
+    const fixedText = toSentenceCase(boldText);
+    onError({
+      lineNumber,
+      detail,
+      context: `**${boldText}**`,
+      fixInfo: fixedText ? getFixInfoForBoldText(line, boldText, fixedText) : undefined
+    });
+  }
+
+  /**
+   * Validates bold text with stricter rules than headings.
+   * @param {string} boldText The bold text to validate.
+   * @param {number} lineNumber The line number of the text.
+   * @param {string} sourceLine The full source line.
+   */
+  function validateBoldText(boldText, lineNumber, sourceLine) {
+    if (!boldText || !boldText.trim()) {
+      return;
+    }
+
+    // Debug logging
+    if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
+      console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
+    }
+
+    // Check for specific problematic patterns before processing markup
+    // These patterns indicate violations regardless of markup context
+    const problematicPatterns = [/\b(CODE|LINK|ITALIC|BOLD)\b/,
+    // All caps words that should be lowercase
+    /\bTest\b/,
+    // "Test" should be lowercase unless at start
+    /\bDate\b/,
+    // "Date" should be lowercase unless at start  
+    /\bVersion\b/ // "Version" should be lowercase unless at start
+    ];
+
+    // Check if any word after the first violates these patterns
+    const words = boldText.split(/\s+/);
+    for (let i = 1; i < words.length; i++) {
+      // Skip first word
+      const word = words[i].replace(/[^a-zA-Z]/g, ''); // Remove punctuation/markup
+
+      // Skip single letters (they're often section identifiers like "Part B")
+      if (word.length === 1) {
+        continue;
+      }
+      for (const pattern of problematicPatterns) {
+        if (pattern.test(word)) {
+          reportForBoldText(`Word "${word}" in bold text should be lowercase.`, lineNumber, boldText, sourceLine);
+          return;
+        }
+      }
+    }
+
+    // Prepare text for validation
+    const preparedText = prepareTextForValidation(boldText);
+    if (!preparedText) {
+      return;
+    }
+    const {
+      cleanedText,
+      words: processedWords
+    } = preparedText;
+
+    // Check for multi-word proper phrase violations first
+    if (validateProperPhrases(cleanedText, lineNumber)) {
+      return;
+    }
+
+    // For bold text, use stricter validation
+    const validationResult = performBoldTextValidation(processedWords, cleanedText);
+    if (!validationResult.isValid) {
+      reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine);
+    }
+  }
+
+  /**
+   * Performs stricter validation for bold text in list items.
+   * @param {string[]} words Array of words to validate.
+   * @param {string} cleanedText The cleaned text.
+   * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
+   */
+  function performBoldTextValidation(words, cleanedText) {
+    const firstIndex = findFirstValidationWord(words, cleanedText);
+    if (firstIndex === -1) {
+      return {
+        isValid: true
+      };
+    }
+
+    // Get phrase ignore indices
+    const phraseIgnore = getProperPhraseIndices(words);
+
+    // Validate first word
+    const firstWord = words[firstIndex];
+    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+    if (!firstWordResult.isValid) {
+      return firstWordResult;
+    }
+
+    // Check for all caps (stricter than headings)
+    if (isAllCapsHeading(words)) {
+      return {
+        isValid: false,
+        errorMessage: 'Bold text should not be in all caps.'
+      };
+    }
+
+    // Validate subsequent words with stricter rules
+    for (let i = firstIndex + 1; i < words.length; i++) {
+      if (phraseIgnore.has(i)) {
+        continue;
+      }
+      const word = words[i];
+      const wordLower = word.toLowerCase();
+      const expectedWordCasing = specialCasedTerms[wordLower];
+
+      // Skip preserved segments
+      if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
+        continue;
+      }
+
+      // Skip possessive words (likely part of proper nouns like "Patel's")
+      if (word.endsWith("'s") || word.endsWith("'s")) {
+        continue;
+      }
+
+      // Skip single letters (often section identifiers like "Part B")
+      if (word.length === 1) {
+        continue;
+      }
+
+      // For bold text, be stricter about acronyms - only allow known technical terms
+      if (expectedWordCasing) {
+        // Known proper noun or technical term
+        if (word !== expectedWordCasing) {
+          return {
+            isValid: false,
+            errorMessage: `Word "${word}" should be "${expectedWordCasing}".`
+          };
+        }
+      } else {
+        // For bold text, apply sentence case rules but be more permissive than headings
+        const isFirstWord = i === firstIndex;
+
+        // Allow 'I' pronoun
+        if (word === 'I') {
+          continue;
+        }
+
+        // Allow short acronyms (4 chars or less, all caps)
+        if (word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word)) {
+          continue;
+        }
+
+        // Allow single letters (section identifiers like "Part B")
+        if (word.length === 1) {
+          continue;
+        }
+
+        // For the first word in bold text, it should be capitalized (sentence case)
+        if (isFirstWord) {
+          const expectedCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+          if (word !== expectedCase && !(word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word))) {
+            return {
+              isValid: false,
+              errorMessage: `First word "${word}" in bold text should be properly capitalized.`
+            };
+          }
+        } else {
+          // For non-first words, be selective about what can be capitalized
+          // Allow common section words and descriptive words that are often capitalized
+          const allowedCapitalizedWords = ['Background', 'Context', 'Overview', 'Summary', 'Introduction', 'Conclusion', 'Step', 'Part', 'Section', 'Appendix', 'Chapter', 'Notes', 'References'];
+          if (!allowedCapitalizedWords.includes(word)) {
+            // Check for all-caps violations
+            if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word)) {
+              return {
+                isValid: false,
+                errorMessage: `Word "${word}" in bold text should not be in all caps.`
+              };
+            }
+
+            // Check for general capitalization violations
+            if (word !== word.toLowerCase()) {
+              return {
+                isValid: false,
+                errorMessage: `Word "${word}" in bold text should be lowercase.`
+              };
+            }
+          }
+        }
+      }
+
+      // Check hyphenated words
+      if (word.includes('-')) {
+        const parts = word.split('-');
+        if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
+          return {
+            isValid: false,
+            errorMessage: `Word "${parts[1]}" in bold text should be lowercase.`
+          };
+        }
+      }
+    }
+    return {
+      isValid: true
+    };
   }
 
   /**
@@ -254,25 +498,59 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    */
   function preserveMarkupSegments(text) {
     const preservedSegments = [];
-    const processed = text.replace(/`([^`]+)`/g, m => {
+    let processed = text;
+
+    // Process one type at a time to avoid conflicts
+    // 1. Code spans first (highest priority)
+    processed = processed.replace(/`([^`]+)`/g, m => {
       preservedSegments.push(m);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
-    }).replace(/\[[^\]]+\]\([^)]+\)|\[[^\]]+\]/g, m => {
+    });
+
+    // 2. Links
+    processed = processed.replace(/\[[^\]]+\]\([^)]+\)|\[[^\]]+\]/g, m => {
       preservedSegments.push(m);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
-    }).replace(/\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b/g, m => {
-      preservedSegments.push(m);
+    });
+
+    // 3. Version numbers (but not already preserved)
+    processed = processed.replace(/\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b/g, (match, ...args) => {
+      const fullMatch = args[args.length - 1];
+      // Don't preserve if it's already a preserved segment
+      if (fullMatch.includes('__PRESERVED_')) {
+        return match;
+      }
+      preservedSegments.push(match);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
-    }).replace(/\b(\d{4}-\d{2}-\d{2})\b/g, m => {
-      preservedSegments.push(m);
+    });
+
+    // 4. Dates
+    processed = processed.replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (match, ...args) => {
+      const fullMatch = args[args.length - 1];
+      if (fullMatch.includes('__PRESERVED_')) {
+        return match;
+      }
+      preservedSegments.push(match);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
-    }).replace(/(\*\*|__)(.*?)\1/g, m => {
-      // Bold
-      preservedSegments.push(m);
+    });
+
+    // 5. Bold text (but not already preserved)
+    processed = processed.replace(/(\*\*|__)(.*?)\1/g, (match, marker, content, ...args) => {
+      const fullMatch = args[args.length - 1];
+      if (fullMatch.includes('__PRESERVED_')) {
+        return match;
+      }
+      preservedSegments.push(match);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
-    }).replace(/(\*|_)(.*?)\1/g, m => {
-      // Italic
-      preservedSegments.push(m);
+    });
+
+    // 6. Italic text (but not already preserved)
+    processed = processed.replace(/(\*|_)(.*?)\1/g, (match, marker, content, ...args) => {
+      const fullMatch = args[args.length - 1];
+      if (fullMatch.includes('__PRESERVED_')) {
+        return match;
+      }
+      preservedSegments.push(match);
       return `__PRESERVED_${preservedSegments.length - 1}__`;
     });
     return {
@@ -436,6 +714,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         continue;
       }
 
+      // Skip possessive words (likely part of proper nouns like "Patel's")
+      if (word.endsWith("'s") || word.endsWith("'s")) {
+        continue;
+      }
+
       // Allow capitalization after colon
       const wordPos = headingText.indexOf(word);
       if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {
@@ -490,171 +773,6 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   }
 
   /**
-   * Validates bold list items specifically for sentence case.
-   * More permissive than heading validation.
-   * @param {string} boldText The bold text to validate.
-   * @returns {boolean} True if there's a violation.
-   */
-  function validateBoldListItem(boldText) {
-    // First check exemptions on the original text before any cleaning
-    const textWithoutMarkup = boldText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
-
-    // Skip if should be exempted
-    if (shouldExemptFromValidation(boldText, textWithoutMarkup)) {
-      return false;
-    }
-
-    // Strip leading symbols
-    const cleanedText = stripLeadingSymbols(boldText);
-    if (!cleanedText) {
-      return false;
-    }
-
-    // Check for specific problematic patterns before processing markup
-    // These patterns indicate violations regardless of markup
-    const problematicPatterns = [/\b(CODE|LINK|ITALIC|BOLD)\b/,
-    // All caps words that should be lowercase
-    /\bTest\b/,
-    // "Test" should be lowercase unless at start
-    /\bDate\b/,
-    // "Date" should be lowercase unless at start  
-    /\bVersion\b/ // "Version" should be lowercase unless at start
-    ];
-
-    // Check if any word after the first violates these patterns
-    const words = cleanedText.split(/\s+/);
-    for (let i = 1; i < words.length; i++) {
-      // Skip first word
-      const word = words[i].replace(/[^a-zA-Z]/g, ''); // Remove punctuation/markup
-      for (const pattern of problematicPatterns) {
-        if (pattern.test(word)) {
-          return true;
-        }
-      }
-    }
-
-    // Get text without markup for further analysis
-    const cleanedTextWithoutMarkup = cleanedText.replace(/`[^`]+`/g, '').replace(/\[([^\]]+)\]/g, '$1');
-
-    // Skip if should be exempted after cleaning
-    if (shouldExemptFromValidation(cleanedText, cleanedTextWithoutMarkup)) {
-      return false;
-    }
-    const {
-      processed
-    } = preserveMarkupSegments(cleanedText);
-    const clean = processed.replace(/[#*_~!+={}|:;"<>,.?\\]/g, ' ').trim();
-    if (!clean) {
-      return false;
-    }
-    const processedWords = clean.split(/\s+/).filter(w => w.length > 0);
-    if (processedWords.length === 0) {
-      return false;
-    }
-
-    // Find first actual word (skip preserved segments)
-    let firstWordIndex = 0;
-    while (firstWordIndex < processedWords.length && processedWords[firstWordIndex].startsWith('__PRESERVED_')) {
-      firstWordIndex++;
-    }
-    if (firstWordIndex >= processedWords.length) {
-      return false; // No actual words
-    }
-
-    // For bold list items, flag these violations:
-
-    // 1. Check if first word is a known technical term (allow lowercase if it's a proper term)
-    const firstWord = processedWords[firstWordIndex];
-    const firstWordLower = firstWord.toLowerCase();
-    const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
-
-    // 2. All lowercase start (should start with capital), unless it's a known technical term
-    if (/^[a-z]/.test(firstWord) && !expectedFirstWordCasing) {
-      return true;
-    }
-
-    // 3. All caps (unless it's a short acronym or single word)
-    if (processedWords.length > 1) {
-      const nonPreservedWords = processedWords.filter(w => !w.startsWith('__PRESERVED_'));
-      if (nonPreservedWords.length > 1 && nonPreservedWords.every(w => w === w.toUpperCase() && w.length > 1)) {
-        return true;
-      }
-    }
-
-    // 4. Check for multi-word proper phrases first (must run before title case check)
-    // Also track which word positions are part of approved phrases
-    const approvedPhraseWordIndices = new Set();
-    for (const [phrase, expected] of Object.entries(specialCasedTerms)) {
-      if (!phrase.includes(' ')) {
-        continue;
-      }
-      const regex = new RegExp(`\\b${phrase}\\b`, 'i');
-      const match = regex.exec(cleanedText);
-      if (match) {
-        if (match[0] !== expected) {
-          return true;
-        }
-        // Track which words are part of this approved phrase
-        const phraseWords = match[0].split(/\s+/);
-        let wordIndex = 0;
-        for (let i = 0; i < processedWords.length; i++) {
-          if (wordIndex < phraseWords.length && processedWords[i] === phraseWords[wordIndex]) {
-            approvedPhraseWordIndices.add(i);
-            wordIndex++;
-          }
-        }
-      }
-    }
-
-    // 5. Title case with common words (multiple words with unnecessary capitals)
-    if (processedWords.length >= 2) {
-      const titleCasePattern = /^[A-Z][a-z]*(?:\s+[A-Z][a-z]*){1,}/;
-      if (titleCasePattern.test(cleanedText.trim())) {
-        // Check if it contains common words that shouldn't be capitalized
-        const hasCommonWords = /\b(Is|A|An|The|Of|In|On|At|To|For|With|By|And|Or|But|Test|Date|Version)\b/.test(cleanedText);
-        if (hasCommonWords) {
-          return true;
-        }
-      }
-    }
-
-    // 6. Check for specific technical term violations and other capitalization issues
-    for (let i = 0; i < processedWords.length; i++) {
-      const word = processedWords[i];
-      if (word.startsWith('__PRESERVED_')) continue;
-      const wordLower = word.toLowerCase();
-      const expectedCasing = specialCasedTerms[wordLower];
-
-      // If we have a known technical term and it doesn't match
-      if (expectedCasing && word !== expectedCasing) {
-        return true;
-      }
-
-      // Check for incorrectly capitalized words that should be lowercase or special cased
-      if (i > 0 && !approvedPhraseWordIndices.has(i)) {
-        // Skip first word and approved phrase words
-        // Words like "Test", "Date", "Version" should be lowercase unless they're proper nouns
-        if (/^[A-Z][a-z]+$/.test(word) && !expectedCasing) {
-          const commonWords = ['Test', 'Date', 'Version', 'Link', 'Code', 'Bold', 'Italic'];
-          if (commonWords.includes(word)) {
-            return true;
-          }
-        }
-      }
-
-      // Check for hyphenated words that shouldn't be title-cased
-      if (word.includes('-') && /[A-Z]/.test(word.slice(1))) {
-        const parts = word.split('-');
-        // If second part of hyphenated word is capitalized when it shouldn't be
-        if (parts.length > 1 && parts[1] !== parts[1].toLowerCase() && !specialCasedTerms[parts[1].toLowerCase()]) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  /**
    * Prepares text for validation by cleaning and preserving markup.
    * @param {string} headingText The original heading text.
    * @returns {{cleanedText: string, textWithoutMarkup: string, processed: string, words: string[]} | null} Prepared text data or null if invalid.
@@ -674,7 +792,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const {
       processed
     } = preserveMarkupSegments(cleanedText);
-    const clean = processed.replace(/[#*_~!+={}|:;"<>,.?\\]/g, ' ').trim();
+    // Clean text but preserve the __PRESERVED_N__ markers  
+    const clean = processed.replace(/[#*~!+={}|:;"<>,.?\\]/g, ' ') // Remove special chars but keep underscores for preserved segments
+    .trim();
     if (!clean || /^\d+[\d./-]*$/.test(clean)) {
       return null;
     }
@@ -781,8 +901,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
   });
 
-  // Process bold text in list items
-  // Look for lines with bold markers and validate their content
+  // Process bold text in list items using regex detection
+  // (micromark doesn't parse list item internals deeply enough for token-based detection)
   lines.forEach((line, index) => {
     const lineNumber = index + 1;
 
@@ -791,9 +911,40 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
 
+    // Skip lines that contain both ** and backticks to avoid complex parsing issues
+    // This is a conservative approach to avoid false positives with ** inside code
+    if (line.includes('`') && line.includes('**')) {
+      // Only check if there are ** patterns outside of backticks
+      const tempLine = line.replace(/`[^`]*`/g, ''); // Remove all code spans
+      if (!tempLine.includes('**')) {
+        return; // No bold text outside of code spans
+      }
+    }
+
     // Extract bold text using regex
-    const boldMatches = line.matchAll(/\*\*([^*]+)\*\*/g);
+    const boldMatches = line.matchAll(/\*\*([^*]+?)\*\*/g);
     for (const match of boldMatches) {
+      const matchStart = match.index;
+      const matchEnd = match.index + match[0].length;
+
+      // Check if this match is inside backticks (code span)
+      // Find all code spans in the line and see if our match overlaps
+      let isInsideCode = false;
+      const codeSpanRegex = /`[^`]*`/g;
+      let codeSpanMatch;
+      while ((codeSpanMatch = codeSpanRegex.exec(line)) !== null) {
+        const codeStart = codeSpanMatch.index;
+        const codeEnd = codeStart + codeSpanMatch[0].length;
+
+        // Check if the bold match overlaps with this code span
+        if (matchStart >= codeStart && matchEnd <= codeEnd) {
+          isInsideCode = true;
+          break;
+        }
+      }
+      if (isInsideCode) {
+        continue; // Skip bold text that's inside code spans
+      }
       const boldText = match[1].trim();
       if (!boldText) continue;
 
@@ -803,21 +954,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       // Skip empty text
       if (!textToValidate) continue;
 
-      // Use specialized bold list item validation
-      const hasViolation = validateBoldListItem(textToValidate);
-      if (hasViolation) {
-        onError({
-          lineNumber: lineNumber,
-          detail: "Bold list item should use sentence case: first word capitalized, rest lowercase except for acronyms, proper nouns, and 'I'.",
-          context: `**${boldText}**` // Show with asterisks to indicate it's bold
-        });
-      }
+      // Use the unified validation logic
+      validateBoldText(textToValidate, lineNumber, line);
     }
   });
 }
 var _default = exports.default = {
   names: ['sentence-case-heading', 'SC001'],
-  description: 'Ensures ATX (`# `) headings use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.',
+  description: 'Ensures ATX (`# `) headings and bold text (`**bold**`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.',
   tags: ['headings', 'style', 'custom', 'basic'],
   parser: 'micromark',
   function: basicSentenceCaseHeadingFunction
