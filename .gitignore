@@ -7,6 +7,7 @@ coverage/
 dist/
 build/
 lib/
+.markdownlint-rules/
 
 # Environment variables
 .env
@@ -82,5 +83,16 @@ yarn-error.log*
 
 # Test coverage
 .nyc_output/
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /docs/reference/markdownlint-main/*
