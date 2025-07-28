@@ -34,9 +34,6 @@
   "lint-staged": {
     "*.{js,mjs}": [
       "eslint --fix"
-    ],
-    "*.md": [
-      "markdownlint-cli2 --fix --ignore 'docs/explanations/architecture.md' --ignore 'docs/explanations/test-fixtures.md' --ignore 'docs/reference/rules.md' --ignore 'README.md'"
     ]
   },
   "engines": {
