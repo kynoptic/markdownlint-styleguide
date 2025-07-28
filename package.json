@@ -34,6 +34,9 @@
   "lint-staged": {
     "*.{js,mjs}": [
       "eslint --fix"
+    ],
+    "*.md": [
+      "markdownlint-cli2 --fix"
     ]
   },
   "engines": {
