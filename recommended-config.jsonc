@@ -1,0 +1,24 @@
+{
+  // This is a shareable configuration for markdownlint-trap.
+  // Other projects can extend this file.
+  "customRules": [
+    "markdownlint-trap"
+  ],
+  "config": {
+    // Standard markdownlint rules
+    "default": true,
+    "MD013": false, // line-length
+    "MD024": false, // no-duplicate-heading
+    "MD041": false, // first-line-h1
+    "MD029": { "style": "ordered" },
+    "MD004": { "style": "dash" },
+    "MD036": false, // no-emphasis-as-heading
+
+    // Enable custom rules from this package
+    "sentence-case-heading": true,
+    "backtick-code-elements": true,
+    "no-bare-urls-trap": true,
+    "no-dead-internal-links": true,
+    "no-literal-ampersand": true
+  }
+}
