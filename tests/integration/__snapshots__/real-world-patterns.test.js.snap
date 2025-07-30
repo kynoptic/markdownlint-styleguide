@@ -739,153 +739,12 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests t
 exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all rules against all patterns: combined-rule-analysis 1`] = `
 {
   "api": {
-    "backtickViolations": [
-      {
-        "errorContext": "\`\`\`json",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 22,
-        },
-        "lineNumber": 22,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`json",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 40,
-        },
-        "lineNumber": 40,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "- limit (optional): Number of ...",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-        },
-        "lineNumber": 18,
-        "ruleDescription": "Lists should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
-        "ruleNames": [
-          "MD032",
-          "blanks-around-lists",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          3,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 4,
-          "insertText": "
-",
-        },
-        "lineNumber": 67,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
-    ],
+    "backtickViolations": [],
     "meta": {
       "contentLength": 1004,
       "contentLines": 67,
     },
     "sentenceViolations": [
-      {
-        "errorContext": "\`\`\`json",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 22,
-        },
-        "lineNumber": 22,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`json",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 40,
-        },
-        "lineNumber": 40,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "- limit (optional): Number of ...",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-        },
-        "lineNumber": 18,
-        "ruleDescription": "Lists should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md032.md",
-        "ruleNames": [
-          "MD032",
-          "blanks-around-lists",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          3,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 4,
-          "insertText": "
-",
-        },
-        "lineNumber": 67,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
       {
         "errorContext": "REST API Documentation",
         "errorDetail": "Word "Documentation" in heading should be lowercase.",
@@ -1069,220 +928,12 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "BCE001",
         ],
       },
-      {
-        "errorContext": null,
-        "errorDetail": "Expected: 80; Actual: 93",
-        "errorRange": [
-          81,
-          13,
-        ],
-        "fixInfo": null,
-        "lineNumber": 53,
-        "ruleDescription": "Line length",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
-        "ruleNames": [
-          "MD013",
-          "line-length",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 17,
-        },
-        "lineNumber": 17,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 23,
-        },
-        "lineNumber": 23,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 28,
-        },
-        "lineNumber": 28,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 33,
-        },
-        "lineNumber": 33,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          93,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 94,
-          "insertText": "
-",
-        },
-        "lineNumber": 53,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
     ],
     "meta": {
       "contentLength": 1096,
       "contentLines": 53,
     },
     "sentenceViolations": [
-      {
-        "errorContext": null,
-        "errorDetail": "Expected: 80; Actual: 93",
-        "errorRange": [
-          81,
-          13,
-        ],
-        "fixInfo": null,
-        "lineNumber": 53,
-        "ruleDescription": "Line length",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md013.md",
-        "ruleNames": [
-          "MD013",
-          "line-length",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 17,
-        },
-        "lineNumber": 17,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 23,
-        },
-        "lineNumber": 23,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 28,
-        },
-        "lineNumber": 28,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": "\`\`\`bash",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": {
-          "insertText": "
-",
-          "lineNumber": 33,
-        },
-        "lineNumber": 33,
-        "ruleDescription": "Fenced code blocks should be surrounded by blank lines",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md031.md",
-        "ruleNames": [
-          "MD031",
-          "blanks-around-fences",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          93,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 94,
-          "insertText": "
-",
-        },
-        "lineNumber": 53,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
       {
         "errorContext": "Project Name",
         "errorDetail": "Word "Name" in heading should be lowercase.",
@@ -1441,52 +1092,12 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "BCE001",
         ],
       },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          3,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 4,
-          "insertText": "
-",
-        },
-        "lineNumber": 39,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
     ],
     "meta": {
       "contentLength": 893,
       "contentLines": 39,
     },
     "sentenceViolations": [
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          3,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 4,
-          "insertText": "
-",
-        },
-        "lineNumber": 39,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
       {
         "errorContext": "Getting Started with Next.js",
         "errorDetail": "Word "Started" in heading should be lowercase.",
@@ -1595,52 +1206,12 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "BCE001",
         ],
       },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          45,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 46,
-          "insertText": "
-",
-        },
-        "lineNumber": 53,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
     ],
     "meta": {
       "contentLength": 1077,
       "contentLines": 53,
     },
     "sentenceViolations": [
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          45,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 46,
-          "insertText": "
-",
-        },
-        "lineNumber": 53,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
       {
         "errorContext": "React Documentation",
         "errorDetail": "Word "Documentation" in heading should be lowercase.",
@@ -1950,110 +1521,12 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "BCE001",
         ],
       },
-      {
-        "errorContext": "\`\`\`",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": null,
-        "lineNumber": 57,
-        "ruleDescription": "Fenced code blocks should have a language specified",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
-        "ruleNames": [
-          "MD040",
-          "fenced-code-language",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          30,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 31,
-          "insertText": "
-",
-        },
-        "lineNumber": 152,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
-      {
-        "errorContext": "[Authentication & Authorization](#authentication--authorization)",
-        "errorDetail": null,
-        "errorRange": [
-          4,
-          64,
-        ],
-        "fixInfo": null,
-        "lineNumber": 8,
-        "ruleDescription": "Link fragments should be valid",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
-        "ruleNames": [
-          "MD051",
-          "link-fragments",
-        ],
-      },
     ],
     "meta": {
       "contentLength": 2702,
       "contentLines": 152,
     },
     "sentenceViolations": [
-      {
-        "errorContext": "\`\`\`",
-        "errorDetail": null,
-        "errorRange": null,
-        "fixInfo": null,
-        "lineNumber": 57,
-        "ruleDescription": "Fenced code blocks should have a language specified",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md040.md",
-        "ruleNames": [
-          "MD040",
-          "fenced-code-language",
-        ],
-      },
-      {
-        "errorContext": null,
-        "errorDetail": null,
-        "errorRange": [
-          30,
-          1,
-        ],
-        "fixInfo": {
-          "editColumn": 31,
-          "insertText": "
-",
-        },
-        "lineNumber": 152,
-        "ruleDescription": "Files should end with a single newline character",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md047.md",
-        "ruleNames": [
-          "MD047",
-          "single-trailing-newline",
-        ],
-      },
-      {
-        "errorContext": "[Authentication & Authorization](#authentication--authorization)",
-        "errorDetail": null,
-        "errorRange": [
-          4,
-          64,
-        ],
-        "fixInfo": null,
-        "lineNumber": 8,
-        "ruleDescription": "Link fragments should be valid",
-        "ruleInformation": "https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/md051.md",
-        "ruleNames": [
-          "MD051",
-          "link-fragments",
-        ],
-      },
       {
         "errorContext": "Building a REST API with Node.js and Express",
         "errorDetail": "Word "Node" in heading should be lowercase.",

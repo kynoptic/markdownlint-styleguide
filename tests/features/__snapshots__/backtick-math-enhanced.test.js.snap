@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`backtick-code-elements enhanced fixture validation math contexts using utility function: fixture-backtick-math 1`] = `
+{
+  "expectations": {
+    "fail": [
+      19,
+      20,
+    ],
+    "fixes": Map {},
+    "pass": [
+      3,
+      4,
+      9,
+      11,
+      15,
+      17,
+      28,
+      30,
+    ],
+  },
+  "violations": [
+    {
+      "errorRange": [
+        32,
+        8,
+      ],
+      "lineNumber": 19,
+      "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+      "ruleNames": [
+        "backtick-code-elements",
+        "BCE001",
+      ],
+    },
+    {
+      "errorRange": [
+        17,
+        15,
+      ],
+      "lineNumber": 20,
+      "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+      "ruleNames": [
+        "backtick-code-elements",
+        "BCE001",
+      ],
+    },
+  ],
+}
+`;

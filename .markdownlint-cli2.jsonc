@@ -1,27 +1,7 @@
 {
   "config": {
-    "default": true,
-    "MD013": false,
-    "MD024": false,
-    "MD041": false,
-    "MD029": { "style": "ordered" },
-    "MD004": { "style": "dash" },
-    "MD036": false,
-    // "sentence-case-heading": {
-    //   // Uncomment and customize these arrays to override or extend the defaults
-    //   // All default terms are defined in src/rules/shared-constants.js as a unified casingTerms object
-    //   "properNouns": ["JavaScript", "GitHub", "YourCustomProperNoun"],
-    //   "technicalTerms": ["Node.js", "VS Code", "YourCustomTechTerm"]
-    // },
-    // NOTE: The arrays above are just examples. The actual defaults are maintained in 
-    // src/rules/shared-constants.js for better maintainability and reuse across rules.
-    "backtick-code-elements": true
+    "extends": "./recommended-config.jsonc"
   },
-  "customRules": [
-    ".markdownlint-rules/rules/sentence-case-heading.cjs",
-    ".markdownlint-rules/rules/backtick-code-elements.cjs",
-    ".markdownlint-rules/rules/no-bare-urls.cjs"
-  ],
   "globs": [
     "**/*.md",
     "!node_modules/**/*",

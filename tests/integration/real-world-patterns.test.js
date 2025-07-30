@@ -447,12 +447,17 @@ describe('Real-World Pattern Tests', () => {
       const combinedResults = {};
       
       for (const [source, content] of Object.entries(REAL_WORLD_PATTERNS)) {
-        const sentenceResults = await testRuleAgainstContent(sentenceRule, content, 'sentence-case-heading');
-        const backtickResults = await testRuleAgainstContent(backtickRule, content, 'backtick-code-elements');
-        
+        const results = await lint({
+          customRules: [sentenceRule, backtickRule],
+          strings: { content },
+          resultVersion: 3
+        });
+
+        const violations = results.content || [];
+
         combinedResults[source] = {
-          sentenceViolations: sentenceResults.fullResults,
-          backtickViolations: backtickResults.fullResults,
+          sentenceViolations: violations.filter(v => v.ruleNames.includes('sentence-case-heading')),
+          backtickViolations: violations.filter(v => v.ruleNames.includes('backtick-code-elements')),
           meta: {
             contentLength: content.length,
             contentLines: content.split('\n').length
