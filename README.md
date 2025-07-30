@@ -55,42 +55,65 @@ npm install markdownlint-trap --save-dev
 
 ## Configuration
 
-### Basic configuration
+### Recommended setup (extends)
+
+The easiest way to get started is by extending the shared configuration included in this package. This automatically enables all custom rules with our recommended settings.
 
 Create or update your `.markdownlint-cli2.jsonc` file:
 
 ```json
 {
-  "customRules": [
-    "markdownlint-trap"
-  ],
-  "config": {
-    "sentence-case-heading": true,
-    "backtick-code-elements": true,
-    "no-bare-urls-trap": true,
-    "no-dead-internal-links": true,
-    "no-literal-ampersand": true
-  }
+  "extends": "markdownlint-trap/recommended-config.jsonc"
 }
 ```
 
-### Advanced configuration
-
-Individual rules can be customized. For example:
+This single line gives you a great starting point. You can still override any setting for your specific project needs. For example, to disable a rule from the shared config:
 
 ```json
 {
-  "customRules": ["markdownlint-trap"],
+  "extends": "markdownlint-trap/recommended-config.jsonc",
   "config": {
-    "sentence-case-heading": {
-      "properNouns": ["GitHub", "JavaScript", "TypeScript"],
-      "technicalTerms": ["API", "CLI", "SDK"]
-    },
-    "backtick-code-elements": true,
-    "no-dead-internal-links": true
+    "no-literal-ampersand": false
   }
 }
 ```
+
+### Manual configuration
+
+If you prefer to configure each rule individually, you can add them manually to your `.markdownlint-cli2.jsonc` file.
+
+1. **Load the custom rules:**
+
+   First, tell markdownlint where to find the rules.
+
+   ```json
+   {
+     "customRules": ["markdownlint-trap"]
+   }
+   ```
+
+2. **Enable and configure rules:**
+
+   Next, add the rules you want to use to the config object. You can enable them with `true` or provide an object for advanced configuration.
+
+   ```json
+   {
+     "customRules": ["markdownlint-trap"],
+     "config": {
+       // Enable all custom rules
+       "sentence-case-heading": true,
+       "backtick-code-elements": true,
+       "no-bare-urls-trap": true,
+       "no-dead-internal-links": true,
+       "no-literal-ampersand": true,
+       
+       // Example of advanced configuration for a single rule
+       "sentence-case-heading": {
+         "specialTerms": ["GitHub", "JavaScript", "TypeScript", "API", "CLI", "SDK"]
+       }
+     }
+   }
+   ```
 
 ### Running the linter
 
