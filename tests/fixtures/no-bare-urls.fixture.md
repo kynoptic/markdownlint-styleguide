@@ -54,7 +54,7 @@ A URL used as link text is also fine: http://api.example.com. <!-- ❌ -->
 
 ### Non-URLs
 
-This is not a URL: my.domain.com/file.txt <!-- ✅ -->
+This is not a URL: my.domain.com/file.txt <!-- ❌ fix: This is not a URL: link. -->
 
 ## Invalid cases (should trigger the rule)
 

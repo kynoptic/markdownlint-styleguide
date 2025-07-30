@@ -26,7 +26,7 @@ describe('no-bare-urls enhanced fixture validation', () => {
     const testResults = await testRuleWithFixtureValidation(
       noBareUrlsRule, 
       fixtureContent, 
-      'no-bare-urls'
+      'no-bare-url'
     );
     
     // This provides comprehensive validation of every marked line
@@ -46,7 +46,7 @@ describe('no-bare-urls enhanced fixture validation', () => {
     const testResults = await testRuleWithFixtureValidation(
       noBareUrlsRule, 
       fixtureContent, 
-      'no-bare-urls'
+      'no-bare-url'
     );
     
     const { expectations, violations } = testResults;
@@ -77,7 +77,7 @@ describe('no-bare-urls enhanced fixture validation', () => {
     const testResults = await testRuleWithFixtureValidation(
       noBareUrlsRule, 
       fixtureContent, 
-      'no-bare-urls'
+      'no-bare-url'
     );
     
     const { expectations, violations } = testResults;
