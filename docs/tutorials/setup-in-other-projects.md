@@ -68,7 +68,7 @@ npm install
 
 ## Simple setup (two files needed)
 
-Once you have `markdownlint-trap` available in your project (see installation options below), you only need these **two configuration files**:
+Once you have `markdownlint-trap` available in your project, you only need these **two configuration files**:
 
 ### 1. `.markdownlint-cli2.jsonc` (for CLI linting)
 
