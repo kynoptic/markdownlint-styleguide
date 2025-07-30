@@ -2,69 +2,33 @@
 
 This guide explains how to configure `markdownlint-trap` custom rules in your project to work in both CLI and VS Code editor environments.
 
-## Quick start: basic configuration
-
-Once `markdownlint-trap` is available in your `node_modules` directory (see Installation Options below), you can configure your project to use it.
-
-### Required files
-
-#### 1. `.markdownlint-cli2.jsonc`
-
-Configuration for CLI tools (markdownlint-cli2):
-
-```jsonc
-{
-  "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  },
-  "globs": [
-    "**/*.md",
-    "!node_modules/**/*"
-  ]
-}
-```
-
-#### 2. `.vscode/settings.json` (for VS Code users)
-
-Optional workspace settings for the VS Code markdownlint extension:
-
-```json
-{
-  "markdownlint.customRules": [
-    "markdownlint-trap"
-  ],
-  "markdownlint.config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  }
-}
-```
-
-### Usage
-
-- **CLI**: Run `npx markdownlint-cli2`
-- **VS Code**: Rules will apply automatically if the [markdownlint extension](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is installed.
-
 ---
 
 ## Installation options
 
-Since `markdownlint-trap` is not published to npm, you have several options for getting it into your project.
+Since `markdownlint-trap` is **not published to npm** (it's a `private/internal` project), you need to make it available to your project using one of these methods:
 
-### Option 1: npm link (recommended for development)
+### Option 1: npm link (for active development)
 
-In the `markdownlint-trap` project directory:
+**Use this when**: You're actively developing markdownlint-trap rules and want changes to be immediately available in your other project.
+
+First, in the `markdownlint-trap` project directory:
 
 ```bash
 npm link
 ```
 
-In your other project directory:
+Then, in your other project directory:
 
 ```bash
 npm link markdownlint-trap
 ```
 
-### Option 2: Local file path dependency
+**Note**: You'll need to run `npm run build` in the markdownlint-trap project whenever you modify rules.
+
+### Option 2: Local file path dependency (for stable internal use)
+
+**Use this when**: You want to use a specific local version without the overhead of `npm link`.
 
 Add to your `package.json`:
 
@@ -82,7 +46,9 @@ Then run:
 npm install
 ```
 
-### Option 3: Git dependency
+### Option 3: Git dependency (if hosted in a git repository)
+
+**Use this when**: The markdownlint-trap project is available in a `git repository` (GitHub, GitLab, etc.).
 
 Add to your `package.json`:
 
@@ -94,9 +60,49 @@ Add to your `package.json`:
 }
 ```
 
-### Option 4: Copy rules directly
+Then run:
 
-This method doesn't use the `markdownlint-trap` package directly but copies its rules and configuration. You would need to update the configuration files to point to the copied rule files. See the original `setup-in-other-projects.md` for more details on this advanced approach if needed.
+```bash
+npm install
+```
+
+## Simple setup (two files needed)
+
+Once you have `markdownlint-trap` available in your project (see installation options below), you only need these **two configuration files**:
+
+### 1. `.markdownlint-cli2.jsonc` (for CLI linting)
+
+```jsonc
+{
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
+  },
+  "globs": [
+    "**/*.md",
+    "!node_modules/**/*"
+  ]
+}
+```
+
+### 2. `.vscode/settings.json` (for VS Code editor integration)
+
+```json
+{
+  "markdownlint.customRules": [
+    "markdownlint-trap"
+  ],
+  "markdownlint.config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
+  }
+}
+```
+
+### Usage
+
+- **CLI**: Run `npx markdownlint-cli2`
+- **VS Code**: Rules will apply automatically if the [markdownlint extension](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) is installed and you reload the window.
+
+ ---
 
 ## Active custom rules
 
@@ -129,4 +135,5 @@ For detailed configuration options, see the [configuration reference](../referen
 
 - **Custom rules not working in VS Code**: Reload the VS Code window and ensure the markdownlint extension is enabled.
 - **CLI errors**: Verify `.markdownlint-cli2.jsonc` is valid JSON and that `markdownlint-trap` exists in `node_modules`.
-- **Package not found**: If using `npm link` or a file path dependency, ensure the path is correct and run `npm install`.
+
+- ##### **Package not found**: If using `npm link` or a file path dependency, ensure the path is correct and run `npm install`
