@@ -2,7 +2,7 @@
 
 This guide explains how to configure `markdownlint-trap` custom rules in your project to work in both CLI and VS Code editor environments.
 
-## Quick Start: Basic Configuration
+## Quick start: basic configuration
 
 Once `markdownlint-trap` is available in your `node_modules` directory (see Installation Options below), you can configure your project to use it.
 
@@ -46,18 +46,20 @@ Optional workspace settings for the VS Code markdownlint extension:
 
 ---
 
-## Installation Options
+## Installation options
 
 Since `markdownlint-trap` is not published to npm, you have several options for getting it into your project.
 
 ### Option 1: npm link (recommended for development)
 
 In the `markdownlint-trap` project directory:
+
 ```bash
 npm link
 ```
 
 In your other project directory:
+
 ```bash
 npm link markdownlint-trap
 ```
@@ -65,6 +67,7 @@ npm link markdownlint-trap
 ### Option 2: Local file path dependency
 
 Add to your `package.json`:
+
 ```json
 {
   "dependencies": {
@@ -74,6 +77,7 @@ Add to your `package.json`:
 ```
 
 Then run:
+
 ```bash
 npm install
 ```
@@ -81,6 +85,7 @@ npm install
 ### Option 3: Git dependency
 
 Add to your `package.json`:
+
 ```json
 {
   "dependencies": {
@@ -93,7 +98,7 @@ Add to your `package.json`:
 
 This method doesn't use the `markdownlint-trap` package directly but copies its rules and configuration. You would need to update the configuration files to point to the copied rule files. See the original `setup-in-other-projects.md` for more details on this advanced approach if needed.
 
-## Active Custom Rules
+## Active custom rules
 
 The recommended configuration enables the following rules:
 
@@ -103,7 +108,7 @@ The recommended configuration enables the following rules:
 - `no-dead-internal-links` - Checks that internal links exist in the repository
 - `no-literal-ampersand` - Requires "and" instead of "&" symbol
 
-## Customizing Rules
+## Customizing rules
 
 You can customize rule behavior by overriding specific rules in your `.markdownlint-cli2.jsonc` or `markdownlint.config` object:
 

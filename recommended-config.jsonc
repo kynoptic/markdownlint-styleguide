@@ -2,7 +2,11 @@
   // This is a shareable configuration for markdownlint-trap.
   // Other projects can extend this file.
   "customRules": [
-    "markdownlint-trap"
+    ".markdownlint-rules/rules/sentence-case-heading.cjs",
+    ".markdownlint-rules/rules/backtick-code-elements.cjs",
+    ".markdownlint-rules/rules/no-bare-urls.cjs",
+    ".markdownlint-rules/rules/no-dead-internal-links.cjs",
+    ".markdownlint-rules/rules/no-literal-ampersand.cjs"
   ],
   "config": {
     // Standard markdownlint rules
