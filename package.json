@@ -2,6 +2,11 @@
   "name": "markdownlint-trap",
   "version": "1.5.0",
   "main": "./src/index.js",
+  "files": [
+    ".markdownlint-rules",
+    "src/index.js",
+    "recommended-config.jsonc"
+  ],
   "type": "module",
   "scripts": {
     "prebuild": "rm -rf .markdownlint-rules",
