@@ -85,16 +85,15 @@ describe("Backtick autofix safety", () => {
     expect(result.content).toHaveLength(0);
   });
 
-  test("should NOT autofix natural language paths", async () => {
+  test("should NOT flag natural language option patterns", async () => {
     const content = "Choose between read/write or pass/fail options.";
     const result = await lint({
       ...lintOptions,
       strings: { content },
     });
 
-    // Should detect natural language phrases but NOT provide autofix
-    expect(result.content.length).toBeGreaterThan(0);
-    expect(result.content.every(v => v.fixInfo === null)).toBe(true);
+    // Should not detect natural language option patterns as violations
+    expect(result.content.length).toBe(0);
   });
 
   test("should handle mixed confidence scenarios", async () => {

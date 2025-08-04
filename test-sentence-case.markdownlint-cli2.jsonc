@@ -1,0 +1,12 @@
+{
+  "customRules": [
+    ".markdownlint-rules/rules/sentence-case-heading.cjs"
+  ],
+  "config": {
+    "default": false,
+    "sentence-case-heading": true
+  },
+  "globs": [
+    "test-emoji.md"
+  ]
+}

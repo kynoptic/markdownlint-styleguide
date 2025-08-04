@@ -189,3 +189,14 @@ _Step 4: Clear your cache_ <!-- ✅ -->
 # `AGENTS.md` – Project guide for AI agents <!-- ✅ -->
 
 ## [Unreleased] <!-- ✅ -->
+
+## 🔧 Parentheses and acronyms in bold list items
+
+- **True cost of ownership (TCO) calculator** – Personalized annual cost calculations including depreciation, financing, maintenance, fuel, and insurance <!-- ✅ -->
+- **FastAPI backend** (Python 3.11+) with comprehensive API endpoints <!-- ✅ -->
+- **186 backend tests** – Comprehensive pytest suite with fixtures and integration testing <!-- ✅ -->
+- **201 frontend tests** – React Testing Library with Vitest and comprehensive mocking <!-- ✅ -->
+- `POST /api/v1/upload-vehicles` – CSV/JSON file upload with validation <!-- ✅ -->
+- **API documentation** – Interactive Swagger/OpenAPI documentation <!-- ✅ -->
+- **Sophisticated financial modeling** – Make-specific depreciation models, age/mileage-based maintenance costs, CPO warranty calculations <!-- ✅ -->
+- **React SPA frontend** (v19.1.0) with Vite build system for modern development <!-- ✅ -->

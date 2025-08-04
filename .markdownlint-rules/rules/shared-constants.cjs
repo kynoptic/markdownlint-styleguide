@@ -25,6 +25,7 @@ const casingTerms = exports.casingTerms = {
   cdc: 'CDC',
   cdn: 'CDN',
   cli: 'CLI',
+  cpo: 'CPO',
   css: 'CSS',
   dns: 'DNS',
   es6: 'ES6',
@@ -43,9 +44,11 @@ const casingTerms = exports.casingTerms = {
   oauth2: 'OAuth2',
   rest: 'REST',
   sdk: 'SDK',
+  spa: 'SPA',
   sso: 'SSO',
   sql: 'SQL',
   ssl: 'SSL',
+  tco: 'TCO',
   tls: 'TLS',
   ui: 'UI',
   unesco: 'UNESCO',
@@ -60,6 +63,7 @@ const casingTerms = exports.casingTerms = {
   'c#': 'C#',
   'c++': 'C++',
   eslint: 'ESLint',
+  fastapi: 'FastAPI',
   go: 'Go',
   java: 'Java',
   javascript: 'JavaScript',
@@ -68,6 +72,7 @@ const casingTerms = exports.casingTerms = {
   kotlin: 'Kotlin',
   'node.js': 'Node.js',
   php: 'PHP',
+  pytest: 'pytest',
   python: 'Python',
   'react.js': 'React.js',
   react: 'React',
@@ -76,7 +81,9 @@ const casingTerms = exports.casingTerms = {
   scala: 'Scala',
   swift: 'Swift',
   typescript: 'TypeScript',
+  vite: 'Vite',
   vue: 'Vue',
+  vitest: 'Vitest',
   webpack: 'Webpack',
   // Databases
   mongodb: 'MongoDB',
@@ -142,6 +149,7 @@ const casingTerms = exports.casingTerms = {
   socrates: 'Socrates',
   'single sign-on': 'Single Sign-On',
   swagger: 'Swagger',
+  openapi: 'OpenAPI',
   terraform: 'Terraform',
   ubuntu: 'Ubuntu',
   'user experience': 'User experience',
@@ -173,7 +181,9 @@ const casingTerms = exports.casingTerms = {
  * Additional terms to ignore in the `backtick-code-elements` rule, not covered by casingTerms.
  * @type {readonly string[]}
  */
-const additionalBacktickIgnoredTerms = ['github.com', 'ulca.edu', 'pass/fail', 'e.g', 'i.e', 'CI/CD', 'Describe/test'];
+const additionalBacktickIgnoredTerms = ['github.com', 'ulca.edu', 'pass/fail', 'e.g', 'i.e', 'CI/CD', 'Describe/test', 'CSV/JSON', 'Swagger/OpenAPI',
+// Common option/alternative patterns
+'on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull', 'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https', 'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE', 'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max', 'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest', 'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod'];
 /**
  * A set of terms that should be ignored by the `backtick-code-elements` rule.
  * This includes all special-cased terms from the dictionary above plus a few domain-specific exceptions.

@@ -319,11 +319,16 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Get phrase ignore indices
     const phraseIgnore = getProperPhraseIndices(words);
     
-    // Validate first word
+    // Check if the original text starts with a number
+    const startsWithNumber = firstIndex > 0 && /^\d/.test(words[0]);
+    
+    // Validate first word (but not if it comes after a number in bold text)
     const firstWord = words[firstIndex];
-    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
-    if (!firstWordResult.isValid) {
-      return firstWordResult;
+    if (!startsWithNumber) {
+      const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+      if (!firstWordResult.isValid) {
+        return firstWordResult;
+      }
     }
     
     // Check for all caps (stricter than headings)
@@ -342,7 +347,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       
       const word = words[i];
       const wordLower = word.toLowerCase();
-      const expectedWordCasing = specialCasedTerms[wordLower];
+      // Strip punctuation for lookup in specialCasedTerms
+      const wordForLookup = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const expectedWordCasing = specialCasedTerms[wordLower] || specialCasedTerms[wordForLookup];
       
       // Skip preserved segments
       if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
@@ -362,7 +369,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       // For bold text, be stricter about acronyms - only allow known technical terms
       if (expectedWordCasing) {
         // Known proper noun or technical term
-        if (word !== expectedWordCasing) {
+        // Allow parentheses around special terms like (TCO)
+        const wordWithoutParens = word.replace(/[()]/g, '');
+        if (word !== expectedWordCasing && wordWithoutParens !== expectedWordCasing) {
           return {
             isValid: false,
             errorMessage: `Word "${word}" should be "${expectedWordCasing}".`
@@ -388,7 +397,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         }
         
         // For the first word in bold text, it should be capitalized (sentence case)
-        if (isFirstWord) {
+        // But if the text starts with a number, don't require capitalization
+        if (isFirstWord && !startsWithNumber) {
           const expectedCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
           if (word !== expectedCase && !(word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word))) {
             return {
@@ -405,8 +415,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
           ];
           
           if (!allowedCapitalizedWords.includes(word)) {
-            // Check for all-caps violations
-            if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word)) {
+            // Check for all-caps violations (but allow known acronyms from specialCasedTerms)
+            if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word) && !expectedWordCasing) {
               return {
                 isValid: false,
                 errorMessage: `Word "${word}" in bold text should not be in all caps.`
@@ -514,9 +524,34 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @returns {string} The cleaned text.
    */
   function stripLeadingSymbols(text) {
-    // Remove leading emoji and symbol characters
-    // Use a simpler approach that works with complex emoji sequences
-    return text.replace(/^[^\w\s]*\s*/, '').trim();
+    // Remove leading emoji and some decorative symbols but preserve numbers, letters, and markdown
+    // This handles complex emoji sequences including:
+    // - Basic emoji (🎉, 🚀, ✨, 📝)
+    // - Emoji with skin tone modifiers (👨🏻‍💻)
+    // - Multi-person emoji (👨‍👩‍👧‍👦)
+    // - Professional emoji (🧑‍⚕️, 👨‍💻)
+    
+    // Use a more conservative approach that targets specific emoji ranges only
+    // Avoid Unicode properties that incorrectly match digits and asterisks
+    let cleaned = text;
+    
+    // Remove specific emoji ranges one by one - this is more reliable than Unicode properties
+    cleaned = cleaned
+      .replace(/^[\u{1F600}-\u{1F64F}]+/gu, '') // Emoticons
+      .replace(/^[\u{1F300}-\u{1F5FF}]+/gu, '') // Misc Symbols and Pictographs
+      .replace(/^[\u{1F680}-\u{1F6FF}]+/gu, '') // Transport and Map
+      .replace(/^[\u{1F1E0}-\u{1F1FF}]+/gu, '') // Regional indicators
+      .replace(/^[\u{2600}-\u{26FF}]+/gu, '')   // Misc symbols (includes ✨)
+      .replace(/^[\u{2700}-\u{27BF}]+/gu, '')   // Dingbats
+      .replace(/^[\u{1F900}-\u{1F9FF}]+/gu, '') // Supplemental Symbols and Pictographs
+      .replace(/^[\u{1F018}-\u{1F270}]+/gu, '') // Additional emoji ranges
+      .replace(/^[\u{FE00}-\u{FE0F}]+/gu, '')   // Variation Selectors
+      .replace(/^[\u{200D}]+/gu, '')            // Zero Width Joiner
+      .replace(/^\s+/, '')                      // Remove any leading whitespace
+      .trim();
+    
+    
+    return cleaned;
   }
 
   /**
@@ -682,7 +717,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     
     if (expectedFirstWordCasing) {
       // Known proper noun or technical term
-      if (firstWord !== expectedFirstWordCasing) {
+      // Allow parentheses around special terms like (TCO)
+      const firstWordWithoutParens = firstWord.replace(/[()]/g, '');
+      if (firstWord !== expectedFirstWordCasing && firstWordWithoutParens !== expectedFirstWordCasing) {
         return {
           isValid: false,
           errorMessage: `First word "${firstWord}" should be "${expectedFirstWordCasing}".`
@@ -738,7 +775,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       
       const word = words[i];
       const wordLower = word.toLowerCase();
-      const expectedWordCasing = specialCasedTerms[wordLower];
+      // Strip punctuation for lookup in specialCasedTerms
+      const wordForLookup = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const expectedWordCasing = specialCasedTerms[wordLower] || specialCasedTerms[wordForLookup];
       
       // Skip preserved segments
       if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
@@ -770,8 +809,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       
       if (expectedWordCasing) {
         // Known proper noun or technical term
+        // Allow parentheses around special terms like (TCO)
+        const wordWithoutParens = word.replace(/[()]/g, '');
         if (
           word !== expectedWordCasing &&
+          wordWithoutParens !== expectedWordCasing &&
           !(expectedWordCasing === 'Markdown' && wordLower === 'markdown')
         ) {
           return {

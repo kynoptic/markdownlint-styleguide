@@ -148,10 +148,44 @@ function isLikelyFilePath(str) {
     return false;
   }
 
+  // Common option/alternative patterns that should not be treated as paths
+  const commonOptionPatterns = [
+    'on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'pass/fail',
+    'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull',
+    'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https',
+    'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE',
+    'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max',
+    'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest',
+    'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod'
+  ];
+  
+  // Check if this matches a common option pattern (case-insensitive)
+  if (commonOptionPatterns.includes(str.toLowerCase())) {
+    return false;
+  }
+
   // For simple "a/b" paths without file extensions, be more skeptical.
   if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
     // Avoids flagging common short phrases like "on/off", "i/o".
     if (segments[0].length <= 2 || segments[1].length <= 2) {
+      return false;
+    }
+    
+    // Additional heuristics for two-segment paths:
+    // If both segments are common English words, it's likely an option pattern
+    const commonWords = [
+      'true', 'false', 'yes', 'no', 'on', 'off', 'read', 'write', 'input', 'output',
+      'pass', 'fail', 'enable', 'disable', 'start', 'stop', 'open', 'close',
+      'get', 'set', 'push', 'pull', 'left', 'right', 'up', 'down', 'in', 'out',
+      'and', 'or', 'either', 'http', 'https', 'import', 'export', 'add', 'remove',
+      'insert', 'delete', 'show', 'hide', 'expand', 'collapse', 'min', 'max',
+      'first', 'last', 'prev', 'next', 'before', 'after', 'old', 'new',
+      'client', 'server', 'local', 'remote', 'dev', 'prod', 'source', 'target',
+      'from', 'to', 'create', 'update', 'post', 'put', 'patch'
+    ];
+    
+    const [first, second] = segments.map(s => s.toLowerCase());
+    if (commonWords.includes(first) && commonWords.includes(second)) {
       return false;
     }
   }
@@ -273,7 +307,7 @@ function backtickCodeElements(params, onError) {
     return;
   }
 
-  const config = params.config?.['backtick-code-elements'] || params.config?.BCE001 || {};
+  const config = params.config?.['backtick-code-elements'] || params.config?.BCE001 || params.config || {};
 
   // Validate configuration
   const configSchema = {
@@ -389,6 +423,15 @@ function backtickCodeElements(params, onError) {
         if (allIgnoredTerms.has(fullMatch)) {
           continue;
         }
+        
+        // Skip version numbers in parentheses (e.g., "(v19.1.0)", "(Python 3.11+)")
+        if (start > 0 && line[start - 1] === '(' && end < line.length && line[end] === ')') {
+          // Check if it looks like a version number
+          if (/^v?\d+(\.\d+)*(\+|\.\d+)*$/.test(fullMatch) || /^[A-Za-z]+\s+\d+(\.\d+)*(\+)?$/.test(fullMatch)) {
+            continue;
+          }
+        }
+        
         // Skip if already flagged
         if (flaggedPositions.has(start)) {
           continue;

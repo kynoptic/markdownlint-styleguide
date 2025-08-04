@@ -77,3 +77,11 @@ The sigmoid function is `1 / (1 + e^-x)` <!-- ✅ -->
 Write a quick bash loop like `for f in *.jpg; do ...; done` <!-- ✅ -->
 Escape special characters with `\n`, `\t`, or `\\` <!-- ✅ -->
 Markdown supports `**bold**`, `_italic_`, and `\`escapes\`` <!-- ✅ -->
+
+## Format descriptions and version references
+
+Supports CSV/JSON file upload with validation <!-- ✅ -->
+Interactive Swagger/OpenAPI documentation <!-- ✅ -->
+Backend services (Python 3.11+) for data processing <!-- ✅ -->
+React SPA frontend (v19.1.0) with Vite build system <!-- ✅ -->
+Legacy support (v1.2.3) maintained for compatibility <!-- ✅ -->
