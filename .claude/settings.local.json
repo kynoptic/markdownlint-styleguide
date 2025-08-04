@@ -7,7 +7,8 @@
       "Bash(git reset:*)",
       "Bash(npm test)",
       "Bash(npm test:*)",
-      "Bash(npx markdownlint-cli2:*)"
+      "Bash(npx markdownlint-cli2:*)",
+      "Bash(git rev-parse:*)"
     ],
     "deny": []
   }
