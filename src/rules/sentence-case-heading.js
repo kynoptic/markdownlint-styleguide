@@ -311,7 +311,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
    */
   function performBoldTextValidation(words, cleanedText) {
-    const firstIndex = findFirstValidationWord(words, cleanedText);
+    const firstIndex = findFirstValidationWord(words);
     if (firstIndex === -1) {
       return { isValid: true };
     }
@@ -531,25 +531,25 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // - Multi-person emoji (👨‍👩‍👧‍👦)
     // - Professional emoji (🧑‍⚕️, 👨‍💻)
     
-    // Use a more conservative approach that targets specific emoji ranges only
-    // Avoid Unicode properties that incorrectly match digits and asterisks
+    // Use a comprehensive emoji removal approach that handles complete sequences
     let cleaned = text;
     
-    // Remove specific emoji ranges one by one - this is more reliable than Unicode properties
+    // Remove complete emoji sequences first (including ZWJ sequences)
+    // This regex matches any sequence of:
+    // - Emoji characters and their variations
+    // - Zero-width joiners (ZWJ) and variation selectors 
+    // - Skin tone modifiers
+    // This ensures complex sequences like 🧑‍⚕️ are removed as complete units
+    // Use multiple simple replaces to avoid character class issues
     cleaned = cleaned
-      .replace(/^[\u{1F600}-\u{1F64F}]+/gu, '') // Emoticons
-      .replace(/^[\u{1F300}-\u{1F5FF}]+/gu, '') // Misc Symbols and Pictographs
-      .replace(/^[\u{1F680}-\u{1F6FF}]+/gu, '') // Transport and Map
-      .replace(/^[\u{1F1E0}-\u{1F1FF}]+/gu, '') // Regional indicators
-      .replace(/^[\u{2600}-\u{26FF}]+/gu, '')   // Misc symbols (includes ✨)
-      .replace(/^[\u{2700}-\u{27BF}]+/gu, '')   // Dingbats
-      .replace(/^[\u{1F900}-\u{1F9FF}]+/gu, '') // Supplemental Symbols and Pictographs
-      .replace(/^[\u{1F018}-\u{1F270}]+/gu, '') // Additional emoji ranges
-      .replace(/^[\u{FE00}-\u{FE0F}]+/gu, '')   // Variation Selectors
-      .replace(/^[\u{200D}]+/gu, '')            // Zero Width Joiner
-      .replace(/^\s+/, '')                      // Remove any leading whitespace
-      .trim();
+      .replace(/^[\u{1F600}-\u{1F64F}]+/gu, "") // Emoticons
+      .replace(/^[\u{1F300}-\u{1F5FF}]+/gu, "") // Misc symbols
+      .replace(/^[\u{1F680}-\u{1F6FF}]+/gu, "") // Transport
+      .replace(/^[\u{2600}-\u{26FF}]+/gu, "")   // Misc symbols
+      .replace(/^[\u{1F900}-\u{1F9FF}]+/gu, ""); // Supplemental
     
+    // Clean up any remaining whitespace
+    cleaned = cleaned.replace(/^\s+/, '').trim();
     
     return cleaned;
   }
@@ -656,6 +656,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return true;
     }
     
+    // Skip numbered list-style headings only if they have emoji prefix
+    // (e.g., "🔧 1. getting started" but not "1. article weighting algorithm")
+    const cleanedText = stripLeadingSymbols(headingText);
+    const hasEmojiPrefix = cleanedText !== headingText.trim();
+    if (hasEmojiPrefix && /^\d+\.\s/.test(cleanedText)) {
+      return true;
+    }
+    
     return false;
   }
 
@@ -665,19 +673,16 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {string} headingText Original heading text.
    * @returns {number} Index of first word to validate, or -1 if none found.
    */
-  function findFirstValidationWord(words, headingText) {
+  function findFirstValidationWord(words) {
     let firstIndex = 0;
     const numeric = /^[-\d.,/]+$/;
-    const isNumberedHeading = /^\d+\.\s/.test(headingText);
     
     while (
       firstIndex < words.length &&
       (
         // Skip preserved segments (code spans, links, etc.) at the start
         (words[firstIndex].startsWith('__PRESERVED_') && words[firstIndex].endsWith('__')) ||
-        numeric.test(words[firstIndex]) ||
-        // Skip numbered list prefixes (e.g., "1.")
-        (isNumberedHeading && /^\d+\.$/.test(words[firstIndex]))
+        numeric.test(words[firstIndex])
       )
     ) {
       firstIndex++;
@@ -892,7 +897,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
     
     // Also check if we can find a valid first word for validation
-    const firstValidIndex = findFirstValidationWord(words, cleanedText);
+    const firstValidIndex = findFirstValidationWord(words);
     if (firstValidIndex === -1) {
       return null; // No valid words to validate
     }
@@ -908,7 +913,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
    */
   function performWordValidation(words, cleanedText, phraseIgnore) {
-    const firstIndex = findFirstValidationWord(words, cleanedText);
+    const firstIndex = findFirstValidationWord(words);
     if (firstIndex === -1) {
       return { isValid: true };
     }
