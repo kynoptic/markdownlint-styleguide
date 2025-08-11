@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _configValidation = require("./config-validation.cjs");
 var _sharedUtils = require("./shared-utils.cjs");
+var _sharedConstants = require("./shared-constants.cjs");
 var _autofixSafety = require("./autofix-safety.cjs");
 // @ts-check
 
@@ -123,7 +124,7 @@ function noLiteralAmpersand(params, onError) {
   }
 
   // Extract configuration with defaults
-  const exceptions = Array.isArray(config.exceptions) ? config.exceptions : [];
+  const exceptions = Array.isArray(config.exceptions) ? [..._sharedConstants.ampersandDefaultExceptions, ...config.exceptions] : _sharedConstants.ampersandDefaultExceptions;
   const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true;
   const skipInlineCode = typeof config.skipInlineCode === 'boolean' ? config.skipInlineCode : true;
   const lines = params.lines;

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.casingTerms = exports.backtickIgnoredTerms = void 0;
+exports.casingTerms = exports.backtickIgnoredTerms = exports.ampersandDefaultExceptions = void 0;
 // @ts-check
 
 /**
@@ -190,3 +190,11 @@ const additionalBacktickIgnoredTerms = ['github.com', 'ulca.edu', 'pass/fail', '
  * @type {Readonly<Set<string>>}
  */
 const backtickIgnoredTerms = exports.backtickIgnoredTerms = new Set([...Object.values(casingTerms), ...additionalBacktickIgnoredTerms]);
+
+/**
+ * Default exceptions where a literal ampersand is acceptable in prose.
+ * These are common industry and brand names.
+ * Consumers can extend/override via the rule's `exceptions` option.
+ * @type {readonly string[]}
+ */
+const ampersandDefaultExceptions = exports.ampersandDefaultExceptions = ['R&D', 'Q&A', 'M&A', 'S&P', 'AT&T'];
