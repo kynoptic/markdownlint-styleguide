@@ -11,24 +11,50 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 
 ## Quick start
 
-1. **Install the package:**
+1. Install the package
 
    ```bash
-   npm install markdownlint-trap --save-dev
+   npm install --save-dev markdownlint-trap markdownlint-cli2
    ```
 
-2. **Add to your markdownlint config** (`.markdownlint-cli2.jsonc`):
+2. Configure markdownlint-cli2
 
-   ```json
-   {
-     "customRules": ["markdownlint-trap"]
-   }
-   ```
+   Create `.markdownlint-cli2.jsonc` at the root of your repo. Choose one of the following setups:
 
-3. **Run on your files:**
+   - Recommended (extends the preset from this package):
+
+     ```jsonc
+     {
+       "config": {
+         "extends": "markdownlint-trap/recommended-config.jsonc"
+       },
+       "globs": ["**/*.md", "!node_modules/**/*"]
+     }
+     ```
+
+   - Manual (load rules and enable them explicitly):
+
+     ```jsonc
+     {
+       "customRules": ["markdownlint-trap"],
+       "config": {
+         "default": true,
+         "sentence-case-heading": true,
+         "backtick-code-elements": true,
+         "no-bare-url": true,
+         "no-dead-internal-links": true,
+         "no-literal-ampersand": true
+       },
+       "globs": ["**/*.md", "!node_modules/**/*"]
+     }
+     ```
+
+3. Run on your files
 
    ```bash
    npx markdownlint-cli2 "**/*.md"
+   # or auto-fix where supported
+   npx markdownlint-cli2 --fix "**/*.md"
    ```
 
 ## Table of contents
@@ -36,6 +62,7 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Rules overview](#rules-overview)
+- [Docs](#docs)
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [License](#license)
@@ -61,18 +88,20 @@ The easiest way to get started is by extending the shared configuration included
 
 Create or update your `.markdownlint-cli2.jsonc` file:
 
-```json
+```jsonc
 {
-  "extends": "markdownlint-trap/recommended-config.jsonc"
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
+  }
 }
 ```
 
 This single line gives you a great starting point. You can still override any setting for your specific project needs. For example, to disable a rule from the shared config:
 
-```json
+```jsonc
 {
-  "extends": "markdownlint-trap/recommended-config.jsonc",
   "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc",
     "no-literal-ampersand": false
   }
 }
@@ -94,20 +123,29 @@ If you prefer to configure each rule individually, you can add them manually to 
 
 2. **Enable and configure rules:**
 
-   Next, add the rules you want to use to the config object. You can enable them with `true` or provide an object for advanced configuration.
+   Next, add the rules you want to use to the config object. You can enable them with `true`.
 
-   ```json
+   ```jsonc
    {
      "customRules": ["markdownlint-trap"],
      "config": {
        // Enable all custom rules
        "sentence-case-heading": true,
        "backtick-code-elements": true,
-       "no-bare-urls-trap": true,
+       "no-bare-url": true,
        "no-dead-internal-links": true,
-       "no-literal-ampersand": true,
-       
-       // Example of advanced configuration for a single rule
+       "no-literal-ampersand": true
+     }
+   }
+   ```
+
+   Example of advanced configuration for a single rule:
+
+   ```jsonc
+   {
+     "customRules": ["markdownlint-trap"],
+     "config": {
+       "default": true,
        "sentence-case-heading": {
          "specialTerms": ["GitHub", "JavaScript", "TypeScript", "API", "CLI", "SDK"]
        }
@@ -138,7 +176,7 @@ This package includes five custom rules designed to improve documentation qualit
 |------|----|-----------| --------|
 | `sentence-case-heading` | SC001 | ✅ | Enforces sentence case for headings |
 | `backtick-code-elements` | BCE001 | ✅ | Wraps code elements in backticks |
-| `no-bare-urls-trap` | BU001 | ❌ | Prevents bare URLs in content |
+| `no-bare-url` | BU001 | ✅ | Prevents bare URLs in content |
 | `no-dead-internal-links` | DL001 | ❌ | Detects broken internal links |
 | `no-literal-ampersand` | NLA001 | ✅ | Replaces `&` with "and" |
 
@@ -153,10 +191,10 @@ This package includes five custom rules designed to improve documentation qualit
 **💻 backtick-code-elements** - Makes code references clear
 
 - Wraps file paths, commands, and variables in backticks
-- `npm install` ✅ vs `npm install` ❌
+- `npm install` ✅ vs npm install ❌
 - Improves visual distinction between code and prose
 
-**🔗 no-bare-urls-trap** - Ensures accessible links
+**🔗 no-bare-url** - Ensures accessible links
 
 - Requires proper link formatting: `[GitHub](https://github.com)` ✅
 - Prevents bare URLs: <https://github.com> ❌
@@ -174,7 +212,14 @@ This package includes five custom rules designed to improve documentation qualit
 - "Dogs and cats" ✅ vs "Dogs & cats" ❌
 - Ignores ampersands in code contexts
 
-For complete documentation and configuration options, see the [rules reference](./docs/reference/rules.md).
+## Docs
+
+- Rules: `docs/rules.md`
+- Configuration: `docs/configuration.md`
+- Setup and usage in other repos: `docs/setup.md`
+- Architecture: `docs/architecture.md`
+- Testing: `docs/testing.md`
+- Performance: `docs/performance.md`
 
 ## Examples
 
@@ -199,7 +244,7 @@ Install the package using `npm install my-package`.
 
 Visit [our documentation](https://example.com) for docs and tutorials.
 
-Check the [configuration guide](docs/config.md) for setup.
+See [Configuration](docs/configuration.md) for setup.
 ```
 
 ## Contributing
@@ -230,4 +275,4 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 
 ---
 
-**Questions or issues?** Please [open an issue](https://github.com/your-username/markdownlint-trap/issues) on GitHub.
+**Questions or issues?** Please [open an issue](https://github.com/kynoptic/markdownlint-trap/issues) on GitHub.
