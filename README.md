@@ -84,15 +84,17 @@ npm install markdownlint-trap --save-dev
 
 ### Recommended setup (extends)
 
-The easiest way to get started is by extending the shared configuration included in this package. This automatically enables all custom rules with our recommended settings.
+Pick a preset and extend it in `.markdownlint-cli2.jsonc`.
 
-Create or update your `.markdownlint-cli2.jsonc` file:
+- Basic (most users): `markdownlint-trap/basic-config.jsonc`
+- Recommended: `markdownlint-trap/recommended-config.jsonc`
+- Strict: `markdownlint-trap/strict-config.jsonc`
+
+Example:
 
 ```jsonc
 {
-  "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  }
+  "config": { "extends": "markdownlint-trap/basic-config.jsonc" }
 }
 ```
 
@@ -216,9 +218,9 @@ This package includes five custom rules designed to improve documentation qualit
 
 - Rules: `docs/rules.md`
 - Configuration: `docs/configuration.md`
+- Beginner's guide: `docs/beginners.md`
 - Setup and usage in other repos: `docs/setup.md`
-  - Quick start in another repo: `docs/setup.md#apply-in-another-repo-quick-start`
-  - Keeping in sync across projects: `docs/setup.md#keeping-in-sync-across-projects`
+  - Use in another repo: `docs/setup.md#use-in-another-repo`
   - Local development via npm link: `docs/setup.md#option-c--npm-link-local-development`
 - Architecture: `docs/architecture.md`
 - Testing: `docs/testing.md`

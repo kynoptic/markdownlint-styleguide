@@ -2,6 +2,18 @@
 
 Guidance for running markdownlint-trap efficiently in large repositories.
 
+```mermaid
+flowchart TD
+  A[markdownlint-cli2] --> B[Parse Markdown]
+  B --> C[Run fast rules\n(sentence-case, backticks)]
+  B --> D[Run link checks\n(no-dead-internal-links)]
+  D --> E[Cache file stats\n and headings]
+  C --> F{Scope globs}
+  E --> F
+  F -- small set --> G[Fast execution]
+  F -- huge set --> H[Consider narrowing globs]
+```
+
 ## Rule characteristics
 
 - `no-dead-internal-links` performs filesystem checks and heading extraction:
@@ -22,4 +34,3 @@ Enable internal debug output while developing:
 ```bash
 DEBUG=markdownlint-trap* npx markdownlint-cli2 "**/*.md"
 ```
-

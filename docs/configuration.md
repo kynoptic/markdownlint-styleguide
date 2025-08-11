@@ -1,45 +1,38 @@
-# Configuration reference
+# Configuration
 
-This page lists configuration options for each rule. Use these in your `.markdownlint-cli2.jsonc` under the top-level `config` key.
-
-Global examples:
+Getting started (most users)
 
 ```jsonc
 {
-  "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  }
+  "config": { "extends": "markdownlint-trap/basic-config.jsonc" }
 }
 ```
 
+Presets
+
+- Basic: `markdownlint-trap/basic-config.jsonc` — minimal, high-signal rules
+- Recommended: `markdownlint-trap/recommended-config.jsonc` — balanced defaults
+- Strict: `markdownlint-trap/strict-config.jsonc` — maximal style + link hygiene
+
+Example
+
 ```jsonc
 {
-  "customRules": ["markdownlint-trap"],
-  "config": {
-    "default": true,
-    "sentence-case-heading": {
-      "specialTerms": ["API", "GitHub", "OAuth"]
-    },
-    "backtick-code-elements": {
-      "ignoredTerms": ["README", "LICENSE"],
-      "skipCodeBlocks": true,
-      "skipMathBlocks": true
-    },
-    "no-bare-url": {
-      "allowedDomains": ["localhost"]
-    },
-    "no-dead-internal-links": {
-      "ignoredPaths": ["node_modules/**"],
-      "checkAnchors": true,
-      "allowedExtensions": [".md", ".markdown"]
-    },
-    "no-literal-ampersand": {
-      "exceptions": ["R&D", "Q&A"],
-      "skipCodeBlocks": true,
-      "skipInlineCode": true
-    }
-  }
+  "config": { "extends": "markdownlint-trap/recommended-config.jsonc" }
 }
+```
+
+Visual: Configuration flow
+
+```mermaid
+flowchart TD
+  A[Your config\n extends preset] --> B[Preset file]
+  B --> C[customRules list\n compiled .cjs]
+  C --> D[markdownlint engine]
+  D --> E[Rules run on Markdown]
+  E --> F{Violations?}
+  F -- yes --> G[Report + fixes]
+  F -- no --> H[Pass]
 ```
 
 ---
@@ -49,7 +42,7 @@ Global examples:
 - specialTerms: string[] — Proper nouns and technical terms to preserve as-is.
 - Deprecated: technicalTerms, properNouns — Use `specialTerms` instead.
 
-Defaults: none (uses built-in dictionary for common terms). Fixable: Yes.
+Defaults: Uses built‑in dictionary of proper nouns and tech terms (no config needed for most teams). Fixable: Yes.
 
 ---
 
@@ -84,7 +77,7 @@ Fixable: No.
 
 ## `no-literal-ampersand` (NLA001)
 
-- exceptions: string[] — Phrases where `&` is allowed (e.g., `R&D`).
+- exceptions: string[] — Phrases where `&` is allowed (e.g., `R&D`). A default list is included: `R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`.
 - skipCodeBlocks: boolean (default: true) — Skip fenced/indented code blocks.
 - skipInlineCode: boolean (default: true) — Skip inline code spans.
 

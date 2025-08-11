@@ -75,5 +75,5 @@ Examples
 Replaces standalone `&` with "and" in prose for clarity.
 
 - Skips code blocks, inline code, links, and HTML entity contexts.
-- Respects configurable `exceptions` (e.g., `R&D`, `Q&A`).
+- Respects configurable `exceptions` and includes common defaults (`R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`).
 - Auto-fix replaces `&` with `and`.
