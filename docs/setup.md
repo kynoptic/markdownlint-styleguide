@@ -5,10 +5,10 @@ Apply `markdownlint-trap` rules in another repo using `markdownlint-cli2`.
 ```mermaid
 flowchart TD
   A[Start] --> B{How to consume?}
-  B -- GitHub tag/commit --> C[Option A\nGit dependency]
-  B -- Submodule OK --> D[Option B\nGit submodule]
-  B -- Local dev only --> E[Option C\nnpm link]
-  C --> F[Extend preset\n in .markdownlint-cli2.jsonc]
+  B -- GitHub tag/commit --> C[Option A<br/>Git dependency]
+  B -- Submodule OK --> D[Option B<br/>Git submodule]
+  B -- Local dev only --> E[Option C<br/>npm link]
+  C --> F[Extend preset<br/>in .markdownlint-cli2.jsonc]
   D --> F
   E --> F
   F --> G[Run markdownlint-cli2]
