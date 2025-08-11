@@ -1,6 +1,13 @@
 {
   "config": {
-    "extends": "./recommended-config.jsonc"
+    // Standard markdownlint rules
+    "default": true,
+    "MD013": false, // line-length
+    "MD024": false, // no-duplicate-heading
+    "MD041": false, // first-line-h1
+    "MD029": { "style": "ordered" },
+    "MD004": { "style": "dash" },
+    "MD036": false // no-emphasis-as-heading
   },
   "globs": [
     "**/*.md",

@@ -24,4 +24,3 @@ Consumers typically use the shareable preset `markdownlint-trap/recommended-conf
 
 - `npm run build` transpiles to `.markdownlint-rules` with `.cjs` files copied.
 - The package `files` field includes `.markdownlint-rules`, `src/index.js`, and `recommended-config.jsonc` for consumption.
-

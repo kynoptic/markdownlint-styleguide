@@ -67,4 +67,3 @@ flowchart TD
 - Start with the Basic preset; move to Recommended/Strict as needed.
 - Run `--fix` locally; keep CI non-fixing for clarity.
 - Scope globs if your repo is large (e.g., `docs/**/*.md`).
-
