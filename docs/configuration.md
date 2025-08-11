@@ -26,8 +26,8 @@ Visual: Configuration flow
 
 ```mermaid
 flowchart TD
-  A[Your config\n extends preset] --> B[Preset file]
-  B --> C[customRules list\n compiled .cjs]
+  A[Your config<br/>extends preset] --> B[Preset file]
+  B --> C[customRules list<br/>compiled .cjs]
   C --> D[markdownlint engine]
   D --> E[Rules run on Markdown]
   E --> F{Violations?}

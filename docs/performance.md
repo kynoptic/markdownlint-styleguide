@@ -5,9 +5,9 @@ Guidance for running markdownlint-trap efficiently in large repositories.
 ```mermaid
 flowchart TD
   A[markdownlint-cli2] --> B[Parse Markdown]
-  B --> C[Run fast rules\n(sentence-case, backticks)]
-  B --> D[Run link checks\n(no-dead-internal-links)]
-  D --> E[Cache file stats\n and headings]
+  B --> C[Run fast rules<br/>(sentence-case, backticks)]
+  B --> D[Run link checks<br/>(no-dead-internal-links)]
+  D --> E[Cache file stats<br/>and headings]
   C --> F{Scope globs}
   E --> F
   F -- small set --> G[Fast execution]

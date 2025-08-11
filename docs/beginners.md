@@ -54,8 +54,8 @@ npx markdownlint-cli2 --fix "**/*.md"
 
 ```mermaid
 flowchart TD
-  A[.markdownlint-cli2.jsonc\nextends: preset] --> B[markdownlint-cli2]
-  B --> C[Load preset\n+ custom rules]
+  A[.markdownlint-cli2.jsonc<br/>extends: preset] --> B[markdownlint-cli2]
+  B --> C[Load preset<br/>+ custom rules]
   C --> D[Analyze Markdown]
   D --> E{Issues found?}
   E -- yes --> F[Report + optional fixes]
