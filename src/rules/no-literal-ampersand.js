@@ -13,6 +13,7 @@ import {
   createMarkdownlintLogger 
 } from './config-validation.js';
 import { getCodeBlockLines, isInInlineCode } from './shared-utils.js';
+import { ampersandDefaultExceptions } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
 
 /**
@@ -132,7 +133,9 @@ function noLiteralAmpersand(params, onError) {
   }
 
   // Extract configuration with defaults
-  const exceptions = Array.isArray(config.exceptions) ? config.exceptions : [];
+  const exceptions = Array.isArray(config.exceptions)
+    ? [...ampersandDefaultExceptions, ...config.exceptions]
+    : ampersandDefaultExceptions;
   const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true;
   const skipInlineCode = typeof config.skipInlineCode === 'boolean' ? config.skipInlineCode : true;
 

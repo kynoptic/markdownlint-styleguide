@@ -237,3 +237,17 @@ export const backtickIgnoredTerms = new Set([
   ...Object.values(casingTerms),
   ...additionalBacktickIgnoredTerms
 ]);
+
+/**
+ * Default exceptions where a literal ampersand is acceptable in prose.
+ * These are common industry and brand names.
+ * Consumers can extend/override via the rule's `exceptions` option.
+ * @type {readonly string[]}
+ */
+export const ampersandDefaultExceptions = [
+  'R&D',
+  'Q&A',
+  'M&A',
+  'S&P',
+  'AT&T'
+];
