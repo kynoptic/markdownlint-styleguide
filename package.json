@@ -18,7 +18,7 @@
     "test:integration:external": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration/curated-repos.test.js --verbose",
     "lint": "eslint .",
     "docs:config": "node scripts/generate-config-docs.js",
-    "prepare": "husky"
+    "prepare": "node scripts/prepare.mjs"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.2",

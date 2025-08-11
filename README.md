@@ -217,6 +217,9 @@ This package includes five custom rules designed to improve documentation qualit
 - Rules: `docs/rules.md`
 - Configuration: `docs/configuration.md`
 - Setup and usage in other repos: `docs/setup.md`
+  - Quick start in another repo: `docs/setup.md#apply-in-another-repo-quick-start`
+  - Keeping in sync across projects: `docs/setup.md#keeping-in-sync-across-projects`
+  - Local development via npm link: `docs/setup.md#option-c--npm-link-local-development`
 - Architecture: `docs/architecture.md`
 - Testing: `docs/testing.md`
 - Performance: `docs/performance.md`
