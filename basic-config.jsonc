@@ -1,0 +1,18 @@
+{
+  // A minimal, friendly preset for most teams.
+  "customRules": [
+    ".markdownlint-rules/rules/sentence-case-heading.cjs",
+    ".markdownlint-rules/rules/backtick-code-elements.cjs"
+  ],
+  "config": {
+    // Core markdownlint defaults with a few relaxed rules
+    "default": true,
+    "MD013": false, // line-length
+    "MD041": false, // first-line-h1
+
+    // Enable a small, high-signal set of custom rules
+    "sentence-case-heading": true,
+    "backtick-code-elements": true
+  }
+}
+

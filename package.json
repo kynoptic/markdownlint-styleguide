@@ -5,7 +5,9 @@
   "files": [
     ".markdownlint-rules",
     "src/index.js",
-    "recommended-config.jsonc"
+    "recommended-config.jsonc",
+    "basic-config.jsonc",
+    "strict-config.jsonc"
   ],
   "type": "module",
   "scripts": {

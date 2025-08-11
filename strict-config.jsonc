@@ -1,0 +1,22 @@
+{
+  // A strict preset for rigorous style and link hygiene.
+  "customRules": [
+    ".markdownlint-rules/rules/sentence-case-heading.cjs",
+    ".markdownlint-rules/rules/backtick-code-elements.cjs",
+    ".markdownlint-rules/rules/no-bare-urls.cjs",
+    ".markdownlint-rules/rules/no-dead-internal-links.cjs",
+    ".markdownlint-rules/rules/no-literal-ampersand.cjs"
+  ],
+  "config": {
+    // Keep core rules strict (do not disable MD013/MD041/etc.)
+    "default": true,
+
+    // Enable all custom rules
+    "sentence-case-heading": true,
+    "backtick-code-elements": true,
+    "no-bare-url": true,
+    "no-dead-internal-links": true,
+    "no-literal-ampersand": true
+  }
+}
+
