@@ -289,7 +289,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     
-    const { cleanedText, words: processedWords } = preparedText;
+    const { cleanedText, words: processedWords, hadLeadingEmoji } = preparedText;
     
     // Check for multi-word proper phrase violations first
     if (validateProperPhrases(cleanedText, lineNumber)) {
@@ -297,7 +297,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
     
     // For bold text, use stricter validation
-    const validationResult = performBoldTextValidation(processedWords, cleanedText);
+    const validationResult = performBoldTextValidation(processedWords, cleanedText, hadLeadingEmoji);
     
     if (!validationResult.isValid) {
       reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine);
@@ -308,9 +308,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * Performs stricter validation for bold text in list items.
    * @param {string[]} words Array of words to validate.
    * @param {string} cleanedText The cleaned text.
+   * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
    * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
    */
-  function performBoldTextValidation(words, cleanedText) {
+  function performBoldTextValidation(words, cleanedText, hadLeadingEmoji) {
     const firstIndex = findFirstValidationWord(words);
     if (firstIndex === -1) {
       return { isValid: true };
@@ -325,7 +326,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Validate first word (but not if it comes after a number in bold text)
     const firstWord = words[firstIndex];
     if (!startsWithNumber) {
-      const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+      const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji);
       if (!firstWordResult.isValid) {
         return firstWordResult;
       }
@@ -532,21 +533,34 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // - Professional emoji (🧑‍⚕️, 👨‍💻)
     
     // Use a comprehensive emoji removal approach that handles complete sequences
-    let cleaned = text;
+    let cleaned = text.trim();
     
-    // Remove complete emoji sequences first (including ZWJ sequences)
-    // This regex matches any sequence of:
-    // - Emoji characters and their variations
-    // - Zero-width joiners (ZWJ) and variation selectors 
-    // - Skin tone modifiers
-    // This ensures complex sequences like 🧑‍⚕️ are removed as complete units
-    // Use multiple simple replaces to avoid character class issues
-    cleaned = cleaned
-      .replace(/^[\u{1F600}-\u{1F64F}]+/gu, "") // Emoticons
-      .replace(/^[\u{1F300}-\u{1F5FF}]+/gu, "") // Misc symbols
-      .replace(/^[\u{1F680}-\u{1F6FF}]+/gu, "") // Transport
-      .replace(/^[\u{2600}-\u{26FF}]+/gu, "")   // Misc symbols
-      .replace(/^[\u{1F900}-\u{1F9FF}]+/gu, ""); // Supplemental
+    // Remove complete emoji sequences including ZWJ sequences
+    // Using a simple approach that works with emoji ranges
+    // This handles complex emoji with ZWJ, skin tone modifiers, etc.
+    let prevLength;
+    do {
+      prevLength = cleaned.length;
+      // Remove various emoji ranges
+      cleaned = cleaned.replace(/^[\u{1F1E0}-\u{1F1FF}]/u, ''); // Regional indicators (flags)
+      cleaned = cleaned.replace(/^[\u{1F300}-\u{1F5FF}]/u, ''); // Miscellaneous symbols and pictographs
+      cleaned = cleaned.replace(/^[\u{1F600}-\u{1F64F}]/u, ''); // Emoticons
+      cleaned = cleaned.replace(/^[\u{1F680}-\u{1F6FF}]/u, ''); // Transport and map symbols
+      cleaned = cleaned.replace(/^[\u{1F700}-\u{1F77F}]/u, ''); // Alchemical symbols
+      cleaned = cleaned.replace(/^[\u{1F780}-\u{1F7FF}]/u, ''); // Geometric shapes extended
+      cleaned = cleaned.replace(/^[\u{1F800}-\u{1F8FF}]/u, ''); // Supplemental arrows-C
+      cleaned = cleaned.replace(/^[\u{2600}-\u{26FF}]/u, '');  // Miscellaneous symbols
+      cleaned = cleaned.replace(/^[\u{2700}-\u{27BF}]/u, '');  // Dingbats
+      cleaned = cleaned.replace(/^[\u{1F900}-\u{1F9FF}]/u, ''); // Supplemental symbols and pictographs
+      cleaned = cleaned.replace(/^[\u{1FA00}-\u{1FA6F}]/u, ''); // Chess symbols
+      cleaned = cleaned.replace(/^[\u{1FA70}-\u{1FAFF}]/u, ''); // Symbols and pictographs extended-A
+      cleaned = cleaned.replace(/^[\u{1F000}-\u{1F02F}]/u, ''); // Mahjong tiles
+      cleaned = cleaned.replace(/^[\u{1F0A0}-\u{1F0FF}]/u, ''); // Playing cards
+      cleaned = cleaned.replace(/^[\u{1F100}-\u{1F1FF}]/u, ''); // Enclosed alphanumeric supplement
+      cleaned = cleaned.replace(/^[\u{1F3FB}-\u{1F3FF}]/u, ''); // Skin tone modifiers
+      cleaned = cleaned.replace(/^\u200D/u, ''); // Zero-width joiner
+      cleaned = cleaned.replace(/^\uFE0F/u, ''); // Variation selector-16
+    } while (cleaned.length < prevLength && cleaned.length > 0);
     
     // Clean up any remaining whitespace
     cleaned = cleaned.replace(/^\s+/, '').trim();
@@ -698,9 +712,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {Set<number>} phraseIgnore Indices to ignore.
    * @param {Object} specialCasedTerms Special casing terms.
    * @param {string} headingText Original heading text.
+   * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
    * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
    */
-  function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, headingText) {
+  function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, headingText, hadLeadingEmoji) {
     const firstWordLower = firstWord.toLowerCase();
     const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
     
@@ -717,6 +732,35 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     
     // Skip if part of ignored phrase or preserved
     if (phraseIgnore.has(firstIndex) || firstWord.startsWith('__PRESERVED_')) {
+      return { isValid: true };
+    }
+    
+    // If there was a leading emoji, the first word after it should be treated as the first word
+    // and follow standard first-word capitalization rules
+    if (hadLeadingEmoji) {
+      // For first word after emoji, it should be capitalized (unless it's a special term)
+      if (expectedFirstWordCasing) {
+        // Known proper noun or technical term
+        const firstWordWithoutParens = firstWord.replace(/[()]/g, '');
+        if (firstWord !== expectedFirstWordCasing && firstWordWithoutParens !== expectedFirstWordCasing) {
+          return {
+            isValid: false,
+            errorMessage: `First word "${firstWord}" should be "${expectedFirstWordCasing}".`
+          };
+        }
+      } else {
+        // Regular sentence case - first letter uppercase, rest lowercase
+        const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+        if (firstWord !== expectedSentenceCase) {
+          // Allow short acronyms (<= 4 chars, all caps)
+          if (!(firstWord.length <= 4 && firstWord.toUpperCase() === firstWord)) {
+            return {
+              isValid: false,
+              errorMessage: `First word "${firstWord}" should be "${expectedSentenceCase}".`
+            };
+          }
+        }
+      }
       return { isValid: true };
     }
     
@@ -861,7 +905,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   /**
    * Prepares text for validation by cleaning and preserving markup.
    * @param {string} headingText The original heading text.
-   * @returns {{cleanedText: string, textWithoutMarkup: string, processed: string, words: string[]} | null} Prepared text data or null if invalid.
+   * @returns {{cleanedText: string, textWithoutMarkup: string, processed: string, words: string[], hadLeadingEmoji: boolean} | null} Prepared text data or null if invalid.
    */
   function prepareTextForValidation(headingText) {
     // First check exemptions on the original text before any cleaning
@@ -872,6 +916,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (shouldExemptFromValidation(headingText, textWithoutMarkup)) {
       return null;
     }
+    
+    // Check if we had emoji at the start before cleaning
+    const hadLeadingEmoji = headingText.trim() !== stripLeadingSymbols(headingText.trim());
     
     // Now clean the text for further processing
     const cleanedText = stripLeadingSymbols(headingText);
@@ -902,7 +949,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return null; // No valid words to validate
     }
     
-    return { cleanedText, textWithoutMarkup, processed, words };
+    return { cleanedText, textWithoutMarkup, processed, words, hadLeadingEmoji };
   }
 
   /**
@@ -910,9 +957,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {string[]} words Array of words to validate.
    * @param {string} cleanedText The cleaned heading text.
    * @param {Set<number>} phraseIgnore Indices to ignore during validation.
+   * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
    * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
    */
-  function performWordValidation(words, cleanedText, phraseIgnore) {
+  function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji) {
     const firstIndex = findFirstValidationWord(words);
     if (firstIndex === -1) {
       return { isValid: true };
@@ -920,7 +968,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     
     // Validate first word
     const firstWord = words[firstIndex];
-    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji);
     if (!firstWordResult.isValid) {
       return firstWordResult;
     }
@@ -957,7 +1005,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       return;
     }
     
-    const { cleanedText, words } = preparedText;
+    const { cleanedText, words, hadLeadingEmoji } = preparedText;
     
     // Check for multi-word proper phrase violations first
     if (validateProperPhrases(cleanedText, lineNumber)) {
@@ -966,7 +1014,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     
     // Perform comprehensive word validation
     const phraseIgnore = getProperPhraseIndices(words);
-    const validationResult = performWordValidation(words, cleanedText, phraseIgnore);
+    const validationResult = performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji);
     
     if (!validationResult.isValid) {
       reportFn(validationResult.errorMessage, lineNumber, cleanedText, sourceLine);
