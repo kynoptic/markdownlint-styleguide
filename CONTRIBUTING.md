@@ -59,7 +59,7 @@ Tests run against the **raw ESM source code** in `src/`, not the transpiled Comm
 - **Testing:** Jest with a fixture-based approach.
 - **Documentation:** Located in the `docs/` directory.
 
-For more details, see the [project architecture documentation](./docs/explanations/project-stack.md).
+For more details, see the [architecture](./docs/architecture.md) and [testing guide](./docs/testing.md).
 
 ## Contributing workflow
 
