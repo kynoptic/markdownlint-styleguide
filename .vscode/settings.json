@@ -15,7 +15,7 @@
     "MD036": false,
     "sentence-case-heading": true,
     "backtick-code-elements": true,
-    "no-bare-urls-trap": true,
+    "no-bare-url": true,
     "no-literal-ampersand": true
   },
   "markdownlint.run": "onType",
