@@ -24,7 +24,7 @@ lib/
 !.vscode/custom-rules/*
 .idea/
 .history/
-.windsurf/*/global/*
+.windsurf/
 *.suo
 *.ntvs*
 *.njsproj
