@@ -7,9 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-09-17
+
+### Added
+
+- Add new `no-dead-internal-links` rule to validate internal file links and anchors
+- Add new `no-literal-ampersand` rule to replace `&` with "and" in prose
+- Add new `no-bare-urls` rule to prevent bare URLs and require link formatting
+- Add basic, recommended, and strict configuration presets for easier setup
+- Add comprehensive autofix safety system to prevent false positive corrections
+- Add performance optimization with caching for large documents
+- Add integration testing framework with external repository validation
+- Add configuration validation system with markdownlint error integration
+- Add pre-commit hooks with Husky and lint-staged for automated quality checks
+- Add comprehensive performance testing with garbage collection profiling
+
 ### Fixed
 
-- Exempt bracketed headings (e.g., `[Unreleased]`) from sentence-case validation.
+- Fix Mermaid parsing error with parentheses in node labels
+- Fix proper line breaks in Mermaid diagrams by replacing `\n` with `<br/>`
+- Fix markdownlint configuration and formatting issues
+- Fix sentence-case-heading rule violations and exemptions for bracketed headings
+- Fix ESLint configuration for Jest globals in test files
+- Fix rule filename references in markdownlint configuration
+- Fix emoji handling in sentence-case-heading rule for complex sequences
+- Fix repository URL in documentation
+
+### Changed
+
+- Enhance ampersand rule with defaults and improve emoji handling
+- Restructure documentation with consolidated guides and improved setup instructions
+- Improve bold text validation in sentence-case-heading rule
+- Optimize code block detection performance for large documents
+- Consolidate shared utilities and enhance config validation across all rules
+- Update gitignore to exclude IDE configuration and build artifacts
+- Replace CONTRIBUTING.md with CLAUDE.md for AI agent guidance
+
+### Documentation
+
+- Add comprehensive agent handbook for AI development assistance
+- Add project roadmap with development milestones
+- Update configuration guides with preset documentation
+- Enhance README with improved setup instructions and examples
+- Add auto-generated configuration documentation system
 
 ## [1.5.0] - 2025-06-28
 
@@ -292,3 +332,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `index.js` to allow usage as an `npm` package.
 - Implemented JSDoc comments for improved code understanding.
 - Structured project documentation following the Diátaxis framework.
+
+[1.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.5.0...v1.6.0
