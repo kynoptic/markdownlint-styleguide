@@ -1,14 +1,6 @@
 # Roadmap
 
-_MECE Area_: Release notes and changes
-_Type_: explanation
-
 This roadmap highlights the prioritized initiatives required to keep `markdownlint-trap` reliable and helpful for downstream documentation teams.
-
-## Release readiness
-
-- **Cut `v1.5.1` patch release** to ship the bracketed-heading sentence-case fix (`CHANGELOG.md`, `package.json`, docs references).
-- **Automate changelog hygiene** by validating that `Unreleased` items are published before tagging.
 
 ## Test infrastructure
 
