@@ -143,7 +143,11 @@ async function testRuleAgainstFiles(rule, files, ruleName) {
   return results;
 }
 
-describe.skip('Integration Tests - Curated Repositories', () => {
+const shouldRunNetworkTests = process.env.RUN_NETWORK_TESTS === 'true';
+
+const describeMethod = shouldRunNetworkTests ? describe : describe.skip;
+
+describeMethod('Integration Tests - Curated Repositories', () => {
   beforeAll(async () => {
     // Clean up any existing temp directory
     if (fs.existsSync(TEMP_DIR)) {
