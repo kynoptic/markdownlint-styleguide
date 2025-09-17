@@ -4,8 +4,8 @@ This roadmap highlights the prioritized initiatives required to keep `markdownli
 
 ## Test infrastructure
 
-- **Unskip curated integration suite** by replacing live `git clones` with vendored fixtures or an opt-in network flag; keep it runnable in CI (`tests/integration/curated-repos.test.js`, `package.json`).
-- **Cover config regression paths** for `allowedExtensions` so non-Markdown targets stay supported (`no-dead-internal-links` rule tests).
+- ✅ **Unskip curated integration suite** by replacing live `git clones` with vendored fixtures or an opt-in network flag; keep it runnable in CI (`tests/integration/curated-repos.test.js`, `package.json`).
+- ✅ **Cover config regression paths** for `allowedExtensions` so non-Markdown targets stay supported (`no-dead-internal-links` rule tests).
 
 ## Rule quality
 
