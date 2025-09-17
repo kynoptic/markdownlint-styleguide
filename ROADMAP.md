@@ -1,39 +1,36 @@
 # Roadmap
 
-## 🔥 Code quality improvements
+## Core rule quality
 
-- 🚨 **Fix cyclomatic complexity issues** in `sentence-case-heading.js` - The main function has ~1100 lines with 15+ nested validation functions. Split into modular classes or separate files.
-- 🚨 **Optimize regex performance** in `backtick-code-elements.js` - Replace `O(n²)` regex compilation in loops with pre-compiled patterns. Current implementation recompiles 15+ regex patterns per line.
-- 🔧 **Enhance error handling** - Add comprehensive input validation and graceful degradation for malformed markdown content across all rules.
-- 🔧 **Standardize caching strategy** - Implement consistent WeakMap caching pattern across all rules (currently only `shared-utils.js` and `no-dead-internal-links.js` use caching).
-- 🔧 **Improve unicode handling** - Replace manual Unicode ranges with proper Unicode category handling in `sentence-case-heading.js` emoji processing to support newer emoji and complex sequences.
-- 🔧 **Replace magic numbers with named constants** - Extract hardcoded values (line 756: length <= 4, line 663: ratio > 0.4) into well-documented configuration constants.
+- **Now** – 🧩 Break down `src/rules/sentence-case-heading.js` (~1110 LOC) into composable modules (token extraction, case classifier, fix builder) and route deprecation warnings through the markdownlint logger to keep the rule maintainable.
+- **Now** – ✅ Backfill unit-level tests for the bold-text and heading-extraction paths (`validateBoldText`, `performBoldTextValidation`, `extractHeadingText`) so refactors catch regressions instead of relying on broad fixtures.
+- **Next** – 🔁 Consolidate shared heuristics (acronym detection, preserved segments, inline code checks) across rules into `shared-utils` to eliminate drift between sentence-case and backtick behavior.
+- **Later** – 🧰 Define a lightweight rule authoring contract with typed helpers so future rules inherit config validation, logging, and fix wiring without `copy/paste`.
 
-## 🛡️ Security and dependency management
+## Autofix and safety
 
-- ⚠️ **Address low-severity vulnerability** - Update `brace-expansion` dependency to resolve ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw).
-- 🔐 **Implement dependency scanning automation** - Add automated security scanning to CI/CD pipeline.
-- 🔐 **Add regex timeout protection** - Implement timeout mechanisms for complex regex patterns to prevent ReDoS attacks in `backtick-code-elements.js` lines 92-108.
+- **Now** – ⚙️ Precompile the large command and extension pattern sets in `src/rules/autofix-safety.js`; `analyzeCodeVsNaturalLanguage` currently rebuilds multi-hundred-term regexes for every violation.
+- **Now** – 🧪 Add focused tests around `shouldApplyAutofix` and `createSafeFixInfo` to assert confidence thresholds and metadata because the safety layer is untested today.
+- **Next** – 🎚️ Expose per-rule safety tuning (confidence threshold, `safe/unsafe` word lists) through configuration so teams can dial aggressiveness without forking.
+- **Later** – 📈 Emit structured telemetry (confidence scores, skipped fixes) during lint runs to highlight heuristics that need adjustments.
 
-## ⚡ Performance and scalability
+## Performance and scalability
 
-- 📊 **Benchmark large-repo performance** quarterly and publish findings in `docs/performance.md`.
-- 🚀 **Optimize file system operations** in `no-dead-internal-links.js` - Current implementation performs synchronous I/O operations that can become bottlenecks.
-- 🚀 **Implement incremental processing** for large documents (>10,000 lines) to reduce memory usage.
+- **Now** – 🚀 Consolidate internal link resolution in `src/rules/no-dead-internal-links.js` by caching normalized targets and anchors once per document, removing repeated `path.resolve`, `fs.statSync`, and heading extraction for the same URL.
+- **Now** – 🌐 Extend heading-anchor normalization beyond `[\w\u4e00-\u9fa5]` so multilingual docs stop tripping false negatives; add regression fixtures covering emoji and extended Unicode.
+- **Next** – ⏱️ Track micro-benchmarks for `backtick-code-elements` and the autofix safety classifiers inside `tests/performance`, and fail CI when regressions exceed agreed thresholds.
+- **Later** – ♻️ Prototype incremental linting (file hash + per-rule fingerprints) so docs exceeding 10k lines avoid full rescans on every run.
 
-## 🧪 Testing and reliability
+## Tooling and supply chain
 
-- 🔍 **Improve test behavior validation** - Current tests focus on execution rather than meaningful behavior validation. Add scenario-based testing.
-- 🔍 **Enhance edge case coverage** - Add tests for malformed markdown, unicode edge cases, and performance regression scenarios.
-- 🔍 **Implement property-based testing** for rule validation logic.
+- **Now** – 🛡️ Patch the `brace-expansion` vulnerability (pulled in via `eslint -> minimatch@3.1.2`) and document the remediation in the changelog.
+- **Now** – 🔍 Add automated vulnerability scanning to CI (e.g., `npm audit --omit=dev` plus `osv-scanner`) so supply-chain regressions are caught pre-release.
+- **Next** – 🤖 Enable dependable automated dependency updates (Renovate or Dependabot) with lockfile verification to keep the `ESLint/Jest/Babel` stack current.
+- **Later** – 🧪 Revisit the Babel build: ship native dual-module output once markdownlint consumers accept ESM to simplify releases.
 
-## 🏗️ Architectural evolution
+## Documentation and ecosystem
 
-- 🔌 **Plugin architecture foundation** - Design and implement extensible plugin system to enable third-party rule development without core modifications.
-- 🛠️ **Build system modernization** - Migrate from Babel transpilation to native Node.js dual exports (`ESM/CommonJS`) for improved performance and reduced complexity.
-- 📝 **TypeScript adoption consideration** - Evaluate TypeScript migration for enhanced type safety and developer experience.
-
-## ✨ Feature development
-
-- 💡 **Investigate new rules** for table header capitalization and link text clarity once the current backlog is cleared.
-- 🧩 **Rule composition framework** - Enable complex rules to be built from simple, composable building blocks.
+- **Now** – 📝 Capture the autofix safety strategy in an ADR and update `docs/architecture.md` to describe the new module boundaries after the sentence-case refactor.
+- **Now** – 🧱 Harden `scripts/generate-config-docs.js` with parsing tests instead of regex scraping so configuration docs survive schema changes.
+- **Next** – 📚 Publish an advanced configuration how-to that links from `docs/setup.md` and `docs/testing.md`, covering safety knobs and per-rule overrides.
+- **Later** – 🌱 Formalize the `extension/plugin` story and queue new rule ideas (table header capitalization, link text clarity) once shared primitives stabilize.
