@@ -64,15 +64,19 @@ function runRuleOnFile(filePath) {
  * Helper function to run the rule on markdown content with a specific file context.
  * @param {string} markdown - Markdown content
  * @param {string} fileName - File name for context
+ * @param {Object} config - Configuration for the rule
  * @returns {Array} Array of errors
  */
-function runRuleWithContent(markdown, fileName) {
+function runRuleWithContent(markdown, fileName, config = {}) {
   const errors = [];
   const onError = (error) => errors.push(error);
 
   const params = {
     name: fileName,
     lines: markdown.split('\n'),
+    config: {
+      'no-dead-internal-links': config
+    },
     parsers: {
       micromark: {
         tokens: []
@@ -330,6 +334,166 @@ Broken [link format
       expect(afterClear.fileExistenceCache).toBe(0);
       expect(afterClear.headingCache).toBe(0);
       expect(afterClear.contentCache).toBe(0);
+    });
+  });
+
+  describe('allowedExtensions configuration', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    test('uses default extensions (.md, .markdown) when not configured', () => {
+      const markdown = `
+[Link without extension](existing-file)
+[Link to non-markdown file](test-file.txt)
+[Link to missing file](missing-file.xyz)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // Should find existing-file.md, find test-file.txt (since it exists), but fail on missing file
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "missing-file.xyz" does not exist');
+    });
+
+    test('respects custom allowedExtensions configuration', () => {
+      const markdown = `
+[Link without extension](test-file)
+[Link to markdown](existing-file)
+[Link to html file](test-file.html)
+`;
+
+      const config = {
+        allowedExtensions: ['.txt', '.html']
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // With custom extensions, should find test-file.txt but not existing-file.md
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "existing-file" does not exist');
+    });
+
+    test('allows multiple custom extensions', () => {
+      const markdown = `
+[Link to text file](test-file)
+[Link to html file](test-file)
+[Link to missing file](missing-file)
+`;
+
+      const config = {
+        allowedExtensions: ['.txt', '.html', '.md']
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // Should find test-file.txt and test-file.html, but fail on missing-file
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "missing-file" does not exist');
+    });
+
+    test('handles empty allowedExtensions array', () => {
+      const markdown = `
+[Link without extension](existing-file)
+[Link with extension](existing-file.md)
+`;
+
+      const config = {
+        allowedExtensions: []
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // With empty extensions, only files with exact names should work
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "existing-file" does not exist');
+    });
+
+    test('validates anchors work with custom extensions', () => {
+      const markdown = `
+[Link to text file with anchor](test-file#heading)
+`;
+
+      const config = {
+        allowedExtensions: ['.txt'],
+        checkAnchors: true
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // Should find test-file.txt but fail on anchor validation
+      // (since .txt files don't have markdown headings)
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#heading" not found in "test-file"');
+    });
+
+    test('works with files that have explicit extensions', () => {
+      const markdown = `
+[Direct link to txt](test-file.txt)
+[Direct link to html](test-file.html)
+[Direct link to missing](missing.txt)
+`;
+
+      const config = {
+        allowedExtensions: ['.md']  // Different from actual file extensions
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // Should validate existing files regardless of allowedExtensions when extension is explicit
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "missing.txt" does not exist');
+    });
+
+    test('reports configuration errors for non-string values in allowedExtensions', () => {
+      const markdown = `
+[Link without extension](existing-file)
+`;
+
+      const config = {
+        allowedExtensions: ['.md', null, undefined, 123, '.txt']  // Mixed types
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // Should report configuration validation errors
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].detail).toContain('Configuration validation failed');
+      expect(errors[0].detail).toContain('allowedExtensions');
+    });
+
+    test('reports configuration errors for invalid type', () => {
+      const markdown = `
+[Link without extension](existing-file)
+`;
+
+      const config = {
+        allowedExtensions: "not-an-array"  // Invalid type
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // Should report configuration error for wrong type
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].detail).toContain('Configuration validation failed');
+      expect(errors[0].detail).toContain('allowedExtensions must be an array');
+    });
+
+    test('case sensitivity in extensions (when filesystem supports it)', () => {
+      const markdown = `
+[Link without extension](test-file)
+[Link to missing file](missing-file)
+`;
+
+      const config = {
+        allowedExtensions: ['.TXT', '.HTML']  // Uppercase extensions
+      };
+
+      const errors = runRuleWithContent(markdown, testFile, config);
+
+      // On case-sensitive filesystems, extensions should be case sensitive
+      // On case-insensitive filesystems (like macOS default), this may still find files
+      // Test should have at least 1 error (for missing-file)
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors.some(e => e.detail.includes('missing-file'))).toBe(true);
     });
   });
 });
