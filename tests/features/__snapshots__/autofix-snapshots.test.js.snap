@@ -176,7 +176,7 @@ exports[`Autofix snapshot tests Individual autofix transformations sentence case
 
 exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 7`] = `
 {
-  "fixed": "## Using JSON with REST apis
+  "fixed": "## Using JSON with REST APIs
 ",
   "hasChanges": true,
   "original": "## Using JSON with REST APIs",

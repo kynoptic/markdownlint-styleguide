@@ -176,16 +176,17 @@ Neo4j excels at graph database use cases.
       expect(violations).toHaveLength(0);
     });
 
-    test('recognizes multi-word emerging tech terms', async () => {
+    test('enforces sentence case for descriptive tech phrases', async () => {
       const markdown = `
-# Introduction to Generative AI
-## Edge Computing solutions
-### Quantum Computing basics
-#### Reinforcement Learning applications
+# Introduction to generative AI
+## Edge computing solutions
+### Quantum computing basics
+#### Reinforcement learning applications
 `;
 
       const violations = await testSentenceCase(markdown);
 
+      // These descriptive phrases should follow normal sentence case rules
       expect(violations).toHaveLength(0);
     });
   });
