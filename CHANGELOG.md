@@ -7,363 +7,233 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
 ## [1.7.0] - 2025-09-17
 
-### Added
+### ✨ Added
 
-- Add setext heading support to `no-dead-internal-links` rule for improved compatibility
-- Add npm validate script for development environment validation
-- Add comprehensive quality gates to Husky pre-commit and pre-push hooks
-- Add 50+ emerging technology terms to casing dictionary (AI, ML, VR, AR, LLM, etc.)
-- Add modern framework support (Next.js, Nuxt, Remix, SvelteKit, etc.)
-- Add database and cloud service terms (DynamoDB, Supabase, ClickHouse, etc.)
-- Add emerging AI platforms and tools (OpenAI, Anthropic, Claude, etc.)
-- Add comprehensive test validation suite for emerging technology terms
-- Add setext heading test fixtures and comprehensive test coverage
-- Add network test opt-in functionality via RUN_NETWORK_TESTS environment variable
+- Expanded casing dictionary with **50+ terms** for emerging tech (AI, ML, LLMs), modern frameworks (`Next.js`, SvelteKit), and cloud services (DynamoDB, Supabase).
+- Enhanced `no-dead-internal-links` rule to support **Setext headings** (`---` and `===`).
+- Introduced an `npm validate` script to check the development environment.
+- Added a network test opt-in feature using the `RUN_NETWORK_TESTS` environment variable.
 
-### Enhanced
+### 🚀 Enhanced
 
-- Enhance prepare script with build artifact drift detection for safer builds
-- Enhance Husky hooks with comprehensive quality gate enforcement
-- Enhance no-dead-internal-links rule to recognize both ATX and setext heading formats
+- Strengthened code quality with comprehensive **Husky pre-commit and pre-push hooks**.
+- Improved build safety with a `prepare` script that detects build artifact drift.
 
-### Fixed
+### 🐞 Fixed
 
-- Fix test snapshots reflecting resolved false positives in sentence-case validation
-- Remove generic descriptive phrases from casing dictionary to reduce false positives
+- Corrected test snapshots to reflect resolved false positives in sentence-case validation.
+- Reduced false positives by removing generic phrases from the casing dictionary.
 
-### Documentation
+### 📚 Documentation
 
-- Add comprehensive release checklist with semantic versioning guidance
-- Consolidate roadmap documentation with completed items removed
-- Mark developer experience and rule quality roadmap items as completed
+- Added a comprehensive **Release checklist** with semantic versioning guidance.
+- Updated the project roadmap to reflect completed tasks.
+
+---
 
 ## [1.6.0] - 2025-09-17
 
-### Added
+This release introduced three powerful new rules, configuration presets, and significant performance enhancements.
 
-- Add new `no-dead-internal-links` rule to validate internal file links and anchors
-- Add new `no-literal-ampersand` rule to replace `&` with "and" in prose
-- Add new `no-bare-urls` rule to prevent bare URLs and require link formatting
-- Add basic, recommended, and strict configuration presets for easier setup
-- Add comprehensive autofix safety system to prevent false positive corrections
-- Add performance optimization with caching for large documents
-- Add integration testing framework with external repository validation
-- Add configuration validation system with markdownlint error integration
-- Add pre-commit hooks with Husky and lint-staged for automated quality checks
-- Add comprehensive performance testing with garbage collection profiling
+### ✨ Added
 
-### Fixed
+- **New rule**: `no-dead-internal-links` to validate internal file links and heading anchors.
+- **New rule**: `no-literal-ampersand` to enforce replacing `&` with "and" in prose.
+- **New rule**: `no-bare-urls` to ensure all URLs are formatted as markdown links.
+- **Configuration presets**: `basic`, `recommended`, and `strict` for easier project setup.
+- **Infrastructure**:
+  - Added a robust **Autofix safety system** to prevent incorrect modifications.
+  - Improved performance with a new caching system for large documents.
+  - Implemented a configuration validation system that integrates with `markdownlint`.
+  - Set up **Husky and lint-staged** for automated pre-commit quality checks.
 
-- Fix Mermaid parsing error with parentheses in node labels
-- Fix proper line breaks in Mermaid diagrams by replacing `\n` with `<br/>`
-- Fix markdownlint configuration and formatting issues
-- Fix sentence-case-heading rule violations and exemptions for bracketed headings
-- Fix ESLint configuration for Jest globals in test files
-- Fix rule filename references in markdownlint configuration
-- Fix emoji handling in sentence-case-heading rule for complex sequences
-- Fix repository URL in documentation
+### 🐞 Fixed
 
-### Changed
+- Resolved a Mermaid diagram parsing error involving parentheses in node labels.
+- Corrected line break rendering in Mermaid diagrams by replacing `\n` with `<br/>`.
+- Fixed various violations in the `sentence-case-heading` rule, especially for bracketed headings and complex emojis.
 
-- Enhance ampersand rule with defaults and improve emoji handling
-- Restructure documentation with consolidated guides and improved setup instructions
-- Improve bold text validation in sentence-case-heading rule
-- Optimize code block detection performance for large documents
-- Consolidate shared utilities and enhance config validation across all rules
-- Update gitignore to exclude IDE configuration and build artifacts
-- Replace CONTRIBUTING.md with CLAUDE.md for AI agent guidance
+### 🔄 Changed
 
-### Documentation
+- Restructured all documentation for improved clarity and consolidated setup guides.
+- Replaced `CONTRIBUTING.md` with `CLAUDE.md` to provide guidance for AI agent contributors.
 
-- Add comprehensive agent handbook for AI development assistance
-- Add project roadmap with development milestones
-- Update configuration guides with preset documentation
-- Enhance README with improved setup instructions and examples
-- Add auto-generated configuration documentation system
+### 📚 Documentation
+
+- Added a comprehensive **Agent handbook** for AI development assistance.
+- Created a project roadmap outlining future development milestones.
+- Published auto-generated configuration documentation.
+
+---
 
 ## [1.5.0] - 2025-06-28
 
-### Added
+### ✨ Added
 
-- Add Husky pre-commit hook to automate rule compilation and staging
-- Exempt headings that start with code spans from sentence case rules
+- Automated rule compilation and staging with a new Husky pre-commit hook.
+- Exempted headings that start with inline code spans from sentence case rules.
 
-### Changed
+### 🔄 Changed
 
-- Improve `sentence-case-heading` rule and consolidate casing terms dictionary
-- Consolidate special casing terms into unified `casingTerms` dictionary with expanded entries
-- Migrate rules to CommonJS and reorganize directory structure
-- Extract additional backtick ignored terms into separate constant array
-- Standardize markdown list style to dashes and update build config
+- Improved the `sentence-case-heading` rule by consolidating all casing terms into a unified, expanded dictionary.
+- Migrated rule files to CommonJS and reorganized the project's directory structure.
 
-### Test
-
-- Add fixture files for backticks and sentence case false positives
-
-### Documentation
-
-- Update roadmap with build process fixes and revise planned rules
-- Update changelog formatting and simplify release notes for `v1.4.0`
+---
 
 ## [1.4.0] - 2025-06-28
 
-### Added
+### ✨ Added
 
-- Add support for custom rules in `.markdownlint-rules/` for easier extension and sharing.
-- Add a build script to automate bundling and distribution of custom rules.
+- Added support for custom rules in a `.markdownlint-rules/` directory for easy extension.
+- Included a build script to automate the bundling and distribution of custom rules.
 
-### Changed
+### 🔄 Changed
 
-- Move all test files to a new `features/` directory for improved organization and clarity.
-- Improve validation of bold list items and sentence case in headings, ensuring more consistent and accurate linting results.
-- Update `import paths` and project structure to align with modern ESM and markdownlint plugin conventions.
+- Improved project organization by moving all test files to a new `features/` directory.
+- Updated `import paths` and project structure to align with modern ESM conventions.
 
-### Documentation
-
-- Update documentation to explain the ESM build process and new usage instructions for custom rules and tests.
-
-### Maintenance
-
-- Clean up and reformat test codebase for readability and maintainability.
+---
 
 ## [1.3.0] - 2025-06-27
 
-### Added
+### ✨ Added
 
-- Enhance sentence case validation for bold list items with improved regex and debug logging
-- Enhance file path detection heuristics to reduce false positives from natural language
-- Expand special-cased terms dictionary with tech acronyms and brand names
-- Add sentence case tests and mark fixture coverage as complete
-- Expand shared constants with additional tech terms, brands, and programming languages
-- Add sentence case autofix for headings and list items with improved inline element handling
+- Enhanced the `sentence-case` rule to **Autofix bolded list items**.
+- Expanded the special-cased terms dictionary with more tech acronyms and brand names.
 
-### Fixed
+### 🐞 Fixed
 
-- Improve regex patterns to avoid false positives for host:port and shell variables
-- Update wt-no-bare-urls fixture and correct heading
-- Update autofix fixture annotation markers
-- Improve version number detection in sentence case heading rule
+- Improved regex patterns to avoid false positives for `host:port` formats, shell variables, and version numbers.
 
-### Changed
+### 🔄 Changed
 
-- Update sentence case in README and add test case annotations
-- Add test fixtures explanation with examples and best practices
-- Remove debug logging statements and delete unused test file
-- Update roadmap by removing completed tasks and refining section headers
-- Extend sentence case rule to include bolded list item lead-ins
-- Improve README clarity and organization with expanded sections
-- Wrap filenames in backticks for consistent code formatting
+- Extended the `sentence-case` rule to validate the leading words of bolded list items.
 
-## [`1.2.0`] - 2025-06-26
+---
 
-### Added
+## [1.2.0] - 2025-06-26
 
-- Implement `no-bare-urls` rule with auto-fix, tests, and documentation
-- Add user-configurable proper nouns and technical terms to sentence-case-heading rule
-- Add LaTeX math detection and improve backtick rule handling for shell commands
-- Add file path regex validation and centralize ignored terms for backtick rule
-- Add sentence case auto-fix (#57)
-- Add backtick code element rule with auto-fix tests and fixtures
-- Add Babel configuration
+### ✨ Added
 
-### Fixed
+- Implemented the `no-bare-urls` rule with auto-fix capabilities.
+- Implemented the `backtick-code-elements` rule with auto-fix.
+- Enhanced `sentence-case-heading` rule to support user-configurable proper nouns.
+- Added detection for LaTeX math and shell commands to avoid false positives in multiple rules.
 
-- Improve LaTeX math detection to avoid false positives with shell variables
-- Improve environment variable detection in backtick rule
-- Improve rule robustness for hyphens and tilde fences (#55)
-- Harden custom rule checks (#53)
-- Handle multi-word proper nouns in sentence case rule (#52)
-- Add `npm` to ignored terms and normalize `VS Code` casing
-- Refine path detection heuristics (#41)
-- Remove unnecessary text suffix from code block language identifier
-- Enable markdownlint autofix for `backtick-code-elements` (BCE001) rule
-- Update backtick rule and tests (#56)
-- Update rules and fixtures (#42)
+### 🐞 Fixed
 
-### Changed
+- Hardened custom rules against false positives for hyphens, tildes, and environment variables.
+- Improved multi-word proper noun handling in the `sentence-case` rule.
 
-- Improved parameter validation for custom rules
-- Enhanced detection of fenced code blocks with tildes
-- Consolidate markdownlint configs and add proper noun exceptions
-- Consolidate special-cased terms into shared constants module
-- Improve technical term handling with case-sensitive dictionary
-- Improve bare URL detection using `markdown-it`
-- Rename `no-bare-urls` rule to `wt-no-bare-urls` and modernize test infrastructure
-- Reorganize ignored terms into categories and add test coverage
+### 🔄 Changed
 
-### Documentation
+- Consolidated all special-cased terms and markdownlint configurations into shared modules for better consistency.
+- Renamed `no-bare-urls` to `wt-no-bare-urls` and modernized the test infrastructure.
 
-- Restructure roadmap with clearer focus areas and prioritized tasks
-- Add markdown formatting conventions (#40)
-- Update agent guidelines (#39)
-- Add folder READMEs (#38)
-- Add missing JSDoc comments (#37)
+---
 
-## [`1.1.0`] - 2025-06-06
+## [1.1.0] - 2025-06-06
 
-### Added
+### ✨ Added
 
-- Added backtick-code-elements markdownlint rule
-- Added debug logging infrastructure (#8)
+- Added the `backtick-code-elements` markdownlint rule.
+- Implemented a debug logging system for easier troubleshooting.
 
-### Fixed
+### 🔄 Changed
 
-- Improved sentence case heading rule to handle special cases
+- Simplified `sentence-case` rule logic and improved its handling of special cases.
+- Reorganized the test directory and fixture structure for better clarity.
 
-### Changed
+---
 
-- Simplified sentence-case rule logic (#5)
-- Reorganized tests directory structure (#29)
-- Restructured test fixtures by outcome and consolidated rule fixtures (#33, #34, #36)
+## [1.0.0] - 2025-06-03
 
-### Documentation
+### 💥 Breaking changes
 
-- Added project roadmap (#7)
-- Added basic testing instructions (#12)
-- Improved rule documentation (#9)
-- Updated error messages docs and tests (#10)
-- Listed all docs in docs README (#11)
-- Clarified contributor guidelines (#32)
+- **Complete project restructuring**. The project was migrated to use ES Modules (`type: module`), making old `import` paths and rule structures invalid.
+- Documentation structure was significantly reorganized.
 
-## [`1.0.0`] - 2025-06-03
+### ✨ Added
 
-### Added
+- Initial stable release.
+- Added the `sentence-case-heading` markdownlint rule.
+- Updated all major dependencies, including `markdownlint` and `Jest`.
 
-- Added dedicated rules documentation file
-- Added sentence-case-heading markdownlint rule
+---
 
-### Changed
+## [0.3.0] - 2025-06-03
 
-- Reorganized project documentation structure
-- Removed legacy code structure
-- Updated project dependencies and structure
-- Switched to ES modules with type: module in `package.json`
-- Updated to latest markdownlint and markdownlint-cli2
-- Updated Jest with experimental VM modules support
+### ✨ Added
 
-### Documentation
+- Published the initial package to `npm with` an `index.js` entry point.
+- Enhanced the `sentence-case` rule to detect and handle ALL CAPS headings.
 
-- Enhanced project documentation and test fixtures
-- Updated markdownlint rule authoring guidelines
-- Added validation markers to test fixtures
-- Improved changelog formatting
+### 🐞 Fixed
 
-### Breaking changes
+- Prevented false positives for common abbreviations (e.g., `e.g.`, `i.e.`).
+- Fixed issues with emoji-prefixed headings and bold text in the `sentence-case` rule.
 
-- Complete restructuring of the project. Old `import` paths and rule structure are no longer valid
-- Documentation structure has been significantly reorganized
+### 🔄 Changed
 
-## [`0.3.0`] - 2025-06-03
+- **Migrated the entire test suite to Jest**.
+- Restructured the repository to improve organization and testability.
 
-### Added
+---
 
-- Added `index.js` as package entry point
-- Enhanced test helpers with `lintMarkdown` function
-- Enhanced sentence-case rule with ALL CAPS detection
-- Added feature tests for markdownlint rules
-- Added alternative markdownlint configuration formats
+## [0.2.2] - 2025-05-31
 
-### Fixed
+### 🐞 Fixed
 
-- Fixed test helpers to work with new directory structure
-- Prevented false positives for common abbreviations like e.g. and i.e.
-- Corrected sentence-case rule and added comprehensive tests
-- Improved handling of proper nouns and natural language in rules
-- Fixed sentence-case rule for bold text detection
-- Improved backtick-code-elements rule for common phrases
-- Excluded version numbers in CHANGELOG headings from sentence case checking
-- Added null checks for result in integration tests
-- Fixed handling of emoji-prefixed headings in sentence-case rule
+- Fixed false positives in `backtick-code-elements` for technology names with dot notation (e.g., `Node.js`).
+- Improved the `sentence-case` rule to correctly handle short, bolded phrases used as labels.
 
-### Changed
+---
 
-- Improved repository structure with dedicated helpers directory
-- Extracted backtick-code-elements helpers and added TypeScript types
-- Enhanced rule documentation and error handling
-- Restructured backtick-code-elements rule for testability
-- Reorganized test files into proper directories
-- Moved markdownlint config files to configs/
-- Migrated to Jest-based test structure
+## [0.2.1] - 2025-05-31
 
-### Documentation
+### 🐞 Fixed
 
-- Added project stack definition for Windsurf
-- Improved repository structure documentation
-- Added comprehensive unit tests for backtick-code-elements-helpers
-- Updated rules directory documentation
-- Restructured `docs/README.md` using Diátaxis framework
-- Added JSDoc comments to improve code documentation
+- Fixed a false positive in the `backtick-code-elements` rule where code keywords were flagged inside descriptive markdown links.
 
-## [`0.2.2`] - 2025-05-31
+---
 
-### Fixed
+## [0.2.0] - 2025-05-31
 
-- Fixed false positives for technology names with dot notation (Node.js, `React.js`) in `backtick-code-elements` rule
-- Improved detection of from when used as a preposition in natural language contexts
-- Fixed false positive for short bold phrases used as labels in the `sentence-case` rule
-- Improved sentence-case rule for more accurate bold text detection in paragraphs
+### ✨ Added
 
-### Added
+- Added alternative markdownlint configuration formats for improved flexibility.
+- Created a `test-fixtures` directory to support unit tests and manual rule testing.
 
-- Added feature tests for proper nouns and common English words
-- Added test fixtures for technology names, prepositions, and bold labels
+### 🔄 Changed
 
-### Documentation
+- Optimized the `backtick-code-elements` rule for better performance with precompiled regex patterns.
+- Migrated to a Jest-based test structure with shared test utilities.
 
-- Added comprehensive reference documentation for components and interactions
-- Added visual Mermaid diagrams for rule integration flows
-- Simplified README with clearer rule examples and streamlined installation steps
+---
 
-## [`0.2.1`] - 2025-05-31
+## [0.1.0] - 2025-05-30
 
-### Fixed
+### ✨ Added
 
-- Fixed false positives in `backtick-code-elements` rule for code keywords in descriptive bullet points with markdown links
-- Improved exclusion logic for descriptive text in documentation
+- **Initial release** of `markdownlint-custom-rules`.
+- Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
+- Established the project documentation structure using the Diátaxis framework.
 
-### Added
-
-- Added feature tests for descriptive text exclusions in `backtick-code-elements` rule
-- Added test fixtures to prevent regression of fixed false positives
-
-### Documentation
-
-- Added comprehensive README files to all test subfolders (`features`, `helpers`, `integration`, `unit`)
-- Expanded existing READMEs with usage examples and cross-references
-
-## [`0.2.0`] - 2025-05-31
-
-### Added
-
-- Added alternative markdownlint configuration formats for improved flexibility
-- Added test fixtures for unit tests and manual rule testing
-- Added README for `test-fixtures` directory to document purpose and usage
-
-### Changed
-
-- Optimized `backtick-code-elements` rule for better performance with precompiled regex patterns
-- Updated markdownlint configuration format to use array format for custom rules
-- Migrated to Jest-based test structure with shared test utilities
-- Improved documentation formatting and clarity throughout the project
-- Reorganized test files and moved `test-rules.md` to `fixtures` directory
-
-### Fixed
-
-- Fixed handling of emoji-prefixed headings in sentence-case rule
-- Added null checks for result in integration tests
-- Fixed handling of sentence case for list marker headings
-
-## [`0.1.0`] - 2025-05-30
-
-### Added
-
-- Initial release of `markdownlint-custom-rules`.
-- Includes custom rules such as `sentence-case-headings-bold` and `backtick-code-elements`.
-- Added `index.js` to allow usage as an `npm` package.
-- Implemented JSDoc comments for improved code understanding.
-- Structured project documentation following the Diátaxis framework.
-
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.0...HEAD
 [1.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.3.0...v1.0.0
+[0.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/kynoptic/markdownlint-trap/releases/tag/v0.1.0
