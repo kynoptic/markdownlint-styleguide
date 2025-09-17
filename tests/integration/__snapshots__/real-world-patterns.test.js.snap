@@ -319,26 +319,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests g
 exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests nextjs documentation patterns: backtick-nextjs 1`] = `
 [
   {
-    "errorContext": "Next.js",
-    "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
-    "errorRange": [
-      21,
-      7,
-    ],
-    "fixInfo": {
-      "deleteCount": 7,
-      "editColumn": 21,
-      "insertText": "\`Next.js\`",
-    },
-    "lineNumber": 5,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
     "errorContext": "pages/api",
     "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
     "errorRange": [
@@ -391,26 +371,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests n
       "insertText": "\`hello.js\`",
     },
     "lineNumber": 17,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
-    "errorContext": "Next.js",
-    "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
-    "errorRange": [
-      1,
-      7,
-    ],
-    "fixInfo": {
-      "deleteCount": 7,
-      "editColumn": 1,
-      "insertText": "\`Next.js\`",
-    },
-    "lineNumber": 23,
     "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
     "ruleInformation": null,
     "ruleNames": [
@@ -973,26 +933,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
   "nextjs": {
     "backtickViolations": [
       {
-        "errorContext": "Next.js",
-        "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
-        "errorRange": [
-          21,
-          7,
-        ],
-        "fixInfo": {
-          "deleteCount": 7,
-          "editColumn": 21,
-          "insertText": "\`Next.js\`",
-        },
-        "lineNumber": 5,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
         "errorContext": "pages/api",
         "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
         "errorRange": [
@@ -1053,26 +993,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         ],
       },
       {
-        "errorContext": "Next.js",
-        "errorDetail": "Filename 'Next.js' should be wrapped in backticks to distinguish it from regular text",
-        "errorRange": [
-          1,
-          7,
-        ],
-        "fixInfo": {
-          "deleteCount": 7,
-          "editColumn": 1,
-          "insertText": "\`Next.js\`",
-        },
-        "lineNumber": 23,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
         "errorContext": "next.config.js",
         "errorDetail": "Filename 'next.config.js' should be wrapped in backticks to distinguish it from regular text",
         "errorRange": [
@@ -1105,7 +1025,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "fixInfo": {
           "deleteCount": 28,
           "editColumn": 3,
-          "insertText": "Getting started with next.js",
+          "insertText": "Getting started with Next.js",
         },
         "lineNumber": 1,
         "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
@@ -1945,7 +1865,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests ne
     "fixInfo": {
       "deleteCount": 28,
       "editColumn": 3,
-      "insertText": "Getting started with next.js",
+      "insertText": "Getting started with Next.js",
     },
     "lineNumber": 1,
     "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
