@@ -47,6 +47,7 @@ function headingToAnchor(heading) {
 
 /**
  * Extract headings from a markdown file content.
+ * Supports both ATX headings (# Heading) and Setext headings (underlined).
  * PERFORMANCE: This function is lightweight but called frequently.
  * Headings extraction results are cached at the file level.
  * @param {string} content - The markdown content
@@ -55,16 +56,35 @@ function headingToAnchor(heading) {
 function extractHeadings(content) {
   const headings = [];
   const lines = content.split('\n');
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
     // Match ATX headings (# Heading)
     const atxMatch = line.match(/^#{1,6}\s+(.+)/);
     if (atxMatch) {
       const headingText = atxMatch[1].trim();
       headings.push(headingToAnchor(headingText));
+      continue;
     }
 
-    // Could also match Setext headings (underlined with = or -) if needed
-    // But ATX headings are more common in modern markdown
+    // Match Setext headings (underlined with = or -)
+    // Check if next line exists and is a setext underline
+    if (i + 1 < lines.length) {
+      const nextLine = lines[i + 1];
+      const currentLineText = line.trim();
+
+      // Setext H1: underlined with = (at least 3 characters)
+      if (currentLineText && /^=+$/.test(nextLine.trim()) && nextLine.trim().length >= 3) {
+        headings.push(headingToAnchor(currentLineText));
+        continue;
+      }
+
+      // Setext H2: underlined with - (at least 3 characters)
+      if (currentLineText && /^-+$/.test(nextLine.trim()) && nextLine.trim().length >= 3) {
+        headings.push(headingToAnchor(currentLineText));
+        continue;
+      }
+    }
   }
   return headings;
 }

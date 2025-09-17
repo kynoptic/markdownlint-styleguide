@@ -509,25 +509,31 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     let cleaned = text.trim();
 
     // Remove complete emoji sequences including ZWJ sequences
-    // This comprehensive pattern matches:
-    // - Any emoji character
-    // - Zero-width joiners (U+200D)
-    // - Variation selectors (U+FE0F)
-    // - Skin tone modifiers
-    // - And any combination of these
-    // The pattern repeats to catch entire emoji sequences at the start
-    // Using a loop to handle complex emoji sequences with ZWJ
-    while (cleaned.length > 0) {
-      const oldLength = cleaned.length;
-      // Remove emoji characters
-      cleaned = cleaned.replace(/^[\u{1F1E0}-\u{1F1FF}\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}]+/gu, "");
-      // Remove ZWJ and variation selectors
-      cleaned = cleaned.replace(/^[\u200D\uFE0F]+/, "");
-      // If nothing was removed, we're done
-      if (cleaned.length === oldLength) {
-        break;
-      }
-    }
+    // Using a simple approach that works with emoji ranges
+    // This handles complex emoji with ZWJ, skin tone modifiers, etc.
+    let prevLength;
+    do {
+      prevLength = cleaned.length;
+      // Remove various emoji ranges
+      cleaned = cleaned.replace(/^[\u{1F1E0}-\u{1F1FF}]/u, ''); // Regional indicators (flags)
+      cleaned = cleaned.replace(/^[\u{1F300}-\u{1F5FF}]/u, ''); // Miscellaneous symbols and pictographs
+      cleaned = cleaned.replace(/^[\u{1F600}-\u{1F64F}]/u, ''); // Emoticons
+      cleaned = cleaned.replace(/^[\u{1F680}-\u{1F6FF}]/u, ''); // Transport and map symbols
+      cleaned = cleaned.replace(/^[\u{1F700}-\u{1F77F}]/u, ''); // Alchemical symbols
+      cleaned = cleaned.replace(/^[\u{1F780}-\u{1F7FF}]/u, ''); // Geometric shapes extended
+      cleaned = cleaned.replace(/^[\u{1F800}-\u{1F8FF}]/u, ''); // Supplemental arrows-C
+      cleaned = cleaned.replace(/^[\u{2600}-\u{26FF}]/u, ''); // Miscellaneous symbols
+      cleaned = cleaned.replace(/^[\u{2700}-\u{27BF}]/u, ''); // Dingbats
+      cleaned = cleaned.replace(/^[\u{1F900}-\u{1F9FF}]/u, ''); // Supplemental symbols and pictographs
+      cleaned = cleaned.replace(/^[\u{1FA00}-\u{1FA6F}]/u, ''); // Chess symbols
+      cleaned = cleaned.replace(/^[\u{1FA70}-\u{1FAFF}]/u, ''); // Symbols and pictographs extended-A
+      cleaned = cleaned.replace(/^[\u{1F000}-\u{1F02F}]/u, ''); // Mahjong tiles
+      cleaned = cleaned.replace(/^[\u{1F0A0}-\u{1F0FF}]/u, ''); // Playing cards
+      cleaned = cleaned.replace(/^[\u{1F100}-\u{1F1FF}]/u, ''); // Enclosed alphanumeric supplement
+      cleaned = cleaned.replace(/^[\u{1F3FB}-\u{1F3FF}]/u, ''); // Skin tone modifiers
+      cleaned = cleaned.replace(/^\u200D/u, ''); // Zero-width joiner
+      cleaned = cleaned.replace(/^\uFE0F/u, ''); // Variation selector-16
+    } while (cleaned.length < prevLength && cleaned.length > 0);
 
     // Clean up any remaining whitespace
     cleaned = cleaned.replace(/^\s+/, '').trim();
