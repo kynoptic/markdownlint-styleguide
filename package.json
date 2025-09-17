@@ -46,7 +46,7 @@
       "eslint --fix"
     ],
     "*.md": [
-      "bash -c 'if [[ \"$1\" != docs/configuration.md ]]; then markdownlint-cli2 --fix \"$1\"; fi' --"
+      "bash -c 'if [[ \"$1\" != docs/configuration.md ]] && [[ \"$1\" != .windsurf/* ]]; then markdownlint-cli2 --fix \"$1\"; fi' --"
     ]
   },
   "engines": {

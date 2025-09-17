@@ -12,6 +12,7 @@
   "globs": [
     "**/*.md",
     "!node_modules/**/*",
-    "!tests/**/*.md"
+    "!tests/**/*.md",
+    "!.windsurf/**/*"
   ]
 }
