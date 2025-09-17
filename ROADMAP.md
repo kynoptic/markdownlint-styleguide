@@ -9,8 +9,8 @@ This roadmap highlights the prioritized initiatives required to keep `markdownli
 
 ## Rule quality
 
-- **Expand heading parsing to setext** blocks so anchors resolve for underlined H1/H2 sections (`src/rules/no-dead-internal-links.js`).
-- **Audit shared dictionaries** to capture emerging terms and minimize sentence-case false positives (`sentence-case-heading` and shared constants).
+- ✅ **Expand heading parsing to setext** blocks so anchors resolve for underlined H1/H2 sections (`src/rules/no-dead-internal-links.js`).
+- ✅ **Audit shared dictionaries** to capture emerging terms and minimize sentence-case false positives (`sentence-case-heading` and shared constants).
 
 ## Developer experience
 
