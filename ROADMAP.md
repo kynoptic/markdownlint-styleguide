@@ -6,11 +6,14 @@
 - **Optimize regex performance** in `backtick-code-elements.js` - Replace O(n²) regex compilation in loops with pre-compiled patterns. Current implementation recompiles 15+ regex patterns per line.
 - **Enhance error handling** - Add comprehensive input validation and graceful degradation for malformed markdown content across all rules.
 - **Standardize caching strategy** - Implement consistent WeakMap caching pattern across all rules (currently only `shared-utils.js` and `no-dead-internal-links.js` use caching).
+- **Improve Unicode handling** - Replace manual Unicode ranges with proper Unicode category handling in `sentence-case-heading.js` emoji processing to support newer emoji and complex sequences.
+- **Replace magic numbers with named constants** - Extract hardcoded values (line 756: length <= 4, line 663: ratio > 0.4) into well-documented configuration constants.
 
 ## Security and dependency management (medium priority)
 
 - **Address low-severity vulnerability** - Update `brace-expansion` dependency to resolve ReDoS vulnerability (GHSA-v6h2-p8h4-qcjw).
 - **Implement dependency scanning automation** - Add automated security scanning to CI/CD pipeline.
+- **Add regex timeout protection** - Implement timeout mechanisms for complex regex patterns to prevent ReDoS attacks in `backtick-code-elements.js` lines 92-108.
 
 ## Performance and scalability (medium priority)
 
@@ -24,6 +27,13 @@
 - **Enhance edge case coverage** - Add tests for malformed markdown, unicode edge cases, and performance regression scenarios.
 - **Implement property-based testing** for rule validation logic.
 
+## Architectural evolution (low priority)
+
+- **Plugin architecture foundation** - Design and implement extensible plugin system to enable third-party rule development without core modifications.
+- **Build system modernization** - Migrate from Babel transpilation to native Node.js dual exports (ESM/CommonJS) for improved performance and reduced complexity.
+- **TypeScript adoption consideration** - Evaluate TypeScript migration for enhanced type safety and developer experience.
+
 ## Feature development (low priority)
 
 - **Investigate new rules** for table header capitalization and link text clarity once the current backlog is cleared.
+- **Rule composition framework** - Enable complex rules to be built from simple, composable building blocks.
