@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2025-09-17
+
+### Added
+
+- Add setext heading support to `no-dead-internal-links` rule for improved compatibility
+- Add npm validate script for development environment validation
+- Add comprehensive quality gates to Husky pre-commit and pre-push hooks
+- Add 50+ emerging technology terms to casing dictionary (AI, ML, VR, AR, LLM, etc.)
+- Add modern framework support (Next.js, Nuxt, Remix, SvelteKit, etc.)
+- Add database and cloud service terms (DynamoDB, Supabase, ClickHouse, etc.)
+- Add emerging AI platforms and tools (OpenAI, Anthropic, Claude, etc.)
+- Add comprehensive test validation suite for emerging technology terms
+- Add setext heading test fixtures and comprehensive test coverage
+- Add network test opt-in functionality via RUN_NETWORK_TESTS environment variable
+
+### Enhanced
+
+- Enhance prepare script with build artifact drift detection for safer builds
+- Enhance Husky hooks with comprehensive quality gate enforcement
+- Enhance no-dead-internal-links rule to recognize both ATX and setext heading formats
+
+### Fixed
+
+- Fix test snapshots reflecting resolved false positives in sentence-case validation
+- Remove generic descriptive phrases from casing dictionary to reduce false positives
+
+### Documentation
+
+- Add comprehensive release checklist with semantic versioning guidance
+- Consolidate roadmap documentation with completed items removed
+- Mark developer experience and rule quality roadmap items as completed
+
 ## [1.6.0] - 2025-09-17
 
 ### Added
@@ -333,4 +365,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implemented JSDoc comments for improved code understanding.
 - Structured project documentation following the Diátaxis framework.
 
+[1.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.5.0...v1.6.0
