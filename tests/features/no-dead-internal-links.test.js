@@ -496,4 +496,136 @@ Broken [link format
       expect(errors.some(e => e.detail.includes('missing-file'))).toBe(true);
     });
   });
+
+  describe('setext heading support', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    test('recognizes setext H1 headings (underlined with =)', () => {
+      const markdown = `
+Setext Heading Level 1
+======================
+
+This is [a link to setext heading](#setext-heading-level-1).
+This is [a link to non-existent heading](#missing-setext-heading).
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#missing-setext-heading" not found in current file');
+    });
+
+    test('recognizes setext H2 headings (underlined with -)', () => {
+      const markdown = `
+Setext Heading Level 2
+----------------------
+
+This is [a link to setext H2](#setext-heading-level-2).
+This is [a link to missing H2](#missing-h2).
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#missing-h2" not found in current file');
+    });
+
+    test('handles mixed ATX and setext headings', () => {
+      const markdown = `
+# ATX Heading
+
+Setext Heading
+==============
+
+## Another ATX
+
+Another Setext
+--------------
+
+[Link to ATX](#atx-heading)
+[Link to setext H1](#setext-heading)
+[Link to ATX H2](#another-atx)
+[Link to setext H2](#another-setext)
+[Link to missing](#missing-heading)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#missing-heading" not found in current file');
+    });
+
+    test('requires minimum underline length for setext headings', () => {
+      const markdown = `
+Too Short Underline
+=
+
+Valid Underline
+===============
+
+[Link to short](#too-short-underline)
+[Link to valid](#valid-underline)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // Should not recognize "Too Short Underline" because underline is < 3 chars
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#too-short-underline" not found in current file');
+    });
+
+    test('handles setext headings with special characters', () => {
+      const markdown = `
+Special Characters & Symbols!
+=============================
+
+Mixed Content-123 (Test)
+------------------------
+
+[Link to special](#special-characters-symbols)
+[Link to mixed](#mixed-content-123-test)
+[Link to wrong format](#Special-Characters-&-Symbols!)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // Should only fail on the wrong format link
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#Special-Characters-&-Symbols!" not found in current file');
+    });
+
+    test('ignores lines that look like setext but are not headings', () => {
+      const markdown = `
+This is not a heading because there's no text above
+===================================================
+
+Regular paragraph text.
+
+====
+Another paragraph.
+
+---
+
+[Link to fake heading](#this-is-not-a-heading-because-theres-no-text-above)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // Should not recognize the fake heading
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#this-is-not-a-heading-because-theres-no-text-above" not found in current file');
+    });
+
+    test('validates setext headings in external files', () => {
+      const markdown = `
+[Link to setext in existing file](setext-headings-test.md#setext-heading-level-1)
+[Link to missing setext](setext-headings-test.md#non-existent-setext)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#non-existent-setext" not found in "setext-headings-test.md"');
+    });
+  });
 });
