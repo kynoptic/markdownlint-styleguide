@@ -14,8 +14,8 @@ This roadmap highlights the prioritized initiatives required to keep `markdownli
 
 ## Developer experience
 
-- **Document release checklist** in `docs/` to align with semantic versioning guidance and agent workflow.
-- **Tighten `Husky/prepare` hooks** to fail early when build artifacts drift or linting is skipped.
+- ✅ **Document release checklist** in `docs/` to align with semantic versioning guidance and agent workflow.
+- ✅ **Tighten `Husky/prepare` hooks** to fail early when build artifacts drift or linting is skipped.
 
 ## Stretch ideas
 
