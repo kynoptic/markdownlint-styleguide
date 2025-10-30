@@ -26,7 +26,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 
 - [ ] **Review commit history**: `git log --oneline $(git describe --tags --abbrev=0)..HEAD`
 - [ ] **Review code changes**: `git diff $(git describe --tags --abbrev=0)..HEAD`
-- [ ] **Verify no BREAKING changes** unless intentional for major release
+- [ ] **Verify no BREAKING Changes** unless intentional for major release
 - [ ] **Confirm new features** are user-facing (not just internal improvements)
 
 ## Changelog preparation

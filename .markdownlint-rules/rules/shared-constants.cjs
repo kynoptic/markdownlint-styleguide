@@ -176,6 +176,7 @@ const casingTerms = exports.casingTerms = {
   netlify: 'Netlify',
   notion: 'Notion',
   npm: 'npm',
+  'npm publishing': 'npm Publishing',
   nvidia: 'NVIDIA',
   openai: 'OpenAI',
   paas: 'PaaS',
@@ -227,6 +228,7 @@ const casingTerms = exports.casingTerms = {
   minor: 'MINOR',
   major: 'MAJOR',
   breaking: 'BREAKING',
+  'breaking changes': 'BREAKING Changes',
   // GitHub Markdown Alerts (must be all-caps per spec)
   note: 'NOTE',
   tip: 'TIP',
