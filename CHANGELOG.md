@@ -12,6 +12,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Consolidated shared heuristics (acronym detection, markup preservation, code span checking) into `shared-heuristics.js` to prevent behavioral drift between `sentence-case-heading` and `backtick-code-elements` rules.
 - Improved consistency: PM2-style terms (containing numbers) are now correctly identified across all rules.
 - Enhanced maintainability by eliminating duplicate implementations of core detection logic.
+- Broke down monolithic `sentence-case-heading` rule (1,111 LOC) into composable modules for improved maintainability and 78% faster concurrent test execution:
+  - `case-classifier.js` (721 LOC) - Text segment classification
+  - `fix-builder.js` (127 LOC) - Autofix string generation
+  - `token-extraction.js` (36 LOC) - Heading token parsing
+
+### 🧪 Testing
+
+- Added comprehensive unit tests for autofix safety layer (568 tests)
+- Added unit tests for `sentence-case-heading` internal functions (1,244 tests across 4 files)
+- Added unit tests for shared heuristics module (210 tests)
+- Improved test coverage with intentional overlap between unit and integration tests for different bug classes
+
+### ✨ Added
+
+- Automated vulnerability scanning to CI pipeline using `npm audit` and `osv-scanner`
+- GitHub issue and pull request templates for standardized contributions
+- Comprehensive semantic label system documentation in `.github/LABELS.md`
+- Security policy documentation in `SECURITY.md`
+
+### 📚 Documentation
+
+- Enhanced architecture documentation with module organization and testing strategy
+- Created architectural decision record for 2025 refactoring work
+- Updated testing documentation with multi-layered testing strategy
+- Updated rules documentation to reflect shared heuristics
+- Updated agent handbook (`CLAUDE.md`) with new module structure
 
 ---
 
