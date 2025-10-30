@@ -14,7 +14,7 @@ var _sharedUtils = require("./shared-utils.cjs");
  * Rule that requires code snippets, file names and directory paths
  * to be wrapped in backticks when used in prose.
  */
-// Import the centralized ignoredTerms Set
+// Import the centralized ignoredTerms Set and path detection constants
 
 // Regex patterns used by helper functions
 const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
@@ -149,7 +149,9 @@ function isLikelyFilePath(str) {
   }
 
   // Common option/alternative patterns that should not be treated as paths
-  const commonOptionPatterns = ['on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'pass/fail', 'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull', 'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https', 'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE', 'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max', 'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest', 'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod'];
+  const commonOptionPatterns = ['on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'pass/fail', 'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull', 'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https', 'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE', 'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max', 'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest', 'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod',
+  // Issue #89: Additional non-path patterns
+  'integration/e2e', 'value/effort', 'feature/module', 'added/updated', 'adapt/extend', 'start/complete', 'lowest/most', 'pass/fail'];
 
   // Check if this matches a common option pattern (case-insensitive)
   if (commonOptionPatterns.includes(str.toLowerCase())) {
@@ -165,9 +167,24 @@ function isLikelyFilePath(str) {
 
     // Additional heuristics for two-segment paths:
     // If both segments are common English words, it's likely an option pattern
-    const commonWords = ['true', 'false', 'yes', 'no', 'on', 'off', 'read', 'write', 'input', 'output', 'pass', 'fail', 'enable', 'disable', 'start', 'stop', 'open', 'close', 'get', 'set', 'push', 'pull', 'left', 'right', 'up', 'down', 'in', 'out', 'and', 'or', 'either', 'http', 'https', 'import', 'export', 'add', 'remove', 'insert', 'delete', 'show', 'hide', 'expand', 'collapse', 'min', 'max', 'first', 'last', 'prev', 'next', 'before', 'after', 'old', 'new', 'client', 'server', 'local', 'remote', 'dev', 'prod', 'source', 'target', 'from', 'to', 'create', 'update', 'post', 'put', 'patch'];
     const [first, second] = segments.map(s => s.toLowerCase());
-    if (commonWords.includes(first) && commonWords.includes(second)) {
+    if (_sharedConstants.commonConceptualWords.includes(first) && _sharedConstants.commonConceptualWords.includes(second)) {
+      return false;
+    }
+  }
+
+  // Issue #89: Additional heuristic - check for known directory prefixes
+  // Real file paths typically start with directory indicators like src/, docs/, tests/, etc.
+  // If it's a two-segment path without an extension and doesn't start with a known directory,
+  // and doesn't look like a typical file path pattern, it's likely not a path
+  if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
+    const firstSegmentLower = segments[0].toLowerCase();
+
+    // Check if it starts with a known directory or contains path-like indicators
+    const hasDirectoryPrefix = _sharedConstants.knownDirectoryPrefixes.includes(firstSegmentLower);
+    const hasPathIndicators = /^\.\.?\//.test(str) || /^\//.test(str) || /^~\//.test(str);
+    if (!hasDirectoryPrefix && !hasPathIndicators) {
+      // This looks more like a conceptual pair or category than a path
       return false;
     }
   }
@@ -328,7 +345,15 @@ function backtickCodeElements(params, onError) {
       }
     }
     const codeSpans = (0, _sharedUtils.getInlineCodeSpans)(line);
-    const patterns = [/\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g,
+    const patterns = [
+    // Issue #89: Absolute Unix paths like /etc/hosts, /mnt/usb, /usr/local/bin
+    // Pattern breakdown:
+    //   (?:^|(?<=\s))  - Start of line or preceded by whitespace (lookbehind)
+    //   \/             - Leading slash
+    //   (?:[\w.-]+\/)* - Zero or more path segments (word chars, dots, dashes + slash)
+    //   [\w.-]+        - Final segment (filename or directory)
+    //   (?=\s|$)       - Followed by whitespace or end of line (lookahead)
+    /(?:^|(?<=\s))\/(?:[\w.-]+\/)*[\w.-]+(?=\s|$)/g, /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g,
     // directory or file path
     /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g,
     // file name with letters

@@ -53,3 +53,10 @@ Set HOME to /home/user <!-- ❌ -->
 ### ⌨️ Keyboard shortcuts
 
 Use CTRL+C to cancel <!-- ❌ -->
+
+### 📂 Actual file paths (should trigger)
+
+Edit the src/components/Button.tsx file <!-- ❌ -->
+Navigate to docs/api/endpoints.md for details <!-- ❌ -->
+Run the scripts/build.sh script <!-- ❌ -->
+Check tests/integration/auth.test.js for examples <!-- ❌ -->

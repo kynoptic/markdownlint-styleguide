@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.casingTerms = exports.backtickIgnoredTerms = exports.ampersandDefaultExceptions = void 0;
+exports.knownDirectoryPrefixes = exports.commonConceptualWords = exports.casingTerms = exports.backtickIgnoredTerms = exports.ampersandDefaultExceptions = void 0;
 // @ts-check
 
 /**
@@ -229,7 +229,23 @@ const casingTerms = exports.casingTerms = {
  */
 const additionalBacktickIgnoredTerms = ['github.com', 'ulca.edu', 'pass/fail', 'e.g', 'i.e', 'CI/CD', 'Describe/test', 'CSV/JSON', 'Swagger/OpenAPI',
 // Common option/alternative patterns
-'on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull', 'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https', 'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE', 'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max', 'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest', 'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod'];
+'on/off', 'true/false', 'yes/no', 'read/write', 'input/output', 'enable/disable', 'start/stop', 'open/close', 'get/set', 'push/pull', 'left/right', 'up/down', 'in/out', 'and/or', 'either/or', 'http/https', 'import/export', 'GET/POST', 'PUT/POST', 'PUT/PATCH', 'CREATE/UPDATE', 'add/remove', 'insert/delete', 'show/hide', 'expand/collapse', 'min/max', 'first/last', 'prev/next', 'before/after', 'old/new', 'src/dest', 'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod',
+// Issue #89: Additional non-path patterns
+'integration/e2e', 'Integration/E2E', 'value/effort', 'Value/Effort', 'feature/module', 'added/updated', 'adapt/extend', 'start/complete', 'lowest/most'];
+
+/**
+ * Common English words used in non-path conceptual pairs (issue #89).
+ * Used by isLikelyFilePath() to avoid flagging phrases like "pass/fail" or "start/complete".
+ * @type {readonly string[]}
+ */
+const commonConceptualWords = exports.commonConceptualWords = ['true', 'false', 'yes', 'no', 'on', 'off', 'read', 'write', 'input', 'output', 'pass', 'fail', 'enable', 'disable', 'start', 'stop', 'open', 'close', 'get', 'set', 'push', 'pull', 'left', 'right', 'up', 'down', 'in', 'out', 'and', 'or', 'either', 'http', 'https', 'import', 'export', 'add', 'remove', 'insert', 'delete', 'show', 'hide', 'expand', 'collapse', 'min', 'max', 'first', 'last', 'prev', 'next', 'before', 'after', 'old', 'new', 'client', 'server', 'local', 'remote', 'dev', 'prod', 'source', 'target', 'from', 'to', 'create', 'update', 'post', 'put', 'patch', 'integration', 'e2e', 'value', 'effort', 'feature', 'module', 'added', 'updated', 'adapt', 'extend', 'complete', 'lowest', 'most'];
+
+/**
+ * Known directory prefixes commonly used in project structures (issue #89).
+ * Used to distinguish actual file paths from conceptual pairs.
+ * @type {readonly string[]}
+ */
+const knownDirectoryPrefixes = exports.knownDirectoryPrefixes = ['src', 'lib', 'dist', 'build', 'out', 'bin', 'test', 'tests', 'spec', 'specs', 'doc', 'docs', 'examples', 'demo', 'config', 'configs', 'scripts', 'tools', 'assets', 'static', 'public', 'private', 'node_modules', 'vendor', 'packages', 'app', 'apps', 'components', 'pages', 'views', 'models', 'controllers', 'services', 'utils', 'helpers', 'middleware', 'routes', 'api', 'styles', 'css', 'js', 'ts', 'img', 'images', 'fonts', 'data', 'fixtures'];
 /**
  * A set of terms that should be ignored by the `backtick-code-elements` rule.
  * This includes all special-cased terms from the dictionary above plus a few domain-specific exceptions.

@@ -3,7 +3,7 @@
 This page describes each custom rule's behavior, ID, and fixability. See `docs/configuration.md` for configuration options.
 
 > [!NOTE]
-> Since v1.7.0, rules share common heuristics for acronym detection, markup preservation, and code span recognition. This ensures consistent behavior across the entire rule suite and prevents edge-case handling from drifting over time.
+> Since `v1.7.0`, rules share common heuristics for acronym detection, markup preservation, and code span recognition. This ensures consistent behavior across the entire rule suite and prevents edge-case handling from drifting over time.
 
 ## Summary
 
@@ -24,7 +24,7 @@ Ensures headings (ATX: `#`) and bold text in list items follow sentence case: fi
 - Respects configured `specialTerms` and common technical terms (e.g., API, JSON, GitHub).
 - Skips code-heavy headings, version/date-only headings, and certain bracketed labels.
 - Provides safe auto-fixes with guardrails.
-- Since v1.7.0: improved internal architecture with modular components for better maintainability and performance.
+- Since `v1.7.0`: improved internal architecture with modular components for better maintainability and performance.
 
 Examples
 
@@ -40,12 +40,24 @@ Wraps code-like tokens in prose with backticks to improve readability.
 - Detects commands, flags, file paths, filenames, function-like calls, env vars, and common tech references.
 - Avoids code spans, links, HTML comments, LaTeX math, URLs, and configured `ignoredTerms`.
 - Provides contextual error messages and safe auto-fixes.
-- Since v1.7.0: uses shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
+- Since `v1.7.0`: uses shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
+- Since `v1.7.1`: improved path detection to reduce false positives on
+  non-path text containing slashes (e.g., "Integration/E2E", "Value/Effort",
+  "pass/fail").
 
 Examples
 
 - Good: "Run `npm install` and edit `config.json`."
-- Bad: "Run npm install and edit config.json."
+- Bad: "Run `npm install` and edit `config.json`."
+
+Path detection heuristics
+
+The rule distinguishes between actual file paths and conceptual pairs or
+category labels:
+
+- ✅ Detected as paths: `src/components/Button.tsx`, `docs/api/endpoints.md`, `/etc/hosts`
+- ❌ Not treated as paths: "Integration/E2E testing", "Value/Effort fields",
+  "pass/fail criteria"
 
 ---
 

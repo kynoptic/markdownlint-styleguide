@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const jsonc = require('jsonc-parser');
 
 function log(msg) {
   // eslint-disable-next-line no-console
@@ -122,8 +123,11 @@ function mergeJsonSettings(existingPath, newContent) {
   }
 
   try {
-    const existing = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
-    const newData = JSON.parse(newContent);
+    const existingText = fs.readFileSync(existingPath, 'utf8');
+
+    // Parse both files with JSONC to handle comments
+    const existing = jsonc.parse(existingText);
+    const newData = jsonc.parse(newContent);
 
     // Merge objects, with new content taking precedence
     // NOTE: This is a shallow merge. Nested objects are replaced, not merged.
@@ -131,7 +135,49 @@ function mergeJsonSettings(existingPath, newContent) {
     // result will be {config: {b: 3}}, not {config: {a: 1, b: 3}}.
     // For more complex merging needs, consider using lodash.merge or similar.
     const merged = { ...existing, ...newData };
-    return JSON.stringify(merged, null, 2) + '\n';
+
+    // Use strip-json-comments approach: keep template structure with comments,
+    // then manually insert existing-only keys at the end
+    const lines = newContent.split('\n');
+    const lastBrace = lines.lastIndexOf('}');
+
+    if (lastBrace === -1) {
+      // Malformed JSON, fall back to overwrite
+      return newContent;
+    }
+
+    // Collect keys that only exist in existing file
+    const existingOnlyKeys = Object.keys(existing).filter(key => !(key in newData));
+
+    if (existingOnlyKeys.length === 0) {
+      // No extra keys to add, return template as-is
+      return newContent;
+    }
+
+    // Insert existing-only keys before the closing brace
+    const additionalLines = [];
+    additionalLines.push(''); // Blank line before existing settings
+    additionalLines.push('  // === Existing project settings ===');
+    additionalLines.push('');
+
+    for (let i = 0; i < existingOnlyKeys.length; i++) {
+      const key = existingOnlyKeys[i];
+      const value = JSON.stringify(existing[key], null, 2).split('\n').map((line, idx) =>
+        idx === 0 ? line : '  ' + line
+      ).join('\n');
+      // Add comma only if not the last key overall
+      const comma = i < existingOnlyKeys.length - 1 ? ',' : '';
+      additionalLines.push(`  ${JSON.stringify(key)}: ${value}${comma}`);
+    }
+
+    // Insert before closing brace
+    const result = [
+      ...lines.slice(0, lastBrace),
+      ...additionalLines,
+      ...lines.slice(lastBrace)
+    ].join('\n');
+
+    return result;
   } catch (e) {
     log(`  Warning: Could not merge existing file, will overwrite: ${e.message}`);
     return newContent;

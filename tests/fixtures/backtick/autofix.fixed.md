@@ -18,7 +18,7 @@ Add `import os` at the top of your script <!-- ✅ -->
 
 ## Nested code elements (should only fix outer ones)
 
-The command `echo PATH=/usr/bin` sets your path variable to /`usr/bin` <!-- ✅ -->
+The command `echo PATH=/usr/bin` sets your path variable to `/usr/bin` <!-- ✅ -->
 
 ## Elements after punctuation
 

@@ -1,22 +1,24 @@
 {
   "markdownlint.customRules": [
-    ".markdownlint-rules/rules/sentence-case-heading.cjs",
-    ".markdownlint-rules/rules/backtick-code-elements.cjs",
-    ".markdownlint-rules/rules/no-bare-urls.cjs",
-    ".markdownlint-rules/rules/no-literal-ampersand.cjs"
+    "./.markdownlint-rules/index.cjs"
   ],
   "markdownlint.config": {
     "default": true,
     "MD013": false,
     "MD024": false,
     "MD041": false,
-    "MD029": { "style": "ordered" },
-    "MD004": { "style": "dash" },
+    "MD029": {
+      "style": "ordered"
+    },
+    "MD004": {
+      "style": "dash"
+    },
     "MD036": false,
     "sentence-case-heading": true,
     "backtick-code-elements": true,
     "no-bare-url": true,
-    "no-literal-ampersand": true
+    "no-literal-ampersand": true,
+    "no-dead-internal-links": true
   },
   "markdownlint.run": "onType",
   "files.associations": {

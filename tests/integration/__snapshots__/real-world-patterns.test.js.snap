@@ -78,26 +78,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests a
 exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests github documentation patterns: backtick-github 1`] = `
 [
   {
-    "errorContext": "feature/amazing-feature",
-    "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
-    "errorRange": [
-      45,
-      23,
-    ],
-    "fixInfo": {
-      "deleteCount": 23,
-      "editColumn": 45,
-      "insertText": "\`feature/amazing-feature\`",
-    },
-    "lineNumber": 46,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
     "errorContext": "-b",
     "errorDetail": "Command flag '-b' should be wrapped in backticks to show it's a command option",
     "errorRange": [
@@ -162,26 +142,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests g
       "insertText": "\`git commit\`",
     },
     "lineNumber": 47,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
-    "errorContext": "feature/amazing-feature",
-    "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
-    "errorRange": [
-      40,
-      23,
-    ],
-    "fixInfo": {
-      "deleteCount": 23,
-      "editColumn": 40,
-      "insertText": "\`feature/amazing-feature\`",
-    },
-    "lineNumber": 48,
     "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
     "ruleInformation": null,
     "ruleNames": [
@@ -757,26 +717,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
   "github": {
     "backtickViolations": [
       {
-        "errorContext": "feature/amazing-feature",
-        "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
-        "errorRange": [
-          45,
-          23,
-        ],
-        "fixInfo": {
-          "deleteCount": 23,
-          "editColumn": 45,
-          "insertText": "\`feature/amazing-feature\`",
-        },
-        "lineNumber": 46,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
         "errorContext": "-b",
         "errorDetail": "Command flag '-b' should be wrapped in backticks to show it's a command option",
         "errorRange": [
@@ -841,26 +781,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "\`git commit\`",
         },
         "lineNumber": 47,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
-        "errorContext": "feature/amazing-feature",
-        "errorDetail": "Path 'feature/amazing-feature' should be wrapped in backticks to indicate it's a file system reference",
-        "errorRange": [
-          40,
-          23,
-        ],
-        "fixInfo": {
-          "deleteCount": 23,
-          "editColumn": 40,
-          "insertText": "\`feature/amazing-feature\`",
-        },
-        "lineNumber": 48,
         "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
         "ruleInformation": null,
         "ruleNames": [

@@ -85,3 +85,16 @@ Interactive Swagger/OpenAPI documentation <!-- ✅ -->
 Backend services (Python 3.11+) for data processing <!-- ✅ -->
 React SPA frontend (v19.1.0) with Vite build system <!-- ✅ -->
 Legacy support (v1.2.3) maintained for compatibility <!-- ✅ -->
+
+## Non-path slash usage (category labels and concept pairs)
+
+Integration/E2E testing strategy <!-- ✅ -->
+Value/Effort custom fields <!-- ✅ -->
+Choose between feature/module organization <!-- ✅ -->
+Files were added/updated successfully <!-- ✅ -->
+You can adapt/extend this pattern <!-- ✅ -->
+Track start/complete timestamps <!-- ✅ -->
+Use the lowest/most efficient approach <!-- ✅ -->
+The pass/fail criteria are documented <!-- ✅ -->
+Either/or decision points require review <!-- ✅ -->
+True/false configuration values <!-- ✅ -->
