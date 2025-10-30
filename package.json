@@ -1,6 +1,6 @@
 {
   "name": "markdownlint-trap",
-  "version": "1.7.1",
+  "version": "2.0.0",
   "main": "./.markdownlint-rules/index.cjs",
   "bin": {
     "markdownlint-trap": "./scripts/init.cjs"

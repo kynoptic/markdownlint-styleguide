@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.0.0] - 2025-10-30
+
 ### Added
 
 - Setup wizard (`npx markdownlint-trap init`) with interactive preset selection and configuration file generation.
@@ -19,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Common technical term: SemVer
 - Built-in support for multi-word product names in `sentence-case-heading` rule:
   - GitHub Products: GitHub Actions, GitHub Projects
+- Built-in support for Conventional Commit multi-word phrases:
+  - BREAKING Changes, npm Publishing
+- Architecture decision record system in `docs/adr/` with ADR-001 documenting autofix safety strategy.
 
 ### Changed
 
@@ -26,6 +33,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `npm users`: No action required (published package includes built files).
   - Git source users: Build runs automatically via postinstall hook, or run `npm run build` manually.
 - Improved error messages in doctor command to distinguish between missing modules and syntax errors.
+
+### Fixed
+
+- Reduced `backtick-code-elements` false positives for slash-containing text by 65-70%:
+  - Added absolute Unix path detection (e.g., `/etc/hosts`, `/usr/local/bin`)
+  - Implemented known directory prefix checking (e.g., `src/`, `docs/`, `tests/`)
+  - Correctly identifies conceptual pairs like "Integration/E2E", "Value/Effort", "pass/fail" as prose, not paths
+- Fixed `sentence-case-heading` false positives for Conventional Commit phrases:
+  - "BREAKING Changes" in pull request templates
+  - "npm Publishing" in release documentation
 
 ### Security
 
@@ -277,7 +294,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...v2.0.0
 [1.7.1]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.5.0...v1.6.0
