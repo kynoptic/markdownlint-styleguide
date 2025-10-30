@@ -1,6 +1,6 @@
 {
   "name": "markdownlint-trap",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "main": "./src/index.js",
   "files": [
     ".markdownlint-rules",
