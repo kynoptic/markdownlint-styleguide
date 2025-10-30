@@ -1,0 +1,14 @@
+{
+  // Basic configuration for markdownlint-trap
+  // Enables core sentence case and backticks rules
+  "customRules": [
+    "markdownlint-trap"
+  ],
+  "config": {
+    "sentence-case-heading": true,
+    "backtick-code-elements": true,
+    "no-bare-url": false,
+    "no-dead-internal-links": false,
+    "no-literal-ampersand": false
+  }
+}

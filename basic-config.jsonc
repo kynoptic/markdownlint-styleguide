@@ -1,8 +1,8 @@
 {
   // A minimal, friendly preset for most teams.
+  // Note: Using package reference for better compatibility
   "customRules": [
-    ".markdownlint-rules/rules/sentence-case-heading.cjs",
-    ".markdownlint-rules/rules/backtick-code-elements.cjs"
+    "markdownlint-trap"
   ],
   "config": {
     // Core markdownlint defaults with a few relaxed rules

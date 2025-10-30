@@ -1,0 +1,14 @@
+{
+  // Recommended configuration for markdownlint-trap
+  // Enables all custom rules with balanced strictness
+  "customRules": [
+    "markdownlint-trap"
+  ],
+  "config": {
+    "sentence-case-heading": true,
+    "backtick-code-elements": true,
+    "no-bare-url": true,
+    "no-dead-internal-links": true,
+    "no-literal-ampersand": true
+  }
+}

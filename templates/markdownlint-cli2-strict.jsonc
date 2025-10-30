@@ -1,7 +1,6 @@
 {
-  // This is a shareable configuration for markdownlint-trap.
-  // Other projects can extend this file.
-  // Note: Using package reference for better compatibility
+  // Strict configuration for markdownlint-trap
+  // Enables all custom rules plus standard markdownlint rules
   "customRules": [
     "markdownlint-trap"
   ],
@@ -15,7 +14,7 @@
     "MD004": { "style": "dash" },
     "MD036": false, // no-emphasis-as-heading
 
-    // Enable custom rules from this package
+    // Custom rules from markdownlint-trap
     "sentence-case-heading": true,
     "backtick-code-elements": true,
     "no-bare-url": true,

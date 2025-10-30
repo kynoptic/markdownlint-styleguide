@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Setup wizard (`npx markdownlint-trap init`) with interactive preset selection and configuration file generation.
+- Diagnostics command (`npm run doctor`) to validate installation and configuration.
+- Multi-project distribution system for deploying configurations across multiple projects with wildcard support.
+- Postinstall hook to automatically build rules when installing from git source.
+
+### Changed
+
+- **Breaking**: Package `main` field now points to compiled output (`.markdownlint-rules/index.cjs`) instead of source (`src/index.js`).
+  - npm users: No action required (published package includes built files).
+  - Git source users: Build runs automatically via postinstall hook, or run `npm run build` manually.
+- Improved error messages in doctor command to distinguish between missing modules and syntax errors.
+
+### Security
+
+- Added path validation in distribution script to prevent directory traversal attacks.
+
 ---
 
 ## [1.7.1] - 2025-10-30

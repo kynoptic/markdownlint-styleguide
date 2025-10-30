@@ -1,11 +1,8 @@
 {
   // A strict preset for rigorous style and link hygiene.
+  // Note: Using package reference for better compatibility
   "customRules": [
-    ".markdownlint-rules/rules/sentence-case-heading.cjs",
-    ".markdownlint-rules/rules/backtick-code-elements.cjs",
-    ".markdownlint-rules/rules/no-bare-urls.cjs",
-    ".markdownlint-rules/rules/no-dead-internal-links.cjs",
-    ".markdownlint-rules/rules/no-literal-ampersand.cjs"
+    "markdownlint-trap"
   ],
   "config": {
     // Keep core rules strict (do not disable MD013/MD041/etc.)

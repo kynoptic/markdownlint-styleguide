@@ -1,0 +1,12 @@
+{
+  "markdownlint.customRules": [
+    "markdownlint-trap"
+  ],
+  "markdownlint.config": {
+    "sentence-case-heading": true,
+    "backtick-code-elements": true,
+    "no-bare-url": false,
+    "no-dead-internal-links": false,
+    "no-literal-ampersand": false
+  }
+}

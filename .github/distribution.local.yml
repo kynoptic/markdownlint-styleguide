@@ -1,0 +1,105 @@
+version: 1
+# Local distribution config for markdownlint-trap
+# Copies configuration files to consumer projects
+# Edit this file to customize distribution targets
+
+defaults:
+  cleanDest: false  # Preserve existing configs by default
+  merge: true       # Merge JSON settings instead of overwriting
+
+# Targets of type "local" copy files to local directories
+# Fields:
+# - name: label for logging
+# - enabled: boolean to activate (set to true to use)
+# - type: must be "local"
+# - src: source file (relative to repo root or absolute)
+# - dest: destination path (supports wildcards) or array of paths
+# - merge: merge JSON files instead of replacing (default: true for JSON)
+# - cleanDest: delete destination before copying (default: false)
+#
+# WILDCARD EXAMPLES:
+# - dest: ~/Projects/*/.vscode/settings.json       # All projects
+# - dest: ../sibling-project/.vscode/settings.json # Specific project
+# - dest:                                          # Multiple destinations
+#     - ~/Projects/docs-*/.vscode/settings.json
+#     - ~/Work/api-docs/.vscode/settings.json
+
+targets:
+  # --------------------------------------
+  # VS Code Settings
+  # --------------------------------------
+  
+  # Basic preset - minimal rules
+  - name: vscode-basic
+    enabled: false
+    type: local
+    src: templates/vscode-settings-basic.json
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/my-project/.vscode/settings.json
+    merge: true
+    cleanDest: false
+
+  # Recommended preset - balanced strictness
+  - name: vscode-recommended
+    enabled: false
+    type: local
+    src: templates/vscode-settings-recommended.json
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/my-docs/.vscode/settings.json
+      # - ~/Projects/*/.vscode/settings.json  # All projects (wildcard)
+    merge: true
+    cleanDest: false
+
+  # Strict preset - all rules enabled
+  - name: vscode-strict
+    enabled: false
+    type: local
+    src: templates/vscode-settings-strict.json
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/api-docs/.vscode/settings.json
+    merge: true
+    cleanDest: false
+
+  # --------------------------------------
+  # markdownlint-cli2 Configuration
+  # --------------------------------------
+  
+  # Basic CLI config
+  - name: cli-basic
+    enabled: false
+    type: local
+    src: templates/markdownlint-cli2-basic.jsonc
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/my-project/.markdownlint-cli2.jsonc
+    cleanDest: false
+
+  # Recommended CLI config
+  - name: cli-recommended
+    enabled: false
+    type: local
+    src: templates/markdownlint-cli2-recommended.jsonc
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/my-docs/.markdownlint-cli2.jsonc
+      # - ~/Projects/*/.markdownlint-cli2.jsonc  # All projects
+    cleanDest: false
+
+  # Strict CLI config
+  - name: cli-strict
+    enabled: false
+    type: local
+    src: templates/markdownlint-cli2-strict.jsonc
+    dest:
+      # Edit this list to target your projects
+      # - ~/Projects/api-docs/.markdownlint-cli2.jsonc
+    cleanDest: false
+
+# USAGE:
+# 1. Edit the 'dest' paths above to point to your projects
+# 2. Set 'enabled: true' for the targets you want to use
+# 3. Run 'npm run dist:local:dry' to preview changes
+# 4. Run 'npm run dist:local' to apply changes
