@@ -19,3 +19,39 @@ jobs:
       - run: npm test
       - run: npm run test:performance
         name: Run performance tests
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+
+      - name: Run npm audit
+        run: |
+          echo "Running npm audit on production dependencies..."
+          npm audit --omit=dev --audit-level=high
+        continue-on-error: false
+
+      - name: Install osv-scanner
+        run: |
+          curl -L https://github.com/google/osv-scanner/releases/latest/download/osv-scanner_linux_amd64 -o osv-scanner
+          chmod +x osv-scanner
+          sudo mv osv-scanner /usr/local/bin/
+
+      - name: Run osv-scanner
+        run: |
+          echo "Running osv-scanner against package-lock.json..."
+          osv-scanner --lockfile=package-lock.json --config=osv-scanner.toml --format=json --output=osv-results.json || true
+          osv-scanner --lockfile=package-lock.json --config=osv-scanner.toml
+        continue-on-error: false
+
+      - name: Upload vulnerability scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-scan-results
+          path: osv-results.json
+          retention-days: 30

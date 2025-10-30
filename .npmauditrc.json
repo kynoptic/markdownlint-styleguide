@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json.schemastore.org/npmauditrc.json",
+  "description": "npm audit exception policy for markdownlint-trap",
+  "exceptions": []
+}
