@@ -122,12 +122,12 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   }
 
   /**
-   * Validates bold text with stricter rules than headings.
+   * Validates bold text in its source line context with stricter rules than headings.
    * @param {string} boldText The bold text to validate.
    * @param {number} lineNumber The line number of the text.
    * @param {string} sourceLine The full source line.
    */
-  function validateBoldTextWrapper(boldText, lineNumber, sourceLine) {
+  function validateBoldTextInContext(boldText, lineNumber, sourceLine) {
     if (!boldText || !boldText.trim()) {
       return;
     }
@@ -229,7 +229,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       if (!textToValidate) continue;
 
       // Use the unified validation logic
-      validateBoldTextWrapper(textToValidate, lineNumber, line);
+      validateBoldTextInContext(textToValidate, lineNumber, line);
     }
   });
 }

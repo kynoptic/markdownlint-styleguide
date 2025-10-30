@@ -20,6 +20,18 @@ Consumers typically use the shareable preset `markdownlint-trap/recommended-conf
 - Fixtures exercise real-world patterns and performance.
 - Integration tests use `markdownlint` with custom rules loaded from `src/`.
 
+## Shared utilities
+
+To ensure consistent behavior and prevent code drift, common heuristics are consolidated in shared modules:
+
+- `src/rules/shared-heuristics.js` - Acronym detection, markup preservation, and code span checking used across multiple rules
+- `src/rules/shared-utils.js` - Performance-optimized utilities for code block detection and inline code processing
+- `src/rules/shared-constants.js` - Centralized term dictionaries and configuration constants
+- `src/rules/autofix-safety.js` - Safety layer for auto-fix operations
+- `src/rules/config-validation.js` - Configuration validation and error reporting
+
+Rules should import from these shared modules rather than duplicating logic to maintain behavioral consistency.
+
 ## Build
 
 - `npm run build` transpiles to `.markdownlint-rules` with `.cjs` files copied.

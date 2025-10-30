@@ -7,6 +7,8 @@
  * All functions return validation results without side effects (no onError calls).
  */
 
+import { isAcronym, preserveSegments } from '../shared-heuristics.js';
+
 /**
  * Strips emoji and symbol characters from the beginning of text.
  * @param {string} text The text to clean.
@@ -56,71 +58,8 @@ function stripLeadingSymbols(text) {
   return cleaned;
 }
 
-/**
- * Preserves markup segments and returns processed text with placeholders.
- * @param {string} text The text to process.
- * @returns {{processed: string, preservedSegments: string[]}} Processed text and preserved segments.
- */
-function preserveMarkupSegments(text) {
-  const preservedSegments = [];
-  let processed = text;
-
-  // Process one type at a time to avoid conflicts
-  // 1. Code spans first (highest priority)
-  processed = processed.replace(/`([^`]+)`/g, (m) => {
-    preservedSegments.push(m);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  // 2. Links
-  processed = processed.replace(/\[[^\]]+\]\([^)]+\)|\[[^\]]+\]/g, (m) => {
-    preservedSegments.push(m);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  // 3. Version numbers (but not already preserved)
-  processed = processed.replace(/\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b/g, (match, ...args) => {
-    const fullMatch = args[args.length - 1];
-    // Don't preserve if it's already a preserved segment
-    if (fullMatch.includes('__PRESERVED_')) {
-      return match;
-    }
-    preservedSegments.push(match);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  // 4. Dates
-  processed = processed.replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (match, ...args) => {
-    const fullMatch = args[args.length - 1];
-    if (fullMatch.includes('__PRESERVED_')) {
-      return match;
-    }
-    preservedSegments.push(match);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  // 5. Bold text (but not already preserved)
-  processed = processed.replace(/(\*\*|__)(.*?)\1/g, (match, marker, content, ...args) => {
-    const fullMatch = args[args.length - 1];
-    if (fullMatch.includes('__PRESERVED_')) {
-      return match;
-    }
-    preservedSegments.push(match);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  // 6. Italic text (but not already preserved)
-  processed = processed.replace(/(\*|_)(.*?)\1/g, (match, marker, content, ...args) => {
-    const fullMatch = args[args.length - 1];
-    if (fullMatch.includes('__PRESERVED_')) {
-      return match;
-    }
-    preservedSegments.push(match);
-    return `__PRESERVED_${preservedSegments.length - 1}__`;
-  });
-
-  return { processed, preservedSegments };
-}
+// Note: preserveMarkupSegments has been replaced with the shared preserveSegments function
+// from shared-heuristics.js to avoid code duplication
 
 /**
  * Checks if text should be exempted from validation based on content.
@@ -240,7 +179,7 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
         // Allow short acronyms (<= 4 chars, all caps)
-        if (!(firstWord.length <= 4 && firstWord.toUpperCase() === firstWord)) {
+        if (!isAcronym(firstWord)) {
           return {
             isValid: false,
             errorMessage: `First word "${firstWord}" should be "${expectedSentenceCase}".`
@@ -279,7 +218,7 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
         // Allow short acronyms (<= 4 chars, all caps)
-        if (!(firstWord.length <= 4 && firstWord.toUpperCase() === firstWord)) {
+        if (!isAcronym(firstWord)) {
           return {
             isValid: false,
             errorMessage: "Heading's first word should be capitalized."
@@ -373,7 +312,7 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
     // Check general lowercase requirement
     if (
       word !== word.toLowerCase() &&
-      !(word.length <= 4 && word === word.toUpperCase()) && // Allow short acronyms
+      !isAcronym(word) && // Allow short acronyms
       word !== 'I' && // Allow the pronoun "I"
       !expectedWordCasing && // If it's not a known proper noun/technical term
       !word.startsWith('PRESERVED')
@@ -482,7 +421,7 @@ function prepareTextForValidation(headingText) {
     return null;
   }
 
-  const { processed } = preserveMarkupSegments(cleanedText);
+  const { processed } = preserveSegments(cleanedText);
   // Clean text but preserve the __PRESERVED_N__ markers
   const clean = processed
     .replace(/[#*~!+={}|:;"<>,.?\\]/g, ' ') // Remove special chars but keep underscores for preserved segments
@@ -627,7 +566,7 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
       }
 
       // Allow short acronyms (4 chars or less, all caps)
-      if (word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word)) {
+      if (isAcronym(word)) {
         continue;
       }
 
@@ -640,7 +579,7 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
       // But if the text starts with a number, don't require capitalization
       if (isFirstWord && !startsWithNumber) {
         const expectedCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        if (word !== expectedCase && !(word.length <= 4 && word === word.toUpperCase() && /^[A-Z]+$/.test(word))) {
+        if (word !== expectedCase && !isAcronym(word)) {
           return {
             isValid: false,
             errorMessage: `First word "${word}" in bold text should be properly capitalized.`

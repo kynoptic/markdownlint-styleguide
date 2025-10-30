@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🔧 Refactored
+
+- Consolidated shared heuristics (acronym detection, markup preservation, code span checking) into `shared-heuristics.js` to prevent behavioral drift between `sentence-case-heading` and `backtick-code-elements` rules.
+- Improved consistency: PM2-style terms (containing numbers) are now correctly identified across all rules.
+- Enhanced maintainability by eliminating duplicate implementations of core detection logic.
+
 ---
 
 ## [1.7.0] - 2025-09-17
