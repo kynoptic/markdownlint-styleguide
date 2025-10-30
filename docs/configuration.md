@@ -69,7 +69,7 @@ Fixable: Yes (wrap in `<...>`). Requires markdown-it with `linkify: true`.
 
 - ignoredPaths: string[] — Paths to ignore when checking targets.
 - checkAnchors: boolean (default: true) — Validate `#anchors` against headings.
-- allowedExtensions: string[] (default: [".md", ".markdown"]) — Extensions to try for extensionless links.
+- allowedExtensions: string[] (default: ["`.md`", "`.markdown`"]) — Extensions to try for extensionless links.
 
 Fixable: No.
 

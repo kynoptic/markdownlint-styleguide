@@ -38,13 +38,13 @@ Avoid vanity tests that only verify framework behavior or trivial operations
 -->
 
 - **Unit tests**:
-- **Integration/E2E tests**:
+- **Integration/e2e tests**:
 - **Edge cases**:
 
 ## Links
 
 - **User stories**: `US-XXX`
-- **ADRs**: `ADR-XXX`
+- **Adrs**: `ADR-XXX`
 
 <!--
 Set these fields in GitHub's project interface after creating the issue

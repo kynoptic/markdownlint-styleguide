@@ -39,7 +39,7 @@ Get up and running in under 2 minutes:
    npx markdownlint-cli2 --fix "**/*.md"
    ```
 
-### Alternative: Manual configuration
+### Alternative: manual configuration
 
 If you prefer manual setup or need advanced configuration:
 
@@ -97,7 +97,7 @@ If you prefer manual setup or need advanced configuration:
 npm install markdownlint-trap --save-dev
 ```
 
-> **Note**: If installing from git source (not npm), the package includes a postinstall hook that automatically builds the rules. If needed, you can manually run `npm run build` to generate the compiled output.
+> **Note**: If installing from `git source` (not npm), the package includes a postinstall hook that automatically builds the rules. If needed, you can manually run `npm run build` to generate the compiled output.
 
 ## Configuration
 
@@ -326,7 +326,7 @@ This package includes five custom rules designed to improve documentation qualit
 **💻 backtick-code-elements** - Makes code references clear
 
 - Wraps file paths, commands, and variables in backticks
-- `npm install` ✅ vs npm install ❌
+- `npm install` ✅ vs `npm install` ❌
 - Improves visual distinction between code and prose
 
 **🔗 no-bare-url** - Ensures accessible links
@@ -344,7 +344,7 @@ This package includes five custom rules designed to improve documentation qualit
 **✏️ no-literal-ampersand** - Professional writing style
 
 - Replaces standalone `&` with "and" in prose
-- "Dogs and cats" ✅ vs "Dogs & cats" ❌
+- "Dogs and cats" ✅ vs "Dogs and cats" ❌
 - Ignores ampersands in code contexts
 
 ## Docs
@@ -354,7 +354,7 @@ This package includes five custom rules designed to improve documentation qualit
 - Beginner's guide: `docs/beginners.md`
 - Setup and usage in other repos: `docs/setup.md`
   - Use in another repo: `docs/setup.md#use-in-another-repo`
-  - Local development via npm link: `docs/setup.md#option-c--npm-link-local-development`
+  - Local development via `npm link`: `docs/setup.md#option-c--npm-link-local-development`
 - Architecture: `docs/architecture.md`
 - Testing: `docs/testing.md`
 - Performance: `docs/performance.md`

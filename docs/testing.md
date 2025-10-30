@@ -238,6 +238,6 @@ Feature tests reference fixtures via absolute paths. Integration tests also gene
 
 ## Notes
 
-- Tests import ESM from `src/` directly via `babel-jest`; no build step is required before running tests.
+- Tests `import ESM` from `src/` directly via `babel-jest`; no build step is required before running tests.
 - The distribution `.markdownlint-rules/` is only used by consumers of the published package or the shareable preset.
 - All tests run in Node.js `>=18` (see `.nvmrc` for version requirements).

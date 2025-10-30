@@ -25,6 +25,8 @@ Ensures headings (ATX: `#`) and bold text in list items follow sentence case: fi
 - Includes built-in support for standard all-caps terminology:
   - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
   - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
+- Includes built-in support for multi-word product names:
+  - GitHub Products: GitHub Actions, GitHub Projects
 - Skips code-heavy headings, `version/date-only` headings, and certain bracketed labels.
 - Provides safe auto-fixes with guardrails.
 - Since `v1.7.0`: improved internal architecture with modular components for better maintainability and performance.
@@ -33,6 +35,7 @@ Examples
 
 - Good: `# Getting started with APIs`
 - Good: `# Understanding PATCH releases`
+- Good: `# GitHub Projects and custom fields`
 - Good: `**IMPORTANT** security update required`
 - Bad: `# Getting Started With APIs`
 

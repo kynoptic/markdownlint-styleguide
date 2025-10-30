@@ -216,7 +216,7 @@ _MINOR version increments for new features_ <!-- ✅ -->
 - _Use BREAKING to indicate API changes_ <!-- ✅ -->
   PATCH releases maintain backward compatibility. <!-- ✅ -->
 
-## 🚨 GitHub Markdown alerts
+## 🚨 Markdown alerts
 
 # Working with NOTE alerts <!-- ✅ -->
 
@@ -245,3 +245,33 @@ _WARNING data loss may occur_ <!-- ✅ -->
 
 > [!TIP]
 > **TIP** Press Ctrl+Z to undo. <!-- ✅ -->
+
+## 🏷️ Product and feature names
+
+# GitHub Actions integration <!-- ✅ -->
+
+## GitHub Projects and custom fields <!-- ✅ -->
+
+### Configure GitHub Actions workflow <!-- ✅ -->
+
+**API reference documentation** <!-- ✅ -->
+_CLI usage guide_ <!-- ✅ -->
+
+- **GitHub Projects hygiene** <!-- ✅ -->
+- _Labels vs custom fields_ <!-- ✅ -->
+  Document proper nouns like GitHub, AWS, and Docker correctly. <!-- ✅ -->
+
+## 🛠️ Context-specific capitalization
+
+# Using GitHub Projects to track issues <!-- ✅ -->
+
+## Custom fields for metadata management <!-- ✅ -->
+
+### See the API reference for endpoint details <!-- ✅ -->
+
+**Refer to the CLI usage section for command examples** <!-- ✅ -->
+_GitHub Actions automates workflows_ <!-- ✅ -->
+
+- **Configure custom fields in GitHub Projects** <!-- ✅ -->
+- _The API reference includes authentication details_ <!-- ✅ -->
+  Use alerts in Markdown for important notices. <!-- ✅ -->

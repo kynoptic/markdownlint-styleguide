@@ -16,9 +16,9 @@ This document provides a comprehensive checklist for releasing new versions of m
 
 Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Analyze both commit messages AND actual code changes:
 
-- [ ] **PATCH (x.y.Z)**: Bug fixes, type annotations, test improvements, documentation, internal refactoring
-- [ ] **MINOR (x.Y.0)**: New features, new CLI commands, new user-facing functionality
-- [ ] **MAJOR (X.0.0)**: Breaking changes, API changes, removed functionality
+- [ ] **PATCH (`x.y.Z`)**: Bug fixes, type annotations, test improvements, documentation, internal refactoring
+- [ ] **MINOR (`x.Y.0`)**: New features, new CLI commands, new user-facing functionality
+- [ ] **MAJOR (`X.0.0`)**: Breaking changes, API changes, removed functionality
 
 **Critical**: Use the lowest increment unless there is strong evidence at BOTH commit message level AND actual code diff level.
 
@@ -26,12 +26,12 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 
 - [ ] **Review commit history**: `git log --oneline $(git describe --tags --abbrev=0)..HEAD`
 - [ ] **Review code changes**: `git diff $(git describe --tags --abbrev=0)..HEAD`
-- [ ] **Verify no breaking changes** unless intentional for major release
+- [ ] **Verify no BREAKING changes** unless intentional for major release
 - [ ] **Confirm new features** are user-facing (not just internal improvements)
 
 ## Changelog preparation
 
-- [ ] **Update CHANGELOG.md** following [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format
+- [ ] **Update `CHANGELOG.md`** following [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format
 - [ ] **Move items from [Unreleased]** to new version section
 - [ ] **Categorize changes correctly**:
   - `Added` for new features
@@ -45,16 +45,16 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 
 ## Package preparation
 
-- [ ] **Update package.json version** to match release version
-- [ ] **Verify package.json metadata** (description, keywords, repository)
+- [ ] **Update `package.json` version** to match release version
+- [ ] **Verify `package.json` metadata** (description, keywords, repository)
 - [ ] **Check dependencies** are up to date and secure
-- [ ] **Validate package.json** with `npm pack --dry-run`
+- [ ] **Validate `package.json`** with `npm pack --dry-run`
 
 ## Documentation updates
 
 - [ ] **Update version references** in documentation
 - [ ] **Regenerate config documentation**: `npm run docs:config`
-- [ ] **Update README.md** if new features require documentation
+- [ ] **Update `README.md`** if new features require documentation
 - [ ] **Verify example configurations** still work
 - [ ] **Update rule documentation** if rules have changed
 
@@ -80,9 +80,9 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 - [ ] **Push changes**: `git push origin main`
 - [ ] **Push tags**: `git push origin --tags`
 
-### NPM publishing
+### npm Publishing
 
-- [ ] **Verify npm authentication**: `npm whoami`
+- [ ] **Verify `npm authentication`**: `npm whoami`
 - [ ] **Dry run publish**: `npm publish --dry-run`
 - [ ] **Publish package**: `npm publish`
 - [ ] **Verify publication**: `npm view markdownlint-trap@latest`
@@ -99,7 +99,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 - [ ] **Install from npm**: `npm install -g markdownlint-trap@latest`
 - [ ] **Test basic functionality** on sample markdown files
 - [ ] **Verify documentation** links work correctly
-- [ ] **Check npm package page** for correct metadata
+- [ ] **Check `npm package` page** for correct metadata
 - [ ] **Monitor for issues** in first 24 hours
 
 ## Rollback procedures
@@ -112,7 +112,7 @@ If critical issues are discovered:
 - [ ] **Prepare hotfix** if possible
 - [ ] **Communicate via GitHub issues** and release notes
 
-### For breaking issues
+### For BREAKING issues
 
 - [ ] **Unpublish if <72 hours**: `npm unpublish markdownlint-trap@x.y.z`
 - [ ] **Release hotfix version** with fix
@@ -132,7 +132,7 @@ This checklist is designed for both human and AI agent use:
 
 ### Human oversight
 
-- [ ] **Review AI-generated changelog** for accuracy
+- [ ] **Review ai-generated changelog** for accuracy
 - [ ] **Verify version increment** matches actual changes
 - [ ] **Approve final publication** step
 - [ ] **Monitor post-release** metrics and feedback
@@ -141,5 +141,5 @@ This checklist is designed for both human and AI agent use:
 
 - **Update this checklist** when release process evolves
 - **Review checklist effectiveness** after each release
-- **Keep security practices** current with npm best practices
+- **Keep security practices** current with `npm best` practices
 - **Maintain backup procedures** for critical release artifacts

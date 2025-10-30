@@ -48,7 +48,7 @@ Option B — Git submodule (no lifecycle scripts needed)
 - Run: `npx markdownlint-cli2 "**/*.md"`
 - Update later: `git submodule update --remote --merge tools/markdownlint-trap`
 
-Option C — npm link (local development)
+Option C — `npm link` (local development)
 
 - From this repo: `npm link`
 - In target repo: `npm link markdownlint-trap`

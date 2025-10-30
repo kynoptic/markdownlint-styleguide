@@ -8,8 +8,8 @@ This project uses automated vulnerability scanning to detect and prevent securit
 
 The CI pipeline runs two complementary security scanners on every pull request and push to main:
 
-- **npm audit**: Scans production dependencies against the npm advisory database
-- **osv-scanner**: Cross-references dependencies against the Open Source Vulnerabilities database
+- **`npm audit`**: Scans production dependencies against the `npm advisory` database
+- **Osv-scanner**: Cross-references dependencies against the Open Source Vulnerabilities database
 
 ### Severity thresholds
 
@@ -43,7 +43,7 @@ Edit `.npmauditrc.json` to add exceptions:
 }
 ```
 
-#### osv-scanner exceptions
+#### Osv-scanner exceptions
 
 Edit `osv-scanner.toml` to add exceptions:
 

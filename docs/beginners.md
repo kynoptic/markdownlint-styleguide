@@ -1,8 +1,8 @@
-# Beginner's Guide
+# Beginner's guide
 
 A quick, friendly path to use markdownlint-trap in your repo.
 
-## 1) Install and configure
+## 1) install and configure
 
 ```bash
 npm i -D github:kynoptic/markdownlint-trap#v1.5.0 markdownlint-cli2
@@ -16,7 +16,7 @@ Create `.markdownlint-cli2.jsonc`:
 }
 ```
 
-## 2) Run the linter
+## 2) run the linter
 
 ```bash
 npx markdownlint-cli2 "**/*.md"

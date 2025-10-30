@@ -35,7 +35,7 @@ Brief description of the changes and the problem being solved:
 - [ ] Tests follow behavioral naming (`test_should_X_when_Y`)
 - [ ] Tests focus on meaningful behavior, not implementation details
 
-## Breaking changes
+## BREAKING Changes
 
 - List any breaking changes to public APIs
 - Include migration steps or configuration changes needed

@@ -1,10 +1,10 @@
 # Architecture decisions: v1.7.0 refactoring initiative
 
-Synthesized architectural decisions and rationale from the major refactoring work completed between v1.7.0 and HEAD (commits through c4f9417).
+Synthesized architectural decisions and rationale from the major refactoring work completed between `v1.7.0` and HEAD (commits through c4f9417).
 
 ## Overview
 
-This document captures the "why" behind significant architectural changes introduced during the v1.7.0+ refactoring initiative. These decisions represent lessons learned about maintainability, testing, and code organization in a custom markdownlint rule suite.
+This document captures the "why" behind significant architectural changes introduced during the `v1.7.0`+ refactoring initiative. These decisions represent lessons learned about maintainability, testing, and code organization in a custom markdownlint rule suite.
 
 ## 🏗️ Architecture decisions
 
@@ -81,7 +81,7 @@ Created `src/rules/shared-heuristics.js` with:
 - Requires careful testing to avoid regressions
 
 > [!IMPORTANT]
-> Future rules **must** import from `shared-heuristics.js` rather than duplicating logic. Update the shared module if the heuristic needs refinement.
+> Future rules **must** `import from` `shared-heuristics.js` rather than duplicating logic. Update the shared module if the heuristic needs refinement.
 
 **Historical context**: This refactor directly addresses Issue #66 ("Consolidate shared heuristics to prevent drift"), which documented the PM2 inconsistency as a real-world failure case.
 
@@ -169,8 +169,8 @@ Unit tests are essential here because:
 
 Added security job to CI workflow using:
 
-- **npm audit** - Scans against npm advisory database
-- **osv-scanner** - Cross-references against Open Source Vulnerabilities database
+- **`npm audit`** - Scans against `npm advisory` database
+- **Osv-scanner** - Cross-references against Open Source Vulnerabilities database
 
 **Configuration**:
 
@@ -255,7 +255,7 @@ If the build produces changes, the commit is blocked with a message to run `npm 
 
 ## Legacy constraints
 
-### CommonJS distribution requirement
+### Commonjs distribution requirement
 
 **Constraint**: markdownlint-cli2 requires rules to be exported as CommonJS, not ES modules.
 
@@ -263,7 +263,7 @@ If the build produces changes, the commit is blocked with a message to run `npm 
 
 - Write all source code as ES modules in `src/`
 - Transpile to CommonJS in `.markdownlint-rules/` via Babel
-- Ship both formats in the npm package
+- Ship both formats in the `npm package`
 
 **Why not pure ESM?**
 

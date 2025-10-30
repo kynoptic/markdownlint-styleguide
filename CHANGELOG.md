@@ -12,16 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Setup wizard (`npx markdownlint-trap init`) with interactive preset selection and configuration file generation.
 - Diagnostics command (`npm run doctor`) to validate installation and configuration.
 - Multi-project distribution system for deploying configurations across multiple projects with wildcard support.
-- Postinstall hook to automatically build rules when installing from git source.
+- Postinstall hook to automatically build rules when installing from `git source`.
 - Built-in support for standard all-caps terminology in `sentence-case-heading` rule:
   - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
   - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
   - Common technical term: SemVer
+- Built-in support for multi-word product names in `sentence-case-heading` rule:
+  - GitHub Products: GitHub Actions, GitHub Projects
 
 ### Changed
 
-- **Breaking**: Package `main` field now points to compiled output (`.markdownlint-rules/index.cjs`) instead of source (`src/index.js`).
-  - npm users: No action required (published package includes built files).
+- **BREAKING**: Package `main` field now points to compiled output (`.markdownlint-rules/index.cjs`) instead of source (`src/index.js`).
+  - `npm users`: No action required (published package includes built files).
   - Git source users: Build runs automatically via postinstall hook, or run `npm run build` manually.
 - Improved error messages in doctor command to distinguish between missing modules and syntax errors.
 
@@ -142,7 +144,7 @@ This release introduced three powerful new rules, configuration presets, and sig
 ### Changed
 
 - Improved project organization by moving all test files to a new `features/` directory.
-- Updated import paths and project structure to align with modern ESM conventions.
+- Updated `import paths` and project structure to align with modern ESM conventions.
 
 ---
 
@@ -208,12 +210,12 @@ This release introduced three powerful new rules, configuration presets, and sig
 
 ### Changed
 
-- Complete project restructuring: migrated to use ES Modules (`type: module`), making old import paths and rule structures invalid.
+- Complete project restructuring: migrated to use ES Modules (`type: module`), making old `import paths` and rule structures invalid.
 - Documentation structure was significantly reorganized.
 
 ### Removed
 
-- Support for old import paths and rule structures due to ES Module migration.
+- Support for old `import paths` and rule structures due to ES Module migration.
 
 ---
 
@@ -221,7 +223,7 @@ This release introduced three powerful new rules, configuration presets, and sig
 
 ### Added
 
-- Published the initial package to npm with an `index.js` entry point.
+- Published the initial package to `npm with` an `index.js` entry point.
 - Enhanced the `sentence-case` rule to detect and handle ALL CAPS headings.
 
 ### Changed

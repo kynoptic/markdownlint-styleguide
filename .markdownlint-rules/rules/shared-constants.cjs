@@ -216,6 +216,7 @@ const casingTerms = exports.casingTerms = {
   'ci/cd': 'CI/CD',
   'google cloud platform': 'Google Cloud Platform',
   'github actions': 'GitHub Actions',
+  'github projects': 'GitHub Projects',
   'gitlab ci': 'GitLab CI',
   'microsoft azure': 'Microsoft Azure',
   // Geographic names
