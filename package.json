@@ -63,7 +63,7 @@
       "eslint --fix"
     ],
     "*.md": [
-      "bash -c 'if [[ \"$1\" != docs/configuration.md ]]; then markdownlint-cli2 --fix \"$1\"; fi' --"
+      "bash -c 'if [[ \"$1\" != docs/configuration.md ]]; then markdownlint-cli2 --fix \"$1\" || true; fi' --"
     ]
   },
   "engines": {

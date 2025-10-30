@@ -2,6 +2,8 @@
 
 Overview of how this project is structured and consumed.
 
+For architectural decisions and their rationale, see [Architecture Decision Records](adr/).
+
 ## Source vs distribution
 
 - Source code: ES Modules under `src/`.
@@ -32,7 +34,7 @@ Tests run directly against ESM in `src/` (via `babel-jest`), not the compiled ou
 
 ### 🏗️ Modular rule design
 
-Since v1.7.0, complex rules have been refactored into composable modules following single-responsibility principles. The `sentence-case-heading` rule exemplifies this architecture:
+Since `v1.7.0`, complex rules have been refactored into composable modules following single-responsibility principles. The `sentence-case-heading` rule exemplifies this architecture:
 
 - **Main rule file** (`src/rules/sentence-case-heading.js`, 266 lines) - Orchestrates markdownlint integration and coordinates module interactions
 - **Token extraction** (`src/rules/sentence-case/token-extraction.js`, 36 lines) - Parses and extracts plain text from ATX headings
@@ -81,30 +83,42 @@ Centralized term dictionaries and configuration constants:
 
 ### `src/rules/autofix-safety.js`
 
-Safety layer for auto-fix operations with confidence scoring:
+Safety layer for auto-fix operations with confidence scoring, preventing false positive corrections.
+
+**Purpose**: Separates safety decision-making from rule validation logic, allowing rules to focus on detecting violations while the safety module determines when autofixes should apply automatically.
+
+**Key functions**:
 
 - `shouldApplyAutofix()` - Evaluates confidence thresholds and manual review flags
 - `createSafeFixInfo()` - Generates safety metadata for fix operations
 - `calculateSentenceCaseConfidence()` - Analyzes structural changes and technical terms
 - `calculateBacktickConfidence()` - Distinguishes code vs. natural language
-- `analyzeCodeVsNaturalLanguage()` - Context-aware code detection
+- `analyzeCodeVsNaturalLanguage()` - Context-aware code detection with explicit reasoning
 
-Tested with 568 behavioral unit tests covering boundary conditions and decision-making logic ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)).
+**Confidence scoring system**: Each autofix receives a score from 0 (definitely unsafe) to 1 (definitely safe). Default threshold is 0.5. Scores incorporate:
+
+- Pattern strength (file paths, commands, technical indicators)
+- Ambiguity markers (short words, common English terms)
+- Context analysis (surrounding text, technical vs. natural language)
+
+**Testing**: Validated with 568 behavioral unit tests covering boundary conditions and decision-making logic ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)).
+
+**Architecture rationale**: See [ADR-001](adr/adr-001-autofix-safety-strategy.md) for design decisions, alternatives considered, and tradeoffs.
 
 ### `src/rules/config-validation.js`
 
 Configuration validation and error reporting for rule options.
 
 > [!IMPORTANT]
-> Rules **must** import from shared modules rather than duplicating logic. This prevents behavioral drift and ensures consistent behavior across the rule suite.
+> Rules **must** `import from` shared modules rather than duplicating logic. This prevents behavioral drift and ensures consistent behavior across the rule suite.
 
 ## Security architecture
 
-Since v1.7.0, the project includes automated vulnerability scanning in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)):
+Since `v1.7.0`, the project includes automated vulnerability scanning in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)):
 
-- **npm audit** scans production dependencies against the npm advisory database
-- **osv-scanner** cross-references against the Open Source Vulnerabilities database
-- Builds fail on high/critical vulnerabilities in production dependencies
+- **`npm audit`** scans production dependencies against the `npm advisory` database
+- **Osv-scanner** cross-references against the Open Source Vulnerabilities database
+- Builds fail on `high/critical` vulnerabilities in production dependencies
 - Scan results are archived as artifacts with 30-day retention
 - Exception policy documented in `SECURITY.md` for temporary waivers
 
