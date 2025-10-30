@@ -200,3 +200,48 @@ _Step 4: Clear your cache_ <!-- ✅ -->
 - **API documentation** – Interactive Swagger/OpenAPI documentation <!-- ✅ -->
 - **Sophisticated financial modeling** – Make-specific depreciation models, age/mileage-based maintenance costs, CPO warranty calculations <!-- ✅ -->
 - **React SPA frontend** (v19.1.0) with Vite build system for modern development <!-- ✅ -->
+
+## 📦 SemVer and release terminology
+
+# Understanding PATCH releases <!-- ✅ -->
+
+## When to use MINOR versions <!-- ✅ -->
+
+### MAJOR version changes require migration <!-- ✅ -->
+
+**PATCH version increments for bug fixes** <!-- ✅ -->
+_MINOR version increments for new features_ <!-- ✅ -->
+
+- **MAJOR version increments for BREAKING changes** <!-- ✅ -->
+- _Use BREAKING to indicate API changes_ <!-- ✅ -->
+  PATCH releases maintain backward compatibility. <!-- ✅ -->
+
+## 🚨 GitHub Markdown alerts
+
+# Working with NOTE alerts <!-- ✅ -->
+
+## Using IMPORTANT in documentation <!-- ✅ -->
+
+### WARNING indicators for critical issues <!-- ✅ -->
+
+**IMPORTANT security update required** <!-- ✅ -->
+_WARNING data loss may occur_ <!-- ✅ -->
+
+- **CAUTION this action is irreversible** <!-- ✅ -->
+- _TIP use shortcuts for efficiency_ <!-- ✅ -->
+  NOTE that configuration changes take effect immediately. <!-- ✅ -->
+
+> [!NOTE]
+> This is a standard GitHub Alert format. <!-- ✅ -->
+
+> [!IMPORTANT]
+> **IMPORTANT** changes are highlighted here. <!-- ✅ -->
+
+> [!WARNING]
+> **WARNING** This operation cannot be undone. <!-- ✅ -->
+
+> [!CAUTION]
+> **CAUTION** Ensure backups are current. <!-- ✅ -->
+
+> [!TIP]
+> **TIP** Press Ctrl+Z to undo. <!-- ✅ -->

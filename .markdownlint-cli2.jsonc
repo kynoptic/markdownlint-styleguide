@@ -5,10 +5,26 @@
     "./.markdownlint-rules/index.cjs"
   ],
   "config": {
+    // Standard markdownlint rules
+    "default": true,
+    "MD013": false, // line-length
+    "MD024": false, // no-duplicate-heading
+    "MD041": false, // first-line-h1
+    "MD029": { "style": "ordered" },
+    "MD004": { "style": "dash" },
+    "MD036": false, // no-emphasis-as-heading
+
+    // Custom rules from markdownlint-trap
     "sentence-case-heading": true,
     "backtick-code-elements": true,
     "no-bare-url": true,
     "no-dead-internal-links": true,
     "no-literal-ampersand": true
-  }
+  },
+  "globs": [
+    "**/*.md",
+    "!node_modules/**/*",
+    "!tests/**/*.md",
+    "!.windsurf/**/*"
+  ]
 }

@@ -5,6 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { parse as parseJsonc } from 'jsonc-parser';
 
 const scriptPath = path.resolve('./scripts/init.cjs');
 
@@ -188,7 +189,7 @@ describe('init.cjs', () => {
         cwd: tempDir,
       });
 
-      const content = JSON.parse(fs.readFileSync(vscodeConfig, 'utf8'));
+      const content = parseJsonc(fs.readFileSync(vscodeConfig, 'utf8'));
       expect(content['editor.formatOnSave']).toBe(true);
       expect(content['markdownlint.customRules']).toBeDefined();
     });

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Diagnostics command (`npm run doctor`) to validate installation and configuration.
 - Multi-project distribution system for deploying configurations across multiple projects with wildcard support.
 - Postinstall hook to automatically build rules when installing from git source.
+- Built-in support for standard all-caps terminology in `sentence-case-heading` rule:
+  - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
+  - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
+  - Common technical term: SemVer
 
 ### Changed
 

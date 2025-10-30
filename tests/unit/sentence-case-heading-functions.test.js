@@ -208,13 +208,14 @@ describe("validateBoldText", () => {
   });
 
   test("test_should_validate_bold_text_with_punctuation", async () => {
-    const validContent = "- **Note:** this is important";
+    const validContent = "- **NOTE:** this is important";
     const invalidContent = "- **Wrong Case:** this is important";
 
     const validViolations = await lintMarkdown(validContent);
     const invalidViolations = await lintMarkdown(invalidContent);
 
     // Punctuation should not break validation
+    // NOTE is now a special term that must be all-caps
     expect(validViolations.length).toBe(0);
     // But text before colon with capitalization errors should be caught
     expect(invalidViolations.length).toBeGreaterThan(0);

@@ -184,14 +184,21 @@ describe('doctor.cjs', () => {
 
   describe('rule loading checks', () => {
     it('should verify rules can be loaded', () => {
-      const output = execSync('node ' + scriptPath, {
-        encoding: 'utf8',
-        cwd: process.cwd(), // Run from project root where rules are available
-      });
+      try {
+        const output = execSync('node ' + scriptPath, {
+          encoding: 'utf8',
+          cwd: process.cwd(), // Run from project root where rules are available
+        });
 
-      expect(output).toContain('Custom rules loadable');
-      // Should either pass (if built) or fail with helpful message
-      expect(output).toMatch(/✓|✗/);
+        expect(output).toContain('Custom rules loadable');
+        // Should either pass (if built) or fail with helpful message
+        expect(output).toMatch(/✓|✗/);
+      } catch (err) {
+        // Doctor script may exit with non-zero if checks fail, but output should still be captured
+        const output = err.stdout || '';
+        expect(output).toContain('Custom rules loadable');
+        expect(output).toMatch(/✓|✗/);
+      }
     });
 
     it('should list loaded rules on success', () => {

@@ -87,6 +87,36 @@ describe("toSentenceCase", () => {
     const result = toSentenceCase("JAVASCRIPT IS GREAT", defaultSpecialTerms);
     expect(result).toBe("JavaScript Is great");
   });
+
+  test("test_should_convert_lowercase_to_uppercase_for_all_caps_terms", () => {
+    const allCapsTerms = { patch: "PATCH", note: "NOTE", warning: "WARNING" };
+    const result = toSentenceCase("understanding patch releases", allCapsTerms);
+    expect(result).toBe("Understanding PATCH releases");
+  });
+
+  test("test_should_fix_mixed_case_to_uppercase_for_all_caps_terms", () => {
+    const allCapsTerms = { patch: "PATCH", important: "IMPORTANT" };
+    const result = toSentenceCase("this is Important and uses Patch", allCapsTerms);
+    expect(result).toBe("This is IMPORTANT and uses PATCH");
+  });
+
+  test("test_should_handle_github_alert_terms", () => {
+    const allCapsTerms = {
+      note: "NOTE",
+      tip: "TIP",
+      important: "IMPORTANT",
+      warning: "WARNING",
+      caution: "CAUTION"
+    };
+    const result = toSentenceCase("using note and warning alerts", allCapsTerms);
+    expect(result).toBe("Using NOTE and WARNING alerts");
+  });
+
+  test("test_should_preserve_already_correct_all_caps_terms", () => {
+    const allCapsTerms = { patch: "PATCH", breaking: "BREAKING" };
+    const result = toSentenceCase("Understanding PATCH and BREAKING changes", allCapsTerms);
+    expect(result).toBeNull(); // Already correct
+  });
 });
 
 describe("buildHeadingFix", () => {

@@ -220,6 +220,22 @@ export const casingTerms = {
   // Geographic names
   andes: 'Andes',
   mit: 'MIT',
+
+  // SemVer terminology (must be all-caps per convention)
+  patch: 'PATCH',
+  minor: 'MINOR',
+  major: 'MAJOR',
+  breaking: 'BREAKING',
+
+  // GitHub Markdown Alerts (must be all-caps per spec)
+  note: 'NOTE',
+  tip: 'TIP',
+  important: 'IMPORTANT',
+  warning: 'WARNING',
+  caution: 'CAUTION',
+
+  // Common technical terms
+  semver: 'SemVer',
 };
 
 /**

@@ -1,0 +1,15 @@
+# Test fixtures and samples - intentionally non-compliant for testing
+tests/fixtures/
+tests/**/*.md
+
+# Build artifacts
+node_modules/
+.markdownlint-rules/
+
+# IDE and tool directories
+.windsurf/
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp.md
