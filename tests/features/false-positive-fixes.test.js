@@ -157,6 +157,52 @@ describe('False positive fixes from ultimate-ranks evaluation', () => {
       expect(result.input).toHaveLength(0);
     });
 
+    test('should generate autofix when multi-word specialTerm has wrong casing', async () => {
+      const { applyFixes } = await import('markdownlint');
+      const input = '# Contributing to ultimate ranks';
+
+      const result = await lint({
+        strings: { input },
+        config: {
+          default: false,
+          'sentence-case-heading': {
+            specialTerms: ['Ultimate Ranks']
+          },
+        },
+        customRules: [sentenceCaseHeading],
+      });
+
+      expect(result.input).toHaveLength(1);
+      expect(result.input[0].ruleNames).toContain('sentence-case-heading');
+      expect(result.input[0].errorDetail).toContain('Phrase "ultimate ranks" should be "Ultimate Ranks"');
+      expect(result.input[0].fixInfo).toBeDefined();
+
+      const fixed = applyFixes(input, result.input);
+      expect(fixed).toBe('# Contributing to Ultimate Ranks');
+    });
+
+    test('should generate autofix when multi-word specialTerm appears mid-heading', async () => {
+      const { applyFixes } = await import('markdownlint');
+      const input = '## Working with github actions in ultimate ranks';
+
+      const result = await lint({
+        strings: { input },
+        config: {
+          default: false,
+          'sentence-case-heading': {
+            specialTerms: ['Ultimate Ranks', 'GitHub Actions']
+          },
+        },
+        customRules: [sentenceCaseHeading],
+      });
+
+      expect(result.input).toHaveLength(1);
+      expect(result.input[0].fixInfo).toBeDefined();
+
+      const fixed = applyFixes(input, result.input);
+      expect(fixed).toBe('## Working with GitHub Actions in Ultimate Ranks');
+    });
+
     test('should NOT flag common acronyms when configured', async () => {
       const input = '# README for the project\n\n## ADR documentation\n\n### E2E tests';
 
