@@ -227,8 +227,6 @@ const casingTerms = exports.casingTerms = {
   patch: 'PATCH',
   minor: 'MINOR',
   major: 'MAJOR',
-  breaking: 'BREAKING',
-  'breaking changes': 'BREAKING Changes',
   // GitHub Markdown Alerts (must be all-caps per spec)
   note: 'NOTE',
   tip: 'TIP',

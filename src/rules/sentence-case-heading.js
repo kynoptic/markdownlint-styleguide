@@ -48,7 +48,8 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
   const tokens = params.parsers.micromark.tokens;
   const lines = params.lines;
-  const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || {};
+  // Support both nested config (from .markdownlint-cli2.jsonc) and direct config (from lint API)
+  const config = params.config?.['sentence-case-heading'] || params.config?.SC001 || params.config || {};
 
   // Validate configuration
   const configSchema = {

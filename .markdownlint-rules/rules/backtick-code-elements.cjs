@@ -158,6 +158,24 @@ function isLikelyFilePath(str) {
     return false;
   }
 
+  // Detect capitalized enumeration patterns (e.g., "Essential/Useful/Nice-to-have", "Heavy/Moderate/Light")
+  // These are option sets, not file paths. Pattern: starts with capital letter, contains multiple slashes
+  if (segments.length >= 2) {
+    const allCapitalized = segments.every(s => /^[A-Z]/.test(s));
+    const hasMultiWordSegments = segments.some(s => s.includes('-'));
+    const allShortSegments = segments.every(s => s.length <= 8); // Data/API, Value/Effort
+
+    if (allCapitalized && (segments.length >= 3 || hasMultiWordSegments || allShortSegments)) {
+      // This looks like an enumerated option set (Essential/Useful/Nice-to-have)
+      return false;
+    }
+  }
+
+  // Detect BDD-style patterns (GIVEN/WHEN/THEN)
+  if (segments.length >= 2 && segments.every(s => /^[A-Z]+$/.test(s))) {
+    return false;
+  }
+
   // For simple "a/b" paths without file extensions, be more skeptical.
   if (segments.length === 2 && !/\.[^/]+$/.test(segments[1])) {
     // Avoids flagging common short phrases like "on/off", "i/o".
@@ -231,7 +249,7 @@ const ERROR_MESSAGE_PATTERNS = [{
   pattern: /^--?[a-zA-Z]/,
   message: text => `Command flag '${text}' should be wrapped in backticks to show it's a command option`
 }, {
-  pattern: /\([^)]*\)$/,
+  pattern: text => /\([^)]*\)$/.test(text) && !/^\w+\([a-z]\)$/.test(text),
   message: text => `Function call '${text}' should be wrapped in backticks to show it's code`
 }, {
   pattern: /^import\s+/,
@@ -240,7 +258,14 @@ const ERROR_MESSAGE_PATTERNS = [{
   pattern: /^[A-Z]+\+[A-Z]+$/,
   message: text => `Key combination '${text}' should be wrapped in backticks to distinguish it from regular text`
 }, {
-  pattern: /^[A-Za-z0-9.-]+:\d+$/,
+  pattern: text => {
+    // Match network addresses but exclude WCAG ratios (e.g., 4.5:1, 3:1, 7:1)
+    // WCAG ratios are decimal numbers followed by :1
+    if (/^\d+(\.\d+)?:1$/.test(text)) {
+      return false; // This is a WCAG contrast ratio, not a network address
+    }
+    return /^[A-Za-z0-9.-]+:\d+$/.test(text);
+  },
   message: text => `Network address '${text}' should be wrapped in backticks to show it's a technical reference`
 }, {
   pattern: /^(?:export|set)\s+/,
@@ -373,8 +398,10 @@ function backtickCodeElements(params, onError) {
     // common CLI commands
     /\bimport\s+\w+/g,
     // import statements
-    // host:port patterns, avoids bible verses like "1:10"
-    /\b(?!\d+:\d+\b)[A-Za-z0-9.-]+:\d+\b/g, /\b[A-Z]+\+[A-Z]\b/g,
+    // host:port patterns, avoids bible verses like "1:10" and WCAG ratios like "4.5:1"
+    // Negative lookbehind: not preceded by decimal number (WCAG ratios)
+    // Negative lookahead: not followed by just "1" (WCAG ratios end with :1)
+    /\b(?!\d+:\d+\b)(?<!\d\.)[\w.-]+:(?!\d*1\b)\d+\b/g, /\b[A-Z]+\+[A-Z]\b/g,
     // key combos like CTRL+C
     /\b(?:export|set)\s+[A-Za-z_][\w.-]*=\$?[\w.-]+\b/g,
     // shell variable assignments
@@ -415,6 +442,11 @@ function backtickCodeElements(params, onError) {
           if (/^v?\d+(\.\d+)*(\+|\.\d+)*$/.test(fullMatch) || /^[A-Za-z]+\s+\d+(\.\d+)*(\+)?$/.test(fullMatch)) {
             continue;
           }
+        }
+
+        // Skip grammar pluralization patterns (e.g., "word(s)", "term(s)", "issue(s)")
+        if (/^\w+\([a-z]\)$/.test(fullMatch)) {
+          continue;
         }
 
         // Skip if already flagged

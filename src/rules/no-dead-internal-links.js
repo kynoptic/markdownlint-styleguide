@@ -200,13 +200,15 @@ function noDeadInternalLinks(params, onError) {
     return;
   }
 
-  const config = params.config?.['no-dead-internal-links'] || params.config?.DL001 || {};
+  // Support both nested config (from .markdownlint-cli2.jsonc) and direct config (from lint API)
+  const config = params.config?.['no-dead-internal-links'] || params.config?.DL001 || params.config || {};
 
   // Validate configuration
   const configSchema = {
     ignoredPaths: validateStringArray,
     checkAnchors: validateBoolean,
-    allowedExtensions: validateStringArray
+    allowedExtensions: validateStringArray,
+    allowPlaceholders: validateBoolean
   };
 
   const validationResult = validateConfig(config, configSchema, 'no-dead-internal-links');
@@ -220,6 +222,7 @@ function noDeadInternalLinks(params, onError) {
   const ignoredPaths = Array.isArray(config.ignoredPaths) ? config.ignoredPaths : [];
   const checkAnchors = typeof config.checkAnchors === 'boolean' ? config.checkAnchors : true;
   const allowedExtensions = Array.isArray(config.allowedExtensions) ? config.allowedExtensions : ['.md', '.markdown'];
+  const allowPlaceholders = typeof config.allowPlaceholders === 'boolean' ? config.allowPlaceholders : false;
 
   const lines = params.lines;
   const currentFile = params.name || '';
@@ -278,10 +281,15 @@ function noDeadInternalLinks(params, onError) {
       
       // Parse the link URL to separate file path and anchor
       const [filePath, anchor] = linkUrl.split('#');
-      
+
       if (filePath) {
         // Check if this path should be ignored
         if (ignoredPaths.some(ignored => filePath.includes(ignored))) {
+          continue;
+        }
+
+        // Skip template placeholders if configured (e.g., adr-XXX-title.md, TODO.md, PLACEHOLDER.md)
+        if (allowPlaceholders && /(?:XXX|TODO|PLACEHOLDER)/i.test(filePath)) {
           continue;
         }
         
