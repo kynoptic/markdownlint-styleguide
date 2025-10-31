@@ -32,6 +32,12 @@
     "doctor": "node scripts/doctor.cjs",
     "dist:local": "node scripts/distribute-local.cjs",
     "dist:local:dry": "node scripts/distribute-local.cjs --dry-run",
+    "install:global": "bash scripts/install-global.sh",
+    "install:global:dry": "bash scripts/install-global.sh --dry-run",
+    "link:projects": "bash scripts/link-to-projects.sh",
+    "link:projects:dry": "bash scripts/link-to-projects.sh --dry-run",
+    "unlink:projects": "bash scripts/unlink-from-projects.sh",
+    "unlink:projects:dry": "bash scripts/unlink-from-projects.sh --dry-run",
     "prepare": "node scripts/prepare.mjs",
     "validate": "npm run lint && npm run build && npm test && echo '✅ All validation checks passed'"
   },

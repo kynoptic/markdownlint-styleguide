@@ -11,6 +11,8 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 
 ## Quick start
 
+### For published package
+
 Get up and running in under 2 minutes:
 
 1. Install the package
@@ -38,6 +40,23 @@ Get up and running in under 2 minutes:
    # or auto-fix where supported
    npx markdownlint-cli2 --fix "**/*.md"
    ```
+
+### For local development (recommended)
+
+If you're developing markdownlint-trap or want to use it across all your projects:
+
+```bash
+# In the markdownlint-trap repository
+npm run dist:local
+```
+
+This automatically:
+
+- Installs globally (works in ALL projects, including `non-Node.js`)
+- Distributes configs to `~/Projects/*`
+- Detects package managers (npm, pnpm, yarn, bun)
+
+See [Installation Guide](docs/installation.md) for detailed setup options.
 
 ### Alternative: manual configuration
 

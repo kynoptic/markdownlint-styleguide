@@ -6,6 +6,7 @@ version: 1
 defaults:
   cleanDest: false  # Preserve existing configs by default
   merge: true       # Merge JSON settings instead of overwriting
+  createDirs: true  # Create missing parent directories
 
 # Targets of type "local" copy files to local directories
 # Fields:
@@ -16,6 +17,7 @@ defaults:
 # - dest: destination path (supports wildcards) or array of paths
 # - merge: merge JSON files instead of replacing (default: true for JSON)
 # - cleanDest: delete destination before copying (default: false)
+# - createDirs: create missing parent directories (default: true)
 #
 # WILDCARD EXAMPLES:
 # - dest: ~/Projects/*/.vscode/settings.json       # All projects
@@ -42,13 +44,11 @@ targets:
 
   # Recommended preset - balanced strictness
   - name: vscode-recommended
-    enabled: false
+    enabled: true
     type: local
     src: templates/vscode-settings-recommended.jsonc
     dest:
-      # Edit this list to target your projects
-      # - ~/Projects/my-docs/.vscode/settings.json
-      # - ~/Projects/*/.vscode/settings.json  # All projects (wildcard)
+      - ~/Projects/*/.vscode/settings.json  # All projects (wildcard)
     merge: true
     cleanDest: false
 
@@ -79,13 +79,11 @@ targets:
 
   # Recommended CLI config
   - name: cli-recommended
-    enabled: false
+    enabled: true
     type: local
     src: templates/markdownlint-cli2-recommended.jsonc
     dest:
-      # Edit this list to target your projects
-      # - ~/Projects/my-docs/.markdownlint-cli2.jsonc
-      # - ~/Projects/*/.markdownlint-cli2.jsonc  # All projects
+      - ~/Projects/*/.markdownlint-cli2.jsonc  # All projects
     cleanDest: false
 
   # Strict CLI config
@@ -98,8 +96,38 @@ targets:
       # - ~/Projects/api-docs/.markdownlint-cli2.jsonc
     cleanDest: false
 
+# --------------------------------------
+# Global Installation
+# --------------------------------------
+# Install markdownlint-trap and markdownlint-cli2 globally
+# This enables usage in ALL projects (including non-Node.js projects)
+globalInstall:
+  enabled: true
+  linkLocal: true  # Use npm link for local development (false would use npm install -g)
+
+# --------------------------------------
+# NPM Package Installation (per-project)
+# --------------------------------------
+# Automatically install npm packages in target projects
+# NOTE: Set enabled to false until markdownlint-trap is published to npm
+# For local development, global installation + distribution is recommended
+#
+# IMPORTANT: The default projectDirs assumes ~/Projects/* structure.
+# Edit this to match your actual project layout:
+# - Single directory: ~/Code/my-projects/*
+# - Multiple directories: [~/Projects/*, ~/Work/*]
+# - Specific projects: [~/Code/project-a, ~/Code/project-b]
+npmInstall:
+  enabled: false  # Disabled: use globalInstall instead for local development
+  packages:
+    - markdownlint-trap
+    - markdownlint-cli2
+  projectDirs:
+    - ~/Projects/*  # Default assumes this structure - customize as needed
+
 # USAGE:
 # 1. Edit the 'dest' paths above to point to your projects
 # 2. Set 'enabled: true' for the targets you want to use
-# 3. Run 'npm run dist:local:dry' to preview changes
-# 4. Run 'npm run dist:local' to apply changes
+# 3. Configure npmInstall section to install dependencies
+# 4. Run 'npm run dist:local:dry' to preview changes
+# 5. Run 'npm run dist:local' to apply changes and install packages

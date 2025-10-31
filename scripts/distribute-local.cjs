@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const jsonc = require('jsonc-parser');
+const { execSync } = require('child_process');
 
 function log(msg) {
   // eslint-disable-next-line no-console
@@ -36,6 +37,8 @@ function loadConfig(configPath) {
   if (!cfg || typeof cfg !== 'object') throw new Error('Invalid YAML config');
   cfg.defaults = cfg.defaults || {};
   cfg.targets = cfg.targets || [];
+  cfg.npmInstall = cfg.npmInstall || {};
+  cfg.globalInstall = cfg.globalInstall || {};
   return cfg;
 }
 
@@ -195,6 +198,73 @@ function main() {
       log('DRY RUN MODE - no files will be modified\n');
     }
 
+    // Handle global installation first
+    if (cfg.globalInstall && cfg.globalInstall.enabled && !dryRun) {
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      log('GLOBAL INSTALLATION PHASE\n');
+
+      const linkLocal = cfg.globalInstall.linkLocal !== false;
+
+      try {
+        // Check if already globally linked
+        const checkCmd = 'npm list -g --depth=0 markdownlint-trap';
+        let isLinked = false;
+        try {
+          isLinked = execSync(checkCmd, { stdio: 'pipe' }).toString().includes('markdownlint-trap');
+        } catch (checkError) {
+          // npm list exits non-zero if package not found, which is expected
+          isLinked = false;
+        }
+
+        if (isLinked) {
+          log('✓ markdownlint-trap is already globally linked');
+        } else {
+          if (linkLocal) {
+            log('Globally linking markdownlint-trap...');
+            execSync('npm link', { cwd: repoRoot, stdio: 'inherit' });
+            log('✓ Globally linked markdownlint-trap');
+          } else {
+            log('Installing markdownlint-trap globally...');
+            execSync('npm install -g markdownlint-trap', { stdio: 'inherit' });
+            log('✓ Installed markdownlint-trap globally');
+          }
+        }
+      } catch (e) {
+        error(`Failed to install markdownlint-trap globally: ${e.message}`);
+        throw e;
+      }
+
+      // Check if markdownlint-cli2 is installed globally
+      let cli2Installed = false;
+      try {
+        execSync('which markdownlint-cli2', { stdio: 'pipe' });
+        cli2Installed = true;
+      } catch (e) {
+        // Not in PATH, check npm global list
+        try {
+          const globalList = execSync('npm list -g --depth=0', { stdio: 'pipe' }).toString();
+          cli2Installed = globalList.includes('markdownlint-cli2');
+        } catch (e2) {
+          // Error listing, assume not installed
+        }
+      }
+
+      if (cli2Installed) {
+        try {
+          const version = execSync('markdownlint-cli2 --version', { stdio: 'pipe' }).toString().trim();
+          log(`✓ markdownlint-cli2 is already installed globally (${version})`);
+        } catch (e) {
+          log('✓ markdownlint-cli2 is already installed globally');
+        }
+      } else {
+        log('Installing markdownlint-cli2 globally...');
+        execSync('npm install -g markdownlint-cli2', { stdio: 'inherit' });
+        log('✓ Installed markdownlint-cli2 globally');
+      }
+
+      log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    }
+
     const targets = (cfg.targets || []).filter(t => t && t.enabled);
     if (targets.length === 0) {
       log('No enabled targets. Edit .github/distribution.local.yml to enable targets.');
@@ -232,12 +302,14 @@ function main() {
 
         const cleanDest = t.cleanDest ?? cfg.defaults.cleanDest ?? false;
         const merge = t.merge ?? false;
+        const createDirs = t.createDirs ?? cfg.defaults.createDirs ?? false;
 
         log(`Target '${t.name || 'unnamed'}':`);
         log(`  Source: ${src}`);
         log(`  Destinations: ${dests.length}`);
         log(`  Merge: ${merge}`);
         log(`  Clean: ${cleanDest}`);
+        log(`  Create dirs: ${createDirs}`);
         
         const srcContent = fs.readFileSync(src, 'utf8');
 
@@ -257,11 +329,20 @@ function main() {
 
           // Handle parent directory
           const destDir = path.dirname(dest);
-          
-          // Check if parent directory exists - skip if it doesn't
+
+          // Check if parent directory exists
           if (!fs.existsSync(destDir)) {
-            log(`     [skip] Parent directory does not exist: ${destDir}`);
-            continue;
+            if (createDirs) {
+              if (dryRun) {
+                log(`     [dry-run] Would create directory: ${destDir}`);
+              } else {
+                ensureDir(destDir);
+                log(`     [created] ${destDir}`);
+              }
+            } else {
+              log(`     [skip] Parent directory does not exist: ${destDir}`);
+              continue;
+            }
           }
 
           // Prepare content (merge if needed)
@@ -286,11 +367,121 @@ function main() {
       }
     }
     
+    // Handle npm install if configured
+    if (cfg.npmInstall && cfg.npmInstall.enabled && !dryRun) {
+      log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      log('NPM INSTALL PHASE\n');
+
+      const packages = cfg.npmInstall.packages || [];
+      if (packages.length === 0) {
+        log('No packages configured for installation');
+      } else {
+        const projectDirs = cfg.npmInstall.projectDirs || ['~/Projects/*'];
+        const expandedProjects = new Set();
+
+        // Expand wildcard project directories
+        for (const projectPattern of projectDirs) {
+          let expandedPath = projectPattern;
+          if (expandedPath.startsWith('~/')) {
+            expandedPath = path.join(require('os').homedir(), expandedPath.slice(2));
+          }
+
+          if (expandedPath.includes('*')) {
+            const parts = expandedPath.split('*');
+            if (parts.length === 2) {
+              const [baseDir] = parts;
+              if (fs.existsSync(baseDir)) {
+                const entries = fs.readdirSync(baseDir, { withFileTypes: true });
+                for (const entry of entries) {
+                  if (entry.isDirectory() && !entry.name.startsWith('.')) {
+                    expandedProjects.add(path.join(baseDir, entry.name));
+                  }
+                }
+              }
+            }
+          } else {
+            if (!path.isAbsolute(expandedPath)) {
+              expandedPath = path.join(repoRoot, expandedPath);
+            }
+            if (fs.existsSync(expandedPath)) {
+              expandedProjects.add(expandedPath);
+            }
+          }
+        }
+
+        log(`Found ${expandedProjects.size} project(s)`);
+        log(`Packages: ${packages.join(', ')}\n`);
+
+        let installedCount = 0;
+        let skippedCount = 0;
+        let failedCount = 0;
+
+        for (const projectDir of expandedProjects) {
+          const projectName = path.basename(projectDir);
+          const packageJsonPath = path.join(projectDir, 'package.json');
+
+          // Skip if no package.json
+          if (!fs.existsSync(packageJsonPath)) {
+            log(`[skip] ${projectName} (no package.json)`);
+            skippedCount++;
+            continue;
+          }
+
+          // Check if already installed
+          try {
+            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+            const devDeps = packageJson.devDependencies || {};
+            const allInstalled = packages.every(pkg => pkg in devDeps);
+
+            if (allInstalled) {
+              log(`[skip] ${projectName} (already installed)`);
+              skippedCount++;
+              continue;
+            }
+          } catch (e) {
+            log(`[skip] ${projectName} (invalid package.json)`);
+            skippedCount++;
+            continue;
+          }
+
+          // Install packages
+          try {
+            log(`[installing] ${projectName}...`);
+            // Validate package names to prevent command injection
+            const validPackagePattern = /^[@a-z0-9-~][a-z0-9-._~]*$/i;
+            for (const pkg of packages) {
+              if (!validPackagePattern.test(pkg)) {
+                throw new Error(`Invalid package name: ${pkg}`);
+              }
+            }
+            execSync(`npm install --save-dev ${packages.join(' ')}`, {
+              cwd: projectDir,
+              stdio: 'pipe'
+            });
+            log(`[done] ${projectName}`);
+            installedCount++;
+          } catch (e) {
+            error(`[failed] ${projectName}: ${e.message}`);
+            failedCount++;
+            hadErrors = true;
+          }
+        }
+
+        log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        log('NPM INSTALL SUMMARY:');
+        log(`  Installed: ${installedCount} projects`);
+        log(`  Skipped: ${skippedCount} projects`);
+        if (failedCount > 0) {
+          error(`  Failed: ${failedCount} projects`);
+        }
+      }
+    }
+
     if (dryRun) {
-      log('DRY RUN COMPLETE - no files were modified');
+      log('\nDRY RUN COMPLETE - no files were modified');
       log('Run without --dry-run to apply changes');
     } else {
-      log('DISTRIBUTION COMPLETE');
+      log('\nDISTRIBUTION COMPLETE');
     }
   } catch (e) {
     hadErrors = true;
