@@ -8,7 +8,7 @@
 import { createSafeFixInfo } from '../autofix-safety.js';
 
 /**
- * Converts a string to sentence case, respecting preserved segments.
+ * Converts a string to sentence case, respecting preserved segments and multi-word special terms.
  * @param {string} text - The text to convert
  * @param {Object} specialCasedTerms - Map of lowercase terms to their proper casing
  * @returns {string | null} The fixed text, or null if no change is needed
@@ -17,10 +17,26 @@ export function toSentenceCase(text, specialCasedTerms) {
   const preserved = [];
   const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\3|(\*|_)(.*?)\5/g;
 
-  const processed = text.replace(preservedSegmentsRegex, (m) => {
+  let processed = text.replace(preservedSegmentsRegex, (m) => {
     preserved.push(m);
     return `__P_${preserved.length - 1}__`;
   });
+
+  // Handle multi-word special terms BEFORE word-by-word processing
+  // Replace multi-word phrases with placeholders to preserve them through word processing
+  for (const [phraseLower, phraseCorrect] of Object.entries(specialCasedTerms)) {
+    if (!phraseLower.includes(' ')) {
+      continue; // Skip single-word terms, they'll be handled in word loop
+    }
+
+    // Case-insensitive regex to find the phrase
+    const regex = new RegExp(`\\b${phraseLower}\\b`, 'gi');
+    processed = processed.replace(regex, () => {
+      // Preserve the correctly-cased phrase
+      preserved.push(phraseCorrect);
+      return `__P_${preserved.length - 1}__`;
+    });
+  }
 
   const words = processed.split(/\s+/).filter(Boolean);
   const firstWordIndex = words.findIndex((w) => !w.startsWith('__P_'));
