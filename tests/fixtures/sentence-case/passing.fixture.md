@@ -212,8 +212,8 @@ _Step 4: Clear your cache_ <!-- ✅ -->
 **PATCH version increments for bug fixes** <!-- ✅ -->
 _MINOR version increments for new features_ <!-- ✅ -->
 
-- **MAJOR version increments for BREAKING Changes** <!-- ✅ -->
-- _Use BREAKING to indicate API changes_ <!-- ✅ -->
+- **MAJOR version increments for breaking changes** <!-- ✅ -->
+- _Use BREAKING CHANGE keyword to indicate API changes_ <!-- ✅ -->
   PATCH releases maintain backward compatibility. <!-- ✅ -->
 
 ## 🚨 Markdown alerts
