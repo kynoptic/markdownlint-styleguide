@@ -5,7 +5,7 @@ Example: "Add input validation for empty usernames"
 Avoid conventional commit format for PR titles (no "feat:", "fix:", etc.)
 -->
 
-## Summary
+# Summary
 
 Brief description of the changes and the problem being solved:
 

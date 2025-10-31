@@ -251,7 +251,7 @@ npx markdownlint-trap init --dry-run
 
 For managing configurations across multiple projects, use the local distribution system:
 
-**1. Create distribution config**
+## 1. Create distribution config
 
 Create or edit `.github/distribution.local.yml` in the markdownlint-trap package directory:
 
@@ -270,13 +270,13 @@ targets:
     merge: true  # Merge with existing settings
 ```
 
-**2. Preview changes**
+## 2. Preview changes
 
 ```bash
 npm run dist:local:dry
 ```
 
-**3. Apply configuration**
+## 3. Apply configuration
 
 ```bash
 npm run dist:local

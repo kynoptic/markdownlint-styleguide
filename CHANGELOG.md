@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **BREAKING**: Package `main` field now points to compiled output (`.markdownlint-rules/index.cjs`) instead of source (`src/index.js`).
+- **Breaking**: Package `main` field now points to compiled output (`.markdownlint-rules/index.cjs`) instead of source (`src/index.js`).
   - `npm users`: No action required (published package includes built files).
   - Git source users: Build runs automatically via postinstall hook, or run `npm run build` manually.
 - Improved error messages in doctor command to distinguish between missing modules and syntax errors.

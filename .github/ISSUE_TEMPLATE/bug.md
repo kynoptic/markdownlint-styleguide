@@ -14,23 +14,23 @@ Avoid conventional commit format for issues (no "fix:", "bug:", etc.)
 
 ## Summary
 
-<One line description of the bug.>
+*One line description of the bug.*
 
 ## The problem
 
-<What's broken and why it matters to users or contributors.>
+*What's broken and why it matters to users or contributors.*
 
 ## Expected behavior
 
-<What should happen instead.>
+*What should happen instead.*
 
 ## Actual behavior
 
-<What actually happens (include error messages, logs, screenshots).>
+*What actually happens (include error messages, logs, screenshots).*
 
 ## Proposed solution
 
-<How we'll fix it (technical approach if known).>
+*How we'll fix it (technical approach if known).*
 
 ## Acceptance criteria (testable)
 
@@ -46,14 +46,14 @@ Avoid vanity tests that only verify framework behavior or trivial getters/setter
 -->
 
 - **Unit tests**:
-- **E2e tests**:
+- **E2E Tests**:
 - **Edge cases**:
 - **Regression tests**:
 
 ## Links
 
 - **User stories**: `US-XXX`
-- **Adrs**: `ADR-XXX`
+- **ADRs**: `ADR-XXX`
 - **Related issues**: `#XXX`
 
 ## Project fields

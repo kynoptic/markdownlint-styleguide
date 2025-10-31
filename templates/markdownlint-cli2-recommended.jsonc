@@ -5,6 +5,13 @@
     "markdownlint-trap"
   ],
   "config": {
+    "MD013": false,
+    "MD049": {
+      "style": "asterisk"
+    },
+    "MD050": {
+      "style": "asterisk"
+    },
     "sentence-case-heading": true,
     "backtick-code-elements": true,
     "no-bare-url": true,

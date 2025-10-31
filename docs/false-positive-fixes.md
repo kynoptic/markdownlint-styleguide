@@ -8,7 +8,7 @@ This document describes the fixes implemented based on a comprehensive evaluatio
 
 ### 1. backtick-code-elements (bce001) - achieved ~85% accuracy
 
-#### Wcag contrast ratios (__p_0__:1, 3:1, 7:1)
+#### Wcag contrast ratios (**p_0**:1, 3:1, 7:1)
 
 **Issue**: Accessibility ratios like `4.5:1` were incorrectly flagged as network addresses.
 

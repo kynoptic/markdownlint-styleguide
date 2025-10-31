@@ -14,15 +14,15 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 
 ## Summary
 
-<One line overview.>
+*One line overview.*
 
 ## The problem
 
-<Why this matters to users or contributors.>
+*Why this matters to users or contributors.*
 
 ## Proposed solution
 
-<How we'll solve it (keep distinct from the problem).>
+*How we'll solve it (keep distinct from the problem).*
 
 ## Acceptance criteria (testable)
 
