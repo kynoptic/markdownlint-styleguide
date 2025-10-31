@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved `sentence-case-heading` rule handling for emoji-prefixed headings with accented, CJK, and other extended Unicode scripts to better support internationalized content.
+
 ---
 
 ## [2.0.0] - 2025-10-30

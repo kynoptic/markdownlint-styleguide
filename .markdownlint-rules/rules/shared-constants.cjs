@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.knownDirectoryPrefixes = exports.commonConceptualWords = exports.casingTerms = exports.backtickIgnoredTerms = exports.ampersandDefaultExceptions = void 0;
+exports.knownDirectoryPrefixes = exports.commonConceptualWords = exports.casingTerms = exports.backtickIgnoredTerms = exports.ampersandDefaultExceptions = exports.UPPERCASE_WORD_REGEX = exports.UNICODE_UPPERCASE_REGEX = exports.UNICODE_LETTER_REGEX = void 0;
 // @ts-check
 
 /**
@@ -274,3 +274,31 @@ const backtickIgnoredTerms = exports.backtickIgnoredTerms = new Set([...Object.v
  * @type {readonly string[]}
  */
 const ampersandDefaultExceptions = exports.ampersandDefaultExceptions = ['R&D', 'Q&A', 'M&A', 'S&P', 'AT&T'];
+
+/**
+ * Unicode regex patterns for internationalized text validation.
+ * These patterns use Unicode property escapes to support all scripts (Latin, Cyrillic, Greek, CJK, Arabic, etc.).
+ */
+
+/**
+ * Unicode letter regex using \p{L} property escape.
+ * Matches any letter character across all Unicode scripts.
+ * Use this instead of ASCII-only [a-zA-Z] for international text support.
+ * @type {RegExp}
+ */
+const UNICODE_LETTER_REGEX = exports.UNICODE_LETTER_REGEX = /\p{L}/u;
+
+/**
+ * Unicode uppercase letter regex using \p{Lu} property escape.
+ * Matches uppercase letters across all Unicode scripts (A-Z, À-Ö, Α-Ω, А-Я, etc.).
+ * Use this for case validation and acronym detection in internationalized content.
+ * @type {RegExp}
+ */
+const UNICODE_UPPERCASE_REGEX = exports.UNICODE_UPPERCASE_REGEX = /\p{Lu}/u;
+
+/**
+ * Unicode uppercase word regex (word must contain only uppercase letters).
+ * Used for acronym detection across all Unicode scripts.
+ * @type {RegExp}
+ */
+const UPPERCASE_WORD_REGEX = exports.UPPERCASE_WORD_REGEX = /^\p{Lu}+$/u;

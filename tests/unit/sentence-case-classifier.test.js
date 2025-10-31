@@ -27,6 +27,16 @@ describe("stripLeadingSymbols", () => {
     expect(result).toBe("Developer guide");
   });
 
+  test("test_should_preserve_accented_text_after_emoji_prefix", () => {
+    const result = stripLeadingSymbols("🎉 Étude de cas");
+    expect(result).toBe("Étude de cas");
+  });
+
+  test("test_should_preserve_cjk_text_after_flag_emoji_prefix", () => {
+    const result = stripLeadingSymbols("🇯🇵 日本語ガイド");
+    expect(result).toBe("日本語ガイド");
+  });
+
   test("test_should_not_remove_emoji_from_middle_of_text", () => {
     const result = stripLeadingSymbols("Text with 🎉 emoji inside");
     expect(result).toBe("Text with 🎉 emoji inside");
@@ -109,6 +119,19 @@ describe("prepareTextForValidation", () => {
     expect(result).not.toBeNull();
     expect(result.hadLeadingEmoji).toBe(true);
     expect(result.cleanedText).toBe("Party heading");
+  });
+
+  test("test_should_prepare_heading_with_accented_letters_after_emoji", () => {
+    const result = prepareTextForValidation("🎉 Étude de cas");
+    expect(result).not.toBeNull();
+    expect(result.hadLeadingEmoji).toBe(true);
+    expect(result.cleanedText).toBe("Étude de cas");
+  });
+
+  test("test_should_prepare_heading_with_cjk_characters_after_emoji", () => {
+    const result = prepareTextForValidation("🎉 日本語ガイド");
+    expect(result).not.toBeNull();
+    expect(result.cleanedText).toBe("日本語ガイド");
   });
 
   test("test_should_not_set_emoji_flag_when_no_leading_emoji", () => {
@@ -226,6 +249,83 @@ describe("validateHeading", () => {
   test("test_should_handle_heading_with_preserved_segments", () => {
     const result = validateHeading("Using `code` properly", defaultSpecialTerms);
     expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_validate_heading_with_accented_letters_after_emoji", () => {
+    const result = validateHeading("🎉 Étude de cas", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_detect_lowercase_start_for_accented_heading", () => {
+    const result = validateHeading("🎉 étude de cas", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toContain('"Étude"');
+  });
+
+  test("test_should_handle_cyrillic_uppercase_detection", () => {
+    // Cyrillic heading with proper sentence case (first letter uppercase, rest lowercase)
+    const result = validateHeading("🎉 Привет мир", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_detect_cyrillic_lowercase_start", () => {
+    // Cyrillic heading starting with lowercase after emoji
+    const result = validateHeading("🎉 привет мир", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toContain('"Привет"');
+  });
+
+  test("test_should_handle_greek_uppercase_detection", () => {
+    // Greek heading with proper sentence case
+    const result = validateHeading("🎉 Γεια σου κόσμος", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_detect_greek_lowercase_start", () => {
+    // Greek heading starting with lowercase after emoji
+    const result = validateHeading("🎉 γεια σου κόσμος", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toContain('"Γεια"');
+  });
+
+  test("test_should_handle_arabic_rtl_script_detects_as_all_caps", () => {
+    // Arabic (RTL) heading - Arabic has no uppercase/lowercase distinction
+    // The Unicode regex \p{Lu} doesn't match Arabic letters, but they're detected as "all caps"
+    // because the isAllCapsHeading check sees them all as toUpperCase() === the original
+    const result = validateHeading("مرحبا بالعالم", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    // This documents current behavior - RTL scripts without case may fail validation
+    expect(result.errorMessage).toMatch(/all caps/i);
+  });
+
+  test("test_should_handle_hebrew_rtl_script_detects_as_all_caps", () => {
+    // Hebrew (RTL) heading - Hebrew has no uppercase/lowercase distinction
+    // Similar to Arabic, detected as "all caps" by the validation logic
+    const result = validateHeading("שלום עולם", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/all caps/i);
+  });
+
+  test("test_should_handle_mixed_script_heading_with_acronym_and_cjk", () => {
+    // Mixed script: English acronym + Japanese (CJK has no case distinction)
+    // Japanese characters also detected as "all uppercase" because they have no lowercase form
+    const result = validateHeading("API ドキュメント", defaultSpecialTerms);
+    // Documents current limitation: CJK characters fail all-caps check
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/all caps/i);
+  });
+
+  test("test_should_handle_mixed_script_heading_proper_case", () => {
+    // Mixed script with proper sentence case
+    const result = validateHeading("Using ドキュメント correctly", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_detect_improper_case_in_mixed_script", () => {
+    // Mixed script with improper capitalization in Latin part
+    const result = validateHeading("Using Wrong ドキュメント", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/should be lowercase/i);
   });
 });
 

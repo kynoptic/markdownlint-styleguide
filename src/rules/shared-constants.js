@@ -356,3 +356,31 @@ export const ampersandDefaultExceptions = [
   'S&P',
   'AT&T'
 ];
+
+/**
+ * Unicode regex patterns for internationalized text validation.
+ * These patterns use Unicode property escapes to support all scripts (Latin, Cyrillic, Greek, CJK, Arabic, etc.).
+ */
+
+/**
+ * Unicode letter regex using \p{L} property escape.
+ * Matches any letter character across all Unicode scripts.
+ * Use this instead of ASCII-only [a-zA-Z] for international text support.
+ * @type {RegExp}
+ */
+export const UNICODE_LETTER_REGEX = /\p{L}/u;
+
+/**
+ * Unicode uppercase letter regex using \p{Lu} property escape.
+ * Matches uppercase letters across all Unicode scripts (A-Z, À-Ö, Α-Ω, А-Я, etc.).
+ * Use this for case validation and acronym detection in internationalized content.
+ * @type {RegExp}
+ */
+export const UNICODE_UPPERCASE_REGEX = /\p{Lu}/u;
+
+/**
+ * Unicode uppercase word regex (word must contain only uppercase letters).
+ * Used for acronym detection across all Unicode scripts.
+ * @type {RegExp}
+ */
+export const UPPERCASE_WORD_REGEX = /^\p{Lu}+$/u;

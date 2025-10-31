@@ -8,6 +8,7 @@
  */
 
 import { isAcronym, preserveSegments } from '../shared-heuristics.js';
+import { UNICODE_LETTER_REGEX, UNICODE_UPPERCASE_REGEX } from '../shared-constants.js';
 
 /**
  * Strips emoji and symbol characters from the beginning of text.
@@ -79,7 +80,7 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
   }
 
   // Skip if no alphabetic characters (likely version numbers, etc.)
-  if (!/[a-zA-Z]/.test(textWithoutMarkup)) {
+  if (!UNICODE_LETTER_REGEX.test(textWithoutMarkup)) {
     return true;
   }
 
@@ -595,7 +596,7 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
 
         if (!allowedCapitalizedWords.includes(word)) {
           // Check for all-caps violations (but allow known acronyms from specialCasedTerms)
-          if (word === word.toUpperCase() && word.length > 1 && /[A-Z]/.test(word) && !expectedWordCasing) {
+          if (word === word.toUpperCase() && word.length > 1 && UNICODE_UPPERCASE_REGEX.test(word) && !expectedWordCasing) {
             return {
               isValid: false,
               errorMessage: `Word "${word}" in bold text should not be in all caps.`

@@ -2,20 +2,22 @@
 
 /**
  * Shared heuristics for markdownlint rules.
- * 
+ *
  * This module consolidates common detection and preservation logic used across multiple rules,
  * particularly sentence-case-heading and backtick-code-elements. This ensures consistent
  * behavior and reduces code duplication.
  */
 
+import { UPPERCASE_WORD_REGEX } from './shared-constants.js';
+
 /**
  * Determines if a word is a short acronym (≤4 characters, all uppercase letters).
  * This heuristic allows short acronyms like API, HTTP, JSON, GDPR to remain uppercase
  * in sentence case contexts.
- * 
+ *
  * @param {string} word - The word to check
  * @returns {boolean} True if the word is a valid short acronym
- * 
+ *
  * @example
  * isAcronym('HTTP') // true
  * isAcronym('I') // true (single letter)
@@ -23,6 +25,7 @@
  * isAcronym('Http') // false (mixed case)
  * isAcronym('API2') // false (contains numbers)
  */
+
 export function isAcronym(word) {
   if (!word || word.length === 0) {
     return false;
@@ -34,7 +37,7 @@ export function isAcronym(word) {
   }
   
   // Must be all uppercase letters (no numbers or mixed case)
-  return word === word.toUpperCase() && /^[A-Z]+$/.test(word);
+  return word === word.toUpperCase() && UPPERCASE_WORD_REGEX.test(word);
 }
 
 /**
