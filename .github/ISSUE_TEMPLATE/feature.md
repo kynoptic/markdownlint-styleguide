@@ -14,15 +14,15 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 
 ## Summary
 
-[One line overview.]
+<One line overview.>
 
 ## The problem
 
-[Why this matters to users or contributors.]
+<Why this matters to users or contributors.>
 
 ## Proposed solution
 
-[How we'll solve it (keep distinct from the problem).]
+<How we'll solve it (keep distinct from the problem).>
 
 ## Acceptance criteria (testable)
 
@@ -34,17 +34,17 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 
 <!--
 Follow test-first approach with meaningful behavioral tests
-Avoid vanity tests that only verify framework behavior or trivial operations
+Avoid vanity tests that only verify framework behavior or trivial getters/setters
 -->
 
 - **Unit tests**:
-- **Integration/e2e tests**:
+- **E2E tests**:
 - **Edge cases**:
 
 ## Links
 
 - **User stories**: `US-XXX`
-- **Adrs**: `ADR-XXX`
+- **ADRs**: `ADR-XXX`
 
 <!--
 Set these fields in GitHub's project interface after creating the issue

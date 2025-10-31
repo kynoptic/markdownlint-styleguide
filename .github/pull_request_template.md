@@ -17,13 +17,14 @@ Brief description of the changes and the problem being solved:
 
 ### Automated testing
 
-- [ ] Unit tests pass
-- [ ] Integration tests pass
-- [ ] Full test suite passes
-- [ ] All quality checks pass (linting, type checking, etc.)
+- [ ] Unit tests pass (`make unit`)
+- [ ] Integration tests pass (`make test-integration`)
+- [ ] Full test suite passes (`make test`)
+- [ ] All quality checks pass (`make full`)
 
 ### Manual testing
 
+- [ ] Full pipeline runs successfully (`ultimate-ranks run`)
 - [ ] Tested with representative data
 - [ ] Edge cases and error conditions verified
 - [ ] Performance impact assessed (if applicable)
@@ -35,7 +36,7 @@ Brief description of the changes and the problem being solved:
 - [ ] Tests follow behavioral naming (`test_should_X_when_Y`)
 - [ ] Tests focus on meaningful behavior, not implementation details
 
-## BREAKING Changes
+## Breaking changes
 
 - List any breaking changes to public APIs
 - Include migration steps or configuration changes needed
@@ -43,31 +44,38 @@ Brief description of the changes and the problem being solved:
 
 ## Performance and reliability
 
-- [ ] Memory usage impact considered
-- [ ] Retry patterns and error handling implemented where appropriate
+- [ ] Memory usage impact considered (especially for PHP memory limits)
+- [ ] Circuit breaker/retry patterns implemented where appropriate
 - [ ] Logging added for debugging and monitoring
 
 ## Code quality
 
-- [ ] Type annotations added for new code (if applicable to language)
-- [ ] Documentation added for public APIs
+- [ ] Type hints added for new code in covered modules
+- [ ] Docstrings added for public APIs
 - [ ] Error handling implemented with clear messages
 - [ ] Functions maintain single responsibility
-- [ ] Code quality hooks pass without modification
+- [ ] Pre-commit hooks pass without modification
 
 ## Documentation
 
-- [ ] Updated relevant documentation
-- [ ] Added/updated documentation for public APIs
+- [ ] Updated relevant documentation in `docs/`
+- [ ] Added/updated docstrings for public functions
 - [ ] Updated configuration examples if needed
 - [ ] Created or updated ADR for significant architectural decisions
-- [ ] Updated changelog if user-facing changes made
+- [ ] Updated API changelog if API changes made
+
+## QID resolution system (if applicable)
+
+- [ ] QID mappings updated in `config/data/qid/`
+- [ ] QID validation tests pass (`make qid-canonicalize-dryrun-strict`)
+- [ ] QID parity checks pass (`make check-qid-parity`)
+- [ ] Ambiguous name validation passes (`make validate-ambiguous-names`)
 
 ## Conventional commit compliance
 
 - [ ] PR title uses solution-oriented summary (not conventional commit format)
 - [ ] Individual commits follow conventional commit format: `<type>[scope]: <description>`
-- [ ] Scope indicates module/component affected
+- [ ] Scope indicates module/component affected (e.g., `cli`, `qid`, `pipeline`)
 - [ ] Semantic versioning impact: **PATCH** / **MINOR** / **MAJOR**
 
 ## Additional context
