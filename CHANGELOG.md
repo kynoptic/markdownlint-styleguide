@@ -9,6 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2025-11-06
+
+### Added
+
+- External validation system for testing rules against real-world repositories:
+  - New `npm run validate:external` command for validating rules against curated external markdown sources
+  - Configuration via `.markdownlint-trap-validation.jsonc` supporting local files, directories, and GitHub repositories
+  - JSON and Markdown report generation with autofix safety statistics
+  - Validation modules: config-loader, report-generator, source-processor
+- Autofix telemetry system for observability into safety heuristic performance:
+  - Structured decision tracking with confidence scores and heuristic contributions
+  - Telemetry capture, aggregation, and analysis capabilities
+  - Comprehensive test coverage (401 unit tests, 309 integration tests)
+- Enhanced acronym-compound detection in `sentence-case-heading` rule:
+  - Support for patterns like "YAML-based", "API-driven", "HTML/CSS-based", "SQL/NoSQL-hybrid"
+  - Validation for incorrect forms like "Yaml-based" with autofix suggestions
+- Ambiguous term handling to reduce false positives for words that could be proper nouns or common nouns (e.g., "go", "rust", "word")
+- Enhanced product name and timezone detection in shared constants:
+  - Timezone codes: UTC, GMT, EST, EDT, CST, CDT, MST, MDT, PST, PDT, AEST, AEDT, CET, CEST, JST, IST
+  - Product names: Auth0, Datadog, SendGrid, Pandoc, Microsoft Word
+  - Technology terms: NoSQL, OAuth
+
+### Changed
+
+- Improved `backtick-code-elements` rule accuracy with sentence boundary detection:
+  - Detects sentence starters to prevent false positives on patterns like "computer.New" at sentence boundaries
+  - Excludes time ranges (e.g., "AM-12:30", "3-10:30") from network address detection
+  - More conservative false positive reduction strategy
+
+### Fixed
+
+- Reduced false positives in `sentence-case-heading` for acronym-prefixed compounds
+- Eliminated false positives for ambiguous terms in product/technology contexts
+- Fixed incorrect flagging of valid sentence boundaries in `backtick-code-elements`
+
+---
+
 ## [2.1.0] - 2025-11-06
 
 ### Added
@@ -328,7 +365,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...v2.0.0
 [1.7.1]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.0...v1.7.1
