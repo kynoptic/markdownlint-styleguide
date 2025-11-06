@@ -377,6 +377,7 @@ This package includes five custom rules designed to improve documentation qualit
 - Architecture: `docs/architecture.md`
 - Testing: `docs/testing.md`
 - Performance: `docs/performance.md`
+- Autofix telemetry: `docs/telemetry.md` – Track and analyze safety heuristic performance
 
 ## Examples
 

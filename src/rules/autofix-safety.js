@@ -5,6 +5,8 @@
  * These utilities help reduce false positive corrections and make autofix more reliable.
  */
 
+import { getTelemetry } from './autofix-telemetry.js';
+
 /**
  * Set of command keywords for efficient lookup
  * @type {Set<string>}
@@ -184,13 +186,22 @@ const DEFAULT_SAFETY_CONFIG = {
 /**
  * Calculate confidence score for a sentence case autofix.
  * @param {string} original - Original text
- * @param {string} fixed - Fixed text  
+ * @param {string} fixed - Fixed text
  * @param {Object} context - Additional context
- * @returns {number} Confidence score between 0 and 1
+ * @returns {{ confidence: number, heuristics: Object }} Confidence score and heuristic breakdown
  */
 export function calculateSentenceCaseConfidence(original, fixed, context = {}) { // eslint-disable-line no-unused-vars
+  const heuristics = {
+    baseConfidence: 0.5,
+    firstWordCapitalization: 0,
+    caseChangesOnly: 0,
+    structuralChanges: 0,
+    manyWordsChanged: 0,
+    technicalTerms: 0
+  };
+
   if (!original || !fixed || original === fixed) {
-    return 0;
+    return { confidence: 0, heuristics };
   }
 
   let confidence = 0.5; // Base confidence: neutral starting point
@@ -201,8 +212,9 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
   if (words.length > 0) {
     const firstWord = words[0];
     const expectedFirstWord = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
-    
+
     if (fixed.startsWith(expectedFirstWord)) {
+      heuristics.firstWordCapitalization = 0.3;
       confidence += 0.3; // Strong indicator of correct sentence case fix
     }
   }
@@ -210,6 +222,7 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
   // +0.2: Moderate confidence boost if only case changes (no word additions/removals)
   // Purely case-based changes are safer than structural changes
   if (original.toLowerCase() === fixed.toLowerCase()) {
+    heuristics.caseChangesOnly = 0.2;
     confidence += 0.2; // Safe transformation - only case changes
   }
 
@@ -217,8 +230,9 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
   // Word count changes indicate more complex transformations that could be wrong
   const originalWords = original.split(/\s+/);
   const fixedWords = fixed.split(/\s+/);
-  
+
   if (originalWords.length !== fixedWords.length) {
+    heuristics.structuralChanges = -0.2;
     confidence -= 0.2; // Structural changes are riskier
   }
 
@@ -230,21 +244,25 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
       changedWords++;
     }
   }
-  
+
   if (changedWords > originalWords.length * 0.5) {
+    heuristics.manyWordsChanged = -0.3;
     confidence -= 0.3; // Heavy penalty for extensive changes (likely over-correction)
   }
 
   // +0.1 per technical term (max +0.3): Slight confidence boost for technical content
   // Technical content often has specific capitalization rules that should be preserved
   const technicalTermPattern = /\b(API|URL|HTML|CSS|JSON|XML|HTTP|HTTPS|SDK|CLI|GUI|UI|UX|SQL|NoSQL|REST|GraphQL|JWT|OAuth|CSRF|XSS|CORS|DNS|CDN|VPN|SSL|TLS|SSH|FTP|SMTP|POP|IMAP|TCP|UDP|IP|IPv4|IPv6|MAC|VLAN|LAN|WAN|WiFi|Bluetooth|USB|HDMI|GPU|CPU|RAM|SSD|HDD|OS|iOS|Android|Windows|Linux|macOS|Unix|AWS|Azure|GCP|Docker|Kubernetes|Git|GitHub|GitLab|npm|yarn|pip|conda|Maven|Gradle|Webpack|Rollup|Vite|React|Vue|Angular|Next|Nuxt|Express|Django|Flask|Rails|Laravel|Spring|Hibernate|MongoDB|PostgreSQL|MySQL|Redis|Elasticsearch|Kafka|RabbitMQ|Jenkins|CircleCI|GitHub Actions|Travis|Azure DevOps|Terraform|Ansible|Puppet|Chef|Vagrant|VMware|VirtualBox|Hyper-V|KVM|Xen|Node\.js|Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Swift|Kotlin|Scala|Ruby|PHP|Perl|R|MATLAB|Stata|SAS|SPSS|Tableau|PowerBI|Excel|Word|PowerPoint|Outlook|Teams|Slack|Discord|Zoom|WebEx|Skype|WhatsApp|Telegram|Signal|Firefox|Chrome|Safari|Edge|Opera|Brave|Tor|VPN|Proxy|Firewall|Antivirus|Malware|Ransomware|Phishing|Spear-phishing|Social engineering|Two-factor authentication|Multi-factor authentication|Single sign-on|Identity and access management|Role-based access control|Attribute-based access control|Discretionary access control|Mandatory access control|Bell-LaPadula|Biba|Clark-Wilson|Chinese Wall|Take-Grant|HRU|RBAC|ABAC|DAC|MAC|BLP|Biba|CW|TG|HRU)\b/gi;
-  
+
   const technicalMatches = (original.match(technicalTermPattern) || []).length;
   if (technicalMatches > 0) {
-    confidence += 0.1 * Math.min(technicalMatches, 3); // Small boost per technical term, capped at 3
+    const boost = 0.1 * Math.min(technicalMatches, 3);
+    heuristics.technicalTerms = boost;
+    confidence += boost; // Small boost per technical term, capped at 3
   }
 
-  return Math.max(0, Math.min(1, confidence));
+  const finalConfidence = Math.max(0, Math.min(1, confidence));
+  return { confidence: finalConfidence, heuristics };
 }
 
 /**
@@ -363,23 +381,42 @@ function getContextAdjustment(text, context) {
  * Calculate confidence score for a backtick autofix.
  * @param {string} original - Original text to be wrapped
  * @param {Object} context - Additional context
- * @returns {number} Confidence score between 0 and 1
+ * @returns {{ confidence: number, heuristics: Object }} Confidence score and heuristic breakdown
  */
 export function calculateBacktickConfidence(original, context = {}) {
+  const heuristics = {
+    baseConfidence: 0.5,
+    filePathPattern: 0,
+    commandPattern: 0,
+    naturalLanguagePenalty: 0,
+    contextAdjustment: 0
+  };
+
   if (!original) {
-    return 0;
+    return { confidence: 0, heuristics };
   }
 
   let confidence = 0.5; // Base confidence: neutral starting point
 
   // Apply various confidence adjustments
-  confidence += getFilePathConfidence(original);
-  confidence += getCommandConfidence(original);
-  confidence -= getNaturalLanguagePenalty(original);
-  confidence += getContextAdjustment(original, context);
+  const filePathBoost = getFilePathConfidence(original);
+  heuristics.filePathPattern = filePathBoost;
+  confidence += filePathBoost;
 
+  const commandBoost = getCommandConfidence(original);
+  heuristics.commandPattern = commandBoost;
+  confidence += commandBoost;
 
-  return Math.max(0, Math.min(1, confidence));
+  const naturalPenalty = getNaturalLanguagePenalty(original);
+  heuristics.naturalLanguagePenalty = -naturalPenalty;
+  confidence -= naturalPenalty;
+
+  const contextAdj = getContextAdjustment(original, context);
+  heuristics.contextAdjustment = contextAdj;
+  confidence += contextAdj;
+
+  const finalConfidence = Math.max(0, Math.min(1, confidence));
+  return { confidence: finalConfidence, heuristics };
 }
 
 /**
@@ -479,33 +516,46 @@ export function analyzeCodeVsNaturalLanguage(text, context = {}) {
  */
 export function shouldApplyAutofix(ruleType, original, fixed = '', context = {}, config = DEFAULT_SAFETY_CONFIG) {
   if (!config.enabled) {
-    return { safe: true, confidence: 1.0, reason: 'Safety checks disabled' };
+    return {
+      safe: true,
+      confidence: 1.0,
+      reason: 'Safety checks disabled',
+      heuristics: {}
+    };
   }
 
   let confidence = 0;
+  let heuristics = {};
   let reason = '';
 
   switch (ruleType) {
-    case 'sentence-case':
-      confidence = calculateSentenceCaseConfidence(original, fixed, context);
-      reason = `Sentence case confidence: ${confidence.toFixed(2)}`;
+    case 'sentence-case': {
+      const result = calculateSentenceCaseConfidence(original, fixed, context);
+      confidence = result.confidence;
+      heuristics = result.heuristics;
+      reason = 'Sentence case confidence: ' + confidence.toFixed(2);
       break;
-      
-    case 'backtick':
-      confidence = calculateBacktickConfidence(original, context);
-      reason = `Backtick confidence: ${confidence.toFixed(2)}`;
+    }
+
+    case 'backtick': {
+      const result = calculateBacktickConfidence(original, context);
+      confidence = result.confidence;
+      heuristics = result.heuristics;
+      reason = 'Backtick confidence: ' + confidence.toFixed(2);
       break;
-      
+    }
+
     default:
       confidence = 0.5;
       reason = 'Unknown rule type';
   }
 
   const safe = confidence >= config.confidenceThreshold;
-  
+
   return {
     safe,
     confidence,
+    heuristics,
     reason,
     requiresReview: config.requireManualReview && !safe
   };
@@ -528,18 +578,49 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
 
   // Use the existing safety check system for all rules
   const safetyCheck = shouldApplyAutofix(ruleType, original, fixed, context, config);
-  
+
   // For backtick rules, also run the advanced analysis for additional insights
   let advancedAnalysis = null;
   if (ruleType === 'backtick') {
     advancedAnalysis = analyzeCodeVsNaturalLanguage(original, context);
-    
+
     // If the advanced analysis strongly indicates this is NOT code, override the decision
     if (advancedAnalysis.confidence < 0.3) {
+      // Record telemetry for skipped fix
+      const telemetry = getTelemetry();
+      telemetry.recordDecision({
+        rule: ruleType,
+        original,
+        fixed,
+        confidence: advancedAnalysis.confidence,
+        applied: false,
+        reason: 'Advanced analysis indicates not code (confidence < 0.3)',
+        heuristics: safetyCheck.heuristics,
+        file: context.file,
+        line: context.line
+      });
+
       return null;
     }
   }
-  
+
+  // Determine if fix will be applied
+  const applied = safetyCheck.safe;
+
+  // Record telemetry
+  const telemetry = getTelemetry();
+  telemetry.recordDecision({
+    rule: ruleType,
+    original,
+    fixed,
+    confidence: safetyCheck.confidence,
+    applied,
+    reason: !applied ? safetyCheck.reason + ' (confidence < ' + config.confidenceThreshold + ')' : undefined,
+    heuristics: safetyCheck.heuristics,
+    file: context.file,
+    line: context.line
+  });
+
   if (!safetyCheck.safe) {
     // Return null to disable autofix for unsafe changes
     return null;

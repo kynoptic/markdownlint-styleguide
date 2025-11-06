@@ -253,13 +253,13 @@ describe('createSafeFixInfo', () => {
 describe('calculateSentenceCaseConfidence', () => {
   describe('when_no_changes_are_made', () => {
     test('should_return_zero_confidence_for_identical_text', () => {
-      const confidence = calculateSentenceCaseConfidence('Test', 'Test', {});
+      const { confidence } = calculateSentenceCaseConfidence('Test', 'Test', {});
 
       expect(confidence).toBe(0);
     });
 
     test('should_return_zero_confidence_for_empty_input', () => {
-      const confidence = calculateSentenceCaseConfidence('', '', {});
+      const { confidence } = calculateSentenceCaseConfidence('', '', {});
 
       expect(confidence).toBe(0);
     });
@@ -267,13 +267,13 @@ describe('calculateSentenceCaseConfidence', () => {
 
   describe('when_first_word_capitalization_changes', () => {
     test('should_return_high_confidence_for_simple_first_word_fix', () => {
-      const confidence = calculateSentenceCaseConfidence('hello world', 'Hello world', {});
+      const { confidence } = calculateSentenceCaseConfidence('hello world', 'Hello world', {});
 
       expect(confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     test('should_return_high_confidence_when_only_case_changes', () => {
-      const confidence = calculateSentenceCaseConfidence('HELLO WORLD', 'Hello world', {});
+      const { confidence } = calculateSentenceCaseConfidence('HELLO WORLD', 'Hello world', {});
 
       // Base (0.5) + first word (0.3) + only case (0.2) = 1.0
       expect(confidence).toBeGreaterThanOrEqual(0.9);
@@ -282,13 +282,13 @@ describe('calculateSentenceCaseConfidence', () => {
 
   describe('when_structural_changes_occur', () => {
     test('should_reduce_confidence_when_word_count_changes', () => {
-      const confidence = calculateSentenceCaseConfidence('hello world', 'Hello', {});
+      const { confidence } = calculateSentenceCaseConfidence('hello world', 'Hello', {});
 
       expect(confidence).toBeLessThan(0.7);
     });
 
     test('should_reduce_confidence_when_many_words_change', () => {
-      const confidence = calculateSentenceCaseConfidence(
+      const { confidence } = calculateSentenceCaseConfidence(
         'foo bar baz qux quux',
         'Different words entirely here',
         {}
@@ -302,8 +302,8 @@ describe('calculateSentenceCaseConfidence', () => {
     test('should_boost_confidence_for_API_and_technical_terms', () => {
       // Test with actual changes to trigger confidence calculation
       // Compare same type of change with and without technical terms
-      const withTechnical = calculateSentenceCaseConfidence('api documentation guide', 'Api documentation guide', {});
-      const withoutTechnical = calculateSentenceCaseConfidence('simple text guide', 'Simple text guide', {});
+      const { confidence: withTechnical } = calculateSentenceCaseConfidence('api documentation guide', 'Api documentation guide', {});
+      const { confidence: withoutTechnical } = calculateSentenceCaseConfidence('simple text guide', 'Simple text guide', {});
 
       // Both should have positive confidence
       expect(withTechnical).toBeGreaterThan(0);
@@ -318,14 +318,14 @@ describe('calculateSentenceCaseConfidence', () => {
   describe('when_boundary_conditions_are_tested', () => {
     test('should_cap_confidence_at_1.0', () => {
       // Even with all positive signals, confidence shouldn't exceed 1.0
-      const confidence = calculateSentenceCaseConfidence('api url', 'API URL', {});
+      const { confidence } = calculateSentenceCaseConfidence('api url', 'API URL', {});
 
       expect(confidence).toBeLessThanOrEqual(1.0);
     });
 
     test('should_floor_confidence_at_0.0', () => {
       // Even with all negative signals, confidence shouldn't go below 0.0
-      const confidence = calculateSentenceCaseConfidence(
+      const { confidence } = calculateSentenceCaseConfidence(
         'word word word word word',
         'Entirely different sentence structure here',
         {}
@@ -339,7 +339,7 @@ describe('calculateSentenceCaseConfidence', () => {
 describe('calculateBacktickConfidence', () => {
   describe('when_text_is_empty', () => {
     test('should_return_zero_confidence', () => {
-      const confidence = calculateBacktickConfidence('', {});
+      const { confidence } = calculateBacktickConfidence('', {});
 
       expect(confidence).toBe(0);
     });
@@ -347,19 +347,19 @@ describe('calculateBacktickConfidence', () => {
 
   describe('when_text_is_a_file_path', () => {
     test('should_return_high_confidence_for_path_with_extension', () => {
-      const confidence = calculateBacktickConfidence('src/utils/helper.js', {});
+      const { confidence } = calculateBacktickConfidence('src/utils/helper.js', {});
 
       expect(confidence).toBeGreaterThanOrEqual(0.8);
     });
 
     test('should_return_moderate_confidence_for_multi_segment_path', () => {
-      const confidence = calculateBacktickConfidence('docs/guides/tutorial', {});
+      const { confidence } = calculateBacktickConfidence('docs/guides/tutorial', {});
 
       expect(confidence).toBeGreaterThan(0.5);
     });
 
     test('should_return_low_confidence_for_simple_slash', () => {
-      const confidence = calculateBacktickConfidence('and/or', {});
+      const { confidence } = calculateBacktickConfidence('and/or', {});
 
       // This could be natural language, not a path
       expect(confidence).toBeLessThan(0.7);
@@ -368,19 +368,19 @@ describe('calculateBacktickConfidence', () => {
 
   describe('when_text_is_a_command', () => {
     test('should_return_high_confidence_for_npm_command', () => {
-      const confidence = calculateBacktickConfidence('npm install', {});
+      const { confidence } = calculateBacktickConfidence('npm install', {});
 
       expect(confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     test('should_return_high_confidence_for_git_command', () => {
-      const confidence = calculateBacktickConfidence('git status', {});
+      const { confidence } = calculateBacktickConfidence('git status', {});
 
       expect(confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     test('should_return_high_confidence_for_standalone_filename', () => {
-      const confidence = calculateBacktickConfidence('package.json', {});
+      const { confidence } = calculateBacktickConfidence('package.json', {});
 
       expect(confidence).toBeGreaterThanOrEqual(0.7);
     });
@@ -388,19 +388,19 @@ describe('calculateBacktickConfidence', () => {
 
   describe('when_text_is_natural_language', () => {
     test('should_return_very_low_confidence_for_common_word', () => {
-      const confidence = calculateBacktickConfidence('the', {});
+      const { confidence } = calculateBacktickConfidence('the', {});
 
       expect(confidence).toBeLessThan(0.3);
     });
 
     test('should_return_low_confidence_for_short_word', () => {
-      const confidence = calculateBacktickConfidence('is', {});
+      const { confidence } = calculateBacktickConfidence('is', {});
 
       expect(confidence).toBeLessThan(0.4);
     });
 
     test('should_return_low_confidence_for_natural_phrase', () => {
-      const confidence = calculateBacktickConfidence('on/off', {});
+      const { confidence } = calculateBacktickConfidence('on/off', {});
 
       expect(confidence).toBeLessThan(0.3);
     });
@@ -408,20 +408,20 @@ describe('calculateBacktickConfidence', () => {
 
   describe('when_context_provides_technical_indicators', () => {
     test('should_boost_confidence_with_technical_context', () => {
-      const withContext = calculateBacktickConfidence('config', {
+      const { confidence: withContext } = calculateBacktickConfidence('config', {
         line: 'Run the install command to setup config'
       });
-      const withoutContext = calculateBacktickConfidence('config', {});
+      const { confidence: withoutContext } = calculateBacktickConfidence('config', {});
 
       expect(withContext).toBeGreaterThan(withoutContext);
     });
 
     test('should_reduce_confidence_with_natural_language_context', () => {
       // Use a term that benefits more clearly from context
-      const withContext = calculateBacktickConfidence('install', {
+      const { confidence: withContext } = calculateBacktickConfidence('install', {
         line: 'I think we should install the package'
       });
-      const withoutContext = calculateBacktickConfidence('install', {
+      const { confidence: withoutContext } = calculateBacktickConfidence('install', {
         line: 'Run the install command'
       });
 
@@ -432,7 +432,7 @@ describe('calculateBacktickConfidence', () => {
 
   describe('when_boundary_conditions_are_tested', () => {
     test('should_cap_confidence_at_1.0', () => {
-      const confidence = calculateBacktickConfidence('src/index.js', {
+      const { confidence } = calculateBacktickConfidence('src/index.js', {
         line: 'Execute the command npm install'
       });
 
@@ -440,7 +440,7 @@ describe('calculateBacktickConfidence', () => {
     });
 
     test('should_floor_confidence_at_0.0', () => {
-      const confidence = calculateBacktickConfidence('a', {
+      const { confidence } = calculateBacktickConfidence('a', {
         line: 'This is a simple sentence'
       });
 
