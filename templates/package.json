@@ -1,0 +1,14 @@
+{
+  "name": "PLACEHOLDER_PROJECT_NAME",
+  "version": "1.0.0",
+  "description": "Markdown documentation project with linting",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
+    "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\""
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.18.1",
+    "markdownlint-trap": "file:../markdownlint-trap"
+  }
+}

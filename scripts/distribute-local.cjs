@@ -120,6 +120,14 @@ function expandWildcardPath(pattern, repoRoot) {
   return expanded;
 }
 
+function customizePackageJson(templateContent, destPath) {
+  // Extract project name from destination path
+  const projectName = path.basename(path.dirname(destPath));
+
+  // Replace placeholder with actual project name
+  return templateContent.replace(/"name": "PLACEHOLDER_PROJECT_NAME"/, `"name": "${projectName}"`);
+}
+
 function mergeJsonSettings(existingPath, newContent) {
   if (!fs.existsSync(existingPath)) {
     return newContent;
@@ -303,6 +311,7 @@ function main() {
         const cleanDest = t.cleanDest ?? cfg.defaults.cleanDest ?? false;
         const merge = t.merge ?? false;
         const createDirs = t.createDirs ?? cfg.defaults.createDirs ?? false;
+        const skipIfExists = t.skipIfExists ?? false;
 
         log(`Target '${t.name || 'unnamed'}':`);
         log(`  Source: ${src}`);
@@ -310,6 +319,7 @@ function main() {
         log(`  Merge: ${merge}`);
         log(`  Clean: ${cleanDest}`);
         log(`  Create dirs: ${createDirs}`);
+        if (skipIfExists) log(`  Skip if exists: true`);
         
         const srcContent = fs.readFileSync(src, 'utf8');
 
@@ -319,10 +329,16 @@ function main() {
             destPath = path.join(require('os').homedir(), destPath.slice(2));
           }
           const dest = path.isAbsolute(destPath) ? destPath : path.join(repoRoot, destPath);
-          
+
           log(`  -> ${dest}`);
 
-          if (dryRun) { 
+          // Skip if file already exists and skipIfExists is true
+          if (skipIfExists && fs.existsSync(dest)) {
+            log('     [skip] File already exists');
+            continue;
+          }
+
+          if (dryRun) {
             log('     [dry-run] Would copy file');
             continue;
           }
@@ -345,9 +361,11 @@ function main() {
             }
           }
 
-          // Prepare content (merge if needed)
+          // Prepare content (merge if needed or customize package.json)
           let finalContent = srcContent;
-          if (merge && dest.endsWith('.json')) {
+          if (dest.endsWith('package.json') && srcContent.includes('PLACEHOLDER_PROJECT_NAME')) {
+            finalContent = customizePackageJson(srcContent, dest);
+          } else if (merge && dest.endsWith('.json')) {
             finalContent = mergeJsonSettings(dest, srcContent);
           }
 
@@ -427,34 +445,31 @@ function main() {
             continue;
           }
 
-          // Check if already installed
-          try {
-            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-            const devDeps = packageJson.devDependencies || {};
-            const allInstalled = packages.every(pkg => pkg in devDeps);
+          // Check if node_modules already exists and has the packages
+          const nodeModulesPath = path.join(projectDir, 'node_modules');
+          let needsInstall = !fs.existsSync(nodeModulesPath);
 
-            if (allInstalled) {
-              log(`[skip] ${projectName} (already installed)`);
-              skippedCount++;
-              continue;
+          if (!needsInstall) {
+            // Check if the required packages exist in node_modules
+            for (const pkg of packages) {
+              const pkgPath = path.join(nodeModulesPath, pkg);
+              if (!fs.existsSync(pkgPath)) {
+                needsInstall = true;
+                break;
+              }
             }
-          } catch (e) {
-            log(`[skip] ${projectName} (invalid package.json)`);
+          }
+
+          if (!needsInstall) {
+            log(`[skip] ${projectName} (already installed)`);
             skippedCount++;
             continue;
           }
 
-          // Install packages
+          // Install packages from package.json
           try {
             log(`[installing] ${projectName}...`);
-            // Validate package names to prevent command injection
-            const validPackagePattern = /^[@a-z0-9-~][a-z0-9-._~]*$/i;
-            for (const pkg of packages) {
-              if (!validPackagePattern.test(pkg)) {
-                throw new Error(`Invalid package name: ${pkg}`);
-              }
-            }
-            execSync(`npm install --save-dev ${packages.join(' ')}`, {
+            execSync('npm install', {
               cwd: projectDir,
               stdio: 'pipe'
             });

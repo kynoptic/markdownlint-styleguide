@@ -96,6 +96,24 @@ targets:
       # - ~/Projects/api-docs/.markdownlint-cli2.jsonc
     cleanDest: false
 
+  # --------------------------------------
+  # package.json Bootstrap
+  # --------------------------------------
+  # Creates minimal package.json for projects that don't have one
+  # This enables VS Code extension integration (requires node_modules/)
+  # IMPORTANT: Only copies if package.json doesn't already exist
+
+  - name: package-json-bootstrap
+    enabled: true
+    type: local
+    src: templates/package.json
+    dest:
+      - ~/Projects/*/package.json  # All projects
+    merge: false
+    cleanDest: false
+    createDirs: false
+    skipIfExists: true  # Don't overwrite existing package.json files
+
 # --------------------------------------
 # Global Installation
 # --------------------------------------
@@ -118,10 +136,10 @@ globalInstall:
 # - Multiple directories: [~/Projects/*, ~/Work/*]
 # - Specific projects: [~/Code/project-a, ~/Code/project-b]
 npmInstall:
-  enabled: false  # Disabled: use globalInstall instead for local development
+  enabled: true  # Enabled to create node_modules/ for VS Code integration
   packages:
-    - markdownlint-trap
     - markdownlint-cli2
+    - markdownlint-trap
   projectDirs:
     - ~/Projects/*  # Default assumes this structure - customize as needed
 

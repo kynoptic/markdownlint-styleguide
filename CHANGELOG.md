@@ -7,9 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Automated `package.json` bootstrapping for projects without Node.js setup:
+  - Distribution script now creates minimal `package.json` with lint scripts and dependencies
+  - Automatically runs `npm install` to create `node_modules/` for VS Code extension integration
+  - Uses `skipIfExists` flag to preserve existing `package.json` files
+  - Customizes project name based on directory name
+- Enhanced distribution script with `skipIfExists` option for safer file distribution
+
 ### Changed
 
 - Improved `sentence-case-heading` rule handling for emoji-prefixed headings with accented, CJK, and other extended Unicode scripts to better support internationalized content.
+- Distribution now enables VS Code extension integration automatically by creating local `node_modules/` symlinks
 
 ---
 
