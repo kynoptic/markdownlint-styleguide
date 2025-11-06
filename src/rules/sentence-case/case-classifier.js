@@ -222,6 +222,32 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
         };
       }
     } else {
+      // Check for acronym-prefixed compounds (e.g., "YAML-based", "API-driven", "HTML/CSS-based", "SQL/NoSQL-hybrid")
+      // Pattern: ALL_CAPS acronym (2-4 letters, no lowercase) optionally with slash-separated acronyms, then hyphen and lowercase
+      // Special case: allows mixed-case after slash like "SQL/NoSQL" but NOT at the start like "Well-known"
+      const acronymPrefixMatch = /^([A-Z]{2,4}(?:\/[A-Z][a-z]+)?(?:\/[A-Z]{2,})*)(-[a-z].*)$/.exec(firstWord);
+      if (acronymPrefixMatch) {
+        // This is the correct form (e.g., "YAML-based", "HTML/CSS-based", "SQL/NoSQL-hybrid") - allow it
+        return { isValid: true };
+      }
+
+      // Check for incorrect acronym-prefix forms (e.g., "Yaml-based", "Api-driven", "Json-based")
+      // Only flag if it looks like a misspelled acronym (short, matches common patterns)
+      const incorrectAcronymMatch = /^([A-Z][a-z]{1,3})(-[a-z].*)$/.exec(firstWord);
+      if (incorrectAcronymMatch) {
+        const possibleAcronym = incorrectAcronymMatch[1].toUpperCase();
+        // Only flag if the uppercase version would be a valid acronym (2-4 chars)
+        // AND it doesn't look like a normal word (exclude common words like "Well", "Over", "Under", etc.)
+        const commonHyphenatedPrefixes = ['well', 'over', 'under', 'self', 'non', 'pre', 'post', 'anti', 'pro', 'co'];
+        if (possibleAcronym.length >= 2 && possibleAcronym.length <= 4 &&
+            !commonHyphenatedPrefixes.includes(possibleAcronym.toLowerCase())) {
+          return {
+            isValid: false,
+            errorMessage: `First word "${firstWord}" should be "${possibleAcronym}${incorrectAcronymMatch[2]}".`
+          };
+        }
+      }
+
       // Regular sentence case
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
@@ -314,6 +340,14 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
 
     // Check hyphenated words
     if (word.includes('-')) {
+      // Check if this is an acronym-prefixed compound (e.g., "YAML-based", "API-driven", "HTML/CSS-based", "SQL/NoSQL-hybrid")
+      // Pattern: ALL_CAPS acronym (2-4 letters, no lowercase) optionally with slash-separated acronyms, then hyphen and lowercase
+      const acronymPrefixMatch = /^([A-Z]{2,4}(?:\/[A-Z][a-z]+)?(?:\/[A-Z]{2,})*)(-[a-z].*)$/.exec(word);
+      if (acronymPrefixMatch) {
+        // This is valid - acronym prefix with lowercase suffix
+        continue;
+      }
+
       const parts = word.split('-');
       if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
         return {
