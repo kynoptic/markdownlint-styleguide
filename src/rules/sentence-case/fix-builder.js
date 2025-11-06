@@ -58,6 +58,15 @@ export function toSentenceCase(text, specialCasedTerms) {
 
     if (!firstVisibleWordCased) {
       firstVisibleWordCased = true;
+
+      // Check for acronym-prefixed compounds (e.g., "YAML-based", "API-driven")
+      // Pattern: ALL_CAPS followed by hyphen and lowercase word
+      const acronymPrefixMatch = /^([A-Z]{2,})(-[a-z].*)$/.exec(w);
+      if (acronymPrefixMatch) {
+        // Preserve the acronym prefix, lowercase the rest
+        return acronymPrefixMatch[1] + acronymPrefixMatch[2];
+      }
+
       return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
     }
 

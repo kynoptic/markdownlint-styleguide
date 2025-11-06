@@ -137,7 +137,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
       console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
     }
-    const validationResult = (0, _caseClassifier.validateBoldText)(boldText, specialCasedTerms);
+    const validationResult = (0, _caseClassifier.validateBoldText)(boldText, specialCasedTerms, _sharedConstants.ambiguousTerms);
     if (!validationResult.isValid) {
       reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine);
     }
@@ -155,7 +155,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
-    const validationResult = (0, _caseClassifier.validateHeading)(headingText, specialCasedTerms);
+    const validationResult = (0, _caseClassifier.validateHeading)(headingText, specialCasedTerms, _sharedConstants.ambiguousTerms);
     if (!validationResult.isValid) {
       // Use cleanedText (emoji stripped) for error context to match original behavior
       const contextText = validationResult.cleanedText || headingText;

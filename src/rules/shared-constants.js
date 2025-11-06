@@ -62,6 +62,24 @@ export const casingTerms = {
   vr: 'VR',
   xml: 'XML',
 
+  // Timezone codes (always uppercase)
+  utc: 'UTC',
+  gmt: 'GMT',
+  est: 'EST',
+  edt: 'EDT',
+  cst: 'CST',
+  cdt: 'CDT',
+  mst: 'MST',
+  mdt: 'MDT',
+  pst: 'PST',
+  pdt: 'PDT',
+  aest: 'AEST',
+  aedt: 'AEDT',
+  cet: 'CET',
+  cest: 'CEST',
+  jst: 'JST',
+  ist: 'IST',
+
   // Programming Languages & Frameworks
   angular: 'Angular',
   astro: 'Astro',
@@ -70,8 +88,6 @@ export const casingTerms = {
   deno: 'Deno',
   eslint: 'ESLint',
   fastapi: 'FastAPI',
-  go: 'Go',
-  java: 'Java',
   javascript: 'JavaScript',
   jest: 'Jest',
   jsdoc: 'JSDoc',
@@ -82,18 +98,13 @@ export const casingTerms = {
   nuxt: 'Nuxt',
   php: 'PHP',
   pytest: 'pytest',
-  python: 'Python',
   'react.js': 'React.js',
   react: 'React',
   remix: 'Remix',
-  ruby: 'Ruby',
-  rust: 'Rust',
-  scala: 'Scala',
   solidjs: 'SolidJS',
   'solid.js': 'SolidJS',
   svelte: 'Svelte',
   sveltekit: 'SvelteKit',
-  swift: 'Swift',
   typescript: 'TypeScript',
   vite: 'Vite',
   vue: 'Vue',
@@ -194,9 +205,11 @@ export const casingTerms = {
   stripe: 'Stripe',
   swagger: 'Swagger',
   openapi: 'OpenAPI',
+  pandoc: 'Pandoc',
   tensorflow: 'TensorFlow',
   terraform: 'Terraform',
   twilio: 'Twilio',
+  'microsoft word': 'Microsoft Word',
   ubuntu: 'Ubuntu',
   'user experience': 'User experience',
   'user interface': 'User Interface',
@@ -223,11 +236,6 @@ export const casingTerms = {
   andes: 'Andes',
   mit: 'MIT',
 
-  // SemVer terminology (must be all-caps per convention)
-  patch: 'PATCH',
-  minor: 'MINOR',
-  major: 'MAJOR',
-
   // GitHub Markdown Alerts (must be all-caps per spec)
   note: 'NOTE',
   tip: 'TIP',
@@ -237,6 +245,72 @@ export const casingTerms = {
 
   // Common technical terms
   semver: 'SemVer',
+};
+
+/**
+ * Ambiguous terms that could be either common words or proper nouns/technical terms.
+ * These terms are flagged for manual review but NOT autofixed to avoid incorrect changes.
+ *
+ * Each entry maps: lowercase term → { properForm: 'Capitalized', reason: 'explanation' }
+ *
+ * Examples of ambiguity:
+ * - "word" - could be common noun OR Microsoft Word
+ * - "go" - could be verb OR Go programming language
+ * - "swift" - could be adjective OR Swift programming language
+ * - "rust" - could be noun OR Rust programming language
+ * - "major"/"minor" - could be adjectives OR SemVer terminology
+ *
+ * @type {Record<string, { properForm: string, reason: string }>}
+ */
+export const ambiguousTerms = {
+  word: {
+    properForm: 'Word',
+    reason: 'Could be common noun "word" OR Microsoft Word (the software)'
+  },
+  go: {
+    properForm: 'Go',
+    reason: 'Could be verb "go" OR Go programming language'
+  },
+  swift: {
+    properForm: 'Swift',
+    reason: 'Could be adjective "swift" OR Swift programming language'
+  },
+  rust: {
+    properForm: 'Rust',
+    reason: 'Could be noun "rust" OR Rust programming language'
+  },
+  ruby: {
+    properForm: 'Ruby',
+    reason: 'Could be gemstone "ruby" OR Ruby programming language'
+  },
+  python: {
+    properForm: 'Python',
+    reason: 'Could be snake "python" OR Python programming language'
+  },
+  java: {
+    properForm: 'Java',
+    reason: 'Could be island/coffee "java" OR Java programming language'
+  },
+  scala: {
+    properForm: 'Scala',
+    reason: 'Could be Italian word "scala" OR Scala programming language'
+  },
+  dart: {
+    properForm: 'Dart',
+    reason: 'Could be noun "dart" OR Dart programming language'
+  },
+  patch: {
+    properForm: 'PATCH',
+    reason: 'Could be verb/noun "patch" OR SemVer PATCH version'
+  },
+  minor: {
+    properForm: 'MINOR',
+    reason: 'Could be adjective "minor" OR SemVer MINOR version'
+  },
+  major: {
+    properForm: 'MAJOR',
+    reason: 'Could be adjective "major" OR SemVer MAJOR version'
+  },
 };
 
 /**

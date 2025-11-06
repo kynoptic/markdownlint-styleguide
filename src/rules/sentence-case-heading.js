@@ -18,7 +18,7 @@
  * }
  */
 
-import { casingTerms as defaultCasingTerms } from './shared-constants.js';
+import { casingTerms as defaultCasingTerms, ambiguousTerms } from './shared-constants.js';
 import {
   validateStringArray,
   validateConfig,
@@ -152,7 +152,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
     }
 
-    const validationResult = validateBoldText(boldText, specialCasedTerms);
+    const validationResult = validateBoldText(boldText, specialCasedTerms, ambiguousTerms);
 
     if (!validationResult.isValid) {
       reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine);
@@ -172,7 +172,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
 
-    const validationResult = validateHeading(headingText, specialCasedTerms);
+    const validationResult = validateHeading(headingText, specialCasedTerms, ambiguousTerms);
 
     if (!validationResult.isValid) {
       // Use cleanedText (emoji stripped) for error context to match original behavior

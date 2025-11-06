@@ -275,8 +275,9 @@ function noDeadInternalLinks(params, onError) {
           continue;
         }
 
-        // Skip template placeholders if configured (e.g., adr-XXX-title.md, TODO.md, PLACEHOLDER.md)
-        if (allowPlaceholders && /(?:XXX|TODO|PLACEHOLDER)/i.test(filePath)) {
+        // Skip template placeholders if configured (e.g., adr-XXX-title.md, TODO.md, PLACEHOLDER.md, URL, link)
+        // Common placeholder patterns: URL, PLACEHOLDER, TODO, XXX, link, path/to/
+        if (allowPlaceholders && /(?:^URL$|^link$|^path\/to\/|XXX|TODO|PLACEHOLDER)/i.test(filePath)) {
           continue;
         }
 

@@ -145,16 +145,19 @@ async function main() {
   const outputDir = reporting.outputDir || 'validation-reports';
   fs.mkdirSync(outputDir, { recursive: true });
 
+  // Generate timestamp for filenames (format: 2025-11-06T15-26-59)
+  const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
+
   const formats = reporting.format || ['json'];
   for (const format of formats) {
     if (format === 'json') {
       const jsonReport = generateReport(results);
-      const jsonPath = path.join(outputDir, 'validation-report.json');
+      const jsonPath = path.join(outputDir, `validation-report-${timestamp}.json`);
       fs.writeFileSync(jsonPath, JSON.stringify(jsonReport, null, 2));
       console.log('\nJSON report written to:', jsonPath);
     } else if (format === 'markdown') {
       const mdReport = generateMarkdownReport(results);
-      const mdPath = path.join(outputDir, 'validation-report.md');
+      const mdPath = path.join(outputDir, `validation-report-${timestamp}.md`);
       fs.writeFileSync(mdPath, mdReport);
       console.log('Markdown report written to:', mdPath);
     }

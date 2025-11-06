@@ -24,6 +24,59 @@ import { updateCodeBlockState, getInlineCodeSpans, isInCodeSpan } from './shared
 const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
 const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
 
+// Common sentence starters that indicate a sentence boundary, not a filename
+const sentenceStarters = new Set([
+  'The', 'A', 'An', 'This', 'That', 'These', 'Those',
+  'It', 'They', 'We', 'You', 'He', 'She',
+  'New', 'Go', 'Then', 'Next', 'First', 'Second', 'Finally',
+  'However', 'Therefore', 'Additionally', 'Furthermore',
+  'In', 'On', 'At', 'For', 'With', 'From', 'To',
+  'Some', 'Many', 'Most', 'All', 'Few', 'Several'
+]);
+
+/**
+ * Check if a match appears at a sentence boundary.
+ * Returns true if the text before the period ends a sentence and the text after starts a new one.
+ *
+ * @param {string} match - The matched text (e.g., "computer.New")
+ * @param {string} fullText - The complete line text for context
+ * @returns {boolean} True if this appears to be a sentence boundary, not a filename
+ */
+function isSentenceBoundary(match, fullText) {
+  // Pattern: word.Word where second word starts with capital
+  if (!/^[a-z]+\.[A-Z][a-z]*$/.test(match)) {
+    return false;
+  }
+
+  const matchIndex = fullText.indexOf(match);
+  if (matchIndex === -1) return false;
+
+  // Check if there's whitespace or sentence punctuation before the match
+  // (indicating end of previous sentence)
+  const beforeMatch = fullText.substring(0, matchIndex);
+  if (!/[.!?]\s+$/.test(beforeMatch) && !/^\s*$/.test(beforeMatch)) {
+    // Not preceded by sentence-ending punctuation + space, could be a real filename
+    return false;
+  }
+
+  // Extract the word after the period
+  const afterPeriod = match.split('.')[1];
+
+  // If it's a common sentence starter, it's likely a sentence boundary
+  if (sentenceStarters.has(afterPeriod)) {
+    return true;
+  }
+
+  // Additional check: if the word after the period is followed by lowercase text,
+  // it's likely starting a new sentence
+  const afterMatch = fullText.substring(matchIndex + match.length);
+  if (/^\s+[a-z]/.test(afterMatch)) {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * Determine if an index range is within a Markdown link or image.
  *
@@ -251,7 +304,17 @@ const ERROR_MESSAGE_PATTERNS = [
     message: (text) => `Path '${text}' should be wrapped in backticks to indicate it's a file system reference`
   },
   {
-    pattern: /^[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{1,5}$/,
+    pattern: (text, fullText) => {
+      // Check if it matches filename pattern
+      if (!/^[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{1,5}$/.test(text)) {
+        return false;
+      }
+      // But exclude sentence boundaries
+      if (isSentenceBoundary(text, fullText || '')) {
+        return false;
+      }
+      return true;
+    },
     message: (text) => `Filename '${text}' should be wrapped in backticks to distinguish it from regular text`
   },
   {
@@ -288,10 +351,15 @@ const ERROR_MESSAGE_PATTERNS = [
   },
   {
     pattern: (text) => {
-      // Match network addresses but exclude WCAG ratios (e.g., 4.5:1, 3:1, 7:1)
+      // Match network addresses but exclude WCAG ratios and time ranges
       // WCAG ratios are decimal numbers followed by :1
       if (/^\d+(\.\d+)?:1$/.test(text)) {
         return false; // This is a WCAG contrast ratio, not a network address
+      }
+      // Exclude time ranges (e.g., "AM-12:30", "3-10:30")
+      // Pattern: ends with time format like "-12:30" or "-10:30"
+      if (/(AM|PM)?-\d{1,2}:\d{2}$/i.test(text)) {
+        return false; // This is a time range, not a network address
       }
       return /^[A-Za-z0-9.-]+:\d+$/.test(text);
     },
@@ -309,17 +377,18 @@ const ERROR_MESSAGE_PATTERNS = [
  * @param {string} line - The full line context
  * @returns {string} A descriptive error message
  */
-function generateContextualErrorMessage(text, line) { // eslint-disable-line no-unused-vars
+function generateContextualErrorMessage(text, line) {
   // Iterate through patterns to find the first match
   for (const { pattern, message } of ERROR_MESSAGE_PATTERNS) {
     let matches = false;
-    
+
     if (typeof pattern === 'function') {
-      matches = pattern(text);
+      // Pass both text and full line for context (some patterns need context)
+      matches = pattern(text, line);
     } else if (pattern instanceof RegExp) {
       matches = pattern.test(text);
     }
-    
+
     if (matches) {
       return message(text);
     }

@@ -140,11 +140,18 @@ function findFirstValidationWord(words) {
  * @param {Object} specialCasedTerms Special casing terms.
  * @param {string} headingText Original heading text.
  * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, headingText, hadLeadingEmoji) {
+function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, headingText, hadLeadingEmoji, ambiguousTerms = {}) {
   const firstWordLower = firstWord.toLowerCase();
+  const firstWordForLookup = firstWord.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
   const expectedFirstWordCasing = specialCasedTerms[firstWordLower];
+
+  // Skip ambiguous terms - words that could be either common nouns or proper nouns (e.g., "go", "rust", "word")
+  if (ambiguousTerms[firstWordLower] || ambiguousTerms[firstWordForLookup]) {
+    return { isValid: true };
+  }
 
   // Skip numeric headings
   if (/^\d/.test(firstWord)) {
@@ -239,9 +246,10 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
  * @param {Set<number>} phraseIgnore Indices to ignore.
  * @param {Object} specialCasedTerms Special casing terms.
  * @param {string} headingText Original heading text.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTerms, headingText) {
+function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTerms, headingText, ambiguousTerms = {}) {
   const colonIndex = headingText.indexOf(':');
 
   for (let i = startIndex + 1; i < words.length; i++) {
@@ -254,6 +262,11 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
     // Strip punctuation for lookup in specialCasedTerms
     const wordForLookup = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     const expectedWordCasing = specialCasedTerms[wordLower] || specialCasedTerms[wordForLookup];
+
+    // Skip ambiguous terms - words that could be either common nouns or proper nouns (e.g., "go", "rust", "word")
+    if (ambiguousTerms[wordLower] || ambiguousTerms[wordForLookup]) {
+      continue;
+    }
 
     // Skip preserved segments
     if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
@@ -455,9 +468,10 @@ function prepareTextForValidation(headingText) {
  * @param {Set<number>} phraseIgnore Indices to ignore during validation.
  * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
  * @param {Object} specialCasedTerms Special casing terms.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji, specialCasedTerms) {
+function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji, specialCasedTerms, ambiguousTerms = {}) {
   const firstIndex = findFirstValidationWord(words);
   if (firstIndex === -1) {
     return { isValid: true };
@@ -465,7 +479,7 @@ function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji
 
   // Validate first word
   const firstWord = words[firstIndex];
-  const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji);
+  const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji, ambiguousTerms);
   if (!firstWordResult.isValid) {
     return firstWordResult;
   }
@@ -479,7 +493,7 @@ function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji
   }
 
   // Validate subsequent words
-  return validateSubsequentWords(words, firstIndex, phraseIgnore, specialCasedTerms, cleanedText);
+  return validateSubsequentWords(words, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, ambiguousTerms);
 }
 
 /**
@@ -488,9 +502,10 @@ function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji
  * @param {string} cleanedText The cleaned text.
  * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
  * @param {Object} specialCasedTerms Special casing terms.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialCasedTerms) {
+function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms = {}) {
   const firstIndex = findFirstValidationWord(words);
   if (firstIndex === -1) {
     return { isValid: true };
@@ -505,7 +520,7 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
   // Validate first word (but not if it comes after a number in bold text)
   const firstWord = words[firstIndex];
   if (!startsWithNumber) {
-    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji);
+    const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji, ambiguousTerms);
     if (!firstWordResult.isValid) {
       return firstWordResult;
     }
@@ -530,6 +545,11 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
     // Strip punctuation for lookup in specialCasedTerms
     const wordForLookup = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     const expectedWordCasing = specialCasedTerms[wordLower] || specialCasedTerms[wordForLookup];
+
+    // Skip ambiguous terms - words that could be either common nouns or proper nouns (e.g., "go", "rust", "word")
+    if (ambiguousTerms[wordLower] || ambiguousTerms[wordForLookup]) {
+      continue;
+    }
 
     // Skip preserved segments
     if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
@@ -633,9 +653,10 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
  * Validates heading text for sentence case compliance.
  * @param {string} headingText The heading text to validate.
  * @param {Object} specialCasedTerms Special casing terms dictionary.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string, cleanedText?: string}} Validation result with cleaned text for error reporting.
  */
-export function validateHeading(headingText, specialCasedTerms) {
+export function validateHeading(headingText, specialCasedTerms, ambiguousTerms = {}) {
   // Prepare text for validation
   const preparedText = prepareTextForValidation(headingText);
   if (!preparedText) {
@@ -652,7 +673,7 @@ export function validateHeading(headingText, specialCasedTerms) {
 
   // Perform comprehensive word validation
   const phraseIgnore = getProperPhraseIndices(words, specialCasedTerms);
-  const validationResult = performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji, specialCasedTerms);
+  const validationResult = performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji, specialCasedTerms, ambiguousTerms);
   return { ...validationResult, cleanedText };
 }
 
@@ -660,9 +681,10 @@ export function validateHeading(headingText, specialCasedTerms) {
  * Validates bold text with stricter rules than headings.
  * @param {string} boldText The bold text to validate.
  * @param {Object} specialCasedTerms Special casing terms dictionary.
+ * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-export function validateBoldText(boldText, specialCasedTerms) {
+export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {}) {
   if (!boldText || !boldText.trim()) {
     return { isValid: true };
   }
@@ -711,7 +733,7 @@ export function validateBoldText(boldText, specialCasedTerms) {
   }
 
   // For bold text, use stricter validation
-  return performBoldTextValidation(processedWords, cleanedText, hadLeadingEmoji, specialCasedTerms);
+  return performBoldTextValidation(processedWords, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms);
 }
 
 // Export helper functions for testing
