@@ -26,6 +26,7 @@
     "test:performance": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.performance.mjs",
     "test:performance:gc": "node --expose-gc --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.performance.mjs",
     "test:integration:external": "RUN_NETWORK_TESTS=true node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration/curated-repos.test.js --verbose",
+    "validate:external": "node scripts/validate-external.js",
     "lint": "eslint .",
     "security": "npm audit --omit=dev --audit-level=high",
     "docs:config": "node scripts/generate-config-docs.js",

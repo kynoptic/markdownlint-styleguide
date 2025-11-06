@@ -1,0 +1,29 @@
+{
+  // External validation configuration
+  // This is a working example for testing the validation system
+
+  "sources": {
+    // Test with existing fixtures
+    "local": [
+      "./tests/fixtures"
+    ]
+
+    // GitHub repos can be added here for real-world testing
+    // "github": [
+    //   "vercel/next.js"
+    // ]
+  },
+
+  // File filtering options
+  "filters": {
+    "include": ["**/*.md"],
+    "exclude": ["**/node_modules/**", "**/.git/**"]
+  },
+
+  // Report generation options
+  "reporting": {
+    "format": ["json", "markdown"],
+    "detailLevel": "detailed",
+    "outputDir": "validation-reports"
+  }
+}

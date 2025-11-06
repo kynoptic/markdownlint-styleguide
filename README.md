@@ -378,6 +378,8 @@ This package includes five custom rules designed to improve documentation qualit
 - Testing: `docs/testing.md`
 - Performance: `docs/performance.md`
 - Autofix telemetry: `docs/telemetry.md` – Track and analyze safety heuristic performance
+- External validation: `docs/external-validation.md` – Validate rules against real-world markdown
+- Claude Code analysis: `docs/claude-code-analysis.md` – AI-assisted rule improvement workflow
 
 ## Examples
 

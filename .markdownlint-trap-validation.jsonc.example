@@ -1,0 +1,36 @@
+{
+  // External validation configuration example
+  // Copy to .markdownlint-trap-validation.jsonc and customize
+
+  "sources": {
+    // Local file paths and directories
+    "local": [
+      // "~/Documents/my-docs/**/*.md",
+      // "/path/to/project/docs"
+    ],
+
+    // GitHub repositories (public and private via gh CLI)
+    "github": [
+      // "owner/repo-name",
+      // "another-org/another-repo"
+    ]
+  },
+
+  // File filtering options
+  "filters": {
+    "include": ["**/*.md", "**/docs/**/*.md"],
+    "exclude": ["**/node_modules/**", "**/vendor/**", "**/.git/**"]
+  },
+
+  // Report generation options
+  "reporting": {
+    // Output formats: json, markdown
+    "format": ["json", "markdown"],
+    
+    // Detail level: summary, detailed, full
+    "detailLevel": "detailed",
+    
+    // Output directory for reports
+    "outputDir": "validation-reports"
+  }
+}

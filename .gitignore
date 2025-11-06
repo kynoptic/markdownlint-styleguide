@@ -9,6 +9,9 @@ build/
 lib/
 .markdownlint-rules/
 
+# Validation reports
+validation-reports/
+
 # Environment variables
 .env
 .env.local
