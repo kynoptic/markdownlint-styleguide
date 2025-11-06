@@ -7,19 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.1.0] - 2025-11-06
+
 ### Added
 
 - Automated `package.json` bootstrapping for projects without Node.js setup:
-  - Distribution script now creates minimal `package.json` with lint scripts and dependencies
+  - Distribution script creates minimal `package.json` with lint scripts and dependencies
   - Automatically runs `npm install` to create `node_modules/` for VS Code extension integration
   - Uses `skipIfExists` flag to preserve existing `package.json` files
   - Customizes project name based on directory name
-- Enhanced distribution script with `skipIfExists` option for safer file distribution
+- Global installation support with `npm link` integration in distribution script
+- Automated npm installation phase for multi-project distribution
+- New installation scripts for global and project-level setup (`install-global.sh`, `link-to-projects.sh`, `unlink-from-projects.sh`)
+- Support for placeholder detection in `no-dead-internal-links` rule with `allowPlaceholders` configuration option
+- Unicode regex patterns for internationalized text validation (`UNICODE_LETTER_REGEX`, `UNICODE_UPPERCASE_REGEX`, `UPPERCASE_WORD_REGEX`)
+- Documentation for false positive fixes from real-world repository testing
 
 ### Changed
 
-- Improved `sentence-case-heading` rule handling for emoji-prefixed headings with accented, CJK, and other extended Unicode scripts to better support internationalized content.
+- Enhanced `sentence-case-heading` rule with Unicode-aware emoji and internationalization support for accented, CJK, Arabic, Cyrillic, and other extended Unicode scripts
+- Improved distribution script with directory creation support via `createDirs` option
+- Updated rules to support both nested and direct configuration formats for better API compatibility
 - Distribution now enables VS Code extension integration automatically by creating local `node_modules/` symlinks
+
+### Fixed
+
+- Reduced `backtick-code-elements` false positives for enumeration patterns (e.g., "Essential/Useful/Nice-to-have", "Value/Effort")
+- Fixed false positives for BDD-style patterns (GIVEN/WHEN/THEN)
+- Prevented incorrect flagging of WCAG contrast ratios (e.g., 4.5:1, 3:1)
+- Fixed false positives for grammar pluralization patterns (e.g., "word(s)", "term(s)")
+- Preserved multi-word special terms during autofix generation in `sentence-case-heading` rule
+- Removed "breaking" and "breaking changes" from default casing dictionary to reduce false positives in general documentation
 
 ---
 
@@ -308,7 +328,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...v2.0.0
 [1.7.1]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.6.0...v1.7.0
