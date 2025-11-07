@@ -3,11 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.findFirstEmojiPosition = findFirstEmojiPosition;
 exports.getCodeBlockLines = getCodeBlockLines;
 exports.getInlineCodeSpans = getInlineCodeSpans;
 exports.isInCodeSpan = isInCodeSpan;
 exports.isInInlineCode = isInInlineCode;
 exports.stripLeadingDecorations = stripLeadingDecorations;
+exports.truncateAtEmoji = truncateAtEmoji;
 exports.updateCodeBlockState = updateCodeBlockState;
 // @ts-check
 
@@ -266,4 +268,68 @@ function stripLeadingDecorations(text) {
     result = result.replace(/^\uFE0F/u, '');
   } while (result.length < prevLength && result.length > 0);
   return result.trimStart();
+}
+
+/**
+ * Finds the position of the first emoji character in text (outside of code spans).
+ * Returns -1 if no emoji is found.
+ *
+ * This function is used to implement the ignoreAfterEmoji option, which truncates
+ * heading validation at the first emoji to allow status markers and metadata after emoji.
+ *
+ * @param {string} text - The text to search for emoji
+ * @returns {number} Position of first emoji character, or -1 if none found
+ */
+function findFirstEmojiPosition(text) {
+  // Get all code spans first to avoid matching emoji inside code
+  const codeSpans = getInlineCodeSpans(text);
+
+  // Comprehensive emoji ranges (same as EMOJI_REGEX but used with matchAll)
+  // eslint-disable-next-line no-misleading-character-class
+  const emojiRegex = /[\u{1F1E0}-\u{1F1FF}\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}]/ug;
+  const matches = text.matchAll(emojiRegex);
+  for (const match of matches) {
+    const position = match.index;
+
+    // Skip if emoji is inside a code span
+    if (!isInCodeSpan(codeSpans, position, position + 1)) {
+      return position;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Truncates text at the first emoji character (if ignoreAfterEmoji is enabled).
+ * Returns both the truncated text for validation and the original text for context.
+ *
+ * @param {string} text - The text to potentially truncate
+ * @param {boolean} ignoreAfterEmoji - Whether to truncate at emoji
+ * @returns {{textForValidation: string, originalText: string, wasTruncated: boolean}} Truncation result
+ */
+function truncateAtEmoji(text, ignoreAfterEmoji) {
+  if (!ignoreAfterEmoji) {
+    return {
+      textForValidation: text,
+      originalText: text,
+      wasTruncated: false
+    };
+  }
+  const emojiPosition = findFirstEmojiPosition(text);
+  if (emojiPosition === -1) {
+    // No emoji found - use full text
+    return {
+      textForValidation: text,
+      originalText: text,
+      wasTruncated: false
+    };
+  }
+
+  // Truncate at emoji position
+  const truncated = text.substring(0, emojiPosition).trimEnd();
+  return {
+    textForValidation: truncated,
+    originalText: text,
+    wasTruncated: true
+  };
 }

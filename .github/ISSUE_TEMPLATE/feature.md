@@ -14,15 +14,15 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 
 ## Summary
 
-*One line overview.*
+<One line overview.>
 
 ## The problem
 
-*Why this matters to users or contributors.*
+<Why this matters to users or contributors.>
 
 ## Proposed solution
 
-*How we'll solve it (keep distinct from the problem).*
+<How we'll solve it (keep distinct from the problem).>
 
 ## Acceptance criteria (testable)
 
@@ -34,11 +34,11 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 
 <!--
 Follow test-first approach with meaningful behavioral tests
-Avoid vanity tests that only verify framework behavior or trivial getters/setters
+Avoid vanity tests that only verify framework behavior or trivial operations
 -->
 
 - **Unit tests**:
-- **E2E tests**:
+- **Integration/E2E tests**:
 - **Edge cases**:
 
 ## Links

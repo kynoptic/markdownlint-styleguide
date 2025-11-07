@@ -5,6 +5,7 @@
  *
  * Configuration:
  * - specialTerms: Array of terms with specific capitalization (e.g., ["JavaScript", "API", "GitHub"])
+ * - ignoreAfterEmoji: Boolean to ignore text after the first emoji (default: false)
  *
  * Deprecated (use specialTerms instead):
  * - technicalTerms: Legacy option, use specialTerms
@@ -13,7 +14,8 @@
  * Example configuration:
  * {
  *   "sentence-case-heading": {
- *     "specialTerms": ["JavaScript", "TypeScript", "API", "GitHub", "OAuth"]
+ *     "specialTerms": ["JavaScript", "TypeScript", "API", "GitHub", "OAuth"],
+ *     "ignoreAfterEmoji": true
  *   }
  * }
  */
@@ -21,11 +23,12 @@
 import { casingTerms as defaultCasingTerms, ambiguousTerms } from './shared-constants.js';
 import {
   validateStringArray,
+  validateBoolean,
   validateConfig,
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
-import { stripLeadingDecorations } from './shared-utils.js';
+import { stripLeadingDecorations, truncateAtEmoji } from './shared-utils.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading, validateBoldText } from './sentence-case/case-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
@@ -56,16 +59,20 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   const configSchema = {
     specialTerms: validateStringArray,
     technicalTerms: validateStringArray,
-    properNouns: validateStringArray
+    properNouns: validateStringArray,
+    ignoreAfterEmoji: validateBoolean
   };
 
   const validationResult = validateConfig(config, configSchema, 'sentence-case-heading');
   const logger = createMarkdownlintLogger(onError, 'sentence-case-heading');
-  
+
   if (!validationResult.isValid) {
     logValidationErrors('sentence-case-heading', validationResult.errors, logger);
     // Continue execution with empty arrays to prevent crashes
   }
+
+  // Get ignoreAfterEmoji option (default: false for backward compatibility)
+  const ignoreAfterEmoji = typeof config.ignoreAfterEmoji === 'boolean' ? config.ignoreAfterEmoji : false;
 
   // Support both new `specialTerms` and old `technicalTerms`/`properNouns` for user config
   // Only use valid arrays; fall back to empty arrays for invalid config
@@ -103,19 +110,24 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {number} lineNumber - Line number for context.
    * @param {string} headingText - Heading text in question.
    * @param {string} line - Original source line.
+   * @param {string} textForValidation - Text that was validated (may be truncated if ignoreAfterEmoji).
    */
-  function reportForHeading(detail, lineNumber, headingText, line) {
+  function reportForHeading(detail, lineNumber, headingText, line, textForValidation) {
     const commentIndex = line.indexOf('<!--');
     const headingContent = commentIndex !== -1 ?
       line.slice(0, commentIndex).trimEnd() :
       line;
     const textToFix = headingContent.replace(/^#+\s*/, '');
 
+    // If ignoreAfterEmoji is enabled and text was truncated, only fix the part before emoji
+    // We need to use textForValidation (the truncated text) as the fix target
+    const fixTarget = (ignoreAfterEmoji && textForValidation) ? textForValidation : textToFix;
+
     onError({
       lineNumber,
       detail,
       context: headingText,
-      fixInfo: buildHeadingFix(line, textToFix, specialCasedTerms, safetyConfig)
+      fixInfo: buildHeadingFix(line, fixTarget, specialCasedTerms, safetyConfig)
     });
   }
 
@@ -125,15 +137,18 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {number} lineNumber - Line number for context.
    * @param {string} boldText - Bold text in question.
    * @param {string} line - Original source line.
+   * @param {string} textForValidation - Text that was validated (may be truncated if ignoreAfterEmoji).
    */
-  function reportForBoldText(detail, lineNumber, boldText, line) {
-    const fixedText = toSentenceCase(boldText, specialCasedTerms);
+  function reportForBoldText(detail, lineNumber, boldText, line, textForValidation) {
+    // If ignoreAfterEmoji is enabled and text was truncated, only fix the part before emoji
+    const fixTarget = (ignoreAfterEmoji && textForValidation) ? textForValidation : boldText;
+    const fixedText = toSentenceCase(fixTarget, specialCasedTerms);
 
     onError({
       lineNumber,
       detail,
-      context: `**${boldText}**`,
-      fixInfo: fixedText ? buildBoldTextFix(line, boldText, fixedText, safetyConfig) : undefined
+      context: `**${textForValidation || boldText}**`,
+      fixInfo: fixedText ? buildBoldTextFix(line, fixTarget, fixedText, safetyConfig) : undefined
     });
   }
 
@@ -153,10 +168,13 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
     }
 
-    const validationResult = validateBoldText(boldText, specialCasedTerms, ambiguousTerms);
+    // Apply ignoreAfterEmoji truncation if enabled
+    const { textForValidation } = truncateAtEmoji(boldText, ignoreAfterEmoji);
+
+    const validationResult = validateBoldText(textForValidation, specialCasedTerms, ambiguousTerms);
 
     if (!validationResult.isValid) {
-      reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine);
+      reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine, textForValidation);
     }
   }
 
@@ -173,12 +191,15 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
 
-    const validationResult = validateHeading(headingText, specialCasedTerms, ambiguousTerms);
+    // Apply ignoreAfterEmoji truncation if enabled
+    const { textForValidation } = truncateAtEmoji(headingText, ignoreAfterEmoji);
+
+    const validationResult = validateHeading(textForValidation, specialCasedTerms, ambiguousTerms);
 
     if (!validationResult.isValid) {
       // Use cleanedText (emoji stripped) for error context to match original behavior
-      const contextText = validationResult.cleanedText || headingText;
-      reportFn(validationResult.errorMessage, lineNumber, contextText, sourceLine);
+      const contextText = validationResult.cleanedText || textForValidation;
+      reportFn(validationResult.errorMessage, lineNumber, contextText, sourceLine, textForValidation);
     }
   }
 

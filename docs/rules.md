@@ -28,9 +28,21 @@ Ensures headings (ATX: `#`) and bold text in list items follow sentence case: fi
 - Includes built-in support for multi-word product names:
   - GitHub Products: GitHub Actions, GitHub Projects
 - Recognizes emoji-prefixed headings and extended Unicode scripts (accented Latin, CJK, RTL) so internationalized documentation stays compliant.
+- Supports `ignoreAfterEmoji` option to exclude status markers and metadata after emoji from validation.
 - Skips code-heavy headings, `version/date-only` headings, and certain bracketed labels.
 - Provides safe auto-fixes with guardrails.
 - Since `v1.7.0`: improved internal architecture with modular components for better maintainability and performance.
+
+Configuration options
+
+```jsonc
+{
+  "sentence-case-heading": {
+    "specialTerms": ["JavaScript", "TypeScript", "API"],  // Custom terms with specific capitalization
+    "ignoreAfterEmoji": true  // Ignore text after first emoji (default: false)
+  }
+}
+```
 
 Examples
 
@@ -39,6 +51,15 @@ Examples
 - Good: `# GitHub Projects and custom fields`
 - Good: `**IMPORTANT** security update required`
 - Bad: `# Getting Started With APIs`
+
+Status markers with `ignoreAfterEmoji`
+
+When `ignoreAfterEmoji` is enabled, text after the first emoji is excluded from validation. This is useful for roadmaps and status tracking documents where emoji serve as visual separators between heading content and metadata.
+
+- Good with `ignoreAfterEmoji: true`: `## Task complete ✅ DONE`
+- Good with `ignoreAfterEmoji: true`: `## NOW (Current Sprint) ✅ COMPLETED`
+- Good with `ignoreAfterEmoji: true`: `## Infrastructure essentials ✅ HIGH PRIORITY`
+- Still validated: `## WRONG Case ✅ IGNORED` (flags "WRONG Case" before emoji)
 
 ---
 
