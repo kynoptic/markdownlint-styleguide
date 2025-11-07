@@ -628,4 +628,330 @@ Another paragraph.
       expect(errors[0].detail).toContain('Heading anchor "#non-existent-setext" not found in "setext-headings-test.md"');
     });
   });
+
+  describe('placeholder pattern detection', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    describe('allowPlaceholders: true', () => {
+      test('should allow URL placeholder', () => {
+        const markdown = `
+[Documentation](URL)
+[Another link](url)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should allow link placeholder', () => {
+        const markdown = `
+[View in browser](link)
+[Service portal](link)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should allow PLACEHOLDER.md', () => {
+        const markdown = `
+[Configuration guide](PLACEHOLDER.md)
+[Template](PLACEHOLDER)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should allow TODO.md', () => {
+        const markdown = `
+[Pending items](TODO.md)
+[Implementation plan](TODO)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should allow adr-XXX-title.md pattern', () => {
+        const markdown = `
+[ADR template](adr-XXX-title.md)
+[Decision doc](doc-XXX-format.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should allow path/to/ prefix', () => {
+        const markdown = `
+[Example file](path/to/file.md)
+[Image](path/to/image.png)
+[Resource](path/to/nested/resource.txt)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should still flag actual broken links', () => {
+        const markdown = `
+[Real broken link](non-existent-file.md)
+[Missing doc](missing-document.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(2);
+        expect(errors[0].detail).toContain('Link target "non-existent-file.md" does not exist');
+        expect(errors[1].detail).toContain('Link target "missing-document.md" does not exist');
+      });
+
+      test('should handle mixed placeholders and real links', () => {
+        const markdown = `
+[Placeholder](URL)
+[Real file](existing-file.md)
+[Missing file](broken.md)
+[Another placeholder](TODO.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(1);
+        expect(errors[0].detail).toContain('Link target "broken.md" does not exist');
+      });
+    });
+
+    describe('allowPlaceholders: false', () => {
+      test('should validate placeholders as normal links when disabled', () => {
+        const markdown = `
+[Documentation](URL)
+[Guide](PLACEHOLDER.md)
+[Items](TODO.md)
+`;
+
+        const config = {
+          allowPlaceholders: false,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(3);
+        expect(errors[0].detail).toContain('Link target "URL" does not exist');
+        expect(errors[1].detail).toContain('Link target "PLACEHOLDER.md" does not exist');
+        expect(errors[2].detail).toContain('Link target "TODO.md" does not exist');
+      });
+    });
+
+    describe('custom placeholderPatterns', () => {
+      test('should respect custom placeholder patterns', () => {
+        const markdown = `
+[Custom placeholder](CUSTOM.md)
+[Example](EXAMPLE)
+[Template](TEMPLATE.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['CUSTOM', 'EXAMPLE', 'TEMPLATE']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should not match default patterns when custom patterns provided', () => {
+        const markdown = `
+[Custom works](CUSTOM.md)
+[Default URL does not work](URL)
+[Default PLACEHOLDER does not work](PLACEHOLDER.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['CUSTOM']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(2);
+        expect(errors[0].detail).toContain('Link target "URL" does not exist');
+        expect(errors[1].detail).toContain('Link target "PLACEHOLDER.md" does not exist');
+      });
+
+      test('should work with empty patterns array', () => {
+        const markdown = `
+[Link](URL)
+[Guide](PLACEHOLDER.md)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: []
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(2);
+      });
+    });
+
+    describe('default behavior (no configuration)', () => {
+      test('should not allow placeholders by default', () => {
+        const markdown = `
+[Documentation](URL)
+[Guide](PLACEHOLDER.md)
+`;
+
+        // No config provided - should use defaults
+        const errors = runRuleWithContent(markdown, testFile);
+
+        // Default is allowPlaceholders: false, so these should be flagged
+        expect(errors).toHaveLength(2);
+        expect(errors[0].detail).toContain('Link target "URL" does not exist');
+        expect(errors[1].detail).toContain('Link target "PLACEHOLDER.md" does not exist');
+      });
+    });
+
+    describe('edge cases', () => {
+      test('should handle case-insensitive placeholder matching', () => {
+        const markdown = `
+[Link 1](url)
+[Link 2](URL)
+[Link 3](Url)
+[Link 4](uRl)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should handle placeholders in image links', () => {
+        const markdown = `
+![Alt text](URL)
+![Diagram](path/to/image.png)
+![Screenshot](PLACEHOLDER.png)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'PLACEHOLDER', 'path/to/']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should not flag same-page anchors as placeholders', () => {
+        const markdown = `
+# URL Section
+
+[Link to URL section](#url-section)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should handle placeholders with anchors', () => {
+        const markdown = `
+[Link with anchor](URL#section)
+[Placeholder with anchor](PLACEHOLDER.md#heading)
+`;
+
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'PLACEHOLDER']
+        };
+
+        const errors = runRuleWithContent(markdown, testFile, config);
+        expect(errors).toHaveLength(0);
+      });
+    });
+
+    describe('integration with placeholders.fixture.md', () => {
+      test('validates placeholders fixture with allowPlaceholders enabled', async () => {
+        const placeholdersFixture = path.join(fixturesDir, 'placeholders.fixture.md');
+
+        // Read fixture and run with allowPlaceholders: true
+        const content = fs.readFileSync(placeholdersFixture, 'utf8');
+        const config = {
+          allowPlaceholders: true,
+          placeholderPatterns: ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com']
+        };
+
+        const errors = runRuleWithContent(content, placeholdersFixture, config);
+
+        // Should only flag actual broken links, not placeholders
+        // The fixture has intentional broken links in "Should flag" section
+        const brokenLinkErrors = errors.filter(e =>
+          e.detail.includes('does-not-exist.md') ||
+          e.detail.includes('nonexistent-section') ||
+          e.detail.includes('real-file.md') ||
+          e.detail.includes('actual-image.png') ||
+          e.detail.includes('api-guide.md') ||
+          e.detail.includes('guide.md')
+        );
+
+        expect(brokenLinkErrors.length).toBeGreaterThan(0);
+
+        // Should not flag placeholder patterns
+        const placeholderErrors = errors.filter(e =>
+          e.detail.includes('Link target "URL"') ||
+          e.detail.includes('Link target "link"') ||
+          e.detail.includes('Link target "PLACEHOLDER') ||
+          e.detail.includes('Link target "TODO') ||
+          e.detail.includes('Link target "path/to/')
+        );
+
+        expect(placeholderErrors).toHaveLength(0);
+      });
+    });
+  });
 });

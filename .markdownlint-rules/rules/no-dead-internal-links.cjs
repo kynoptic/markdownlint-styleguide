@@ -183,6 +183,61 @@ function anchorExists(filePath, anchor) {
 }
 
 /**
+ * Check if a link target matches common placeholder patterns.
+ * Used to avoid false positives for intentional placeholders in documentation templates.
+ *
+ * Matching strategy:
+ * 1. Exact match (case-insensitive): "URL" matches "url", "URL", "Url"
+ * 2. Path prefix match: "path/to/" matches "path/to/file.md"
+ * 3. Word-boundary substring match: "TODO" matches "TODO.md", "project-TODO.md" but NOT "PHOTODOC.md"
+ *
+ * @param {string} target - Link target to check
+ * @param {string[]} patterns - Array of placeholder patterns to match
+ * @returns {boolean} True if target matches a placeholder pattern
+ */
+function isPlaceholder(target, patterns) {
+  if (!target || !Array.isArray(patterns) || patterns.length === 0) {
+    return false;
+  }
+
+  // Check each pattern
+  for (const pattern of patterns) {
+    // Skip non-string patterns (defensive programming - validation should catch this at config level)
+    if (typeof pattern !== 'string') {
+      continue;
+    }
+
+    // Exact match (case-insensitive for common keywords)
+    if (target.toLowerCase() === pattern.toLowerCase()) {
+      return true;
+    }
+
+    // Check if target starts with the pattern (for path patterns like "path/to/")
+    if (pattern.endsWith('/') && target.startsWith(pattern)) {
+      return true;
+    }
+
+    // Word-boundary substring match: check if pattern appears as a complete word/segment
+    // This prevents "link" from matching "unlinked.md" or "TODO" from matching "PHOTODOC.md"
+    // Uses word boundaries defined by: start/end of string, hyphens, underscores, dots, slashes
+    const wordBoundaryPattern = new RegExp(`(^|[-_./])${escapeRegExp(pattern)}([-_./]|$)`, 'i');
+    if (wordBoundaryPattern.test(target)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Escape special regex characters in a string for use in RegExp constructor.
+ * @param {string} string - String to escape
+ * @returns {string} Escaped string safe for use in regex
+ */
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  * Main rule implementation.
  * @param {import("markdownlint").RuleParams} params - Parsed Markdown input
  * @param {import("markdownlint").RuleOnError} onError - Callback to report violations
@@ -200,7 +255,8 @@ function noDeadInternalLinks(params, onError) {
     ignoredPaths: _configValidation.validateStringArray,
     checkAnchors: _configValidation.validateBoolean,
     allowedExtensions: _configValidation.validateStringArray,
-    allowPlaceholders: _configValidation.validateBoolean
+    allowPlaceholders: _configValidation.validateBoolean,
+    placeholderPatterns: _configValidation.validateStringArray
   };
   const validationResult = (0, _configValidation.validateConfig)(config, configSchema, 'no-dead-internal-links');
   if (!validationResult.isValid) {
@@ -214,6 +270,7 @@ function noDeadInternalLinks(params, onError) {
   const checkAnchors = typeof config.checkAnchors === 'boolean' ? config.checkAnchors : true;
   const allowedExtensions = Array.isArray(config.allowedExtensions) ? config.allowedExtensions : ['.md', '.markdown'];
   const allowPlaceholders = typeof config.allowPlaceholders === 'boolean' ? config.allowPlaceholders : false;
+  const placeholderPatterns = Array.isArray(config.placeholderPatterns) ? config.placeholderPatterns : ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com'];
   const lines = params.lines;
   const currentFile = params.name || '';
 
@@ -275,9 +332,8 @@ function noDeadInternalLinks(params, onError) {
           continue;
         }
 
-        // Skip template placeholders if configured (e.g., adr-XXX-title.md, TODO.md, PLACEHOLDER.md, URL, link)
-        // Common placeholder patterns: URL, PLACEHOLDER, TODO, XXX, link, path/to/
-        if (allowPlaceholders && /(?:^URL$|^link$|^path\/to\/|XXX|TODO|PLACEHOLDER)/i.test(filePath)) {
+        // Skip placeholder patterns if configured
+        if (allowPlaceholders && isPlaceholder(filePath, placeholderPatterns)) {
           continue;
         }
 

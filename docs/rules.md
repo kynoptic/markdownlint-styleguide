@@ -86,13 +86,64 @@ Detects broken internal links (relative paths and anchors).
 
 - Validates that the target file exists; for extensionless links, tries common markdown extensions.
 - Optionally validates `#anchors` against extracted headings (GitHub-style slugs).
+- Supports placeholder pattern detection to avoid false positives in documentation templates.
 - Uses per-run caches for file stats and heading extraction for performance.
 - Not auto-fixable.
+
+Configuration options
+
+```jsonc
+{
+  "no-dead-internal-links": {
+    "checkAnchors": true,              // Validate heading anchors (default: true)
+    "allowedExtensions": [".md", ".markdown"],  // Extensions to try for extensionless links
+    "ignoredPaths": ["node_modules"],  // Paths to skip validation
+    "allowPlaceholders": false,        // Allow placeholder patterns (default: false)
+    "placeholderPatterns": [           // Patterns to recognize as placeholders
+      "URL",
+      "link",
+      "PLACEHOLDER",
+      "TODO",
+      "XXX",
+      "path/to/",
+      "example.com"
+    ]
+  }
+}
+```
+
+Placeholder detection
+
+When `allowPlaceholders` is enabled, the rule recognizes common placeholder patterns in documentation templates and example files, preventing false positives.
+
+**Matching strategy:**
+
+1. **Exact match** (case-insensitive): `URL` matches `url`, `URL`, `Url`
+2. **Path prefix match**: `path/to/` matches `path/to/file.md`, `path/to/image.png`
+3. **Word-boundary substring match**: Pattern must appear as a complete word segment separated by hyphens, underscores, dots, or slashes
+
+**Examples of word-boundary matching:**
+
+- ✅ `TODO` matches: `TODO.md`, `project-TODO.md`, `my_TODO.txt`
+- ❌ `TODO` does NOT match: `PHOTODOC.md` (embedded within word)
+- ✅ `link` matches: `link`, `my-link.md`, `docs/link/file.md`
+- ❌ `link` does NOT match: `unlinked.md`, `linking.md` (embedded within word)
+
+This word-boundary approach prevents false negatives where legitimate broken links are skipped because they contain placeholder keywords (e.g., `unlinked-page.md` containing "link").
+
+**Use cases:**
+
+- Documentation templates with intentional placeholders
+- Example code and snippets showing link syntax
+- ADR templates using `XXX` numbering patterns
+- Newsletter and email templates using generic link text
 
 Examples
 
 - Good: `[Config](docs/configuration.md)`
+- Good (with placeholders): `[Documentation](URL)` when `allowPlaceholders: true`
 - Bad: `[Config](docs/missing.md)`
+- Bad (without placeholders): `[Documentation](URL)` when `allowPlaceholders: false`
 
 ---
 
