@@ -455,16 +455,21 @@ describe("integration tests for function interactions", () => {
 `;
     const violations = await lintMarkdown(content);
 
-    // Should detect the capitalization issue in "Bold Item"
-    expect(violations.length).toBeGreaterThan(0);
+    // After fix for issue #105: Only bold text at the start of list items is validated
+    // Line 3: "**Nested bold text**" is at start - correctly formatted (sentence case)
+    // Line 4: "**Bold Item**" is NOT at start (after "Another ") - NOT validated
+    // No violations expected
+    expect(violations.length).toBe(0);
   });
 
   test("test_should_handle_multiple_bold_segments_in_one_line", async () => {
     const content = "- **First bold** and **Second Bold** text";
     const violations = await lintMarkdown(content);
 
-    // Should validate each bold segment independently
-    expect(violations.length).toBeGreaterThan(0);
+    // After fix for issue #105: Only the first bold segment (at start) is validated
+    // The second bold segment in the middle is NOT validated to avoid false positives
+    // "First bold" is correctly formatted (sentence case) - no violation expected
+    expect(violations.length).toBe(0);
   });
 
   test("test_should_preserve_special_terms_across_heading_and_bold_validation", async () => {

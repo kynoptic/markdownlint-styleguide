@@ -200,7 +200,7 @@ export function getInlineCodeSpans(line) {
 
 /**
  * Check if a position range is inside any inline code span.
- * 
+ *
  * @param {Array<[number, number]>} codeSpans - Code span ranges from getInlineCodeSpans
  * @param {number} start - Start position to check
  * @param {number} end - End position to check
@@ -208,4 +208,66 @@ export function getInlineCodeSpans(line) {
  */
 export function isInCodeSpan(codeSpans, start, end) {
   return codeSpans.some(([spanStart, spanEnd]) => start >= spanStart && end <= spanEnd);
+}
+
+/**
+ * Strips leading emoji and decorative symbols from text.
+ * Handles emoji sequences including skin tone modifiers and ZWJ (Zero Width Joiner) sequences.
+ * Iteratively removes emoji until no more are found at the start.
+ *
+ * This is useful for finding the first actual textual content in strings that may
+ * have decorative emoji prefixes.
+ *
+ * @param {string} text - The text to strip emoji from
+ * @returns {string} Text with leading emoji removed and trimmed
+ */
+export function stripLeadingDecorations(text) {
+  let result = text;
+  let prevLength;
+
+  // Iteratively strip emoji sequences until no more matches
+  // This loop handles complex emoji like flag sequences and emoji with skin tones
+  // that may require multiple passes to fully remove
+  do {
+    prevLength = result.length;
+
+    // Emoji and symbol Unicode ranges (consolidated for performance)
+    // Regional indicator symbols (flags)
+    result = result.replace(/^[\u{1F1E0}-\u{1F1FF}]/u, '');
+    // Miscellaneous symbols
+    result = result.replace(/^[\u{1F300}-\u{1F5FF}]/u, '');
+    // Emoticons
+    result = result.replace(/^[\u{1F600}-\u{1F64F}]/u, '');
+    // Transport and map symbols
+    result = result.replace(/^[\u{1F680}-\u{1F6FF}]/u, '');
+    // Alchemical symbols
+    result = result.replace(/^[\u{1F700}-\u{1F77F}]/u, '');
+    // Geometric shapes extended
+    result = result.replace(/^[\u{1F780}-\u{1F7FF}]/u, '');
+    // Supplemental arrows-C
+    result = result.replace(/^[\u{1F800}-\u{1F8FF}]/u, '');
+    // Miscellaneous symbols and pictographs
+    result = result.replace(/^[\u{2600}-\u{26FF}]/u, '');
+    // Dingbats
+    result = result.replace(/^[\u{2700}-\u{27BF}]/u, '');
+    // Supplemental symbols and pictographs
+    result = result.replace(/^[\u{1F900}-\u{1F9FF}]/u, '');
+    // Symbols and pictographs extended-A
+    result = result.replace(/^[\u{1FA00}-\u{1FA6F}]/u, '');
+    result = result.replace(/^[\u{1FA70}-\u{1FAFF}]/u, '');
+    // Playing cards, Mahjong tiles
+    result = result.replace(/^[\u{1F000}-\u{1F02F}]/u, '');
+    result = result.replace(/^[\u{1F0A0}-\u{1F0FF}]/u, '');
+    // Enclosed alphanumeric supplement
+    result = result.replace(/^[\u{1F100}-\u{1F1FF}]/u, '');
+    // Skin tone modifiers
+    result = result.replace(/^[\u{1F3FB}-\u{1F3FF}]/u, '');
+    // Zero Width Joiner (used in emoji sequences)
+    result = result.replace(/^\u200D/u, '');
+    // Variation Selector-16 (emoji presentation)
+    result = result.replace(/^\uFE0F/u, '');
+
+  } while (result.length < prevLength && result.length > 0);
+
+  return result.trimStart();
 }

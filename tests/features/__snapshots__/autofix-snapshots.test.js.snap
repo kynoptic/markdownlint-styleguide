@@ -140,7 +140,7 @@ exports[`Autofix snapshot tests Individual autofix transformations sentence case
 
 exports[`Autofix snapshot tests Individual autofix transformations sentence case heading transformations 3`] = `
 {
-  "fixed": "### Working with Node.js and express
+  "fixed": "### Working with Node.js and Express
 ",
   "hasChanges": true,
   "original": "### Working With Node.js And Express",

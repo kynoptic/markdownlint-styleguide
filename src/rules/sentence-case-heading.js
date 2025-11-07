@@ -25,6 +25,7 @@ import {
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
+import { stripLeadingDecorations } from './shared-utils.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading, validateBoldText } from './sentence-case/case-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
@@ -196,14 +197,19 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
   // Process bold text in list items using regex detection
   // (micromark doesn't parse list item internals deeply enough for token-based detection)
+  //
+  // CRITICAL: Only validate bold text that appears as the first textual content
+  // in a list item (after optional decorative elements like emojis).
+  // Bold text in the middle or end of list items should NOT be validated.
+  // This fixes ~2,700 false positives (issue #105).
   lines.forEach((line, index) => {
     const lineNumber = index + 1;
-    
+
     // Skip lines that are not list items with bold text
     if (!line.trim().startsWith('-') || !line.includes('**')) {
       return;
     }
-    
+
     // Skip lines that contain both ** and backticks to avoid complex parsing issues
     // This is a conservative approach to avoid false positives with ** inside code
     if (line.includes('`') && line.includes('**')) {
@@ -213,42 +219,55 @@ function basicSentenceCaseHeadingFunction(params, onError) {
         return; // No bold text outside of code spans
       }
     }
-    
+
+    // Extract the content after the list marker
+    const listContent = line.trim().slice(1).trim(); // Remove '-' and trim
+
+    // Strip leading emoji and decorative symbols to find the first textual content
+    const contentAfterDecorations = stripLeadingDecorations(listContent);
+
+    // Check if bold text is at the start of the content (after decorations)
+    // Only validate bold text that is the first textual content
+    if (!contentAfterDecorations.startsWith('**')) {
+      // Bold text is not at the start - skip validation to avoid false positives
+      return;
+    }
+
     // Extract bold text using regex
     const boldMatches = line.matchAll(/\*\*([^*]+?)\*\*/g);
-    
+
     for (const match of boldMatches) {
       const matchStart = match.index;
       const matchEnd = match.index + match[0].length;
-      
+
       // Check if this match is inside backticks (code span)
       // Find all code spans in the line and see if our match overlaps
       let isInsideCode = false;
       const codeSpanRegex = /`[^`]*`/g;
       let codeSpanMatch;
-      
+
       while ((codeSpanMatch = codeSpanRegex.exec(line)) !== null) {
         const codeStart = codeSpanMatch.index;
         const codeEnd = codeStart + codeSpanMatch[0].length;
-        
+
         // Check if the bold match overlaps with this code span
         if (matchStart >= codeStart && matchEnd <= codeEnd) {
           isInsideCode = true;
           break;
         }
       }
-      
+
       if (isInsideCode) {
         continue; // Skip bold text that's inside code spans
       }
-      
+
       const boldText = match[1].trim();
       if (!boldText) continue;
-      
-      
+
+
       // If the bold text has a colon, only validate the part before the colon
-      const textToValidate = boldText.includes(':') ? 
-        boldText.split(':')[0].trim() : 
+      const textToValidate = boldText.includes(':') ?
+        boldText.split(':')[0].trim() :
         boldText;
 
       // Skip empty text
@@ -256,6 +275,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       // Use the unified validation logic
       validateBoldTextInContext(textToValidate, lineNumber, line);
+
+      // Only validate the first bold text in the list item (which we already confirmed is at the start)
+      break;
     }
   });
 }
