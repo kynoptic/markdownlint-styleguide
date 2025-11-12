@@ -19,6 +19,7 @@ import {
   createMarkdownlintLogger 
 } from './config-validation.js';
 import { updateCodeBlockState, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
+import { isDomainInProse } from './shared-heuristics.js';
 
 // Regex patterns used by helper functions
 const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
@@ -480,6 +481,10 @@ function backtickCodeElements(params, onError) {
     const codeSpans = getInlineCodeSpans(line);
 
     const patterns = [
+      // Issue #106: Full URLs with protocol (http://, https://, ftp://, etc.)
+      // Must be checked BEFORE domain patterns to avoid false negatives
+      /\b(?:https?|ftp|ftps|file):\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g,
+
       // Issue #89: Absolute Unix paths like /etc/hosts, /mnt/usb, /usr/local/bin
       // Pattern breakdown:
       //   (?:^|(?<=\s))  - Start of line or preceded by whitespace (lookbehind)
@@ -512,7 +517,7 @@ function backtickCodeElements(params, onError) {
       /\$(?!\d{2,}(?:\.\d*)?\b|\d\.\d+)\S+/g
     ];
 
-    const flaggedPositions = new Set();
+    const flaggedRanges = []; // Track ranges [start, end] that have been flagged
 
     for (const pattern of patterns) {
       pattern.lastIndex = 0;
@@ -521,6 +526,15 @@ function backtickCodeElements(params, onError) {
         const fullMatch = match[0];
         const start = match.index;
         const end = start + fullMatch.length;
+
+        // Skip if this range overlaps with an already-flagged range
+        const overlapsWithFlagged = flaggedRanges.some(([flaggedStart, flaggedEnd]) => {
+          // Check for any overlap: start is before flagged end AND end is after flagged start
+          return start < flaggedEnd && end > flaggedStart;
+        });
+        if (overlapsWithFlagged) {
+          continue;
+        }
 
         // For the path pattern, apply extra heuristics to avoid false positives
         // on natural language like "read/write" or "pass/fail".
@@ -532,12 +546,28 @@ function backtickCodeElements(params, onError) {
         if (isInCodeSpan(codeSpans, start, end)) {
           continue;
         }
-        // Skip if inside a Markdown link, wiki link, or HTML comment
+        // Skip if inside a Markdown link, wiki link, HTML comment, or angle bracket autolink
         if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
           continue;
         }
+
+        // Skip URLs in angle brackets (Markdown autolinks: <https://example.com>)
+        if (start > 0 && line[start - 1] === '<' && end < line.length && line[end] === '>') {
+          // Check if this looks like a URL autolink
+          if (/^(?:https?|ftp|ftps|file):\/\//i.test(fullMatch)) {
+            // Mark this range as flagged to prevent subparts from being matched
+            flaggedRanges.push([start, end]);
+            continue;
+          }
+        }
         // Skip if in ignored terms (default + user-configured)
         if (allIgnoredTerms.has(fullMatch)) {
+          continue;
+        }
+
+        // Skip domain names used in prose (without protocol)
+        // Only flag full URLs that include protocol (http://, https://, etc.)
+        if (isDomainInProse(fullMatch, line, start)) {
           continue;
         }
         
@@ -553,26 +583,40 @@ function backtickCodeElements(params, onError) {
         if (/^\w+\([a-z]\)$/.test(fullMatch)) {
           continue;
         }
-        
-        // Skip if already flagged
-        if (flaggedPositions.has(start)) {
-          continue;
-        }
         // Only skip if this match is inside a true LaTeX math region
         if (inLatexMath(line, start, end)) {
           continue;
         }
-        // Skip if inside a URL (e.g., after http:// or https://)
+        // Check if this match is part of a full URL
+        // We want to flag the ENTIRE URL (with protocol), not skip it
+        // But we should skip individual components (like just the path part)
         const urlRegex = /https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g;
         let urlMatch;
-        let isInUrl = false;
+        let isPartOfUrl = false;
+        let isFullUrl = false;
+
         while ((urlMatch = urlRegex.exec(line)) !== null) {
-          if (start >= urlMatch.index && end <= urlMatch.index + urlMatch[0].length) {
-            isInUrl = true;
+          const urlStart = urlMatch.index;
+          const urlEnd = urlMatch.index + urlMatch[0].length;
+
+          // Check if this match is inside the URL
+          if (start >= urlStart && end <= urlEnd) {
+            // Check if this match includes the protocol (is the full URL or starts with protocol)
+            const matchIncludesProtocol = start <= urlStart + 8; // "https://".length
+
+            if (matchIncludesProtocol) {
+              // This is the full URL with protocol - we want to flag it
+              isFullUrl = true;
+            } else {
+              // This is just a part of the URL (path, query, etc.) - skip it
+              isPartOfUrl = true;
+            }
             break;
           }
         }
-        if (isInUrl) {
+
+        // Skip if this is just a part of a URL (not the full URL with protocol)
+        if (isPartOfUrl && !isFullUrl) {
           continue;
         }
 
@@ -625,7 +669,9 @@ function backtickCodeElements(params, onError) {
             fixInfo: safeFixInfo,
           });
         }
-        flaggedPositions.add(start);
+
+        // Track this range as flagged to prevent overlapping matches
+        flaggedRanges.push([start, end]);
       }
     }
   }

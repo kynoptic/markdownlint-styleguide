@@ -137,12 +137,12 @@ export function restoreSegments(processed, segments) {
 /**
  * Checks if a position range in a line is inside a code span (backticks).
  * This is used to avoid flagging code elements that are already properly marked up.
- * 
+ *
  * @param {string} line - The line to check
  * @param {number} start - Start position (0-indexed)
  * @param {number} end - End position (0-indexed, exclusive)
  * @returns {boolean} True if the range is inside a code span
- * 
+ *
  * @example
  * isInsideCodeSpan('Text `code here` more', 6, 15) // true
  * isInsideCodeSpan('Text `code here` more', 0, 4) // false
@@ -176,4 +176,73 @@ export function isInsideCodeSpan(line, start, end) {
 
   // Check if the range overlaps with any code span
   return codeSpans.some(([spanStart, spanEnd]) => start >= spanStart && end <= spanEnd);
+}
+
+/**
+ * Checks if text appears to be a domain name used in prose (without protocol).
+ * Domain names used as product/service names should not require backticks.
+ * Only full URLs with protocols (http://, https://, ftp://, etc.) require backticks.
+ *
+ * @param {string} text - The text to check (e.g., "example.com", "GitHub.com")
+ * @param {string} line - The full line context
+ * @param {number} start - Start position of text in line (0-indexed)
+ * @returns {boolean} True if this is a domain name in prose (no protocol), false if it's a full URL
+ *
+ * @example
+ * isDomainInProse('example.com', 'Visit example.com for info', 6) // true
+ * isDomainInProse('example.com', 'Visit http://example.com', 13) // false (has protocol)
+ * isDomainInProse('Gmail.com', 'Use Gmail.com for email', 4) // true
+ */
+export function isDomainInProse(text, line, start) {
+  // Must contain a dot to be a domain
+  if (!text.includes('.')) {
+    return false;
+  }
+
+  // Check if the text itself starts with a protocol
+  // This handles cases where the match includes the full URL
+  const protocolPrefixPattern = /^(?:https?|ftp|ftps|file):\/\//i;
+  if (protocolPrefixPattern.test(text)) {
+    // This is a full URL with protocol, not a domain in prose
+    return false;
+  }
+
+  // Check if preceded by a protocol in the line context
+  // Look backwards from the start position for protocol patterns
+  const beforeText = line.substring(0, start);
+
+  // Common protocols: http://, https://, ftp://, ftps://, file://, etc.
+  const protocolPattern = /(?:https?|ftp|ftps|file):\/\/$/i;
+
+  if (protocolPattern.test(beforeText)) {
+    // This domain is part of a full URL with protocol
+    return false;
+  }
+
+  // Check if this looks like an actual domain name (not just a filename with extension)
+  // Domains typically have common TLDs and proper structure
+  // Common TLDs: .com, .org, .net, .edu, .gov, .io, .co, .uk, etc.
+  const commonTLDs = /\.(com|org|net|edu|gov|io|co|uk|us|ca|de|fr|au|jp|cn|in|br|ru|nl|se|no|dk|fi|es|it|ch|at|be|cz|pl|info|biz|dev|app|tech|ai|me|tv|cc)$/i;
+
+  // Also check for domain-like patterns with subdomains (e.g., api.example.com, mail.google.com)
+  // A domain should have at least 2 parts separated by dots, where the last part is a TLD
+  const domainPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+\.[a-zA-Z]{2,}$/;
+
+  // Must match common TLD OR domain pattern
+  if (!commonTLDs.test(text) && !domainPattern.test(text)) {
+    // This looks more like a filename (e.g., config.yaml, data.json)
+    return false;
+  }
+
+  // Additional check: filenames with uncommon extensions should not be treated as domains
+  // Common file extensions that are NOT TLDs
+  const fileExtensions = /\.(yaml|yml|json|xml|toml|ini|cfg|conf|txt|md|rst|log|csv|tsv|sql|sh|bash|py|js|ts|jsx|tsx|java|cpp|c|h|go|rs|rb|php|pl|swift|kt|cs|vb|scala|clj|r|m|mm|asm|s|hs|elm|fs|erl|ex|exs|lua|nim|v|vhdl|sv|vhd)$/i;
+
+  if (fileExtensions.test(text)) {
+    // This is a filename, not a domain
+    return false;
+  }
+
+  // If we get here, it's a domain name in prose without a protocol
+  return true;
 }

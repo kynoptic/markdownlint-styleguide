@@ -319,26 +319,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests n
     ],
   },
   {
-    "errorContext": "hello.js",
-    "errorDetail": "Filename 'hello.js' should be wrapped in backticks to distinguish it from regular text",
-    "errorRange": [
-      32,
-      8,
-    ],
-    "fixInfo": {
-      "deleteCount": 8,
-      "editColumn": 32,
-      "insertText": "\`hello.js\`",
-    },
-    "lineNumber": 17,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
     "errorContext": "next.config.js",
     "errorDetail": "Filename 'next.config.js' should be wrapped in backticks to distinguish it from regular text",
     "errorRange": [
@@ -519,26 +499,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests t
       "deleteCount": 14,
       "editColumn": 13,
       "insertText": "\`models/User.js\`",
-    },
-    "lineNumber": 71,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
-    "errorContext": "User.js",
-    "errorDetail": "Filename 'User.js' should be wrapped in backticks to distinguish it from regular text",
-    "errorRange": [
-      20,
-      7,
-    ],
-    "fixInfo": {
-      "deleteCount": 7,
-      "editColumn": 20,
-      "insertText": "\`User.js\`",
     },
     "lineNumber": 71,
     "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
@@ -883,26 +843,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "deleteCount": 18,
           "editColumn": 22,
           "insertText": "\`pages/api/hello.js\`",
-        },
-        "lineNumber": 17,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
-        "errorContext": "hello.js",
-        "errorDetail": "Filename 'hello.js' should be wrapped in backticks to distinguish it from regular text",
-        "errorRange": [
-          32,
-          8,
-        ],
-        "fixInfo": {
-          "deleteCount": 8,
-          "editColumn": 32,
-          "insertText": "\`hello.js\`",
         },
         "lineNumber": 17,
         "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
@@ -1276,26 +1216,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "deleteCount": 14,
           "editColumn": 13,
           "insertText": "\`models/User.js\`",
-        },
-        "lineNumber": 71,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
-        "errorContext": "User.js",
-        "errorDetail": "Filename 'User.js' should be wrapped in backticks to distinguish it from regular text",
-        "errorRange": [
-          20,
-          7,
-        ],
-        "fixInfo": {
-          "deleteCount": 7,
-          "editColumn": 20,
-          "insertText": "\`User.js\`",
         },
         "lineNumber": 71,
         "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",

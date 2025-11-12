@@ -6,7 +6,7 @@ Run `npm install` to set up your project and then install debug@latest. <!-- ✅
 
 ## File paths and commands
 
-Look in the `src/utils` directory and run `git clone` https://github.com/user/repo.git <!-- ✅ -->
+Look in the `src/utils` directory and run `git clone` `https://github.com/user/repo.git` <!-- ✅ -->
 
 ## Multiple elements spread across the document
 

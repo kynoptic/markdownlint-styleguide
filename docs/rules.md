@@ -61,6 +61,23 @@ When `ignoreAfterEmoji` is enabled, text after the first emoji is excluded from 
 - Good with `ignoreAfterEmoji: true`: `## Infrastructure essentials ✅ HIGH PRIORITY`
 - Still validated: `## WRONG Case ✅ IGNORED` (flags "WRONG Case" before emoji)
 
+Style note: formatting terminology
+
+When headings discuss formatting styles (bold, italic, underline), these words are treated as common nouns and should follow sentence case rules:
+
+- Good: `## Using bold text`
+- Good: `## Applying italic formatting`
+- Bad: `## Using Bold text`
+- Bad: `## Applying Italic formatting`
+
+If you need to emphasize these terms, consider alternative phrasing:
+
+- `## Bold text formatting`
+- `## The Bold style`
+- `## Working with the Italic font style`
+
+This maintains consistency with sentence case principles while allowing natural expression of emphasis through word order and structure.
+
 ---
 
 ## `backtick-code-elements` (BCE001)
@@ -68,17 +85,18 @@ When `ignoreAfterEmoji` is enabled, text after the first emoji is excluded from 
 Wraps code-like tokens in prose with backticks to improve readability.
 
 - Detects commands, flags, file paths, filenames, function-like calls, env vars, and common tech references.
-- Avoids code spans, links, HTML comments, LaTeX math, URLs, and configured `ignoredTerms`.
+- Avoids code spans, links, HTML comments, LaTeX math, angle bracket autolinks, and configured `ignoredTerms`.
 - Provides contextual error messages and safe auto-fixes.
 - Since `v1.7.0`: uses shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
 - Since `v1.7.1`: improved path detection to reduce false positives on
   non-path text containing slashes (e.g., "Integration/E2E", "Value/Effort",
   "pass/fail").
+- Since `v2.3.0`: distinguishes between domain names in prose and full URLs with protocols (issue #106).
 
 Examples
 
 - Good: "Run `npm install` and edit `config.json`."
-- Bad: "Run `npm install` and edit `config.json`."
+- Bad: "Run npm install and edit config.json."
 
 Path detection heuristics
 
@@ -88,6 +106,18 @@ category labels:
 - ✅ Detected as paths: `src/components/Button.tsx`, `docs/api/endpoints.md`, `/etc/hosts`
 - ❌ Not treated as paths: "Integration/E2E testing", "Value/Effort fields",
   "pass/fail criteria"
+
+Domain names vs. full URLs
+
+The rule treats domain names and full URLs differently based on context:
+
+- ✅ **Full URLs with protocol** require backticks: `http://example.com`, `https://github.com/user/repo`
+- ❌ **Domain names in prose** do NOT require backticks: "Visit GitHub.com", "Send email via Gmail.com"
+- ✅ **URLs in angle brackets** are autolinks (already marked up): `<https://example.com>` - not flagged
+
+This behavior ensures that product/service names like "Outlook.com" or "Microsoft365.com" used
+in prose are not incorrectly flagged, while bare URLs with protocols are properly wrapped for
+consistency and clickability.
 
 ---
 

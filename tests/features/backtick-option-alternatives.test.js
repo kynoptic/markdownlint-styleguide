@@ -32,16 +32,15 @@ describe('Backtick Option Alternatives', () => {
     });
 
     const violations = result['test-content'] || [];
-    
-    // We expect exactly 4 violations (the legitimate paths at the end)
-    // Note: config/settings.json gets flagged twice (once for the path, once for the filename)
-    expect(violations).toHaveLength(4);
-    
+
+    // We expect exactly 3 violations (the legitimate paths at the end)
+    // Note: With overlap detection, config/settings.json is only flagged once (not twice)
+    expect(violations).toHaveLength(3);
+
     // Verify the violations are for the expected paths
     const contexts = violations.map(v => v.errorContext);
     expect(contexts).toContain('src/components');
     expect(contexts).toContain('config/settings.json');
-    expect(contexts).toContain('settings.json');
     expect(contexts).toContain('docs/api');
 
     // Ensure none of the option patterns are flagged

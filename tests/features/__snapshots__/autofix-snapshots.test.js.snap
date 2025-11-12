@@ -20,7 +20,7 @@ exports[`Autofix snapshot tests Individual autofix transformations backtick code
 
 exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 3`] = `
 {
-  "fixed": "The src/\`index.js\` file contains the main logic.
+  "fixed": "The \`src/index.js\` file contains the main logic.
 ",
   "hasChanges": true,
   "original": "The src/index.js file contains the main logic.",
@@ -47,7 +47,7 @@ exports[`Autofix snapshot tests Individual autofix transformations backtick code
 
 exports[`Autofix snapshot tests Individual autofix transformations backtick code elements transformations 6`] = `
 {
-  "fixed": "Navigate to the /\`usr/local/bin\` directory.
+  "fixed": "Navigate to the \`/usr/local/bin\` directory.
 ",
   "hasChanges": true,
   "original": "Navigate to the /usr/local/bin directory.",
@@ -202,7 +202,7 @@ Run \`npm install\` to set up your project and then install debug@latest. <!-- �
 
 ## File paths and commands
 
-Look in the \`src/utils\` directory and run \`git clone\` <https://github.com/user/repo.git> <!-- ❌ -->
+Look in the \`src/utils\` directory and run \`git clone\` \`https://github.com/user/repo.git\` <!-- ❌ -->
 
 ## Multiple elements spread across the document
 
