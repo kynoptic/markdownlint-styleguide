@@ -23,6 +23,7 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
   - Testing strategy in `docs/testing.md`
   - Rule reference in `docs/rules.md`
   - Rule authoring guide in `docs/rule-authoring.md` (how to create new rules with helpers)
+  - Dependency management in `docs/dependency-management.md` (automated updates via Renovate)
 - **Consumers** import the native ES modules directly from `src/` through the configuration presets.
 
 ## Command reference
@@ -53,6 +54,17 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 
 - `npm run docs:config` – Regenerate configuration documentation.
 - `npm run prepare` – Install Husky hooks after dependency installation.
+- `npm run security` – Run security audit on production dependencies.
+
+### Dependency management
+
+Dependencies are automatically updated via Renovate:
+- **Security updates**: Created immediately when vulnerabilities detected
+- **Routine updates**: Weekly on Monday mornings
+- **Auto-merge**: Enabled for dev dependency patches/minors that pass CI
+- **Manual review**: Required for production dependencies and major versions
+
+See `docs/dependency-management.md` for detailed workflow and override procedures.
 
 ## Development workflow
 
