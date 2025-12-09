@@ -16,7 +16,7 @@ export default {
 
   // Only run performance tests
   testMatch: [
-    '**/tests/integration/performance.test.js'
+    '**/tests/performance/**/*.test.js'
   ],
 
   // Increase timeout for performance tests

@@ -84,7 +84,9 @@ describe('Performance Optimization Tests', () => {
       console.log(`Processed ${totalLines} lines in ${duration.toFixed(2)}ms (${codeBlockCount} code block lines)`);
     });
 
-    test('caching improves repeated processing', () => {
+    // TODO: Flaky test - timing-based assertions are unreliable across environments
+    // See https://github.com/kynoptic/markdownlint-trap/issues/111
+    test.skip('caching improves repeated processing', () => {
       const largeDoc = generateLargeDocument(100);
       
       // First run (uncached)

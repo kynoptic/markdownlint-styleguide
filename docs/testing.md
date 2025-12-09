@@ -117,15 +117,20 @@ Integration tests validate rules against real-world repositories and combined ru
 
 Performance tests ensure rules meet latency and memory thresholds:
 
-- **Purpose**: Prevent performance regressions, validate optimization changes
-- **Scope**: Execution time, memory usage, garbage collection profiling
-- **When to write**: After optimization work or when changing hot paths
+- **Purpose**: Prevent performance regressions, validate optimization changes, establish baseline metrics
+- **Scope**: Execution time, memory usage, garbage collection profiling, throughput measurements
+- **When to write**: After optimization work, when changing hot paths, or when adding new rules
+- **Documentation**: See `tests/performance/README.md` for detailed usage and interpretation guide
 
 Run with garbage collection profiling:
 
 ```bash
 npm run test:performance:gc
 ```
+
+**Test files**:
+- `rule-performance.test.js` - Rule execution benchmarks for all custom rules
+- `autofix-safety.test.js` - Autofix safety classifier performance benchmarks
 
 ## Test quality principles
 
@@ -195,7 +200,7 @@ All test files use the `*.test.js` suffix for Jest auto-discovery:
 - **Unit tests**: `tests/unit/<module-name>.test.js` or `src/rules/<module>.test.js` (co-located)
 - **Feature tests**: `tests/features/<rule-name>-<scenario>.test.js`
 - **Integration tests**: `tests/integration/<scenario>.test.js`
-- **Performance tests**: `tests/performance/<benchmark-name>.test.js`
+- **Performance tests**: `tests/performance/<component>-performance.test.js` or `tests/performance/<benchmark-name>.test.js`
 
 ## When to write unit vs. feature tests
 
