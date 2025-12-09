@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] - 2025-12-09
+
+### Added
+
+- New `ignoreAfterEmoji` configuration option for `sentence-case-heading` rule to skip validation of headings following emoji prefixes
+- New `placeholderPatterns` configuration option for `no-dead-internal-links` rule with word-boundary matching to customize placeholder detection patterns
+- Rule authoring helpers in `src/rules/rule-helpers.js` to eliminate boilerplate code across rules (internal improvement)
+- Comprehensive performance test suite covering autofix safety, rule performance, and memory stability
+- Automated dependency management via Renovate with weekly updates and security patch automation
+- Documentation for dependency management workflow in `docs/dependency-management.md`
+- Architectural decision record for native ESM distribution in `docs/decisions/adr-001-native-esm-distribution.md`
+- Architectural decision record for automated dependency updates in `docs/decisions/adr-002-automated-dependency-updates.md`
+- Rule authoring guide in `docs/rule-authoring.md` covering new helper utilities
+
+### Changed
+
+- Eliminated Babel transpilation pipeline - now ships native ES modules directly from `src/`
+- Package entry point updated from `.markdownlint-rules/index.cjs` to `src/index.js` (native ESM)
+- Removed 6 Babel-related devDependencies, reducing build complexity
+- Enhanced `backtick-code-elements` rule to distinguish domain names (like `example.com` in prose) from full URLs requiring backticks
+- Improved placeholder detection in `no-dead-internal-links` using word boundaries to prevent false matches (e.g., "TODO" won't match "PHOTODOC.md")
+
+### Fixed
+
+- Reduced false positives in `sentence-case-heading` rule for bold text validation
+- Fixed incorrect flagging of domain names in prose by `backtick-code-elements` rule
+- Resolved Renovate configuration issue by explicitly specifying repository to scan
+- Updated dependencies to resolve security vulnerabilities (markdownlint-cli2, glob, prettier)
+- Replaced flaky timing assertion in performance tests with functional validation
+
+---
+
 ## [2.2.0] - 2025-11-06
 
 ### Added
@@ -365,7 +397,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.2.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...v2.0.0
