@@ -1,6 +1,12 @@
 #!/usr/bin/env node
+/**
+ * Prepare script for markdownlint-trap.
+ * Sets up husky hooks and enforces quality gates during development.
+ *
+ * Note: Build step removed - native ESM distribution (see ADR-001)
+ */
 import { execSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -23,57 +29,13 @@ function safeRun(cmd, label) {
   }
 }
 
-function checkBuildArtifacts() {
-  const artifactsDir = resolve(projectRoot, '.markdownlint-rules');
-  const srcDir = resolve(projectRoot, 'src');
-
-  if (!existsSync(artifactsDir)) {
-    console.log('🏗️  Build artifacts missing, building...');
-    return false;
-  }
-
-  try {
-    // Check if any source file is newer than build artifacts
-    const srcStat = statSync(srcDir);
-    const artifactsStat = statSync(artifactsDir);
-
-    if (srcStat.mtime > artifactsStat.mtime) {
-      console.log('🔄 Source files are newer than build artifacts, rebuilding...');
-      return false;
-    }
-  } catch (err) {
-    console.log('⚠️  Could not check file timestamps, rebuilding to be safe...');
-    return false;
-  }
-
-  return true;
-}
-
 function enforceQualityGates() {
   const isGitRepo = existsSync(resolve(projectRoot, '.git'));
   if (!isGitRepo) {
     return; // Skip quality checks for npm installations
   }
 
-  const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
-
   console.log('🔍 Enforcing quality gates...');
-
-  // Skip build artifacts check in CI since .markdownlint-rules/ is gitignored
-  // and will always appear as uncommitted changes
-  if (!isCI) {
-    try {
-      // Check if there are uncommitted changes to build artifacts after build
-      const status = runQuiet('git status --porcelain .markdownlint-rules/');
-      if (status.trim()) {
-        console.error('❌ Build artifacts are out of sync with source code');
-        console.error('   Run "npm run build" and commit the changes');
-        process.exit(1);
-      }
-    } catch (err) {
-      console.warn('⚠️  Could not check git status for build artifacts');
-    }
-  }
 
   try {
     // Ensure linting passes
@@ -82,19 +44,6 @@ function enforceQualityGates() {
   } catch (err) {
     console.error('❌ Linting failed - fix errors before continuing');
     console.error('   Run "npm run lint" to see details');
-    process.exit(1);
-  }
-}
-
-// Check if build is needed
-const needsBuild = !checkBuildArtifacts();
-
-if (needsBuild) {
-  try {
-    run('npm run build');
-    console.log('✅ Build completed successfully');
-  } catch (err) {
-    console.error('❌ Build failed:', err?.message || err);
     process.exit(1);
   }
 }

@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const { execSync } = require('child_process');
 
 // ANSI colors
@@ -93,27 +94,30 @@ class DoctorCheck {
     }
   }
 
-  checkRuleLoading() {
+  async checkRuleLoading() {
     try {
       // Try to load from the package
       let rules;
       try {
-        rules = require('markdownlint-trap');
+        const loaded = require('markdownlint-trap');
+        // When requiring an ESM module from CJS, Node wraps it with default export
+        rules = loaded.default || loaded;
       } catch (err) {
-        // If running from within the package itself, try loading from built output
-        const localPath = path.join(__dirname, '..', '.markdownlint-rules', 'index.cjs');
+        // If running from within the package itself, try loading from source using dynamic import
+        const localPath = path.join(__dirname, '..', 'src', 'index.js');
         if (fs.existsSync(localPath)) {
           try {
-            rules = require(localPath);
+            // Use dynamic import for ESM modules from CommonJS
+            // pathToFileURL handles Windows backslashes correctly
+            const imported = await import(pathToFileURL(localPath).href);
+            rules = imported.default;
           } catch (localErr) {
             // Report actual syntax or loading errors, not just missing module
             this.addCheck(
               'Custom rules loadable',
               'fail',
               `Error loading rules: ${localErr.message}`,
-              localErr.code === 'MODULE_NOT_FOUND'
-                ? 'Run: npm run build'
-                : 'Check syntax errors in rule files'
+              'Check syntax errors in rule files'
             );
             return false;
           }
@@ -121,8 +125,8 @@ class DoctorCheck {
           this.addCheck(
             'Custom rules loadable',
             'fail',
-            'Package not found in node_modules and built output not available',
-            'Run: npm install markdownlint-trap (or npm run build if developing locally)'
+            'Package not found in node_modules and source not available',
+            'Run: npm install markdownlint-trap'
           );
           return false;
         } else {
@@ -240,7 +244,7 @@ class DoctorCheck {
   }
 }
 
-function runDiagnostics() {
+async function runDiagnostics() {
   const doctor = new DoctorCheck();
   const projectRoot = process.cwd();
 
@@ -250,16 +254,16 @@ function runDiagnostics() {
   log('Checking dependencies...', 'blue');
   doctor.checkDependency('Node.js', 'node --version', 'Install from https://nodejs.org');
   doctor.checkDependency('markdownlint-cli2', 'npx markdownlint-cli2 --version', 'npm install -D markdownlint-cli2');
-  
+
   // Check configuration files
   log('\nChecking configuration files...', 'blue');
   const cliConfigPath = path.join(projectRoot, '.markdownlint-cli2.jsonc');
   const vscodeConfigPath = path.join(projectRoot, '.vscode', 'settings.json');
-  
+
   if (doctor.checkFile('CLI config (.markdownlint-cli2.jsonc)', cliConfigPath, false)) {
     doctor.checkJsonFile('CLI config syntax', cliConfigPath);
   }
-  
+
   if (doctor.checkFile('VS Code config (.vscode/settings.json)', vscodeConfigPath, false)) {
     doctor.checkJsonFile('VS Code config syntax', vscodeConfigPath);
     doctor.checkVSCodeSettings(vscodeConfigPath);
@@ -267,12 +271,16 @@ function runDiagnostics() {
 
   // Check rule loading
   log('\nChecking rules...', 'blue');
-  doctor.checkRuleLoading();
+  await doctor.checkRuleLoading();
 
   // Report results
   return doctor.report();
 }
 
 // Run diagnostics
-const exitCode = runDiagnostics();
-process.exit(exitCode);
+runDiagnostics().then(exitCode => {
+  process.exit(exitCode);
+}).catch(err => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});

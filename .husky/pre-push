@@ -1,22 +1,8 @@
 #!/bin/sh
-# Pre-push hook to ensure build artifacts are current and quality gates pass
+# Pre-push hook to ensure quality gates pass
+# Note: Build step removed - native ESM distribution (see ADR-001)
 
 echo "🔍 Running pre-push quality checks..."
-
-# Check if build artifacts are up to date
-echo "📦 Checking build artifacts..."
-if ! npm run build --silent 2>/dev/null; then
-    echo "❌ Build failed"
-    exit 1
-fi
-
-# Check for uncommitted changes after build (indicates stale artifacts)
-if ! git diff --exit-code --quiet .markdownlint-rules/; then
-    echo "❌ Build artifacts are out of sync with source code"
-    echo "   Run 'npm run build' and commit the changes"
-    git diff --name-only .markdownlint-rules/
-    exit 1
-fi
 
 # Ensure all tests pass before pushing
 echo "🧪 Running test suite..."

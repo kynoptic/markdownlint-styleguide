@@ -1,13 +1,16 @@
 {
   "name": "markdownlint-trap",
   "version": "2.2.0",
-  "main": "./.markdownlint-rules/index.cjs",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
   "bin": {
     "markdownlint-trap": "./scripts/init.cjs"
   },
   "files": [
-    ".markdownlint-rules",
-    "src/index.js",
+    "src",
     "scripts/init.cjs",
     "scripts/doctor.cjs",
     "scripts/distribute-local.cjs",
@@ -18,9 +21,6 @@
   ],
   "type": "module",
   "scripts": {
-    "prebuild": "rm -rf .markdownlint-rules",
-    "build": "BABEL_ENV=build babel src --out-dir .markdownlint-rules --extensions '.js,.mjs' --out-file-extension .cjs --copy-files",
-    "postinstall": "[ -f .markdownlint-rules/index.cjs ] || npm run build",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration",
     "test:performance": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.performance.mjs",
@@ -40,20 +40,14 @@
     "unlink:projects": "bash scripts/unlink-from-projects.sh",
     "unlink:projects:dry": "bash scripts/unlink-from-projects.sh --dry-run",
     "prepare": "node scripts/prepare.mjs",
-    "validate": "npm run lint && npm run build && npm test && echo '✅ All validation checks passed'"
+    "validate": "npm run lint && npm test && echo '✅ All validation checks passed'"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
     "jsonc-parser": "^3.3.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.27.2",
-    "@babel/core": "^7.27.7",
-    "@babel/preset-env": "^7.27.2",
     "@types/jest": "^29.5.14",
-    "babel-jest": "^30.0.2",
-    "babel-plugin-add-module-exports": "^1.0.4",
-    "babel-plugin-transform-rewrite-imports": "^1.5.3",
     "debug": "^4.4.1",
     "eslint": "^8.57.1",
     "glob": "^11.0.3",

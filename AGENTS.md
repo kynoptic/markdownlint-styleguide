@@ -2,9 +2,9 @@
 
 ## Overview
 
-markdownlint-trap is a Node.js project that ships a curated set of custom `markdownlint` rules. The rules enforce documentation standards such as sentence-case headings, backticks around code elements, and validated internal links. Source code is written as ES modules and transpiled via Babel for compatibility with markdownlint. Testing relies on Jest, while ESLint and markdownlint-cli2 enforce code and documentation quality.
+markdownlint-trap is a Node.js project that ships a curated set of custom `markdownlint` rules. The rules enforce documentation standards such as sentence-case headings, backticks around code elements, and validated internal links. Source code is written as native ES modules and distributed directly without transpilation. Testing relies on Jest, while ESLint and markdownlint-cli2 enforce code and documentation quality.
 
-**Key technologies**: Node.js, markdownlint, Babel, Jest, ESLint.
+**Key technologies**: Node.js, markdownlint, Jest, ESLint.
 
 ## Repository layout
 
@@ -12,7 +12,6 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
   - Complex rules may be split into submodules (e.g., `sentence-case/case-classifier.js`, `sentence-case/fix-builder.js`)
   - Shared utilities live in `src/rules/shared-heuristics.js`, `src/rules/shared-utils.js`, `src/rules/shared-constants.js`
   - Rule authoring helpers in `src/rules/rule-helpers.js` provide standardized config validation, logging, and fix wiring
-- **Build artifacts** are emitted to `.markdownlint-rules/`; regenerate them rather than editing in place.
 - **Scripts** reside in `scripts/` and root `*.jsonc` presets (`basic`, `recommended`, `strict`) configure rule bundles.
 - **Tests** live under `tests/`:
   - Unit tests in `tests/unit/` and `src/rules/*.test.js` (fast, isolated component testing)
@@ -24,7 +23,7 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
   - Testing strategy in `docs/testing.md`
   - Rule reference in `docs/rules.md`
   - Rule authoring guide in `docs/rule-authoring.md` (how to create new rules with helpers)
-- **Consumers** `import` the compiled CommonJS rules through the configuration presets.
+- **Consumers** import the native ES modules directly from `src/` through the configuration presets.
 
 ## Command reference
 
@@ -32,12 +31,9 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 
 - `npm install` – Install project dependencies.
 
-### Build and test
+### Test and lint
 
-- `npm run build` – Transpile ES modules in `src/` to CommonJS output in `.markdownlint-rules/`.
 - `npm test` – Run the full Jest suite (all test layers).
-- `npm run test:unit` – Run only unit tests (~200ms, fast feedback).
-- `npm run test:features` – Run feature/end-to-end tests.
 - `npm run test:integration` – Execute integration scenarios.
 - `npm run test:integration:external` – Validate rules against curated external repositories.
 - `npm run test:performance` – Run performance benchmarks (use `...:gc` variant for garbage-collection profiling).
@@ -63,9 +59,9 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 1. Implement or update rules in `src/` using ES modules and shared utilities where appropriate.
    - Use rule helpers from `src/rules/rule-helpers.js` to eliminate boilerplate (see `docs/rule-authoring.md`)
    - Leverage shared utilities for common patterns
-2. Run Jest directly against source (no build step required for tests).
-3. Generate CommonJS artifacts with `npm run build` for distribution.
-4. Validate the user experience with integration tests and performance suites as needed.
+2. Run tests with `npm test` (tests run directly against source).
+3. Validate the user experience with integration tests and performance suites as needed.
+4. No build step required - ES modules are distributed directly from `src/`.
 
 ## Coding style and conventions
 
