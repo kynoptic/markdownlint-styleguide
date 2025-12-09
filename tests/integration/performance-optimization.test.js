@@ -84,30 +84,54 @@ describe('Performance Optimization Tests', () => {
       console.log(`Processed ${totalLines} lines in ${duration.toFixed(2)}ms (${codeBlockCount} code block lines)`);
     });
 
-    // TODO: Flaky test - timing-based assertions are unreliable across environments
-    // See https://github.com/kynoptic/markdownlint-trap/issues/111
-    test.skip('caching improves repeated processing', () => {
+    test('caching returns consistent results', () => {
       const largeDoc = generateLargeDocument(100);
-      
-      // First run (uncached)
-      const startTime1 = process.hrtime.bigint();
+
+      // Warm-up run to stabilize JIT compilation
+      getCodeBlockLines(largeDoc);
+
+      // First measured run
       const result1 = getCodeBlockLines(largeDoc);
-      const endTime1 = process.hrtime.bigint();
-      const duration1 = Number(endTime1 - startTime1) / 1000000;
-      
-      // Second run (cached)
-      const startTime2 = process.hrtime.bigint();
+
+      // Second run (should use cached result)
       const result2 = getCodeBlockLines(largeDoc);
-      const endTime2 = process.hrtime.bigint();
-      const duration2 = Number(endTime2 - startTime2) / 1000000;
-      
-      // Results should be identical
+
+      // Third run (should use cached result)
+      const result3 = getCodeBlockLines(largeDoc);
+
+      // All results should be identical (validates cache correctness)
       expect(result2).toEqual(result1);
-      
-      // Cached run should be significantly faster (at least 50% improvement)
-      expect(duration2).toBeLessThan(duration1 * 0.5);
-      
-      console.log(`First run: ${duration1.toFixed(2)}ms, Cached run: ${duration2.toFixed(2)}ms (${((1 - duration2/duration1) * 100).toFixed(1)}% faster)`);
+      expect(result3).toEqual(result1);
+
+      // Verify the results are actually the expected format
+      expect(result1).toHaveLength(largeDoc.length);
+      expect(Array.isArray(result1)).toBe(true);
+      expect(result1.every(val => typeof val === 'boolean')).toBe(true);
+
+      // Document actual performance characteristics without brittle assertions
+      const iterations = 10;
+      const timings = [];
+
+      for (let i = 0; i < iterations; i++) {
+        const start = process.hrtime.bigint();
+        getCodeBlockLines(largeDoc);
+        const end = process.hrtime.bigint();
+        timings.push(Number(end - start) / 1000000);
+      }
+
+      const avgDuration = timings.reduce((sum, t) => sum + t, 0) / timings.length;
+      const minDuration = Math.min(...timings);
+      const maxDuration = Math.max(...timings);
+
+      console.log(`Cache performance over ${iterations} iterations:`);
+      console.log(`  Average: ${avgDuration.toFixed(2)}ms`);
+      console.log(`  Min: ${minDuration.toFixed(2)}ms`);
+      console.log(`  Max: ${maxDuration.toFixed(2)}ms`);
+      console.log(`  Variation: ${((maxDuration - minDuration) / avgDuration * 100).toFixed(1)}%`);
+
+      // Sanity check: cached operations should complete in reasonable time
+      // This is a very loose threshold to catch severe regressions without being flaky
+      expect(avgDuration).toBeLessThan(100); // 100ms is very generous for cached access
     });
   });
 
