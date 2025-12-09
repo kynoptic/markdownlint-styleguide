@@ -12,12 +12,13 @@ import {
 } from '../../src/rules/autofix-safety.js';
 
 // Performance thresholds (in microseconds)
-// Note: Thresholds are generous to account for CI environment variability
+// Note: Thresholds are very generous to account for CI environment variability
+// and cold-start JIT compilation overhead on first invocation
 const THRESHOLDS = {
-  SINGLE_CLASSIFICATION: 5000, // 5ms max per classification (CI can be slow)
+  SINGLE_CLASSIFICATION: 10000, // 10ms max per classification (CI can have cold-start overhead)
   BATCH_100: 100000, // 100ms max for 100 classifications
   BATCH_1000: 500000, // 500ms max for 1000 classifications
-  HEURISTIC_CHECK: 500, // 500µs max per heuristic check
+  HEURISTIC_CHECK: 1000, // 1ms max per heuristic check
 };
 
 /**

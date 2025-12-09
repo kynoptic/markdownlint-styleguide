@@ -11,6 +11,7 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 - **Source** lives in `src/`, with individual rules inside `src/rules/` and the aggregated export in `src/index.js`.
   - Complex rules may be split into submodules (e.g., `sentence-case/case-classifier.js`, `sentence-case/fix-builder.js`)
   - Shared utilities live in `src/rules/shared-heuristics.js`, `src/rules/shared-utils.js`, `src/rules/shared-constants.js`
+  - Rule authoring helpers in `src/rules/rule-helpers.js` provide standardized config validation, logging, and fix wiring
 - **Build artifacts** are emitted to `.markdownlint-rules/`; regenerate them rather than editing in place.
 - **Scripts** reside in `scripts/` and root `*.jsonc` presets (`basic`, `recommended`, `strict`) configure rule bundles.
 - **Tests** live under `tests/`:
@@ -22,6 +23,7 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
   - Architecture and decisions in `docs/architecture.md` and `docs/decisions/`
   - Testing strategy in `docs/testing.md`
   - Rule reference in `docs/rules.md`
+  - Rule authoring guide in `docs/rule-authoring.md` (how to create new rules with helpers)
 - **Consumers** `import` the compiled CommonJS rules through the configuration presets.
 
 ## Command reference
@@ -59,6 +61,8 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 ## Development workflow
 
 1. Implement or update rules in `src/` using ES modules and shared utilities where appropriate.
+   - Use rule helpers from `src/rules/rule-helpers.js` to eliminate boilerplate (see `docs/rule-authoring.md`)
+   - Leverage shared utilities for common patterns
 2. Run Jest directly against source (no build step required for tests).
 3. Generate CommonJS artifacts with `npm run build` for distribution.
 4. Validate the user experience with integration tests and performance suites as needed.
@@ -86,6 +90,7 @@ The distribution currently contains five custom rules:
 
 Supporting modules include:
 
+- `src/rules/rule-helpers.js` – Rule authoring contract with typed helpers (NEW: eliminates boilerplate, see `docs/rule-authoring.md`)
 - `src/rules/shared-heuristics.js` – Shared utilities for acronym detection, markup preservation, code span checking (prevents behavioral drift between rules)
 - `src/rules/shared-utils.js` – General utility functions
 - `src/rules/shared-constants.js` – Shared constants and patterns
