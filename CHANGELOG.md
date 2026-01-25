@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.0] - 2025-01-25
+
+### Added
+
+- snake_case identifier detection in `backtick-code-elements` rule (e.g., `max_retries`, `user_name`, `fetch_data`)
+- camelCase identifier detection in `backtick-code-elements` rule (e.g., `useEffect`, `useState`, `fetchData`)
+- PascalCase identifier detection in `backtick-code-elements` rule (e.g., `MyComponent`, `HttpClient`, `XMLHttpRequest`)
+- Code identifier preservation in `sentence-case-heading` rule to prevent incorrect lowercasing of programming constructs in headings
+
+### Fixed
+
+- Reduced false positives by exempting locale codes (en_US, zh_CN, ja_JP) from snake_case detection
+- Reduced false positives by exempting brand names (iPhone, eBay, YouTube, LinkedIn) from camelCase/PascalCase detection
+- Reduced false positives by exempting Mc/Mac surname patterns (McDonald, MacArthur) from identifier detection
+- Improved placeholder detection and added documentation-related acronyms to reduce false positives
+
+---
+
 ## [2.3.0] - 2025-12-09
 
 ### Added
