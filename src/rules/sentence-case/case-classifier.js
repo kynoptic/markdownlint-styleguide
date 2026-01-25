@@ -8,7 +8,50 @@
  */
 
 import { isAcronym, preserveSegments } from '../shared-heuristics.js';
-import { UNICODE_LETTER_REGEX, UNICODE_UPPERCASE_REGEX } from '../shared-constants.js';
+import {
+  UNICODE_LETTER_REGEX,
+  UNICODE_UPPERCASE_REGEX,
+  camelCaseExemptions,
+  mcMacNamePattern
+} from '../shared-constants.js';
+
+/**
+ * Code identifier patterns for detecting programming constructs in headings.
+ * These should preserve their original casing (not be lowercased).
+ */
+const CODE_IDENTIFIER_PATTERNS = {
+  // camelCase: starts lowercase, has internal uppercase (useEffect, fetchData)
+  camelCase: /^[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*$/,
+  // PascalCase: starts uppercase, has another uppercase, has lowercase (MyComponent, HttpClient)
+  // Uses requirement of 2+ uppercase letters to avoid matching proper nouns like "Paris"
+  pascalCase: /^[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*$/,
+  // snake_case: lowercase with underscores (user_name, max_retries)
+  snakeCase: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/
+};
+
+/**
+ * Checks if a word is a code identifier that should preserve its casing.
+ * @param {string} word The word to check.
+ * @returns {boolean} True if the word is a code identifier.
+ */
+function isCodeIdentifier(word) {
+  // Check against exemptions first (brand names like iPhone, eBay)
+  if (camelCaseExemptions.has(word)) {
+    return false; // It's a brand name, not a code identifier
+  }
+
+  // Check Mc/Mac surname pattern (McDonald, MacArthur)
+  if (mcMacNamePattern.test(word)) {
+    return false; // It's a name, not a code identifier
+  }
+
+  // Check identifier patterns
+  return (
+    CODE_IDENTIFIER_PATTERNS.camelCase.test(word) ||
+    CODE_IDENTIFIER_PATTERNS.pascalCase.test(word) ||
+    CODE_IDENTIFIER_PATTERNS.snakeCase.test(word)
+  );
+}
 
 /**
  * Strips emoji and symbol characters from the beginning of text.
@@ -273,7 +316,8 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
         // Allow short acronyms (<= 4 chars, all caps)
-        if (!isAcronym(firstWord)) {
+        // Allow code identifiers (camelCase, PascalCase, snake_case)
+        if (!isAcronym(firstWord) && !isCodeIdentifier(firstWord)) {
           return {
             isValid: false,
             errorMessage: "Heading's first word should be capitalized."
@@ -384,7 +428,8 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       !isAcronym(word) && // Allow short acronyms
       word !== 'I' && // Allow the pronoun "I"
       !expectedWordCasing && // If it's not a known proper noun/technical term
-      !word.startsWith('PRESERVED')
+      !word.startsWith('PRESERVED') &&
+      !isCodeIdentifier(word) // Allow code identifiers (camelCase, PascalCase, snake_case)
     ) {
       return {
         isValid: false,

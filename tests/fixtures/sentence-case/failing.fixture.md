@@ -30,7 +30,7 @@
 
 # Node.js-Based tools <!-- ❌ -->
 
-# Should fail: NodeJS 18 <!-- ❌ -->
+# Should fail: Nodejs version 18 <!-- ❌ -->
 
 # When to use 'Git' vs GitHub <!-- ❌ -->
 

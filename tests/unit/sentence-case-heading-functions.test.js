@@ -259,15 +259,15 @@ describe("validateBoldText", () => {
   });
 
   test("test_should_skip_bold_text_inside_code_spans", async () => {
-    const insideCodeContent = "- `**NotValidated**` inside code";
-    const outsideCodeContent = "- **NotValidated** outside code";
+    const insideCodeContent = "- `**Some Text Here**` inside code";
+    const outsideCodeContent = "- **Some Text Here** outside code";
 
     const insideViolations = await lintMarkdown(insideCodeContent);
     const outsideViolations = await lintMarkdown(outsideCodeContent);
 
     // Bold markers inside code spans should not trigger validation
     expect(insideViolations.length).toBe(0);
-    // But bold text outside code spans should be validated
+    // But bold text outside code spans should be validated (Title Case is wrong)
     expect(outsideViolations.length).toBeGreaterThan(0);
     expect(outsideViolations[0].errorDetail).toMatch(/should be lowercase|capitalized/i);
   });
