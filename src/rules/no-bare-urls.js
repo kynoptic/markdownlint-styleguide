@@ -122,7 +122,22 @@ export default {
         token.children.forEach((child, childIndex) => {
           if (child.type === "link_open" && child.info === "auto" && child.markup !== "autolink") {
             const href = child.attrGet("href");
-            
+
+            // Skip markdown file references that were auto-linkified
+            // markdown-it's linkify treats ".md" as a domain (e.g., "SKILL.md" → "http://SKILL.md")
+            // These are not real URLs - they're file references in documentation
+            if (href && /^https?:\/\/[^/]+\.md$/i.test(href)) {
+              // Check if the original text doesn't contain http/https
+              // This indicates markdown-it added the protocol, not the author
+              const textToken = token.children[childIndex + 1];
+              if (textToken && textToken.type === 'text') {
+                const originalText = textToken.content;
+                if (!/^https?:\/\//i.test(originalText)) {
+                  return; // Skip - this is a markdown file reference, not a bare URL
+                }
+              }
+            }
+
             // Check if this URL domain is in the allowed list
             if (allowedDomains.length > 0) {
               try {

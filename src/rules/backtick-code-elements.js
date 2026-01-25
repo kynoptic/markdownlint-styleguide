@@ -275,6 +275,31 @@ function isLikelyFilePath(str) {
     }
   }
 
+  // Detect prose patterns with slashes that describe lists or combinations
+  // e.g., "letters/numbers/hyphens", "tests/lints/quality", "Build/test"
+  // These are typically common English words (often plural), not directory names
+  const proseListWords = new Set([
+    'letters', 'numbers', 'hyphens', 'symbols', 'characters', 'words', 'spaces',
+    'tests', 'lints', 'checks', 'builds', 'runs', 'tasks', 'jobs', 'steps',
+    'files', 'folders', 'items', 'entries', 'records', 'rows', 'columns',
+    'inputs', 'outputs', 'results', 'errors', 'warnings', 'issues', 'bugs',
+    'features', 'options', 'settings', 'configs', 'values', 'keys', 'names',
+    'build', 'test', 'lint', 'check', 'run', 'start', 'stop', 'deploy',
+    'quality', 'performance', 'security', 'safety', 'stability'
+  ]);
+
+  // If all segments (lowercase) are common prose words, it's not a path
+  const allSegmentsAreProse = segments.every(s => proseListWords.has(s.toLowerCase()));
+  if (allSegmentsAreProse) {
+    return false;
+  }
+
+  // If the majority of segments are prose words and there's no file extension, skip it
+  const proseCount = segments.filter(s => proseListWords.has(s.toLowerCase())).length;
+  if (proseCount >= segments.length - 1 && !/\.[^/]+$/.test(segments[segments.length - 1])) {
+    return false;
+  }
+
   // A likely path should contain at least one letter.
   return /[a-zA-Z]/.test(str);
 }

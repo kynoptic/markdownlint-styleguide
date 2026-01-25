@@ -238,7 +238,14 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
         const possibleAcronym = incorrectAcronymMatch[1].toUpperCase();
         // Only flag if the uppercase version would be a valid acronym (2-4 chars)
         // AND it doesn't look like a normal word (exclude common words like "Well", "Over", "Under", etc.)
-        const commonHyphenatedPrefixes = ['well', 'over', 'under', 'self', 'non', 'pre', 'post', 'anti', 'pro', 'co'];
+        // Common English words that appear as hyphenated prefixes - NOT acronyms
+        // e.g., "How-to", "Step-by-step", "In-person", "Self-service"
+        const commonHyphenatedPrefixes = [
+          'well', 'over', 'under', 'self', 'non', 'pre', 'post', 'anti', 'pro', 'co',
+          'how', 'step', 'in', 'on', 'off', 'out', 'up', 'down', 'all', 'one', 'two',
+          'high', 'low', 'long', 'short', 'full', 'half', 'part', 'cross', 'multi',
+          'day', 'time', 'year', 'end', 'mid', 'top', 'sub', 're', 'de', 'un'
+        ];
         if (possibleAcronym.length >= 2 && possibleAcronym.length <= 4 &&
             !commonHyphenatedPrefixes.includes(possibleAcronym.toLowerCase())) {
           return {
