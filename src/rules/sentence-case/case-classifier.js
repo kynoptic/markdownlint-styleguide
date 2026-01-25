@@ -106,6 +106,12 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
     return true;
   }
 
+  // Skip form field / metadata patterns like "name (required)", "description (optional)"
+  // These are intentionally lowercase in technical documentation and API specs
+  if (/^\w+\s*\((required|optional|deprecated|readonly|read-only)\)$/i.test(headingText.trim())) {
+    return true;
+  }
+
   return false;
 }
 
@@ -727,6 +733,17 @@ export function validateHeading(headingText, specialCasedTerms, ambiguousTerms =
  */
 export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {}) {
   if (!boldText || !boldText.trim()) {
+    return { isValid: true };
+  }
+
+  // Skip conventional commit types - these are intentionally lowercase by convention
+  // Common types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+  const conventionalCommitTypes = [
+    'feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test',
+    'build', 'ci', 'chore', 'revert', 'wip', 'release'
+  ];
+  const trimmedText = boldText.trim().toLowerCase();
+  if (conventionalCommitTypes.includes(trimmedText)) {
     return { isValid: true };
   }
 

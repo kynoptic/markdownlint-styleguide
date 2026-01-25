@@ -79,6 +79,49 @@ function isSentenceBoundary(match, fullText) {
 }
 
 /**
+ * Trim trailing punctuation from URLs that is likely sentence punctuation.
+ * URLs can legitimately end with these chars, but when in prose like
+ * "(https://example.com/path)." the trailing ")." is usually sentence punctuation.
+ *
+ * @param {string} url - The matched URL
+ * @returns {string} The URL with trailing sentence punctuation trimmed
+ */
+function trimUrlTrailingPunctuation(url) {
+  // Count opening and closing parens to handle balanced parens in URLs
+  let openParens = 0;
+  let closeParens = 0;
+  for (const char of url) {
+    if (char === '(') openParens++;
+    if (char === ')') closeParens++;
+  }
+
+  // Trim trailing punctuation that's likely sentence-ending
+  // Keep trimming while we have unbalanced closing parens or sentence punctuation
+  let trimmed = url;
+  while (trimmed.length > 0) {
+    const lastChar = trimmed[trimmed.length - 1];
+
+    // Trim trailing periods, commas, semicolons, exclamation, question marks
+    if ('.,:;!?'.includes(lastChar)) {
+      trimmed = trimmed.slice(0, -1);
+      continue;
+    }
+
+    // Trim trailing closing parens only if unbalanced
+    if (lastChar === ')' && closeParens > openParens) {
+      trimmed = trimmed.slice(0, -1);
+      closeParens--;
+      continue;
+    }
+
+    // No more trimming needed
+    break;
+  }
+
+  return trimmed;
+}
+
+/**
  * Determine if an index range is within a Markdown link or image.
  *
  * @param {string} text - Line being evaluated.
@@ -548,9 +591,19 @@ function backtickCodeElements(params, onError) {
       pattern.lastIndex = 0;
       let match;
       while ((match = pattern.exec(line)) !== null) {
-        const fullMatch = match[0];
-        const start = match.index;
-        const end = start + fullMatch.length;
+        let fullMatch = match[0];
+        let start = match.index;
+        let end = start + fullMatch.length;
+
+        // For URLs, trim trailing punctuation that's likely sentence-ending
+        // This handles cases like "(https://example.com/path)." in prose
+        if (/^(?:https?|ftp|ftps|file):\/\//i.test(fullMatch)) {
+          const trimmed = trimUrlTrailingPunctuation(fullMatch);
+          if (trimmed !== fullMatch) {
+            fullMatch = trimmed;
+            end = start + fullMatch.length;
+          }
+        }
 
         // Skip if this range overlaps with an already-flagged range
         const overlapsWithFlagged = flaggedRanges.some(([flaggedStart, flaggedEnd]) => {
@@ -573,6 +626,16 @@ function backtickCodeElements(params, onError) {
         }
         // Skip if inside a Markdown link, wiki link, HTML comment, or angle bracket autolink
         if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
+          continue;
+        }
+
+        // Skip country abbreviations like U.S, U.K, E.U (not filenames)
+        if (/^[A-Z]\.[A-Z]\.?$/i.test(fullMatch)) {
+          continue;
+        }
+
+        // Skip camera aperture notation like f/2.8, f/1.4 (not file paths)
+        if (/^f\/\d+(\.\d+)?$/i.test(fullMatch)) {
           continue;
         }
 
