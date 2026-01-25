@@ -8,7 +8,8 @@
 import {
   backtickIgnoredTerms as ignoredTerms,
   commonConceptualWords,
-  knownDirectoryPrefixes
+  knownDirectoryPrefixes,
+  snakeCaseExemptions
 } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
 import { 
@@ -446,6 +447,10 @@ const ERROR_MESSAGE_PATTERNS = [
   {
     pattern: /^(?:export|set)\s+/,
     message: (text) => `Variable assignment '${text}' should be wrapped in backticks to show it's a shell command`
+  },
+  {
+    pattern: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/,
+    message: (text) => `Identifier '${text}' should be wrapped in backticks to indicate it's a code variable or function name`
   }
 ];
 
@@ -591,7 +596,12 @@ function backtickCodeElements(params, onError) {
       /\b(?:export|set)\s+[A-Za-z_][\w.-]*=\$?[\w.-]+\b/g,   // shell variable assignments
       // Permissive shell variable usage, avoids prices like $50 or $19.99.
       // Allows single-digit variables like $1, but not $10 or more.
-      /\$(?!\d{2,}(?:\.\d*)?\b|\d\.\d+)\S+/g
+      /\$(?!\d{2,}(?:\.\d*)?\b|\d\.\d+)\S+/g,
+
+      // snake_case identifiers (variable_name, function_name, etc.)
+      // Pattern: lowercase letter, followed by one or more (_alphanumeric+) segments
+      // Also matches leading underscore for _internal_helper style
+      /\b_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g
     ];
 
     const flaggedRanges = []; // Track ranges [start, end] that have been flagged
@@ -659,6 +669,17 @@ function backtickCodeElements(params, onError) {
         }
         // Skip if in ignored terms (default + user-configured)
         if (allIgnoredTerms.has(fullMatch)) {
+          continue;
+        }
+
+        // Skip snake_case exemptions (locale codes like en_US, zh_CN, etc.)
+        if (snakeCaseExemptions.has(fullMatch)) {
+          continue;
+        }
+
+        // Skip date-like patterns (YYYY_MM_DD, backup_2024_03_20, etc.)
+        // These contain numeric segments that look like dates
+        if (/^\d{4}_\d{2}_\d{2}$/.test(fullMatch) || /_\d{4}_\d{2}_\d{2}$/.test(fullMatch)) {
           continue;
         }
 

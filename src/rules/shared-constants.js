@@ -526,6 +526,53 @@ export const ampersandDefaultExceptions = [
 ];
 
 /**
+ * Snake_case patterns that should be exempted from code identifier detection.
+ * These are valid snake_case-looking patterns that are NOT code identifiers.
+ * @type {Readonly<Set<string>>}
+ */
+export const snakeCaseExemptions = new Set([
+  // Locale codes (ISO 639-1 language + ISO 3166-1 country)
+  'en_US', 'en_GB', 'en_AU', 'en_CA', 'en_NZ', 'en_IE', 'en_ZA', 'en_IN',
+  'zh_CN', 'zh_TW', 'zh_HK', 'zh_SG',
+  'ja_JP',
+  'ko_KR',
+  'de_DE', 'de_AT', 'de_CH',
+  'fr_FR', 'fr_CA', 'fr_BE', 'fr_CH',
+  'es_ES', 'es_MX', 'es_AR', 'es_CO', 'es_CL',
+  'pt_BR', 'pt_PT',
+  'it_IT', 'it_CH',
+  'ru_RU',
+  'pl_PL',
+  'nl_NL', 'nl_BE',
+  'sv_SE',
+  'da_DK',
+  'fi_FI',
+  'nb_NO', 'nn_NO',
+  'cs_CZ',
+  'sk_SK',
+  'hu_HU',
+  'tr_TR',
+  'el_GR',
+  'he_IL',
+  'ar_SA', 'ar_EG', 'ar_AE',
+  'th_TH',
+  'vi_VN',
+  'id_ID',
+  'ms_MY',
+  'hi_IN',
+  'bn_BD', 'bn_IN',
+  'uk_UA',
+  'ro_RO',
+  'bg_BG',
+  'hr_HR',
+  'sr_RS',
+  'sl_SI',
+  'lt_LT',
+  'lv_LV',
+  'et_EE',
+]);
+
+/**
  * Unicode regex patterns for internationalized text validation.
  * These patterns use Unicode property escapes to support all scripts (Latin, Cyrillic, Greek, CJK, Arabic, etc.).
  */
