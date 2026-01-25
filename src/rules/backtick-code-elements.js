@@ -457,6 +457,10 @@ const ERROR_MESSAGE_PATTERNS = [
   {
     pattern: /^[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*$/,
     message: (text) => `Identifier '${text}' should be wrapped in backticks to indicate it's a code variable or function name`
+  },
+  {
+    pattern: /^[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*$/,
+    message: (text) => `Identifier '${text}' should be wrapped in backticks to indicate it's a code class or type name`
   }
 ];
 
@@ -612,7 +616,14 @@ function backtickCodeElements(params, onError) {
       // camelCase identifiers (useEffect, fetchData, myVariable, etc.)
       // Pattern: starts with lowercase, contains at least one uppercase letter
       // Requires at least 2 chars before the first capital to reduce false positives
-      /\b[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*\b/g
+      /\b[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*\b/g,
+
+      // PascalCase identifiers (MyComponent, UserService, HttpClient, etc.)
+      // Pattern: starts with uppercase, requires at least 2 uppercase total, and has lowercase
+      // Uses lookahead to ensure there's another uppercase letter somewhere in the word
+      // This avoids matching simple proper nouns like "Paris" or "Michael"
+      // Handles: MyComponent, HTMLParser, ApiV1Client, XMLHttpRequest
+      /\b[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*\b/g
     ];
 
     const flaggedRanges = []; // Track ranges [start, end] that have been flagged

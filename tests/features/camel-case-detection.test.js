@@ -351,12 +351,13 @@ const maxRetries = 3;
       expect(violations.length).toBe(0);
     });
 
-    test("does not flag PascalCase (starts with uppercase)", async () => {
-      // PascalCase like MyComponent should NOT be flagged (Phase 3 - not recommended)
+    test("flags PascalCase (handled by Phase 3)", async () => {
+      // PascalCase like MyComponent is now flagged (Phase 3 implemented)
       const violations = await lintString(
         "The MyComponent renders the UI.",
       );
-      expect(violations.length).toBe(0);
+      expect(violations.length).toBe(1);
+      expect(violations[0].errorContext).toBe("MyComponent");
     });
 
     test("does not flag ALL_CAPS", async () => {

@@ -593,7 +593,8 @@ export const camelCaseExemptions = new Set([
   'PayPal', 'MasterCard', 'AmEx',
   'DoorDash', 'GrubHub', 'UberEats',
   'TechCrunch', 'VentureBeat',
-  'OpenAI', 'DeepMind',
+  'OpenAI', 'DeepMind', 'AlphaGo', 'AlphaFold', 'ChatGPT', 'MidJourney',
+  'LaTeX', 'BibTeX', 'MiKTeX', 'XeTeX', 'LuaTeX', 'ConTeXt', // TeX-related
   'DocuSign', 'SalesForce', 'HubSpot', 'MailChimp',
   'LastPass', 'BitLocker', 'NordVPN', 'ExpressVPN',
   'InDesign', 'InCopy', 'QuarkXPress',
