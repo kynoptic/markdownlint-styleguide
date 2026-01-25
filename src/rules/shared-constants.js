@@ -255,6 +255,7 @@ export const casingTerms = {
   postman: 'Postman',
   prettier: 'Prettier',
   prometheus: 'Prometheus',
+  promptfoo: 'Promptfoo',
   pytorch: 'PyTorch',
   rabbitmq: 'RabbitMQ',
   railway: 'Railway',

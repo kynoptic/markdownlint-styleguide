@@ -82,6 +82,8 @@ function isSentenceBoundary(match, fullText) {
  * Trim trailing punctuation from URLs that is likely sentence punctuation.
  * URLs can legitimately end with these chars, but when in prose like
  * "(https://example.com/path)." the trailing ")." is usually sentence punctuation.
+ * Also trims markdown syntax characters that may be captured when URLs appear
+ * inside bold/italic markdown links like **[text](url)**.
  *
  * @param {string} url - The matched URL
  * @returns {string} The URL with trailing sentence punctuation trimmed
@@ -103,6 +105,13 @@ function trimUrlTrailingPunctuation(url) {
 
     // Trim trailing periods, commas, semicolons, exclamation, question marks
     if ('.,:;!?'.includes(lastChar)) {
+      trimmed = trimmed.slice(0, -1);
+      continue;
+    }
+
+    // Trim trailing markdown syntax characters (bold/italic markers)
+    // These can be captured when URLs appear in **[text](url)** patterns
+    if ('*_'.includes(lastChar)) {
       trimmed = trimmed.slice(0, -1);
       continue;
     }
