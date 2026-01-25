@@ -573,6 +573,49 @@ export const snakeCaseExemptions = new Set([
 ]);
 
 /**
+ * camelCase patterns that should be exempted from code identifier detection.
+ * These are brand names, product names, and proper nouns that use internal capitals
+ * but are NOT code identifiers.
+ * @type {Readonly<Set<string>>}
+ */
+export const camelCaseExemptions = new Set([
+  // Apple products and services
+  'iPhone', 'iPad', 'iPod', 'iMac', 'iCloud', 'iTunes', 'iWork', 'iMovie',
+  'iPhoto', 'iBooks', 'iMessage', 'iOS', 'iPadOS', 'macOS', 'tvOS', 'watchOS',
+  'visionOS', 'AirPods', 'AirPlay', 'AirDrop', 'AirPrint', 'AirTag',
+  'HomePod', 'FaceTime', 'QuickTime', 'FileVault', 'TimeMachine',
+  'MacBook', 'MacPro', 'MacMini',
+
+  // Other tech brands and products
+  'eBay', 'eBook', 'eBooks', 'eReader', 'eLearning', 'eCommerce', 'eMail',
+  'PlayStation', 'GameCube', 'GameBoy',
+  'YouTube', 'LinkedIn', 'TikTok', 'WhatsApp', 'WeChat', 'OneDrive',
+  'PayPal', 'MasterCard', 'AmEx',
+  'DoorDash', 'GrubHub', 'UberEats',
+  'TechCrunch', 'VentureBeat',
+  'OpenAI', 'DeepMind',
+  'DocuSign', 'SalesForce', 'HubSpot', 'MailChimp',
+  'LastPass', 'BitLocker', 'NordVPN', 'ExpressVPN',
+  'InDesign', 'InCopy', 'QuarkXPress',
+  'AutoCAD', 'SolidWorks', 'SketchUp',
+  'CodePen', 'CodeSandbox', 'StackBlitz', 'StackOverflow',
+  'HackerRank', 'LeetCode', 'CodeWars',
+  'JetBrains', 'IntelliJ', 'PyCharm', 'WebStorm', 'PhpStorm', 'GoLand',
+  'NetBeans', 'XCode',
+
+  // Names with Mc/Mac prefix (Scottish/Irish surnames)
+  // Note: We use a regex pattern instead of listing all names
+]);
+
+/**
+ * Regex pattern to match Mc/Mac surname prefixes.
+ * These are Scottish/Irish names, not code identifiers.
+ * Examples: McDonald, MacArthur, McCartney, MacBook
+ * @type {RegExp}
+ */
+export const mcMacNamePattern = /^(?:Mc|Mac)[A-Z][a-z]+$/;
+
+/**
  * Unicode regex patterns for internationalized text validation.
  * These patterns use Unicode property escapes to support all scripts (Latin, Cyrillic, Greek, CJK, Arabic, etc.).
  */

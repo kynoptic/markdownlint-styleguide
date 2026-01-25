@@ -384,6 +384,46 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests r
     ],
   },
   {
+    "errorContext": "useState",
+    "errorDetail": "Identifier 'useState' should be wrapped in backticks to indicate it's a code variable or function name",
+    "errorRange": [
+      5,
+      8,
+    ],
+    "fixInfo": {
+      "deleteCount": 8,
+      "editColumn": 5,
+      "insertText": "\`useState\`",
+    },
+    "lineNumber": 22,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
+    "errorContext": "useEffect",
+    "errorDetail": "Identifier 'useEffect' should be wrapped in backticks to indicate it's a code variable or function name",
+    "errorRange": [
+      5,
+      9,
+    ],
+    "fixInfo": {
+      "deleteCount": 9,
+      "editColumn": 5,
+      "insertText": "\`useEffect\`",
+    },
+    "lineNumber": 42,
+    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+    "ruleInformation": null,
+    "ruleNames": [
+      "backtick-code-elements",
+      "BCE001",
+    ],
+  },
+  {
     "errorContext": "React.memo",
     "errorDetail": "Filename 'React.memo' should be wrapped in backticks to distinguish it from regular text",
     "errorRange": [
@@ -959,6 +999,46 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "\`this.state\`",
         },
         "lineNumber": 16,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "useState",
+        "errorDetail": "Identifier 'useState' should be wrapped in backticks to indicate it's a code variable or function name",
+        "errorRange": [
+          5,
+          8,
+        ],
+        "fixInfo": {
+          "deleteCount": 8,
+          "editColumn": 5,
+          "insertText": "\`useState\`",
+        },
+        "lineNumber": 22,
+        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
+        "ruleInformation": null,
+        "ruleNames": [
+          "backtick-code-elements",
+          "BCE001",
+        ],
+      },
+      {
+        "errorContext": "useEffect",
+        "errorDetail": "Identifier 'useEffect' should be wrapped in backticks to indicate it's a code variable or function name",
+        "errorRange": [
+          5,
+          9,
+        ],
+        "fixInfo": {
+          "deleteCount": 9,
+          "editColumn": 5,
+          "insertText": "\`useEffect\`",
+        },
+        "lineNumber": 42,
         "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
         "ruleInformation": null,
         "ruleNames": [

@@ -9,7 +9,9 @@ import {
   backtickIgnoredTerms as ignoredTerms,
   commonConceptualWords,
   knownDirectoryPrefixes,
-  snakeCaseExemptions
+  snakeCaseExemptions,
+  camelCaseExemptions,
+  mcMacNamePattern
 } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
 import { 
@@ -451,6 +453,10 @@ const ERROR_MESSAGE_PATTERNS = [
   {
     pattern: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/,
     message: (text) => `Identifier '${text}' should be wrapped in backticks to indicate it's a code variable or function name`
+  },
+  {
+    pattern: /^[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*$/,
+    message: (text) => `Identifier '${text}' should be wrapped in backticks to indicate it's a code variable or function name`
   }
 ];
 
@@ -601,7 +607,12 @@ function backtickCodeElements(params, onError) {
       // snake_case identifiers (variable_name, function_name, etc.)
       // Pattern: lowercase letter, followed by one or more (_alphanumeric+) segments
       // Also matches leading underscore for _internal_helper style
-      /\b_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g
+      /\b_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g,
+
+      // camelCase identifiers (useEffect, fetchData, myVariable, etc.)
+      // Pattern: starts with lowercase, contains at least one uppercase letter
+      // Requires at least 2 chars before the first capital to reduce false positives
+      /\b[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*\b/g
     ];
 
     const flaggedRanges = []; // Track ranges [start, end] that have been flagged
@@ -680,6 +691,16 @@ function backtickCodeElements(params, onError) {
         // Skip date-like patterns (YYYY_MM_DD, backup_2024_03_20, etc.)
         // These contain numeric segments that look like dates
         if (/^\d{4}_\d{2}_\d{2}$/.test(fullMatch) || /_\d{4}_\d{2}_\d{2}$/.test(fullMatch)) {
+          continue;
+        }
+
+        // Skip camelCase exemptions (brand names like iPhone, eBay, etc.)
+        if (camelCaseExemptions.has(fullMatch)) {
+          continue;
+        }
+
+        // Skip Mc/Mac surname patterns (McDonald, MacArthur, etc.)
+        if (mcMacNamePattern.test(fullMatch)) {
           continue;
         }
 
