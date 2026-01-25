@@ -13,4 +13,11 @@ export default {
 
   // The test environment that will be used for testing. 'node' is suitable for most Node.js projects.
   testEnvironment: 'node',
+
+  // Exclude cloned validation repos and other temporary directories
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/.tmp/',
+    '/.test-dist/',
+  ],
 };
