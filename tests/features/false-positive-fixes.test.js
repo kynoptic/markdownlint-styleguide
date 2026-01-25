@@ -274,19 +274,21 @@ describe('False positive fixes from ultimate-ranks evaluation', () => {
       expect(result.input).toHaveLength(0);
     });
 
-    test('should STILL flag template placeholders when allowPlaceholders is disabled (default)', async () => {
+    test('should STILL flag template placeholders when allowPlaceholders is explicitly disabled', async () => {
       const input = 'See the [ADR template](../adr/adr-XXX-title.md) for decisions.';
 
       const result = await lint({
         strings: { input },
         config: {
           default: false,
-          'no-dead-internal-links': true,
+          'no-dead-internal-links': {
+            allowPlaceholders: false
+          },
         },
         customRules: [noDeadInternalLinks],
       });
 
-      // This should flag because the file doesn't exist and placeholders are not allowed
+      // This should flag because allowPlaceholders is explicitly disabled
       expect(result.input.length).toBeGreaterThan(0);
     });
   });

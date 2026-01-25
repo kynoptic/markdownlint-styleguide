@@ -319,6 +319,15 @@ export const casingTerms = {
   warning: 'WARNING',
   caution: 'CAUTION',
 
+  // Standard documentation file conventions (all-caps by convention)
+  // Note: Only include unambiguous file name conventions, not words that
+  // have common English usage (e.g., "contributing" is also a verb)
+  readme: 'README',
+  readmes: 'READMEs',
+  changelog: 'CHANGELOG',
+  changelogs: 'CHANGELOGs',
+  codeowners: 'CODEOWNERS',
+
   // Common technical terms
   semver: 'SemVer',
 };

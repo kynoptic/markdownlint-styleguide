@@ -833,7 +833,7 @@ Another paragraph.
     });
 
     describe('default behavior (no configuration)', () => {
-      test('should not allow placeholders by default', () => {
+      test('should allow placeholders by default', () => {
         const markdown = `
 [Documentation](URL)
 [Guide](PLACEHOLDER.md)
@@ -842,10 +842,8 @@ Another paragraph.
         // No config provided - should use defaults
         const errors = runRuleWithContent(markdown, testFile);
 
-        // Default is allowPlaceholders: false, so these should be flagged
-        expect(errors).toHaveLength(2);
-        expect(errors[0].detail).toContain('Link target "URL" does not exist');
-        expect(errors[1].detail).toContain('Link target "PLACEHOLDER.md" does not exist');
+        // Default is allowPlaceholders: true, so these should NOT be flagged
+        expect(errors).toHaveLength(0);
       });
     });
 

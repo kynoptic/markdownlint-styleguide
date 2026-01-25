@@ -282,10 +282,19 @@ function noDeadInternalLinks(params, onError) {
   const ignoredPaths = Array.isArray(config.ignoredPaths) ? config.ignoredPaths : [];
   const checkAnchors = typeof config.checkAnchors === 'boolean' ? config.checkAnchors : true;
   const allowedExtensions = Array.isArray(config.allowedExtensions) ? config.allowedExtensions : ['.md', '.markdown'];
-  const allowPlaceholders = typeof config.allowPlaceholders === 'boolean' ? config.allowPlaceholders : false;
+  const allowPlaceholders = typeof config.allowPlaceholders === 'boolean' ? config.allowPlaceholders : true;
   const placeholderPatterns = Array.isArray(config.placeholderPatterns)
     ? config.placeholderPatterns
-    : ['URL', 'link', 'PLACEHOLDER', 'TODO', 'XXX', 'path/to/', 'example.com'];
+    : [
+      // Common placeholder keywords
+      'URL', 'url', 'link', 'Link', 'PLACEHOLDER', 'TODO', 'XXX', 'TBD',
+      // Template path patterns
+      'path/to/', 'example.com', 'your-', 'my-',
+      // Workflow/task template patterns
+      'workflow', 'task-a', 'task-b', 'task-c',
+      // Documentation template patterns
+      'filename', 'file-name', 'your-file', 'example-file'
+    ];
 
   const lines = params.lines;
   const currentFile = params.name || '';
