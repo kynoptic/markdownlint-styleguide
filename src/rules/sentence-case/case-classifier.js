@@ -84,6 +84,14 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
     return true;
   }
 
+  // Skip filename headings (e.g., "### batch-transform.js", "### config.yaml")
+  // These are code identifiers that should preserve their original casing
+  const trimmedText = headingText.trim();
+  const filenamePattern = /^[a-zA-Z][-a-zA-Z0-9_.]*\.(js|mjs|cjs|ts|tsx|jsx|py|sh|bash|zsh|json|yaml|yml|md|txt|html|css|scss|less|xml|toml|ini|cfg|conf|env|sql|rb|go|rs|java|kt|swift|c|cpp|h|hpp|php|pl|r|lua|vim|el|ex|exs|erl|hs|scala|clj|groovy|gradle|make|cmake|dockerfile|gitignore|gitattributes|editorconfig|prettierrc|eslintrc|babelrc|nvmrc|npmrc)$/i;
+  if (filenamePattern.test(trimmedText)) {
+    return true;
+  }
+
   // Skip if mostly code content
   const codeContentRegex = /`[^`]+`|\([A-Z0-9]+\)/g;
   const matches = [...headingText.matchAll(codeContentRegex)];
@@ -758,6 +766,19 @@ export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {
   // Skip kebab-case identifiers (e.g., **architecture-reviewer**, **code-quality-reviewer**)
   // These are code/tool identifiers that should preserve their casing
   if (/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(trimmedText)) {
+    return { isValid: true };
+  }
+
+  // Skip directory path patterns (e.g., **scripts/**, **src/**, **templates/**)
+  // These are code/path identifiers that should preserve their casing
+  if (/^[a-zA-Z][-a-zA-Z0-9_.]*\/\**$/.test(trimmedText)) {
+    return { isValid: true };
+  }
+
+  // Skip filename patterns in bold (e.g., **SKILL.md**, **config.json**, **README.md**)
+  // These are file identifiers that should preserve their casing
+  const boldFilenamePattern = /^[a-zA-Z][-a-zA-Z0-9_.]*\.(js|mjs|cjs|ts|tsx|jsx|py|sh|bash|zsh|json|yaml|yml|md|txt|html|css|scss|less|xml|toml|ini|cfg|conf|env|sql|rb|go|rs|java|kt|swift|c|cpp|h|hpp|php|pl|r|lua|vim|el|ex|exs|erl|hs|scala|clj|groovy|gradle|make|cmake|dockerfile|gitignore|gitattributes|editorconfig|prettierrc|eslintrc|babelrc|nvmrc|npmrc)$/i;
+  if (boldFilenamePattern.test(trimmedText)) {
     return { isValid: true };
   }
 
