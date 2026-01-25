@@ -150,12 +150,13 @@ function test() {
       expect(errors).toHaveLength(0);
     });
 
-    test('flags ampersands in headings', () => {
+    test('allows ampersands in headings (common documentation pattern)', () => {
+      // Headings often use & for brevity (e.g., "Research & Development")
+      // This is acceptable in section titles and should not be flagged
       const markdown = '## Research & Development';
       const errors = runRuleWithContent(markdown);
-      
-      expect(errors).toHaveLength(1);
-      expect(errors[0].detail).toContain('Use "and" instead of literal ampersand (&)');
+
+      expect(errors).toHaveLength(0);
     });
 
     test('flags ampersands in list items', () => {

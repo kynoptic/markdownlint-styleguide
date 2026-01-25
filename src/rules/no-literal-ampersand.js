@@ -70,6 +70,43 @@ function isInSpecialContext(line, position, skipInlineCode = true) {
   return false;
 }
 
+// Common brand names that use ampersands - these should not be flagged
+const BRAND_NAMES_WITH_AMPERSAND = [
+  'Barnes & Noble',
+  'AT&T',
+  'Procter & Gamble',
+  'P&G',
+  'Johnson & Johnson',
+  'J&J',
+  'Dolce & Gabbana',
+  'D&G',
+  'H&M',
+  'M&M',
+  'Ben & Jerry',
+  'Bed Bath & Beyond',
+  'Arm & Hammer',
+  'Ernst & Young',
+  'PricewaterhouseCoopers', // PwC uses &
+  'Zwilling Fresh & Save',
+  'Fresh & Save',
+  'Simon & Schuster',
+  'Warner Bros',
+  'Marks & Spencer',
+  'M&S',
+  'Standard & Poor',
+  'S&P',
+  'Tiffany & Co',
+  'Lord & Taylor',
+  'Smith & Wesson',
+  'Black & Decker',
+  'Fruit & Fibre',
+  'Fish & Chips',
+  'R&D',
+  'R & D',
+  'Q&A',
+  'Q & A'
+];
+
 /**
  * Check if an ampersand should be flagged as a violation.
  * @param {string} line - The line content
@@ -82,6 +119,19 @@ function shouldFlagAmpersand(line, position, skipInlineCode = true, exceptions =
   // Skip if in special context
   if (isInSpecialContext(line, position, skipInlineCode)) {
     return false;
+  }
+
+  // Skip headings - ampersands in headings are often intentional (e.g., "Reasoning & Thinking")
+  if (/^\s*#{1,6}\s/.test(line)) {
+    return false;
+  }
+
+  // Skip lines that contain known brand names with ampersands
+  const lineLower = line.toLowerCase();
+  for (const brand of BRAND_NAMES_WITH_AMPERSAND) {
+    if (lineLower.includes(brand.toLowerCase())) {
+      return false;
+    }
   }
 
   // Check if this ampersand matches any exception patterns

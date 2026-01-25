@@ -736,14 +736,28 @@ export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {
     return { isValid: true };
   }
 
+  const trimmedText = boldText.trim();
+  const trimmedLower = trimmedText.toLowerCase();
+
   // Skip conventional commit types - these are intentionally lowercase by convention
   // Common types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
   const conventionalCommitTypes = [
     'feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test',
     'build', 'ci', 'chore', 'revert', 'wip', 'release'
   ];
-  const trimmedText = boldText.trim().toLowerCase();
-  if (conventionalCommitTypes.includes(trimmedText)) {
+  if (conventionalCommitTypes.includes(trimmedLower)) {
+    return { isValid: true };
+  }
+
+  // Skip all-caps single words used for emphasis (e.g., **ALWAYS**, **NEVER**, **WARNING**)
+  // These are intentionally capitalized for emphasis in documentation
+  if (/^[A-Z]{2,}$/.test(trimmedText)) {
+    return { isValid: true };
+  }
+
+  // Skip kebab-case identifiers (e.g., **architecture-reviewer**, **code-quality-reviewer**)
+  // These are code/tool identifiers that should preserve their casing
+  if (/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(trimmedText)) {
     return { isValid: true };
   }
 

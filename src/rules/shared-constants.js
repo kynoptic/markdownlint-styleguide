@@ -324,8 +324,9 @@ export const casingTerms = {
   // have common English usage (e.g., "contributing" is also a verb)
   readme: 'README',
   readmes: 'READMEs',
+  // Note: "changelog" → "CHANGELOG" recognizes CHANGELOG as valid in any position
+  // "Changelog" as a standalone section title is handled separately in shouldExemptFromValidation
   changelog: 'CHANGELOG',
-  changelogs: 'CHANGELOGs',
   codeowners: 'CODEOWNERS',
 
   // Common technical terms
@@ -395,6 +396,10 @@ export const ambiguousTerms = {
   major: {
     properForm: 'MAJOR',
     reason: 'Could be adjective "major" OR SemVer MAJOR version'
+  },
+  changelog: {
+    properForm: 'Changelog',
+    reason: 'Could be "Changelog" (section title) OR "CHANGELOG" (filename reference)'
   },
 };
 
