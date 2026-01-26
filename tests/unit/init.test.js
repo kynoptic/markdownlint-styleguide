@@ -319,4 +319,219 @@ describe('init.cjs', () => {
       expect(output).toMatch(/doctor|diagnos/i);
     });
   });
+
+  describe('VS Code extension recommendations', () => {
+    it('should create extensions.json when configuring VS Code', () => {
+      execSync('node ' + scriptPath + ' --preset recommended --vscode', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const extensionsPath = path.join(tempDir, '.vscode', 'extensions.json');
+      expect(fs.existsSync(extensionsPath)).toBe(true);
+
+      const content = JSON.parse(fs.readFileSync(extensionsPath, 'utf8'));
+      expect(content.recommendations).toContain('DavidAnson.vscode-markdownlint');
+    });
+
+    it('should merge with existing extensions.json', () => {
+      const vscodeDir = path.join(tempDir, '.vscode');
+      fs.mkdirSync(vscodeDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(vscodeDir, 'extensions.json'),
+        JSON.stringify({ recommendations: ['esbenp.prettier-vscode'] }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --vscode', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const content = JSON.parse(fs.readFileSync(path.join(vscodeDir, 'extensions.json'), 'utf8'));
+      expect(content.recommendations).toContain('esbenp.prettier-vscode');
+      expect(content.recommendations).toContain('DavidAnson.vscode-markdownlint');
+    });
+
+    it('should not duplicate existing extension recommendations', () => {
+      const vscodeDir = path.join(tempDir, '.vscode');
+      fs.mkdirSync(vscodeDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(vscodeDir, 'extensions.json'),
+        JSON.stringify({ recommendations: ['DavidAnson.vscode-markdownlint'] }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --vscode', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const content = JSON.parse(fs.readFileSync(path.join(vscodeDir, 'extensions.json'), 'utf8'));
+      const count = content.recommendations.filter(r => r === 'DavidAnson.vscode-markdownlint').length;
+      expect(count).toBe(1);
+    });
+  });
+
+  describe('GitHub Actions workflow', () => {
+    it('should create workflow when --github-action flag is used', () => {
+      execSync('node ' + scriptPath + ' --preset recommended --github-action', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const workflowPath = path.join(tempDir, '.github', 'workflows', 'markdown-lint.yml');
+      expect(fs.existsSync(workflowPath)).toBe(true);
+
+      const content = fs.readFileSync(workflowPath, 'utf8');
+      expect(content).toContain('markdownlint');
+      expect(content).toContain('npm');
+    });
+
+    it('should not overwrite existing workflow without --force', () => {
+      const workflowDir = path.join(tempDir, '.github', 'workflows');
+      fs.mkdirSync(workflowDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(workflowDir, 'markdown-lint.yml'),
+        'existing: content',
+        'utf8'
+      );
+
+      const output = execSync('node ' + scriptPath + ' --preset recommended --github-action', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('File exists, skipping');
+      const content = fs.readFileSync(path.join(workflowDir, 'markdown-lint.yml'), 'utf8');
+      expect(content).toBe('existing: content');
+    });
+  });
+
+  describe('npm scripts injection', () => {
+    it('should add lint scripts when --scripts flag is used', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({ name: 'test-project', scripts: {} }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --scripts', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+      expect(pkg.scripts['lint:md']).toBeDefined();
+      expect(pkg.scripts['lint:md:fix']).toBeDefined();
+    });
+
+    it('should not overwrite existing lint scripts without --force', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({
+          name: 'test-project',
+          scripts: { 'lint:md': 'custom command' }
+        }, null, 2),
+        'utf8'
+      );
+
+      const output = execSync('node ' + scriptPath + ' --preset recommended --scripts', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('already exists');
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+      expect(pkg.scripts['lint:md']).toBe('custom command');
+    });
+
+    it('should skip scripts if no package.json exists', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended --scripts', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('package.json not found');
+    });
+  });
+
+  describe('pre-commit hook setup', () => {
+    it('should configure lint-staged when --hooks flag is used', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({ name: 'test-project' }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --hooks', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+      expect(pkg['lint-staged']).toBeDefined();
+      expect(pkg['lint-staged']['*.md']).toBeDefined();
+    });
+
+    it('should merge with existing lint-staged config', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({
+          name: 'test-project',
+          'lint-staged': { '*.js': ['eslint --fix'] }
+        }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --hooks', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+      expect(pkg['lint-staged']['*.js']).toEqual(['eslint --fix']);
+      expect(pkg['lint-staged']['*.md']).toBeDefined();
+    });
+  });
+
+  describe('config validation', () => {
+    it('should validate config after creation', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('Validating');
+    });
+
+    it('should report validation success', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toMatch(/valid|✓/i);
+    });
+  });
+
+  describe('merge diff display', () => {
+    it('should show what settings were preserved when merging', () => {
+      const vscodeDir = path.join(tempDir, '.vscode');
+      fs.mkdirSync(vscodeDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(vscodeDir, 'settings.json'),
+        JSON.stringify({ 'editor.formatOnSave': true }, null, 2),
+        'utf8'
+      );
+
+      const output = execSync('node ' + scriptPath + ' --preset recommended --vscode', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('Preserved');
+      expect(output).toContain('editor.formatOnSave');
+    });
+  });
 });

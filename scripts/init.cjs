@@ -23,8 +23,18 @@ function log(msg, color = 'reset') {
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const opts = { preset: null, vscode: false, cli: false, force: false, dryRun: false, help: false };
-  
+  const opts = {
+    preset: null,
+    vscode: false,
+    cli: false,
+    force: false,
+    dryRun: false,
+    help: false,
+    githubAction: false,
+    scripts: false,
+    hooks: false,
+  };
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--preset' && i + 1 < args.length) {
@@ -39,15 +49,21 @@ function parseArgs() {
       opts.dryRun = true;
     } else if (arg === '--help' || arg === '-h') {
       opts.help = true;
+    } else if (arg === '--github-action') {
+      opts.githubAction = true;
+    } else if (arg === '--scripts') {
+      opts.scripts = true;
+    } else if (arg === '--hooks') {
+      opts.hooks = true;
     }
   }
-  
+
   // If neither specified, enable both
   if (!opts.vscode && !opts.cli) {
     opts.vscode = true;
     opts.cli = true;
   }
-  
+
   return opts;
 }
 
@@ -62,6 +78,9 @@ ${colors.yellow}Options:${colors.reset}
   --preset <level>    Preset level: basic, recommended, or strict (default: interactive)
   --vscode           Only configure VS Code settings
   --cli              Only configure markdownlint-cli2
+  --github-action    Add GitHub Actions workflow for CI
+  --scripts          Add npm scripts (lint:md, lint:md:fix) to package.json
+  --hooks            Configure lint-staged for pre-commit hooks
   --force            Overwrite existing configuration files
   --dry-run          Show what would be generated without writing files
   -h, --help         Show this help message
@@ -69,6 +88,7 @@ ${colors.yellow}Options:${colors.reset}
 ${colors.yellow}Examples:${colors.reset}
   npx markdownlint-trap init
   npx markdownlint-trap init --preset recommended
+  npx markdownlint-trap init --preset recommended --github-action --scripts --hooks
   npx markdownlint-trap init --vscode --preset strict
   npx markdownlint-trap init --dry-run
 
@@ -127,7 +147,7 @@ function loadTemplate(preset, type) {
 
 function mergeVSCodeSettings(existingPath, newContent) {
   if (!fs.existsSync(existingPath)) {
-    return newContent;
+    return { content: newContent, preserved: [] };
   }
 
   try {
@@ -144,7 +164,7 @@ function mergeVSCodeSettings(existingPath, newContent) {
 
     if (lastBrace === -1) {
       // Malformed JSON, fall back to overwrite
-      return newContent;
+      return { content: newContent, preserved: [] };
     }
 
     // Collect keys that only exist in existing file
@@ -152,7 +172,7 @@ function mergeVSCodeSettings(existingPath, newContent) {
 
     if (existingOnlyKeys.length === 0) {
       // No extra keys to add, return template as-is
-      return newContent;
+      return { content: newContent, preserved: [] };
     }
 
     // Insert existing-only keys before the closing brace
@@ -178,11 +198,221 @@ function mergeVSCodeSettings(existingPath, newContent) {
       ...lines.slice(lastBrace)
     ].join('\n');
 
-    return result;
+    return { content: result, preserved: existingOnlyKeys };
   } catch (e) {
     log(`  Warning: Could not merge existing VS Code settings: ${e.message}`, 'yellow');
-    return newContent;
+    return { content: newContent, preserved: [] };
   }
+}
+
+function mergeExtensionsJson(existingPath, newRecommendations) {
+  let existing = { recommendations: [] };
+
+  if (fs.existsSync(existingPath)) {
+    try {
+      existing = JSON.parse(fs.readFileSync(existingPath, 'utf8'));
+      if (!Array.isArray(existing.recommendations)) {
+        existing.recommendations = [];
+      }
+    } catch {
+      existing = { recommendations: [] };
+    }
+  }
+
+  // Add new recommendations without duplicates
+  for (const rec of newRecommendations) {
+    if (!existing.recommendations.includes(rec)) {
+      existing.recommendations.push(rec);
+    }
+  }
+
+  return JSON.stringify(existing, null, 2) + '\n';
+}
+
+function configureExtensions(projectRoot, dryRun) {
+  const extensionsPath = path.join(projectRoot, '.vscode', 'extensions.json');
+  const recommendations = ['DavidAnson.vscode-markdownlint'];
+
+  const content = mergeExtensionsJson(extensionsPath, recommendations);
+
+  if (dryRun) {
+    log(`  [DRY RUN] Would write: ${extensionsPath}`, 'blue');
+    return true;
+  }
+
+  const dir = path.dirname(extensionsPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  fs.writeFileSync(extensionsPath, content, 'utf8');
+  log(`  Created: ${extensionsPath}`, 'green');
+  return true;
+}
+
+function getGitHubActionsWorkflow() {
+  return `name: Markdown Lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.md'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint Markdown
+        run: npx markdownlint-cli2 "**/*.md"
+`;
+}
+
+function configureGitHubAction(projectRoot, force, dryRun) {
+  const workflowPath = path.join(projectRoot, '.github', 'workflows', 'markdown-lint.yml');
+
+  if (fs.existsSync(workflowPath) && !force) {
+    log(`  File exists, skipping (use --force to overwrite): ${workflowPath}`, 'yellow');
+    return false;
+  }
+
+  if (dryRun) {
+    log(`  [DRY RUN] Would write: ${workflowPath}`, 'blue');
+    return true;
+  }
+
+  const dir = path.dirname(workflowPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  fs.writeFileSync(workflowPath, getGitHubActionsWorkflow(), 'utf8');
+  log(`  Created: ${workflowPath}`, 'green');
+  return true;
+}
+
+function configureNpmScripts(projectRoot, force, dryRun) {
+  const pkgPath = path.join(projectRoot, 'package.json');
+
+  if (!fs.existsSync(pkgPath)) {
+    log('  ⚠ package.json not found, skipping npm scripts', 'yellow');
+    return false;
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  if (!pkg.scripts) {
+    pkg.scripts = {};
+  }
+
+  const scriptsToAdd = {
+    'lint:md': 'markdownlint-cli2 "**/*.md"',
+    'lint:md:fix': 'markdownlint-cli2 --fix "**/*.md"',
+  };
+
+  let added = 0;
+  let skipped = 0;
+
+  for (const [name, cmd] of Object.entries(scriptsToAdd)) {
+    if (pkg.scripts[name] && !force) {
+      log(`  ⚠ Script "${name}" already exists, skipping`, 'yellow');
+      skipped++;
+    } else {
+      pkg.scripts[name] = cmd;
+      added++;
+    }
+  }
+
+  if (added === 0) {
+    return false;
+  }
+
+  if (dryRun) {
+    log(`  [DRY RUN] Would add ${added} script(s) to package.json`, 'blue');
+    return true;
+  }
+
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+  log(`  Added ${added} script(s) to package.json`, 'green');
+  return true;
+}
+
+function configureLintStaged(projectRoot, dryRun) {
+  const pkgPath = path.join(projectRoot, 'package.json');
+
+  if (!fs.existsSync(pkgPath)) {
+    log('  ⚠ package.json not found, skipping lint-staged config', 'yellow');
+    return false;
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+
+  if (!pkg['lint-staged']) {
+    pkg['lint-staged'] = {};
+  }
+
+  // Add markdown linting to lint-staged
+  if (!pkg['lint-staged']['*.md']) {
+    pkg['lint-staged']['*.md'] = ['markdownlint-cli2 --fix'];
+  }
+
+  if (dryRun) {
+    log('  [DRY RUN] Would add lint-staged config to package.json', 'blue');
+    return true;
+  }
+
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+  log('  Added lint-staged config to package.json', 'green');
+  log('  💡 Make sure husky is installed: npx husky init', 'blue');
+  return true;
+}
+
+function validateConfig(projectRoot, dryRun) {
+  if (dryRun) {
+    return true;
+  }
+
+  log('\n✅ Validating configuration...', 'cyan');
+
+  const cliConfig = path.join(projectRoot, '.markdownlint-cli2.jsonc');
+  if (fs.existsSync(cliConfig)) {
+    try {
+      const content = fs.readFileSync(cliConfig, 'utf8');
+      jsonc.parse(content);
+      log('  ✓ CLI config is valid', 'green');
+    } catch (err) {
+      log(`  ✗ CLI config has errors: ${err.message}`, 'red');
+      return false;
+    }
+  }
+
+  const vscodeConfig = path.join(projectRoot, '.vscode', 'settings.json');
+  if (fs.existsSync(vscodeConfig)) {
+    try {
+      const content = fs.readFileSync(vscodeConfig, 'utf8');
+      jsonc.parse(content);
+      log('  ✓ VS Code settings are valid', 'green');
+    } catch (err) {
+      log(`  ✗ VS Code settings have errors: ${err.message}`, 'red');
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function checkDependency(name, cmd) {
@@ -211,31 +441,40 @@ function checkDependencies() {
 
 function writeConfig(targetPath, content, force, dryRun, merge = false) {
   const exists = fs.existsSync(targetPath);
-  
+  let preserved = [];
+
   if (exists && !force) {
     if (merge && targetPath.endsWith('.json')) {
-      content = mergeVSCodeSettings(targetPath, content);
+      const result = mergeVSCodeSettings(targetPath, content);
+      content = result.content;
+      preserved = result.preserved;
       log(`  Merging with existing file: ${targetPath}`, 'yellow');
     } else {
       log(`  File exists, skipping (use --force to overwrite): ${targetPath}`, 'yellow');
-      return false;
+      return { success: false, preserved: [] };
     }
   }
-  
+
   if (dryRun) {
     log(`  [DRY RUN] Would write: ${targetPath}`, 'blue');
-    return true;
+    return { success: true, preserved };
   }
-  
+
   // Ensure directory exists
   const dir = path.dirname(targetPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   fs.writeFileSync(targetPath, content, 'utf8');
   log(`  Created: ${targetPath}`, 'green');
-  return true;
+
+  // Show preserved settings
+  if (preserved.length > 0) {
+    log(`  Preserved ${preserved.length} existing setting(s): ${preserved.join(', ')}`, 'blue');
+  }
+
+  return { success: true, preserved };
 }
 
 async function init() {
@@ -270,28 +509,63 @@ async function init() {
     log('\n📝 Configuring markdownlint-cli2...', 'cyan');
     const cliConfig = path.join(projectRoot, '.markdownlint-cli2.jsonc');
     const cliTemplate = loadTemplate(preset, 'markdownlint-cli2');
-    
-    if (writeConfig(cliConfig, cliTemplate, opts.force, opts.dryRun, false)) {
+
+    const result = writeConfig(cliConfig, cliTemplate, opts.force, opts.dryRun, false);
+    if (result.success) {
       filesCreated++;
     } else {
       filesSkipped++;
     }
   }
-  
+
   // Configure VS Code
   if (opts.vscode) {
     log('\n🔧 Configuring VS Code...', 'cyan');
     const vscodeDir = path.join(projectRoot, '.vscode');
     const vscodeConfig = path.join(vscodeDir, 'settings.json');
     const vscodeTemplate = loadTemplate(preset, 'vscode-settings');
-    
+
     // Always try to merge VS Code settings
-    if (writeConfig(vscodeConfig, vscodeTemplate, opts.force, opts.dryRun, true)) {
+    const result = writeConfig(vscodeConfig, vscodeTemplate, opts.force, opts.dryRun, true);
+    if (result.success) {
+      filesCreated++;
+    } else {
+      filesSkipped++;
+    }
+
+    // Also create extensions.json for extension recommendations
+    configureExtensions(projectRoot, opts.dryRun);
+    filesCreated++;
+  }
+
+  // Configure GitHub Actions workflow
+  if (opts.githubAction) {
+    log('\n🚀 Configuring GitHub Actions...', 'cyan');
+    if (configureGitHubAction(projectRoot, opts.force, opts.dryRun)) {
       filesCreated++;
     } else {
       filesSkipped++;
     }
   }
+
+  // Configure npm scripts
+  if (opts.scripts) {
+    log('\n📦 Configuring npm scripts...', 'cyan');
+    if (configureNpmScripts(projectRoot, opts.force, opts.dryRun)) {
+      filesCreated++;
+    }
+  }
+
+  // Configure pre-commit hooks
+  if (opts.hooks) {
+    log('\n🪝 Configuring pre-commit hooks...', 'cyan');
+    if (configureLintStaged(projectRoot, opts.dryRun)) {
+      filesCreated++;
+    }
+  }
+
+  // Validate configuration
+  validateConfig(projectRoot, opts.dryRun);
   
   // Check dependencies
   const deps = checkDependencies();
