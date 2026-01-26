@@ -7,21 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Three-tier autofix system with confidence-based categorization:
+  - **Auto-fix tier** (≥0.7 confidence): Applied automatically with high confidence
+  - **Needs-review tier** (0.3-0.7 confidence): Flagged for human/AI verification
+  - **Skip tier** (<0.3 confidence): Too uncertain, silently skipped
+- Needs-review reporter (`src/cli/needs-review-reporter.js`) for collecting and formatting ambiguous items
+- Machine-readable JSON output for AI agent consumption with explicit action instructions
+- Human-readable text reports with contextual decision guidance
+- Ambiguity detection for proper noun vs common noun disambiguation (Word, Go, Swift, Agent, Explore, SDK)
+- Test script for three-tier validation (`scripts/test-three-tier.js`)
+- Claude Code skill for reviewing lint ambiguities (`.claude/skills/review-lint-ambiguities.md`)
+
+### Fixed
+
+- Sentence-case heading autofix now correctly preserves lowercase after multi-word special terms (e.g., "Agent Skills reference" not "Agent Skills Reference")
+- File and line number tracking in needs-review output for accurate location reporting
+
 ---
 
 ## [2.4.0] - 2025-01-25
 
 ### Added
 
-- snake_case identifier detection in `backtick-code-elements` rule (e.g., `max_retries`, `user_name`, `fetch_data`)
-- camelCase identifier detection in `backtick-code-elements` rule (e.g., `useEffect`, `useState`, `fetchData`)
+- `snake_case` identifier detection in `backtick-code-elements` rule (e.g., `max_retries`, `user_name`, `fetch_data`)
+- `camelCase` identifier detection in `backtick-code-elements` rule (e.g., `useEffect`, `useState`, `fetchData`)
 - PascalCase identifier detection in `backtick-code-elements` rule (e.g., `MyComponent`, `HttpClient`, `XMLHttpRequest`)
 - Code identifier preservation in `sentence-case-heading` rule to prevent incorrect lowercasing of programming constructs in headings
 
 ### Fixed
 
-- Reduced false positives by exempting locale codes (en_US, zh_CN, ja_JP) from snake_case detection
-- Reduced false positives by exempting brand names (iPhone, eBay, YouTube, LinkedIn) from camelCase/PascalCase detection
+- Reduced false positives by exempting locale codes (en_US, zh_CN, ja_JP) from `snake_case` detection
+- Reduced false positives by exempting brand names (iPhone, eBay, YouTube, LinkedIn) from `camelCase`/PascalCase detection
 - Reduced false positives by exempting Mc/Mac surname patterns (McDonald, MacArthur) from identifier detection
 - Improved placeholder detection and added documentation-related acronyms to reduce false positives
 
@@ -45,9 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Eliminated Babel transpilation pipeline - now ships native ES modules directly from `src/`
 - Package entry point updated from `.markdownlint-rules/index.cjs` to `src/index.js` (native ESM)
-- Removed 6 Babel-related devDependencies, reducing build complexity
+- Removed 6 Babel-related `devDependencies`, reducing build complexity
 - Enhanced `backtick-code-elements` rule to distinguish domain names (like `example.com` in prose) from full URLs requiring backticks
-- Improved placeholder detection in `no-dead-internal-links` using word boundaries to prevent false matches (e.g., "TODO" won't match "PHOTODOC.md")
+- Improved placeholder detection in `no-dead-internal-links` using word boundaries to prevent false matches (e.g., "TODO" won't match "`PHOTODOC.md`")
 
 ### Fixed
 

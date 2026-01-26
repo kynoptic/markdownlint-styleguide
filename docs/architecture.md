@@ -7,10 +7,10 @@ For architectural decisions and their rationale, see [Architecture Decision Reco
 ## Source vs distribution
 
 - Source code: ES Modules under `src/`.
-- Distribution: CommonJS output under `.markdownlint-rules/` (built via Babel).
-- Entry point: `src/index.js` exports the rules for direct ESM usage.
+- Distribution: Native ESM directly from `src/` (no transpilation since v2.3.0).
+- Entry point: `src/index.js` exports all rules.
 
-Consumers typically use the shareable preset `markdownlint-trap/recommended-config.jsonc`, which references compiled CJS rule files under `.markdownlint-rules/rules/*.cjs`. This allows `markdownlint-cli2` to load the rules without transpiling.
+Consumers use the shareable preset `markdownlint-trap/recommended-config.jsonc`, which references rule files under `src/rules/`. Since v2.3.0, the project ships native ES modules without Babel transpilation.
 
 ## Recommended config
 
@@ -25,7 +25,7 @@ The project employs a multi-layered testing strategy:
 - **Performance tests** (`tests/performance/`) ensure rules meet latency and memory thresholds
 - **External repository tests** (`tests/integration/external/`) validate rules against curated real-world projects
 
-Tests run directly against ESM in `src/` (via `babel-jest`), not the compiled output. This allows rapid iteration during development while maintaining confidence that the transpiled distribution works correctly.
+Tests run directly against native ESM in `src/` using Jest's experimental ESM support. Since v2.3.0, no transpilation is required.
 
 > [!NOTE]
 > Intentional test overlap exists between unit and integration tests. Unit tests provide fast feedback and pinpoint failures, while integration tests catch unexpected interactions and ensure real-world compatibility.
@@ -83,25 +83,37 @@ Centralized term dictionaries and configuration constants:
 
 ### `src/rules/autofix-safety.js`
 
-Safety layer for auto-fix operations with confidence scoring, preventing false positive corrections.
+Safety layer for auto-fix operations with confidence scoring and three-tier categorization, preventing false positive corrections while surfacing ambiguous cases for review.
 
-**Purpose**: Separates safety decision-making from rule validation logic, allowing rules to focus on detecting violations while the safety module determines when autofixes should apply automatically.
+**Purpose**: Separates safety decision-making from rule validation logic, allowing rules to focus on detecting violations while the safety module determines when autofixes should apply automatically, need human review, or should be skipped.
+
+**Three-tier autofix system**:
+
+| Tier | Confidence | Behavior |
+|------|------------|----------|
+| Auto-fix | ≥ 0.7 | Applied automatically with high confidence |
+| Needs-review | 0.3 - 0.7 | Flagged for human/AI verification |
+| Skip | < 0.3 | Too uncertain, silently skipped |
 
 **Key functions**:
 
-- `shouldApplyAutofix()` - Evaluates confidence thresholds and manual review flags
-- `createSafeFixInfo()` - Generates safety metadata for fix operations
+- `shouldApplyAutofix()` - Evaluates confidence and returns tier classification with ambiguity info
+- `createSafeFixInfo()` - Generates safety metadata and reports needs-review items
+- `classifyTier()` - Determines which tier a fix belongs to based on confidence
+- `detectAmbiguity()` - Identifies terms that could be proper or common nouns
 - `calculateSentenceCaseConfidence()` - Analyzes structural changes and technical terms
 - `calculateBacktickConfidence()` - Distinguishes code vs. natural language
-- `analyzeCodeVsNaturalLanguage()` - Context-aware code detection with explicit reasoning
 
-**Confidence scoring system**: Each autofix receives a score from 0 (definitely unsafe) to 1 (definitely safe). Default threshold is 0.5. Scores incorporate:
+**Confidence scoring system**: Each autofix receives a score from 0 (definitely unsafe) to 1 (definitely safe). Scores incorporate:
 
 - Pattern strength (file paths, commands, technical indicators)
-- Ambiguity markers (short words, common English terms)
+- Ambiguity penalties for terms like "Word", "Go", "Swift", "Agent"
 - Context analysis (surrounding text, technical vs. natural language)
+- Rule-specific boosts (snake_case +0.25, camelCase +0.25, code paths +0.30)
 
-**Testing**: Validated with 568 behavioral unit tests covering boundary conditions and decision-making logic ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)).
+**Needs-review reporter**: Items in the 0.3-0.7 confidence range are collected by `src/cli/needs-review-reporter.js` and output in human-readable text or machine-readable JSON format for AI agent processing.
+
+**Testing**: Validated with 568+ behavioral unit tests covering boundary conditions and decision-making logic.
 
 **Architecture rationale**: See [ADR-001](adr/adr-001-autofix-safety-strategy.md) for design decisions, alternatives considered, and tradeoffs.
 
@@ -126,6 +138,8 @@ Since `v1.7.0`, the project includes automated vulnerability scanning in the CI 
 
 ## Build
 
-- `npm run build` transpiles to `.markdownlint-rules` with `.cjs` files copied.
-- The package `files` field includes `.markdownlint-rules`, `src/index.js`, and `recommended-config.jsonc` for consumption.
-- Pre-commit hooks detect build artifact drift to ensure distribution stays synchronized with source.
+Since v2.3.0, the project ships native ES modules without transpilation:
+
+- No build step required - source is distributed directly from `src/`
+- The package `files` field includes `src/`, `scripts/`, and `recommended-config.jsonc` for consumption
+- Pre-commit hooks run linting and tests to ensure code quality
