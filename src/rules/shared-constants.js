@@ -522,6 +522,18 @@ export const ambiguousTerms = {
     properForm: 'Skill',
     reason: 'Could be common noun "skill" OR Claude Skill feature'
   },
+  agent: {
+    properForm: 'Agent',
+    reason: 'Could be common noun "agent" OR Claude Agent feature/SDK'
+  },
+  explore: {
+    properForm: 'Explore',
+    reason: 'Could be verb "explore" OR Explore agent type in Claude Code'
+  },
+  sdk: {
+    properForm: 'SDK',
+    reason: 'Could be generic SDK reference OR specific product SDK name'
+  },
 };
 
 /**
