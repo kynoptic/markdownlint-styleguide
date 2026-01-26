@@ -135,6 +135,20 @@ npx markdownlint-cli2 "**/*.md"
 npx markdownlint-trap doctor
 ```
 
+### Upgrading
+
+To update markdownlint-trap and merge new config options while preserving your customizations:
+
+```bash
+# Update the package
+npm install -D github:kynoptic/markdownlint-trap
+
+# Merge new config options (preserves your customizations)
+npx markdownlint-trap init --preset recommended --upgrade
+```
+
+The `--upgrade` flag intelligently merges new options into your existing config files without overwriting your customizations. For example, if you've added custom `specialTerms` to the sentence-case rule, those will be preserved while new rules or options are added.
+
 ## Configuration
 
 ### Presets
@@ -168,6 +182,7 @@ npx markdownlint-trap init [options]
 |--------|-------------|
 | `--preset <level>` | Use basic, recommended, or strict (skips prompt) |
 | `--all` | Enable all optional features (CI, scripts, hooks) |
+| `--upgrade` | Merge new options into existing configs (preserves customizations) |
 | `--github-action` | Add GitHub Actions workflow |
 | `--scripts` | Add npm scripts (`lint:md`, `lint:md:fix`) |
 | `--hooks` | Configure lint-staged for pre-commit |
@@ -181,6 +196,9 @@ npx markdownlint-trap init [options]
 ```bash
 # Full setup with all features
 npx markdownlint-trap init --preset recommended --all
+
+# Upgrade existing config (after updating the package)
+npx markdownlint-trap init --preset recommended --upgrade
 
 # Just VS Code integration
 npx markdownlint-trap init --preset recommended --vscode
