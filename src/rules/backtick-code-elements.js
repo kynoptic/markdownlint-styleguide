@@ -21,7 +21,7 @@ import {
   logValidationErrors,
   createMarkdownlintLogger 
 } from './config-validation.js';
-import { updateCodeBlockState, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
+import { getCodeBlockLines, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
 import { isDomainInProse } from './shared-heuristics.js';
 
 // Regex patterns used by helper functions
@@ -535,17 +535,17 @@ function backtickCodeElements(params, onError) {
   const allIgnoredTerms = new Set([...ignoredTerms, ...userIgnoredTerms]);
 
   const lines = params.lines;
-  let inCodeBlock = false;
+  // Use getCodeBlockLines for proper fence length tracking (handles 4-backtick fences etc.)
+  const codeBlockLines = getCodeBlockLines(lines);
   let inMathBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
     const line = lines[i];
+    const inCodeBlock = codeBlockLines[i];
 
-    // Update code block state using shared utility
-    const codeBlockUpdate = updateCodeBlockState(line, inCodeBlock);
-    if (codeBlockUpdate.updated) {
-      inCodeBlock = codeBlockUpdate.inCodeBlock;
+    // Skip code block fence lines
+    if (inCodeBlock && /^(`{3,}|~{3,})/.test(line.trim())) {
       continue;
     }
 
@@ -554,7 +554,7 @@ function backtickCodeElements(params, onError) {
       inMathBlock = !inMathBlock;
       continue;
     }
-    
+
     // Skip lines that are in a code block or heading based on configuration
     if ((skipCodeBlocks && inCodeBlock) || /^\s*#/.test(line)) {
       continue;
@@ -597,7 +597,7 @@ function backtickCodeElements(params, onError) {
       /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
       /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
       /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or command()
-      /\B\.[\w.-]+\b/g,                    // dotfiles like .env
+      /\B\.[\w.-]+\b(?!\/)/g,               // dotfiles like .env (exclude if followed by / which indicates a path)
       /\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/g,      // environment variables like NODE_ENV
       /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
@@ -662,6 +662,7 @@ function backtickCodeElements(params, onError) {
         let start = match.index;
         let end = start + fullMatch.length;
 
+
         // For URLs, trim trailing punctuation that's likely sentence-ending
         // This handles cases like "(https://example.com/path)." in prose
         if (/^(?:https?|ftp|ftps|file):\/\//i.test(fullMatch)) {
@@ -683,7 +684,10 @@ function backtickCodeElements(params, onError) {
 
         // For the path pattern, apply extra heuristics to avoid false positives
         // on natural language like "read/write" or "pass/fail".
-        if (pattern.source.includes('\\/') && !isLikelyFilePath(fullMatch)) {
+        // Only apply this check to patterns that are actually path-matching patterns
+        // (contain / as a literal match, not in a negative lookahead)
+        const isPathPattern = pattern.source.includes('\\/') && !pattern.source.includes('(?!');
+        if (isPathPattern && !isLikelyFilePath(fullMatch)) {
           continue;
         }
 
