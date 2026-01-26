@@ -7,7 +7,7 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 - **Consistent style**: Enforces sentence case headings and proper code formatting
 - **Better accessibility**: Ensures URLs are properly formatted and links work correctly
 - **Professional appearance**: Maintains readable, well-structured documentation
-- **Automated fixes**: Most rules provide auto-fix functionality to save time
+- **Smart auto-fixes**: Three-tier confidence system applies safe fixes automatically, flags ambiguous cases for review, and skips uncertain changes
 
 ## Quick start
 
@@ -234,6 +234,18 @@ This package includes five custom rules designed to improve documentation qualit
 | `no-dead-internal-links` | DL001 | ❌ | Detects broken internal links |
 | `no-literal-ampersand` | NLA001 | ✅ | Replaces `&` with "and" |
 
+### Three-tier autofix system
+
+Auto-fixes use confidence scoring to avoid false positives:
+
+| Tier | Confidence | Behavior |
+|------|------------|----------|
+| **Auto-fix** | ≥ 0.7 | Applied automatically |
+| **Needs review** | 0.3 - 0.7 | Flagged for human/AI verification |
+| **Skip** | < 0.3 | Too uncertain, silently skipped |
+
+Ambiguous terms like "Word" (Microsoft Word vs. generic word) or "Go" (Go language vs. verb) are flagged for review rather than incorrectly auto-fixed.
+
 ### Rule details
 
 **🔤 sentence-case-heading** - Keeps headings consistent and readable
@@ -280,6 +292,7 @@ This package includes five custom rules designed to improve documentation qualit
 - Autofix telemetry: `docs/telemetry.md` – Track and analyze safety heuristic performance
 - External validation: `docs/external-validation.md` – Validate rules against real-world markdown
 - Claude Code analysis: `docs/claude-code-analysis.md` – AI-assisted rule improvement workflow
+- Three-tier autofix: `docs/architecture.md#autofix-safety` – Confidence-based fix categorization
 
 ## Examples
 
