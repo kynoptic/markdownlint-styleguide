@@ -17,6 +17,7 @@ export const casingTerms = {
   ai: 'AI',
   api: 'API',
   apis: 'APIs',
+  e2e: 'E2E',  // End-to-End testing acronym
   ar: 'AR',
   aws: 'AWS',
   cdc: 'CDC',
@@ -61,6 +62,7 @@ export const casingTerms = {
   ux: 'UX',
   vpn: 'VPN',
   vr: 'VR',
+  wsl: 'WSL',  // Windows Subsystem for Linux
   xml: 'XML',
 
   // Timezone codes (always uppercase)

@@ -117,6 +117,13 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
     return true;
   }
 
+  // Exempt headings that start with quoted text (e.g., `"npm test" fails silently`)
+  // The quoted portion is treated as a code/command reference, and words after it
+  // don't need to follow standard capitalization rules
+  if (/^["'][^"']+["']\s+[a-z]/.test(headingText.trim())) {
+    return true;
+  }
+
   // Skip if empty after cleaning
   if (!headingText || headingText.trim().length === 0) {
     return true;
@@ -283,6 +290,36 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
         errorMessage: `First word "${firstWord}" should be "${expectedFirstWordCasing}".`
       };
     }
+  } else if (firstWord.includes('/') && !firstWord.includes('://')) {
+    // Check for slash-separated terms (e.g., "macOS/Linux", "Linux/WSL")
+    // Exclude URL protocols
+    const slashParts = firstWord.split('/');
+    const allPartsKnown = slashParts.every(part => {
+      const partLower = part.toLowerCase();
+      return specialCasedTerms[partLower] !== undefined;
+    });
+
+    if (allPartsKnown) {
+      // All parts are known terms - check each has correct casing
+      const allCorrectlyCased = slashParts.every(part => {
+        const partLower = part.toLowerCase();
+        const expected = specialCasedTerms[partLower];
+        return part === expected;
+      });
+
+      if (!allCorrectlyCased) {
+        const expectedCasing = slashParts.map(part => {
+          const partLower = part.toLowerCase();
+          return specialCasedTerms[partLower] || part;
+        }).join('/');
+        return {
+          isValid: false,
+          errorMessage: `First word "${firstWord}" should be "${expectedCasing}".`
+        };
+      }
+      return { isValid: true };
+    }
+    // If not all parts are known, fall through to standard handling
   } else {
     // Check for hyphenated terms
     const hyphenBase = firstWordLower.split('-')[0];
