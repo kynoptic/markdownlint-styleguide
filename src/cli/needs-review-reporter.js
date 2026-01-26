@@ -148,6 +148,14 @@ export function formatTextReport(reporter) {
     return output;
   }
 
+  // Add action instructions for AI agents
+  output += '\n';
+  output += 'ACTION REQUIRED: Review each item below and decide whether to:\n';
+  output += '  1. APPLY the suggested fix (if the suggestion is correct)\n';
+  output += '  2. REJECT the fix (if the original is correct, e.g., proper noun)\n';
+  output += '\n';
+  output += 'For each item, read the surrounding context in the file to determine\n';
+  output += 'whether the term is a proper noun (keep as-is) or common noun (apply fix).\n';
   output += '\n';
 
   // Format items grouped by rule
@@ -168,6 +176,9 @@ export function formatTextReport(reporter) {
       }
 
       output += `    -> Confidence: ${(item.confidence * 100).toFixed(0)}%\n`;
+
+      // Add explicit action instruction
+      output += `    -> Action: Read ${item.file} around line ${item.line}, then APPLY or REJECT\n`;
       output += '\n';
     }
   }
@@ -185,17 +196,56 @@ export function formatJsonReport(reporter) {
   const byRule = reporter.getItemsByRule();
 
   const jsonReport = {
+    // Instructions for AI agents processing this output
+    instructions: {
+      description: 'Items below require manual review. The autofix system was not confident enough to apply these changes automatically.',
+      actions: [
+        'For each item, read the surrounding context in the source file',
+        'Determine if the suggested fix is appropriate based on context',
+        'If APPLY: Edit the file to replace "original" with "suggested"',
+        'If REJECT: The original text is correct (e.g., proper noun), no change needed'
+      ],
+      decisionCriteria: {
+        applyFix: [
+          'Term is used as a common noun (e.g., "a word about...")',
+          'Term is used as a verb (e.g., "go to settings")',
+          'Context clearly indicates generic/lowercase usage'
+        ],
+        rejectFix: [
+          'Term refers to a product/brand (e.g., Microsoft Word)',
+          'Term refers to a programming language (e.g., Go, Swift, Rust)',
+          'Term is part of a proper noun phrase',
+          'Context indicates the capitalization is intentional'
+        ]
+      }
+    },
     needsReview: reporter.items.map(item => ({
+      // Location
       file: item.file,
       line: item.line,
       rule: item.rule,
+
+      // The change
       original: item.original,
       suggested: item.suggested,
+
+      // Why it needs review
       confidence: item.confidence,
       ambiguityType: item.ambiguityInfo?.type,
       term: item.ambiguityInfo?.term,
+      reason: item.ambiguityInfo?.reason,
+
+      // Context for decision-making
       context: item.context,
-      heuristics: item.heuristics
+      heuristics: item.heuristics,
+
+      // Explicit action field
+      action: {
+        required: 'REVIEW_AND_DECIDE',
+        options: ['APPLY', 'REJECT'],
+        howToApply: `In ${item.file}, line ${item.line}: replace "${item.original}" with "${item.suggested}"`,
+        howToReject: 'No file changes needed; original text is correct'
+      }
     })),
     byRule,
     summary

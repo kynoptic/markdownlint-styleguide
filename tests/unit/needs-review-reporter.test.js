@@ -186,6 +186,24 @@ describe('formatTextReport', () => {
     expect(text).toContain('=== NEEDS REVIEW (0 items) ===');
   });
 
+  test('should include action instructions', () => {
+    const reporter = new NeedsReviewReporter();
+    reporter.addItem({
+      file: 'docs/api.md',
+      line: 15,
+      rule: 'sentence-case-heading',
+      original: 'Word Processing',
+      suggested: 'Word processing',
+      confidence: 0.45
+    });
+
+    const text = formatTextReport(reporter);
+
+    expect(text).toContain('ACTION REQUIRED');
+    expect(text).toContain('APPLY the suggested fix');
+    expect(text).toContain('REJECT the fix');
+  });
+
   test('should format report with items grouped by rule', () => {
     const reporter = new NeedsReviewReporter();
     reporter.addItem({
@@ -211,6 +229,7 @@ describe('formatTextReport', () => {
     expect(text).toContain('Word Processing Features');
     expect(text).toContain('Word processing features');
     expect(text).toContain('"Word" could be Microsoft Word');
+    expect(text).toContain('Action: Read docs/api.md around line 15');
   });
 
   test('should format multiple items', () => {
@@ -250,6 +269,49 @@ describe('formatJsonReport', () => {
     expect(parsed.summary.totalItems).toBe(0);
   });
 
+  test('should include instructions for AI agents', () => {
+    const reporter = new NeedsReviewReporter();
+    reporter.addItem({
+      file: 'docs/api.md',
+      line: 15,
+      rule: 'sentence-case-heading',
+      original: 'Word Processing',
+      suggested: 'Word processing',
+      confidence: 0.45
+    });
+
+    const json = formatJsonReport(reporter);
+    const parsed = JSON.parse(json);
+
+    expect(parsed.instructions).toBeDefined();
+    expect(parsed.instructions.actions).toContain('For each item, read the surrounding context in the source file');
+    expect(parsed.instructions.decisionCriteria.applyFix).toBeDefined();
+    expect(parsed.instructions.decisionCriteria.rejectFix).toBeDefined();
+  });
+
+  test('should include action field for each item', () => {
+    const reporter = new NeedsReviewReporter();
+    reporter.addItem({
+      file: 'docs/api.md',
+      line: 15,
+      rule: 'sentence-case-heading',
+      original: 'Word Processing',
+      suggested: 'Word processing',
+      confidence: 0.45
+    });
+
+    const json = formatJsonReport(reporter);
+    const parsed = JSON.parse(json);
+    const item = parsed.needsReview[0];
+
+    expect(item.action).toBeDefined();
+    expect(item.action.required).toBe('REVIEW_AND_DECIDE');
+    expect(item.action.options).toContain('APPLY');
+    expect(item.action.options).toContain('REJECT');
+    expect(item.action.howToApply).toContain('docs/api.md');
+    expect(item.action.howToApply).toContain('Word processing');
+  });
+
   test('should format items with full metadata', () => {
     const reporter = new NeedsReviewReporter();
     reporter.addItem({
@@ -286,6 +348,7 @@ describe('formatJsonReport', () => {
     expect(item.confidence).toBe(0.45);
     expect(item.ambiguityType).toBe('proper-noun-or-common');
     expect(item.term).toBe('Word');
+    expect(item.reason).toBe('"Word" could be Microsoft Word (proper) or generic word (common)');
     expect(item.context).toBe('## Word Processing Features');
     expect(item.heuristics).toBeDefined();
   });
