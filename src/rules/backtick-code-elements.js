@@ -513,7 +513,8 @@ function backtickCodeElements(params, onError) {
   const configSchema = {
     ignoredTerms: validateStringArray,
     skipCodeBlocks: validateBoolean,
-    skipMathBlocks: validateBoolean
+    skipMathBlocks: validateBoolean,
+    detectPascalCase: validateBoolean
   };
 
   const validationResult = validateConfig(config, configSchema, 'backtick-code-elements');
@@ -527,6 +528,8 @@ function backtickCodeElements(params, onError) {
   const userIgnoredTerms = Array.isArray(config.ignoredTerms) ? config.ignoredTerms : [];
   const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true;
   const skipMathBlocks = typeof config.skipMathBlocks === 'boolean' ? config.skipMathBlocks : true;
+  // PascalCase detection is OFF by default due to high false positive rate with brand names
+  const detectPascalCase = typeof config.detectPascalCase === 'boolean' ? config.detectPascalCase : false;
 
   // Combine default ignored terms with user-provided ones
   const allIgnoredTerms = new Set([...ignoredTerms, ...userIgnoredTerms]);
@@ -631,15 +634,21 @@ function backtickCodeElements(params, onError) {
       // camelCase identifiers (useEffect, fetchData, myVariable, etc.)
       // Pattern: starts with lowercase, contains at least one uppercase letter
       // Requires at least 2 chars before the first capital to reduce false positives
-      /\b[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*\b/g,
-
-      // PascalCase identifiers (MyComponent, UserService, HttpClient, etc.)
-      // Pattern: starts with uppercase, requires at least 2 uppercase total, and has lowercase
-      // Uses lookahead to ensure there's another uppercase letter somewhere in the word
-      // This avoids matching simple proper nouns like "Paris" or "Michael"
-      // Handles: MyComponent, HTMLParser, ApiV1Client, XMLHttpRequest
-      /\b[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*\b/g
+      /\b[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*\b/g
     ];
+
+    // PascalCase detection is opt-in due to high false positive rate with brand names
+    // (CrowdStrike, SalesForce, OpenAI, etc. all match PascalCase patterns)
+    if (detectPascalCase) {
+      patterns.push(
+        // PascalCase identifiers (MyComponent, UserService, HttpClient, etc.)
+        // Pattern: starts with uppercase, requires at least 2 uppercase total, and has lowercase
+        // Uses lookahead to ensure there's another uppercase letter somewhere in the word
+        // This avoids matching simple proper nouns like "Paris" or "Michael"
+        // Handles: MyComponent, HTMLParser, ApiV1Client, XMLHttpRequest
+        /\b[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*\b/g
+      );
+    }
 
     const flaggedRanges = []; // Track ranges [start, end] that have been flagged
 
@@ -728,19 +737,6 @@ function backtickCodeElements(params, onError) {
         // Skip camelCase exemptions (brand names like iPhone, eBay, etc.)
         if (camelCaseExemptions.has(fullMatch)) {
           continue;
-        }
-
-        // For PascalCase matches, only flag if they look like code identifiers
-        // (have technical suffixes) rather than brand names
-        const pascalCasePattern = /^[A-Z][a-z]+(?:[A-Z][a-z]+)+$/;
-        if (pascalCasePattern.test(fullMatch)) {
-          // Technical suffixes that indicate code identifiers
-          const codeSuffixes = /(?:Component|Service|Handler|Controller|Manager|Factory|Builder|Provider|Repository|Helper|Util|Utils|Client|Server|Worker|Task|Job|Event|Emitter|Listener|Observer|Error|Exception|Config|Options|Settings|State|Store|Model|View|Router|Route|Middleware|Plugin|Module|Package|Class|Interface|Type|Enum|Struct|Schema|Query|Mutation|Resolver|Action|Reducer|Selector|Hook|Context|Ref|Props|Params|Args|Result|Response|Request|Data|Item|List|Map|Set|Array|Object|String|Number|Boolean|Node|Element|Container|Wrapper|Layout|Page|Screen|Form|Input|Button|Table|Row|Cell|Column|Header|Footer|Sidebar|Modal|Dialog|Toast|Alert|Badge|Card|Panel|Tab|Menu|Nav|Link|Image|Icon|Avatar|Loader|Spinner|Progress|Slider|Toggle|Checkbox|Radio|Select|Option|Textarea|Label|Tooltip|Popover|Dropdown|Parser|Formatter|Validator|Serializer|Deserializer|Encoder|Decoder|Reader|Writer|Stream|Buffer|Cache|Pool|Queue|Stack|Tree|Graph|Iterator|Generator|Promise|Future|Callback|Delegate|Proxy|Adapter|Decorator|Facade|Strategy|Visitor|Command|Invoker|Receiver|Mediator|Memento|Prototype|Singleton|Bridge|Composite|Flyweight|Template|Chain|Interpreter)s?$/;
-          // Skip PascalCase words that don't have technical suffixes
-          // These are likely brand names, not code
-          if (!codeSuffixes.test(fullMatch)) {
-            continue;
-          }
         }
 
         // Skip Mc/Mac surname patterns (McDonald, MacArthur, etc.)

@@ -13,13 +13,19 @@ import backtickRule from "../../src/rules/backtick-code-elements.js";
 /**
  * Helper to run the backtick-code-elements rule on a string.
  * @param {string} markdown - The markdown content to lint.
+ * @param {boolean} detectPascalCase - Whether to enable PascalCase detection (default: true for these tests).
  * @returns {Promise<Array>} - Array of violations.
  */
-async function lintString(markdown) {
+async function lintString(markdown, detectPascalCase = true) {
   const options = {
     customRules: [backtickRule],
     strings: { "test.md": markdown },
     resultVersion: 3,
+    config: {
+      "backtick-code-elements": {
+        detectPascalCase: detectPascalCase,
+      },
+    },
   };
   const results = await lint(options);
   const violations = results["test.md"] || [];

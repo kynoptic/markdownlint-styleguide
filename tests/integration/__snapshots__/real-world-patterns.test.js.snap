@@ -424,26 +424,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests r
     ],
   },
   {
-    "errorContext": "PropTypes",
-    "errorDetail": "Identifier 'PropTypes' should be wrapped in backticks to indicate it's a code class or type name",
-    "errorRange": [
-      7,
-      9,
-    ],
-    "fixInfo": {
-      "deleteCount": 9,
-      "editColumn": 7,
-      "insertText": "\`PropTypes\`",
-    },
-    "lineNumber": 51,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
     "errorContext": "React.memo",
     "errorDetail": "Filename 'React.memo' should be wrapped in backticks to distinguish it from regular text",
     "errorRange": [
@@ -1059,26 +1039,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "\`useEffect\`",
         },
         "lineNumber": 42,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
-      {
-        "errorContext": "PropTypes",
-        "errorDetail": "Identifier 'PropTypes' should be wrapped in backticks to indicate it's a code class or type name",
-        "errorRange": [
-          7,
-          9,
-        ],
-        "fixInfo": {
-          "deleteCount": 9,
-          "editColumn": 7,
-          "insertText": "\`PropTypes\`",
-        },
-        "lineNumber": 51,
         "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
         "ruleInformation": null,
         "ruleNames": [
