@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const jsonc = require('jsonc-parser');
+const { execSync } = require('child_process');
 
 // ANSI colors for terminal output
 const colors = {
@@ -184,6 +185,30 @@ function mergeVSCodeSettings(existingPath, newContent) {
   }
 }
 
+function checkDependency(name, cmd) {
+  try {
+    execSync(cmd, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function checkDependencies() {
+  log('\n🔍 Checking dependencies...', 'cyan');
+
+  const cli2Installed = checkDependency('markdownlint-cli2', 'npx markdownlint-cli2 --version');
+
+  if (cli2Installed) {
+    log('  ✓ markdownlint-cli2 is installed', 'green');
+  } else {
+    log('  ⚠ markdownlint-cli2 not found', 'yellow');
+    log('    Install with: npm install -D markdownlint-cli2', 'yellow');
+  }
+
+  return { cli2Installed };
+}
+
 function writeConfig(targetPath, content, force, dryRun, merge = false) {
   const exists = fs.existsSync(targetPath);
   
@@ -268,6 +293,9 @@ async function init() {
     }
   }
   
+  // Check dependencies
+  const deps = checkDependencies();
+
   // Summary
   log('\n' + '─'.repeat(40), 'blue');
   log('Setup complete!', 'green');
@@ -275,24 +303,35 @@ async function init() {
   if (filesSkipped > 0) {
     log(`Files skipped: ${filesSkipped}`, 'yellow');
   }
-  
+
   if (!opts.dryRun) {
     log('\n📚 Next steps:', 'cyan');
-    log('  1. Install markdownlint-cli2 (if not already): npm install -D markdownlint-cli2');
-    log('  2. Lint your markdown: npx markdownlint-cli2 "**/*.md"');
-    log('  3. Enable auto-fix: npx markdownlint-cli2 --fix "**/*.md"');
-    
-    if (opts.vscode) {
-      log('  4. Install VS Code markdownlint extension for real-time linting');
-      log('     https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint');
+
+    let step = 1;
+    if (!deps.cli2Installed) {
+      log(`  ${step}. Install markdownlint-cli2: npm install -D markdownlint-cli2`);
+      step++;
     }
-    
+    log(`  ${step}. Lint your markdown: npx markdownlint-cli2 "**/*.md"`);
+    step++;
+    log(`  ${step}. Enable auto-fix: npx markdownlint-cli2 --fix "**/*.md"`);
+    step++;
+
+    if (opts.vscode) {
+      log(`  ${step}. Install VS Code markdownlint extension for real-time linting`);
+      log('     https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint');
+      step++;
+    }
+
+    log('\n💡 Troubleshooting:', 'cyan');
+    log('  Run diagnostics: npx markdownlint-trap doctor');
+
     log('\n📖 Documentation:', 'cyan');
     log('  https://github.com/kynoptic/markdownlint-trap#readme');
   } else {
     log('\nRun without --dry-run to apply changes', 'yellow');
   }
-  
+
   log('');
 }
 

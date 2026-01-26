@@ -8,6 +8,63 @@ import { execSync } from 'child_process';
 import { parse as parseJsonc } from 'jsonc-parser';
 
 const scriptPath = path.resolve('./scripts/init.cjs');
+const cliPath = path.resolve('./scripts/cli.cjs');
+
+describe('cli.cjs', () => {
+  let tempDir;
+
+  beforeEach(() => {
+    const timestamp = new Date().getTime();
+    tempDir = path.join(process.cwd(), 'tests', 'tmp', 'cli-test-' + timestamp);
+    fs.mkdirSync(tempDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  describe('subcommand routing', () => {
+    it('should run init by default when no subcommand given', () => {
+      const output = execSync('node ' + cliPath + ' --preset recommended --dry-run', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('markdownlint-trap setup wizard');
+    });
+
+    it('should run init when init subcommand given', () => {
+      const output = execSync('node ' + cliPath + ' init --preset recommended --dry-run', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('markdownlint-trap setup wizard');
+    });
+
+    it('should run doctor when doctor subcommand given', () => {
+      const output = execSync('node ' + cliPath + ' doctor', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('markdownlint-trap diagnostics');
+    });
+
+    it('should show help with --help flag', () => {
+      const output = execSync('node ' + cliPath + ' --help', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('markdownlint-trap');
+      expect(output).toContain('init');
+      expect(output).toContain('doctor');
+    });
+  });
+});
 
 describe('init.cjs', () => {
   let tempDir;
@@ -216,6 +273,50 @@ describe('init.cjs', () => {
       expect(output).toContain('Install markdownlint-cli2');
       expect(output).toContain('Lint your markdown');
       expect(output).toContain('Enable auto-fix');
+    });
+  });
+
+  describe('dependency detection', () => {
+    it('should check if markdownlint-cli2 is installed after setup', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      // Should show dependency check section
+      expect(output).toContain('Checking dependencies');
+    });
+
+    it('should show warning when markdownlint-cli2 is not installed', () => {
+      // Run from temp dir where markdownlint-cli2 is not available
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      // Should warn about missing dependency
+      expect(output).toContain('markdownlint-cli2');
+      expect(output).toMatch(/not found|not installed|missing/i);
+    });
+
+    it('should show success when markdownlint-cli2 is installed', () => {
+      // Run from project root where markdownlint-cli2 is available
+      const output = execSync('node ' + scriptPath + ' --preset recommended --dry-run', {
+        encoding: 'utf8',
+        cwd: process.cwd(),
+      });
+
+      expect(output).toContain('markdownlint-cli2');
+      expect(output).toMatch(/installed|found|✓/i);
+    });
+
+    it('should suggest doctor command for troubleshooting', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toMatch(/doctor|diagnos/i);
     });
   });
 });

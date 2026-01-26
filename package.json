@@ -7,10 +7,11 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "markdownlint-trap": "./scripts/init.cjs"
+    "markdownlint-trap": "./scripts/cli.cjs"
   },
   "files": [
     "src",
+    "scripts/cli.cjs",
     "scripts/init.cjs",
     "scripts/doctor.cjs",
     "scripts/distribute-local.cjs",
@@ -45,6 +46,14 @@
   "dependencies": {
     "js-yaml": "^4.1.0",
     "jsonc-parser": "^3.3.1"
+  },
+  "peerDependencies": {
+    "markdownlint-cli2": ">=0.10.0"
+  },
+  "peerDependenciesMeta": {
+    "markdownlint-cli2": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
