@@ -856,7 +856,7 @@ function backtickCodeElements(params, onError) {
             'backtick',
             fullMatch,
             `\`${fullMatch}\``,
-            { type: 'shell-command', line }
+            { type: 'shell-command', line, file: params.name, lineNumber }
           );
           
           onError({
@@ -879,7 +879,7 @@ function backtickCodeElements(params, onError) {
             'backtick',
             fullMatch,
             `\`${fullMatch}\``,
-            { type: 'code-element', line }
+            { type: 'code-element', line, file: params.name, lineNumber }
           );
           
           onError({
