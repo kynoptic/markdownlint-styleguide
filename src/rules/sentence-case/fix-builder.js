@@ -11,9 +11,10 @@ import { createSafeFixInfo } from '../autofix-safety.js';
  * Converts a string to sentence case, respecting preserved segments and multi-word special terms.
  * @param {string} text - The text to convert
  * @param {Object} specialCasedTerms - Map of lowercase terms to their proper casing
+ * @param {Object} [ambiguousTerms={}] - Map of terms that should preserve their original casing
  * @returns {string | null} The fixed text, or null if no change is needed
  */
-export function toSentenceCase(text, specialCasedTerms) {
+export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
   const preserved = [];
   // Preserve markup, code, links, versions, dates, bold, italic, and quoted text
   const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\3|(\*|_)(.*?)\5|"[^"]+"|'[^']+'/g;
@@ -53,6 +54,26 @@ export function toSentenceCase(text, specialCasedTerms) {
     }
 
     const lower = w.toLowerCase();
+
+    // Preserve ambiguous terms - they could be common nouns or proper nouns
+    // (e.g., "Word" could be common noun "word" or Microsoft Word)
+    // But only preserve if they're already in valid form (capitalized like a proper noun)
+    // Don't preserve ALL CAPS or all lowercase - convert those appropriately
+    if (ambiguousTerms[lower]) {
+      if (!firstVisibleWordCased) {
+        firstVisibleWordCased = true;
+        // For first word, capitalize it appropriately
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      }
+      // For subsequent words, check if it looks like a proper noun (first letter upper, rest lower)
+      // If so, preserve it. If ALL CAPS or all lowercase, convert to lowercase.
+      const looksLikeProperNoun = /^[A-Z][a-z]/.test(w);
+      if (looksLikeProperNoun) {
+        return w; // Preserve "Word" as-is
+      }
+      return w.toLowerCase(); // Convert "WORD" or "word" to lowercase
+    }
+
     if (specialCasedTerms[lower]) {
       // Special term counts as the first visible word if we haven't seen one yet
       if (!firstVisibleWordCased) {
@@ -90,16 +111,17 @@ export function toSentenceCase(text, specialCasedTerms) {
  * @param {string} text - The heading text to fix
  * @param {Object} specialCasedTerms - Map of lowercase terms to their proper casing
  * @param {Object} safetyConfig - Safety configuration for autofix
+ * @param {Object} [ambiguousTerms={}] - Map of terms that should preserve their original casing
  * @returns {object|undefined} Fix information or undefined if no fix available
  */
-export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig) {
+export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig, ambiguousTerms = {}) {
   const match = /^(#{1,6})(\s+)(.*)$/.exec(line);
   if (!match) {
     return undefined;
   }
 
   const prefixLength = match[1].length + match[2].length;
-  const fixedText = toSentenceCase(text, specialCasedTerms);
+  const fixedText = toSentenceCase(text, specialCasedTerms, ambiguousTerms);
 
   if (!fixedText) {
     return undefined;

@@ -127,7 +127,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       lineNumber,
       detail,
       context: headingText,
-      fixInfo: buildHeadingFix(line, fixTarget, specialCasedTerms, safetyConfig)
+      fixInfo: buildHeadingFix(line, fixTarget, specialCasedTerms, safetyConfig, ambiguousTerms)
     });
   }
 
@@ -142,7 +142,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   function reportForBoldText(detail, lineNumber, boldText, line, textForValidation) {
     // If ignoreAfterEmoji is enabled and text was truncated, only fix the part before emoji
     const fixTarget = (ignoreAfterEmoji && textForValidation) ? textForValidation : boldText;
-    const fixedText = toSentenceCase(fixTarget, specialCasedTerms);
+    const fixedText = toSentenceCase(fixTarget, specialCasedTerms, ambiguousTerms);
 
     onError({
       lineNumber,
