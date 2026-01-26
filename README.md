@@ -11,91 +11,80 @@ A collection of custom `markdownlint` rules designed to enforce specific documen
 
 ## Quick start
 
-### For published package
-
 Get up and running in under 2 minutes:
 
-1. Install the package
-
-   ```bash
-   npm install --save-dev markdownlint-trap markdownlint-cli2
-   ```
-
-2. Run the setup wizard
-
-   ```bash
-   npx markdownlint-trap init
-   ```
-
-   This will:
-   - Guide you through preset selection (basic, recommended, or strict)
-   - Create `.markdownlint-cli2.jsonc` configuration
-   - Configure VS Code integration (if `.vscode` exists)
-   - Validate your setup
-
-3. Run on your files
-
-   ```bash
-   npx markdownlint-cli2 "**/*.md"
-   # or auto-fix where supported
-   npx markdownlint-cli2 --fix "**/*.md"
-   ```
-
-### For local development (recommended)
-
-If you're developing markdownlint-trap or want to use it across all your projects:
+### 1. Install
 
 ```bash
-# In the markdownlint-trap repository
-npm run dist:local
+npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
 ```
 
-This automatically:
+### 2. Run the setup wizard
 
-- Installs globally (works in ALL projects, including `non-Node.js`)
-- Distributes configs to `~/Projects/*`
-- Detects package managers (npm, pnpm, yarn, bun)
+```bash
+npx markdownlint-trap init --preset recommended --all
+```
 
-See [Installation Guide](docs/installation.md) for detailed setup options.
+This creates everything you need:
 
-### Alternative: manual configuration
+- `.markdownlint-cli2.jsonc` - CLI configuration
+- `.vscode/settings.json` - VS Code integration (merged with existing)
+- `.vscode/extensions.json` - Recommends the markdownlint extension
+- `.github/workflows/markdown-lint.yml` - CI workflow
+- `package.json` updates - Adds `lint:md` scripts and pre-commit hooks
+
+### 3. Lint your files
+
+```bash
+# Check for issues
+npm run lint:md
+
+# Auto-fix issues
+npm run lint:md:fix
+```
+
+That's it! VS Code will now show lint errors in real-time, and CI will catch issues on pull requests.
+
+## Minimal setup
+
+If you just want the basics without CI or hooks:
+
+```bash
+npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
+npx markdownlint-trap init --preset recommended
+npx markdownlint-cli2 "**/*.md"
+```
+
+## Manual configuration
 
 If you prefer manual setup or need advanced configuration:
 
-- Recommended (extends the preset from this package):
-
-  ```jsonc
-  {
-    "config": {
-      "extends": "markdownlint-trap/recommended-config.jsonc"
-    },
-    "globs": ["**/*.md", "!node_modules/**/*"]
+```jsonc
+// .markdownlint-cli2.jsonc
+{
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
   }
-  ```
+}
+```
 
-- Manual (load rules and enable them explicitly):
+For VS Code, add to `.vscode/settings.json`:
 
-  ```jsonc
-  {
-    "customRules": ["markdownlint-trap"],
-    "config": {
-      "default": true,
-      "sentence-case-heading": true,
-      "backtick-code-elements": true,
-      "no-bare-url": true,
-      "no-dead-internal-links": true,
-      "no-literal-ampersand": true
-    },
-    "globs": ["**/*.md", "!node_modules/**/*"]
+```jsonc
+{
+  "markdownlint.customRules": ["markdownlint-trap"],
+  "markdownlint.config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
   }
-  ```
+}
+```
 
 ## Table of contents
 
 - [Installation](#installation)
 - [Configuration](#configuration)
-  - [Setup wizard](#setup-wizard)
-  - [Multi-project deployment](#multi-project-deployment)
+  - [Presets](#presets)
+  - [Setup wizard options](#setup-wizard-options)
   - [Diagnostics](#diagnostics)
 - [Rules overview](#rules-overview)
 - [Docs](#docs)
@@ -108,33 +97,57 @@ If you prefer manual setup or need advanced configuration:
 ### Requirements
 
 - **Node.js**: Version 18 or higher
-- **markdownlint-cli2**: Recommended for best experience
+- **markdownlint-cli2**: Required for CLI usage
 
-### Install via npm
+### Full setup (recommended)
+
+This installs everything and configures VS Code, CI, npm scripts, and pre-commit hooks:
 
 ```bash
-npm install markdownlint-trap --save-dev
+npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
+npx markdownlint-trap init --preset recommended --all
+```
+
+### VS Code only
+
+If you just want real-time linting in VS Code:
+
+```bash
+npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
+npx markdownlint-trap init --preset recommended --vscode
+```
+
+Then install the [markdownlint extension](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint).
+
+### CLI only
+
+If you just want to run linting from the command line:
+
+```bash
+npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
+npx markdownlint-trap init --preset recommended --cli
+npx markdownlint-cli2 "**/*.md"
+```
+
+### Verify your setup
+
+```bash
+npx markdownlint-trap doctor
 ```
 
 ## Configuration
 
-### Recommended setup (extends)
+### Presets
 
-Pick a preset and extend it in `.markdownlint-cli2.jsonc`.
+Three presets are available:
 
-- Basic (most users): `markdownlint-trap/basic-config.jsonc`
-- Recommended: `markdownlint-trap/recommended-config.jsonc`
-- Strict: `markdownlint-trap/strict-config.jsonc`
+| Preset | Description |
+|--------|-------------|
+| `basic` | Core rules only (sentence-case, backticks) |
+| `recommended` | All custom rules with balanced strictness |
+| `strict` | All custom rules plus standard markdownlint rules |
 
-Example:
-
-```jsonc
-{
-  "config": { "extends": "markdownlint-trap/basic-config.jsonc" }
-}
-```
-
-This single line gives you a great starting point. You can still override any setting for your specific project needs. For example, to disable a rule from the shared config:
+Override individual rules in your `.markdownlint-cli2.jsonc`:
 
 ```jsonc
 {
@@ -145,180 +158,51 @@ This single line gives you a great starting point. You can still override any se
 }
 ```
 
-### Manual configuration
-
-If you prefer to configure each rule individually, you can add them manually to your `.markdownlint-cli2.jsonc` file.
-
-1. **Load the custom rules:**
-
-   First, tell markdownlint where to find the rules.
-
-   ```json
-   {
-     "customRules": ["markdownlint-trap"]
-   }
-   ```
-
-2. **Enable and configure rules:**
-
-   Next, add the rules you want to use to the config object. You can enable them with `true`.
-
-   ```jsonc
-   {
-     "customRules": ["markdownlint-trap"],
-     "config": {
-       // Enable all custom rules
-       "sentence-case-heading": true,
-       "backtick-code-elements": true,
-       "no-bare-url": true,
-       "no-dead-internal-links": true,
-       "no-literal-ampersand": true
-     }
-   }
-   ```
-
-   Example of advanced configuration for a single rule:
-
-   ```jsonc
-   {
-     "customRules": ["markdownlint-trap"],
-     "config": {
-       "default": true,
-       "sentence-case-heading": {
-         "specialTerms": ["GitHub", "JavaScript", "TypeScript", "API", "CLI", "SDK"]
-       }
-     }
-   }
-   ```
-
-### Running the linter
-
-After configuration, run markdownlint on your project:
+### Setup wizard options
 
 ```bash
-# Lint all markdown files
-npx markdownlint-cli2 "**/*.md"
-
-# Lint specific files
-npx markdownlint-cli2 README.md docs/*.md
-
-# Auto-fix issues where possible
-npx markdownlint-cli2 --fix "**/*.md"
+npx markdownlint-trap init [options]
 ```
 
-### Setup wizard
-
-The `init` command provides an interactive setup wizard to configure markdownlint-trap in your project:
-
-```bash
-npx markdownlint-trap init
-```
-
-**Features:**
-
-- Interactive preset selection (basic, recommended, strict)
-- Automatic configuration file generation
-- VS Code integration setup
-- Merge with existing settings (non-destructive)
-
-**Options:**
-
-- `--preset <level>`: Skip interactive prompt and use specified preset
-- `--vscode`: Only configure VS Code settings
-- `--cli`: Only configure markdownlint-cli2
-- `--force`: Overwrite existing configuration files
-- `--dry-run`: Preview changes without writing files
+| Option | Description |
+|--------|-------------|
+| `--preset <level>` | Use basic, recommended, or strict (skips prompt) |
+| `--all` | Enable all optional features (CI, scripts, hooks) |
+| `--github-action` | Add GitHub Actions workflow |
+| `--scripts` | Add npm scripts (`lint:md`, `lint:md:fix`) |
+| `--hooks` | Configure lint-staged for pre-commit |
+| `--vscode` | Only configure VS Code settings |
+| `--cli` | Only configure markdownlint-cli2 |
+| `--force` | Overwrite existing files |
+| `--dry-run` | Preview without writing |
 
 **Examples:**
 
 ```bash
-# Interactive setup (recommended)
-npx markdownlint-trap init
+# Full setup with all features
+npx markdownlint-trap init --preset recommended --all
 
-# Non-interactive with specific preset
-npx markdownlint-trap init --preset recommended
+# Just VS Code integration
+npx markdownlint-trap init --preset recommended --vscode
 
-# Only setup VS Code integration
-npx markdownlint-trap init --vscode --preset strict
-
-# Preview what would be generated
-npx markdownlint-trap init --dry-run
+# Preview what would be created
+npx markdownlint-trap init --preset recommended --all --dry-run
 ```
-
-### Multi-project deployment
-
-For managing configurations across multiple projects, use the local distribution system:
-
-## 1. Create distribution config
-
-Create or edit `.github/distribution.local.yml` in the markdownlint-trap package directory:
-
-```yaml
-version: 1
-targets:
-  - name: vscode-recommended
-    enabled: true  # Set to true to activate
-    type: local
-    src: templates/vscode-settings-recommended.json
-    dest:
-      - ~/Projects/my-docs/.vscode/settings.json
-      - ~/Projects/api-docs/.vscode/settings.json
-      # Wildcards supported:
-      # - ~/Projects/*/.vscode/settings.json
-    merge: true  # Merge with existing settings
-```
-
-## 2. Preview changes
-
-```bash
-npm run dist:local:dry
-```
-
-## 3. Apply configuration
-
-```bash
-npm run dist:local
-```
-
-**Benefits:**
-
-- Deploy configs to multiple projects with one command
-- Wildcard support: `~/Projects/*/.vscode/settings.json`
-- Safe merging with existing configurations
-- Maintain consistency across all your documentation projects
-
-See `.github/distribution.local.yml` for full configuration examples.
 
 ### Diagnostics
 
-Run diagnostics to verify your setup:
+Verify your setup is working correctly:
 
 ```bash
-npm run doctor
+npx markdownlint-trap doctor
 ```
 
-The doctor command checks:
+This checks:
 
-- Required dependencies installed (Node.js, markdownlint-cli2)
-- Configuration files exist and have valid syntax
-- Custom rules can be loaded successfully
-- VS Code integration is properly configured
-
-Example output:
-
-```text
-✓ Node.js installed
-✓ markdownlint-cli2 installed
-✓ CLI config (.markdownlint-cli2.jsonc) exists
-✓ CLI config syntax valid
-✓ VS Code config (.vscode/settings.json) exists
-✓ VS Code config syntax valid
-✓ VS Code custom rules configured
-✓ Custom rules loadable
-
-Results: 8 passed, 0 failed, 0 warnings
-✨ All checks passed! Your setup looks good.
-```
+- Dependencies installed (Node.js, markdownlint-cli2)
+- Configuration files exist and are valid
+- Custom rules load successfully
+- VS Code integration configured
 
 ## Rules overview
 
