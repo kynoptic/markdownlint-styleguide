@@ -28,7 +28,7 @@ import {
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
-import { stripLeadingDecorations, truncateAtEmoji } from './shared-utils.js';
+import { stripLeadingDecorations, truncateAtEmoji, getCodeBlockLines } from './shared-utils.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading, validateBoldText } from './sentence-case/case-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
@@ -223,8 +223,17 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   // in a list item (after optional decorative elements like emojis).
   // Bold text in the middle or end of list items should NOT be validated.
   // This fixes ~2,700 false positives (issue #105).
+
+  // Get code block lines to skip content inside fenced code blocks
+  const codeBlockLines = getCodeBlockLines(lines);
+
   lines.forEach((line, index) => {
     const lineNumber = index + 1;
+
+    // Skip lines inside code blocks - never flag or autofix code block content
+    if (codeBlockLines[index]) {
+      return;
+    }
 
     // Skip lines that are not list items with bold text
     if (!line.trim().startsWith('-') || !line.includes('**')) {

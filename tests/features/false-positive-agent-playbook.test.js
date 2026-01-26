@@ -320,6 +320,58 @@ describe('Sentence-case false positives from agent-playbook', () => {
   });
 });
 
+describe('Code blocks should never be flagged or autofixed', () => {
+  describe('sentence-case-heading should skip code blocks', () => {
+    test('bold text inside code blocks should not be flagged', async () => {
+      const content = `# Heading
+
+\`\`\`markdown
+- **Title Case Bold** should not be flagged
+\`\`\`
+`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('list items inside code blocks should not be flagged', async () => {
+      const content = `# Example
+
+\`\`\`markdown
+- **ALL CAPS** is fine in code blocks
+- **Title Case Here** is also fine
+\`\`\`
+`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('backtick-code-elements should skip code blocks', () => {
+    test('code elements inside code blocks should not be flagged', async () => {
+      const content = `# Example
+
+\`\`\`javascript
+const foo = useEffect(() => {});
+\`\`\`
+`;
+      const errors = await lintWithRule(content, backtickCodeElements);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('import statements inside code blocks should not be flagged', async () => {
+      const content = `# Example
+
+\`\`\`javascript
+import React from 'react';
+import useState from 'react';
+\`\`\`
+`;
+      const errors = await lintWithRule(content, backtickCodeElements);
+      expect(errors).toHaveLength(0);
+    });
+  });
+});
+
 describe('BCE false positives - Round 2', () => {
   describe('URLs should NOT be backticked', () => {
     test('HTTPS URLs in prose should not be backticked', async () => {
