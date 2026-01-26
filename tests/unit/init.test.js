@@ -339,6 +339,98 @@ describe('init.cjs', () => {
     });
   });
 
+  describe('--upgrade flag', () => {
+    it('should merge new config options while preserving existing customizations', () => {
+      // Create existing config with custom settings
+      const existingConfig = {
+        customRules: ['markdownlint-trap'],
+        config: {
+          'sentence-case-heading': {
+            specialTerms: ['MyCustomTerm', 'AnotherTerm']
+          },
+          'backtick-code-elements': true
+        }
+      };
+      fs.writeFileSync(
+        path.join(tempDir, '.markdownlint-cli2.jsonc'),
+        JSON.stringify(existingConfig, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --upgrade', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const updatedConfig = JSON.parse(
+        fs.readFileSync(path.join(tempDir, '.markdownlint-cli2.jsonc'), 'utf8')
+          .replace(/\/\/.*$/gm, '')
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+      );
+
+      // Should preserve custom specialTerms
+      expect(updatedConfig.config['sentence-case-heading'].specialTerms).toContain('MyCustomTerm');
+      expect(updatedConfig.config['sentence-case-heading'].specialTerms).toContain('AnotherTerm');
+
+      // Should add new rules that weren't in original
+      expect(updatedConfig.config['no-bare-url']).toBeDefined();
+      expect(updatedConfig.config['no-dead-internal-links']).toBeDefined();
+    });
+
+    it('should add new scripts without overwriting existing ones', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({
+          name: 'test-project',
+          scripts: {
+            'lint:md': 'my-custom-lint-command',
+            'test': 'jest'
+          }
+        }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --upgrade --scripts', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+
+      // Should preserve existing custom script
+      expect(pkg.scripts['lint:md']).toBe('my-custom-lint-command');
+
+      // Should add new script that didn't exist
+      expect(pkg.scripts['lint:md:fix']).toBeDefined();
+    });
+
+    it('should show what was upgraded in output', () => {
+      // Create minimal existing config
+      fs.writeFileSync(
+        path.join(tempDir, '.markdownlint-cli2.jsonc'),
+        JSON.stringify({ config: { 'sentence-case-heading': true } }, null, 2),
+        'utf8'
+      );
+
+      const output = execSync('node ' + scriptPath + ' --preset recommended --upgrade', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('Upgrading');
+      expect(output).toMatch(/added|merged|new/i);
+    });
+
+    it('should mention --upgrade flag in help output', () => {
+      const output = execSync('node ' + scriptPath + ' --help', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('--upgrade');
+    });
+  });
+
   describe('dependency detection', () => {
     it('should check if markdownlint-cli2 is installed after setup', () => {
       const output = execSync('node ' + scriptPath + ' --preset recommended', {

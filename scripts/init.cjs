@@ -34,6 +34,7 @@ function parseArgs() {
     scripts: false,
     hooks: false,
     all: false,
+    upgrade: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -58,6 +59,8 @@ function parseArgs() {
       opts.hooks = true;
     } else if (arg === '--all') {
       opts.all = true;
+    } else if (arg === '--upgrade') {
+      opts.upgrade = true;
     }
   }
 
@@ -92,6 +95,7 @@ ${colors.yellow}Options:${colors.reset}
   --scripts          Add npm scripts (lint:md, lint:md:fix) to package.json
   --hooks            Configure lint-staged for pre-commit hooks
   --all              Enable all optional features (github-action, scripts, hooks)
+  --upgrade          Merge new config options while preserving customizations
   --force            Overwrite existing configuration files
   --dry-run          Show what would be generated without writing files
   -h, --help         Show this help message
@@ -213,6 +217,58 @@ function mergeVSCodeSettings(existingPath, newContent) {
   } catch (e) {
     log(`  Warning: Could not merge existing VS Code settings: ${e.message}`, 'yellow');
     return { content: newContent, preserved: [] };
+  }
+}
+
+function deepMerge(target, source, path = '') {
+  const result = { ...target };
+  const added = [];
+
+  for (const key of Object.keys(source)) {
+    const currentPath = path ? `${path}.${key}` : key;
+
+    if (!(key in target)) {
+      // New key - add it
+      result[key] = source[key];
+      added.push(currentPath);
+    } else if (
+      typeof source[key] === 'object' &&
+      source[key] !== null &&
+      !Array.isArray(source[key]) &&
+      typeof target[key] === 'object' &&
+      target[key] !== null &&
+      !Array.isArray(target[key])
+    ) {
+      // Both are objects - recurse
+      const merged = deepMerge(target[key], source[key], currentPath);
+      result[key] = merged.result;
+      added.push(...merged.added);
+    }
+    // Otherwise keep existing value (don't overwrite)
+  }
+
+  return { result, added };
+}
+
+function upgradeConfig(existingPath, templateContent) {
+  if (!fs.existsSync(existingPath)) {
+    return { content: templateContent, added: [], isNew: true };
+  }
+
+  try {
+    const existingText = fs.readFileSync(existingPath, 'utf8');
+    const existing = jsonc.parse(existingText);
+    const template = jsonc.parse(templateContent);
+
+    const { result, added } = deepMerge(existing, template);
+
+    // Format the output
+    const content = JSON.stringify(result, null, 2);
+
+    return { content, added, isNew: false };
+  } catch (e) {
+    log(`  Warning: Could not parse existing config: ${e.message}`, 'yellow');
+    return { content: templateContent, added: [], isNew: true };
   }
 }
 
@@ -517,15 +573,34 @@ async function init() {
   
   // Configure markdownlint-cli2
   if (opts.cli) {
-    log('\n📝 Configuring markdownlint-cli2...', 'cyan');
     const cliConfig = path.join(projectRoot, '.markdownlint-cli2.jsonc');
     const cliTemplate = loadTemplate(preset, 'markdownlint-cli2');
 
-    const result = writeConfig(cliConfig, cliTemplate, opts.force, opts.dryRun, false);
-    if (result.success) {
-      filesCreated++;
+    if (opts.upgrade && fs.existsSync(cliConfig)) {
+      log('\n⬆️  Upgrading markdownlint-cli2 config...', 'cyan');
+      const upgrade = upgradeConfig(cliConfig, cliTemplate);
+
+      if (upgrade.added.length > 0) {
+        if (opts.dryRun) {
+          log(`  [DRY RUN] Would add ${upgrade.added.length} new option(s)`, 'blue');
+          log(`  New options: ${upgrade.added.join(', ')}`, 'blue');
+        } else {
+          fs.writeFileSync(cliConfig, upgrade.content, 'utf8');
+          log(`  Upgraded: ${cliConfig}`, 'green');
+          log(`  Added ${upgrade.added.length} new option(s): ${upgrade.added.join(', ')}`, 'green');
+        }
+        filesCreated++;
+      } else {
+        log('  Config is already up to date', 'green');
+      }
     } else {
-      filesSkipped++;
+      log('\n📝 Configuring markdownlint-cli2...', 'cyan');
+      const result = writeConfig(cliConfig, cliTemplate, opts.force, opts.dryRun, false);
+      if (result.success) {
+        filesCreated++;
+      } else {
+        filesSkipped++;
+      }
     }
   }
 
