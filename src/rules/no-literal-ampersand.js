@@ -216,7 +216,13 @@ function noLiteralAmpersand(params, onError) {
             deleteCount: 1,
             insertText: 'and'
           };
-          const safeFixInfo = createSafeFixInfo(basicFixInfo, params.lines, lineNumber, 'no-literal-ampersand');
+          const safeFixInfo = createSafeFixInfo(
+            basicFixInfo,
+            'no-literal-ampersand',
+            '&',
+            'and',
+            { line }
+          );
 
           onError({
             lineNumber,

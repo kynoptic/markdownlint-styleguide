@@ -6,6 +6,24 @@
  */
 
 import { getTelemetry } from './autofix-telemetry.js';
+import { ambiguousTerms } from './shared-constants.js';
+import { getNeedsReviewReporter } from '../cli/needs-review-reporter.js';
+
+/**
+ * Three-tier autofix thresholds for confidence-based decision making.
+ *
+ * | Tier | Confidence | Behavior |
+ * |------|------------|----------|
+ * | Auto-fix | >= 0.7 | Applied automatically, high confidence |
+ * | Needs Review | 0.3 - 0.7 | Flagged for manual/AI verification |
+ * | Skip | < 0.3 | Too uncertain, not worth surfacing |
+ *
+ * @type {{ autoFix: number, needsReview: number }}
+ */
+export const THREE_TIER_THRESHOLDS = {
+  autoFix: 0.7,
+  needsReview: 0.3
+};
 
 /**
  * Set of command keywords for efficient lookup
@@ -165,22 +183,29 @@ function getFileExtension(filename) {
  * Configuration for autofix safety checks.
  * @typedef {Object} AutofixSafetyConfig
  * @property {boolean} enabled - Whether safety checks are enabled
- * @property {number} confidenceThreshold - Minimum confidence score (0-1) to apply autofix
+ * @property {number} confidenceThreshold - Minimum confidence score (0-1) for auto-fix tier (default: 0.7)
+ * @property {number} reviewThreshold - Minimum confidence score (0-1) for needs-review tier (default: 0.3)
  * @property {string[]} safeWords - Words that are always safe to fix
  * @property {string[]} unsafeWords - Words that should never be auto-fixed
  * @property {boolean} requireManualReview - Whether certain fixes require manual review
+ * @property {string[]} alwaysReview - Terms that should always go to needs-review tier
+ * @property {string[]} neverFlag - Terms that should never be flagged at all (skip tier)
  */
 
 /**
  * Default safety configuration.
+ * Uses three-tier thresholds for auto-fix (0.7), needs-review (0.3), and skip (<0.3).
  * @type {AutofixSafetyConfig}
  */
 const DEFAULT_SAFETY_CONFIG = {
   enabled: true,
-  confidenceThreshold: 0.5,
+  confidenceThreshold: THREE_TIER_THRESHOLDS.autoFix,  // 0.7 - high confidence auto-fix
+  reviewThreshold: THREE_TIER_THRESHOLDS.needsReview,  // 0.3 - minimum for needs-review
   safeWords: ['npm', 'api', 'url', 'html', 'css', 'json', 'xml', 'http', 'https'],
   unsafeWords: ['i', 'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by'],
-  requireManualReview: false
+  requireManualReview: false,
+  alwaysReview: [],  // Terms that should always go to needs-review tier
+  neverFlag: []       // Terms that should never be flagged
 };
 
 /**
@@ -266,55 +291,107 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
 }
 
 /**
+ * Common directory prefixes that indicate a code path.
+ */
+const CODE_DIRECTORY_PREFIXES = new Set([
+  'src', 'lib', 'bin', 'dist', 'build', 'out', 'output', 'target',
+  'tests', 'test', 'spec', 'specs', '__tests__', '__mocks__',
+  'docs', 'doc', 'documentation',
+  'config', 'configs', 'conf', 'settings',
+  'scripts', 'tools', 'utils', 'helpers', 'common',
+  'components', 'modules', 'packages', 'plugins',
+  'assets', 'static', 'public', 'resources', 'images', 'icons',
+  'styles', 'css', 'scss', 'less',
+  'node_modules', 'vendor', 'third_party', 'external',
+  'api', 'routes', 'controllers', 'models', 'views', 'services',
+  'app', 'apps', 'pages', 'layouts', 'templates',
+  '.github', '.gitlab', '.circleci', '.vscode'
+]);
+
+/**
  * Get confidence boost for file path patterns.
  * @param {string} text - Text to analyze
  * @returns {number} Confidence boost (0-0.4)
  */
 function getFilePathConfidence(text) {
-  if (text.includes('/') && /\.[a-zA-Z0-9]+$/.test(text)) {
-    return 0.4; // Strong indicator: file path with extension
-  } else if (text.includes('/') && text.split('/').length > 2) {
-    return 0.3; // Multi-segment paths are likely code references
-  } else if (text.includes('/')) {
-    return 0.1; // Simple paths could be code or natural language
+  if (!text.includes('/')) {
+    return 0;
   }
-  return 0;
+
+  // File path with extension (e.g., src/index.js)
+  if (/\.[a-zA-Z0-9]+$/.test(text)) {
+    return 0.4; // Strong indicator: file path with extension
+  }
+
+  const segments = text.split('/');
+  const firstSegment = segments[0].toLowerCase();
+
+  // Paths starting with common code directory prefixes
+  if (CODE_DIRECTORY_PREFIXES.has(firstSegment)) {
+    return 0.3; // Strong indicator: starts with code directory
+  }
+
+  // Multi-segment paths without extension
+  if (segments.length > 2) {
+    return 0.3; // Multi-segment paths are likely code references
+  }
+
+  // Simple two-segment paths (less certain)
+  return 0.15;
 }
 
 /**
  * Get confidence boost for command-like patterns.
  * @param {string} text - Text to analyze
- * @returns {number} Confidence boost (0-0.3)
+ * @returns {number} Confidence boost (0-0.4)
  */
 function getCommandConfidence(text) {
   let confidence = 0;
-  
+
   // Standalone filenames with common extensions
   if (/^[a-zA-Z0-9._-]+\.(json|js|ts|py|md|txt|yml|yaml|xml|html|css|scss|sh|sql|env|cfg|conf|ini|toml|lock|log)$/i.test(text)) {
     confidence += 0.3; // Standalone filenames are strong code indicators
   }
-  
+
   // Import statements
   if (/^import\s+\w+/.test(text)) {
     confidence += 0.2; // Import statements are definitively code
   }
-  
+
   // Command-line tools
   if (COMMAND_KEYWORDS.has(text.split(/\s+/)[0]?.toLowerCase())) {
     confidence += 0.3; // Command tools are strong code indicators
   }
-  
+
   // Environment variables
   if (/^[A-Z_][A-Z0-9_]*$/.test(text) && text.length > 2) {
     confidence += 0.2; // Environment variable pattern
   }
-  
+
   // File extensions
   if (FILE_EXTENSION_KEYWORDS.has(getFileExtension(text))) {
     confidence += 0.2; // File extension references
   }
-  
-  return Math.min(confidence, 0.3); // Cap at 0.3 to avoid over-boosting
+
+  // snake_case identifiers (variable_name, function_name, max_retries)
+  // These are very strong indicators of code identifiers
+  if (/^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(text)) {
+    confidence += 0.25; // snake_case is almost always code
+  }
+
+  // camelCase identifiers (useEffect, fetchData, myVariable)
+  // Strong code indicator
+  if (/^[a-z][a-z0-9]*[A-Z][a-zA-Z0-9]*$/.test(text)) {
+    confidence += 0.25; // camelCase is almost always code
+  }
+
+  // PascalCase identifiers (MyComponent, HttpClient)
+  // Note: May have false positives with brand names, so slightly lower boost
+  if (/^[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*$/.test(text)) {
+    confidence += 0.2; // PascalCase is likely code, but watch for brand names
+  }
+
+  return Math.min(confidence, 0.4); // Cap at 0.4 to avoid over-boosting
 }
 
 /**
@@ -506,22 +583,119 @@ export function analyzeCodeVsNaturalLanguage(text, context = {}) {
 }
 
 /**
+ * Detect ambiguous terms in text and return ambiguity information.
+ * @param {string} text - Text to analyze
+ * @returns {{ isAmbiguous: boolean, term?: string, info?: Object, type?: string }} Ambiguity info
+ */
+function detectAmbiguity(text) {
+  const words = text.toLowerCase().split(/\s+/);
+
+  for (const word of words) {
+    const cleanWord = word.replace(/[^a-z]/g, '');
+    if (ambiguousTerms[cleanWord]) {
+      const termInfo = ambiguousTerms[cleanWord];
+
+      // Determine ambiguity type based on the reason
+      let type = 'proper-noun-or-common';
+      if (termInfo.reason.includes('programming language')) {
+        type = 'programming-language';
+      } else if (termInfo.reason.includes('software') || termInfo.reason.includes('browser')) {
+        type = 'product-name';
+      } else if (termInfo.reason.includes('SemVer')) {
+        type = 'semver-term';
+      }
+
+      return {
+        isAmbiguous: true,
+        term: cleanWord,
+        info: termInfo,
+        type
+      };
+    }
+  }
+
+  return { isAmbiguous: false };
+}
+
+/**
+ * Determine the tier classification based on confidence and thresholds.
+ * @param {number} confidence - Confidence score (0-1)
+ * @param {number} autoFixThreshold - Threshold for auto-fix tier
+ * @param {number} reviewThreshold - Threshold for needs-review tier
+ * @returns {'auto-fix' | 'needs-review' | 'skip'} Tier classification
+ */
+function classifyTier(confidence, autoFixThreshold, reviewThreshold) {
+  if (confidence >= autoFixThreshold) {
+    return 'auto-fix';
+  } else if (confidence >= reviewThreshold) {
+    return 'needs-review';
+  } else {
+    return 'skip';
+  }
+}
+
+/**
  * Check if an autofix should be applied based on safety rules.
+ * Uses a three-tier system:
+ * - Auto-fix (>= autoFixThreshold): Applied automatically
+ * - Needs Review (reviewThreshold to autoFixThreshold): Flagged for review
+ * - Skip (< reviewThreshold): Too uncertain to surface
+ *
  * @param {string} ruleType - Type of rule (e.g., 'sentence-case', 'backtick')
  * @param {string} original - Original text
  * @param {string} fixed - Fixed text (for sentence-case)
  * @param {Object} context - Additional context
  * @param {AutofixSafetyConfig} config - Safety configuration
- * @returns {Object} Safety check result
+ * @returns {Object} Safety check result with tier classification
  */
 export function shouldApplyAutofix(ruleType, original, fixed = '', context = {}, config = DEFAULT_SAFETY_CONFIG) {
+  // Use three-tier thresholds, with config overrides
+  const autoFixThreshold = config.confidenceThreshold ?? THREE_TIER_THRESHOLDS.autoFix;
+  const reviewThreshold = config.reviewThreshold ?? THREE_TIER_THRESHOLDS.needsReview;
+
   if (!config.enabled) {
     return {
       safe: true,
       confidence: 1.0,
       reason: 'Safety checks disabled',
-      heuristics: {}
+      heuristics: {},
+      tier: 'auto-fix',
+      requiresReview: false
     };
+  }
+
+  // Ensure original is a string for safe operations
+  const originalStr = typeof original === 'string' ? original : String(original || '');
+
+  // Check for neverFlag terms (skip entirely)
+  if (config.neverFlag && Array.isArray(config.neverFlag) && originalStr) {
+    const originalLower = originalStr.toLowerCase();
+    for (const term of config.neverFlag) {
+      if (originalLower.includes(term.toLowerCase())) {
+        return {
+          safe: false,
+          confidence: 0,
+          reason: `Term "${term}" is in neverFlag list`,
+          heuristics: {},
+          tier: 'skip',
+          requiresReview: false
+        };
+      }
+    }
+  }
+
+  // Check for alwaysReview terms (force to needs-review tier)
+  let forceReview = false;
+  let forceReviewTerm = null;
+  if (config.alwaysReview && Array.isArray(config.alwaysReview) && originalStr) {
+    const originalLower = originalStr.toLowerCase();
+    for (const term of config.alwaysReview) {
+      if (originalLower.includes(term.toLowerCase())) {
+        forceReview = true;
+        forceReviewTerm = term;
+        break;
+      }
+    }
   }
 
   let confidence = 0;
@@ -545,20 +719,93 @@ export function shouldApplyAutofix(ruleType, original, fixed = '', context = {},
       break;
     }
 
+    case 'no-bare-url': {
+      // URLs are almost always safe to wrap in angle brackets
+      // High confidence since the rule only triggers on valid URLs
+      confidence = 0.9;
+      heuristics = { baseConfidence: 0.9, urlPattern: true };
+      reason = 'URL autofix confidence: 0.90 (bare URL wrapping is safe)';
+      break;
+    }
+
+    case 'no-literal-ampersand': {
+      // Replacing & with "and" is a safe stylistic change
+      // High confidence since the rule only triggers on standalone ampersands
+      confidence = 0.85;
+      heuristics = { baseConfidence: 0.85, ampersandReplacement: true };
+      reason = 'Ampersand replacement confidence: 0.85 (simple substitution)';
+      break;
+    }
+
     default:
       confidence = 0.5;
       reason = 'Unknown rule type';
   }
 
-  const safe = confidence >= config.confidenceThreshold;
+  // Detect ambiguity and apply penalty
+  const ambiguityResult = detectAmbiguity(originalStr);
+  let ambiguityInfo = null;
 
-  return {
+  if (ambiguityResult.isAmbiguous) {
+    // Apply ambiguity penalty to confidence
+    const ambiguityPenalty = 0.25;
+    confidence = Math.max(0, confidence - ambiguityPenalty);
+    heuristics.ambiguityPenalty = -ambiguityPenalty;
+    heuristics.ambiguousTerm = ambiguityResult.term;
+    reason += ` (ambiguous term: ${ambiguityResult.term})`;
+
+    ambiguityInfo = {
+      type: ambiguityResult.type,
+      term: ambiguityResult.term,
+      reason: ambiguityResult.info.reason,
+      properForm: ambiguityResult.info.properForm
+    };
+  }
+
+  // Force to needs-review tier if term is in alwaysReview list
+  if (forceReview) {
+    return {
+      safe: false,
+      confidence: Math.min(confidence, autoFixThreshold - 0.01), // Just below auto-fix
+      heuristics,
+      reason: `Term "${forceReviewTerm}" is in alwaysReview list`,
+      tier: 'needs-review',
+      requiresReview: true,
+      ambiguityInfo,
+      suggestedFix: fixed
+    };
+  }
+
+  // Classify into tier
+  const tier = classifyTier(confidence, autoFixThreshold, reviewThreshold);
+  const safe = tier === 'auto-fix';
+
+  // requiresReview is true for:
+  // 1. needs-review tier items (always)
+  // 2. skip tier items when requireManualReview config is true (backward compatibility)
+  const requiresReview = tier === 'needs-review' ||
+    (config.requireManualReview === true && !safe);
+
+  const result = {
     safe,
     confidence,
     heuristics,
     reason,
-    requiresReview: config.requireManualReview && !safe
+    tier,
+    requiresReview
   };
+
+  // Add ambiguity info if detected
+  if (ambiguityInfo) {
+    result.ambiguityInfo = ambiguityInfo;
+  }
+
+  // Add suggested fix for needs-review tier
+  if (tier === 'needs-review' && fixed) {
+    result.suggestedFix = fixed;
+  }
+
+  return result;
 }
 
 /**
@@ -604,10 +851,10 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
     }
   }
 
-  // Determine if fix will be applied
-  const applied = safetyCheck.safe;
+  // Determine if fix will be applied based on tier
+  const applied = safetyCheck.tier === 'auto-fix';
 
-  // Record telemetry
+  // Record telemetry with tier information
   const telemetry = getTelemetry();
   telemetry.recordDecision({
     rule: ruleType,
@@ -615,14 +862,33 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
     fixed,
     confidence: safetyCheck.confidence,
     applied,
-    reason: !applied ? safetyCheck.reason + ' (confidence < ' + config.confidenceThreshold + ')' : undefined,
+    tier: safetyCheck.tier,
+    reason: !applied ? safetyCheck.reason : undefined,
     heuristics: safetyCheck.heuristics,
+    ambiguityInfo: safetyCheck.ambiguityInfo,
     file: context.file,
     line: context.line
   });
 
-  if (!safetyCheck.safe) {
-    // Return null to disable autofix for unsafe changes
+  // Record needs-review items to the global reporter
+  if (safetyCheck.tier === 'needs-review') {
+    const reporter = getNeedsReviewReporter();
+    reporter.addItem({
+      file: context.file || 'unknown',
+      line: context.lineNumber || 0,
+      rule: ruleType,
+      original,
+      suggested: fixed,
+      confidence: safetyCheck.confidence,
+      ambiguityInfo: safetyCheck.ambiguityInfo,
+      context: context.line,
+      heuristics: safetyCheck.heuristics
+    });
+  }
+
+  // Only auto-fix for the auto-fix tier
+  if (safetyCheck.tier !== 'auto-fix') {
+    // Return null to disable autofix for needs-review and skip tiers
     return null;
   }
 
@@ -633,7 +899,15 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
       confidence: safetyCheck.confidence,
       reason: safetyCheck.reason,
       ruleType,
-      advancedAnalysis
+      tier: safetyCheck.tier,
+      advancedAnalysis,
+      // Include review info for transparency
+      reviewInfo: safetyCheck.requiresReview ? {
+        original,
+        suggested: fixed,
+        reason: safetyCheck.reason,
+        ambiguityInfo: safetyCheck.ambiguityInfo
+      } : undefined
     }
   };
 }

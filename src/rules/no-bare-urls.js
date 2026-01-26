@@ -152,7 +152,13 @@ export default {
             
             // Create autofix that wraps the URL in angle brackets
             const basicFixInfo = createAutoFix(child, token, childIndex, params.lines);
-            const safeFixInfo = createSafeFixInfo(basicFixInfo, params.lines, child.lineNumber, 'no-bare-url');
+            const safeFixInfo = basicFixInfo ? createSafeFixInfo(
+              basicFixInfo,
+              'no-bare-url',
+              href,
+              basicFixInfo.insertText,
+              { line: params.lines[child.lineNumber - 1] }
+            ) : null;
             
             onError({ 
               lineNumber: child.lineNumber, 

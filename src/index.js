@@ -4,6 +4,17 @@ import noBareUrls from './rules/no-bare-urls.js';
 import noDeadInternalLinks from './rules/no-dead-internal-links.js';
 import noLiteralAmpersand from './rules/no-literal-ampersand.js';
 
+// Export three-tier autofix system components
+export { THREE_TIER_THRESHOLDS, shouldApplyAutofix } from './rules/autofix-safety.js';
+export {
+  NeedsReviewReporter,
+  formatTextReport,
+  formatJsonReport,
+  initNeedsReviewReporter,
+  getNeedsReviewReporter,
+  resetNeedsReviewReporter
+} from './cli/needs-review-reporter.js';
+
 /**
  * Export all custom rules as a single array for markdownlint.
  * @type {import('markdownlint').Rule[]}
