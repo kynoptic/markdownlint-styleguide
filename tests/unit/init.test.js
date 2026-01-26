@@ -270,9 +270,72 @@ describe('init.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('Install markdownlint-cli2');
+      expect(output).toContain('Install dependencies');
       expect(output).toContain('Lint your markdown');
       expect(output).toContain('Enable auto-fix');
+    });
+
+    it('should show GitHub-based installation instructions', () => {
+      const output = execSync('node ' + scriptPath + ' --preset recommended', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      // Should mention GitHub installation since not published to npm yet
+      expect(output).toContain('github:');
+    });
+  });
+
+  describe('--all flag', () => {
+    it('should enable all optional features with --all flag', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({ name: 'test-project', scripts: {} }, null, 2),
+        'utf8'
+      );
+
+      const output = execSync('node ' + scriptPath + ' --preset recommended --all', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      // Should configure all features
+      expect(output).toContain('GitHub Actions');
+      expect(output).toContain('npm scripts');
+      expect(output).toContain('pre-commit hooks');
+    });
+
+    it('should create all config files with --all flag', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'package.json'),
+        JSON.stringify({ name: 'test-project', scripts: {} }, null, 2),
+        'utf8'
+      );
+
+      execSync('node ' + scriptPath + ' --preset recommended --all', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      // Verify all files created
+      expect(fs.existsSync(path.join(tempDir, '.markdownlint-cli2.jsonc'))).toBe(true);
+      expect(fs.existsSync(path.join(tempDir, '.vscode', 'settings.json'))).toBe(true);
+      expect(fs.existsSync(path.join(tempDir, '.vscode', 'extensions.json'))).toBe(true);
+      expect(fs.existsSync(path.join(tempDir, '.github', 'workflows', 'markdown-lint.yml'))).toBe(true);
+
+      // Verify package.json has scripts and lint-staged
+      const pkg = JSON.parse(fs.readFileSync(path.join(tempDir, 'package.json'), 'utf8'));
+      expect(pkg.scripts['lint:md']).toBeDefined();
+      expect(pkg['lint-staged']).toBeDefined();
+    });
+
+    it('should mention --all flag in help output', () => {
+      const output = execSync('node ' + scriptPath + ' --help', {
+        encoding: 'utf8',
+        cwd: tempDir,
+      });
+
+      expect(output).toContain('--all');
     });
   });
 

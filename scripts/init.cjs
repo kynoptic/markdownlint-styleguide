@@ -33,6 +33,7 @@ function parseArgs() {
     githubAction: false,
     scripts: false,
     hooks: false,
+    all: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -55,7 +56,16 @@ function parseArgs() {
       opts.scripts = true;
     } else if (arg === '--hooks') {
       opts.hooks = true;
+    } else if (arg === '--all') {
+      opts.all = true;
     }
+  }
+
+  // --all enables all optional features
+  if (opts.all) {
+    opts.githubAction = true;
+    opts.scripts = true;
+    opts.hooks = true;
   }
 
   // If neither specified, enable both
@@ -81,6 +91,7 @@ ${colors.yellow}Options:${colors.reset}
   --github-action    Add GitHub Actions workflow for CI
   --scripts          Add npm scripts (lint:md, lint:md:fix) to package.json
   --hooks            Configure lint-staged for pre-commit hooks
+  --all              Enable all optional features (github-action, scripts, hooks)
   --force            Overwrite existing configuration files
   --dry-run          Show what would be generated without writing files
   -h, --help         Show this help message
@@ -88,7 +99,7 @@ ${colors.yellow}Options:${colors.reset}
 ${colors.yellow}Examples:${colors.reset}
   npx markdownlint-trap init
   npx markdownlint-trap init --preset recommended
-  npx markdownlint-trap init --preset recommended --github-action --scripts --hooks
+  npx markdownlint-trap init --preset recommended --all
   npx markdownlint-trap init --vscode --preset strict
   npx markdownlint-trap init --dry-run
 
@@ -583,7 +594,8 @@ async function init() {
 
     let step = 1;
     if (!deps.cli2Installed) {
-      log(`  ${step}. Install markdownlint-cli2: npm install -D markdownlint-cli2`);
+      log(`  ${step}. Install dependencies:`);
+      log('     npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2');
       step++;
     }
     log(`  ${step}. Lint your markdown: npx markdownlint-cli2 "**/*.md"`);
