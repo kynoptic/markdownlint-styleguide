@@ -274,7 +274,11 @@ function isLikelyFilePath(str) {
     'integration/e2e', 'value/effort', 'feature/module', 'added/updated',
     'adapt/extend', 'start/complete', 'lowest/most', 'pass/fail',
     // Technology choice patterns (not paths)
-    'npm/node.js', 'client/device/os'
+    'npm/node.js', 'client/device/os',
+    // Issue #round10: Format listings and prose alternatives (not file paths)
+    'csv/json', 'csv/json/markdown', 'json/xml', 'html/css', 'js/ts',
+    'pages/documents', 'files/folders', 'users/groups', 'roles/permissions',
+    'read/write/execute', 'owner/group/other'
   ];
 
   // Check if this matches a common option pattern (case-insensitive)
@@ -342,7 +346,10 @@ function isLikelyFilePath(str) {
     'inputs', 'outputs', 'results', 'errors', 'warnings', 'issues', 'bugs',
     'features', 'options', 'settings', 'configs', 'values', 'keys', 'names',
     'build', 'test', 'lint', 'check', 'run', 'start', 'stop', 'deploy',
-    'quality', 'performance', 'security', 'safety', 'stability'
+    'quality', 'performance', 'security', 'safety', 'stability',
+    // Issue #round10: Additional prose words for alternatives
+    'pages', 'documents', 'users', 'groups', 'roles', 'permissions', 'owner', 'group', 'other',
+    'csv', 'json', 'xml', 'html', 'css', 'markdown', 'yaml', 'toml'
   ]);
 
   // If all segments (lowercase) are common prose words, it's not a path

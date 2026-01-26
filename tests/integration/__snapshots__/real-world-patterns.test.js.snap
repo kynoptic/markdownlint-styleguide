@@ -279,26 +279,6 @@ exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests g
 exports[`Real-World Pattern Tests Backtick Code Elements Rule - Snapshot Tests nextjs documentation patterns: backtick-nextjs 1`] = `
 [
   {
-    "errorContext": "pages/api",
-    "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
-    "errorRange": [
-      26,
-      9,
-    ],
-    "fixInfo": {
-      "deleteCount": 9,
-      "editColumn": 26,
-      "insertText": "\`pages/api\`",
-    },
-    "lineNumber": 15,
-    "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "backtick-code-elements",
-      "BCE001",
-    ],
-  },
-  {
     "errorContext": "pages/api/hello.js",
     "errorDetail": "File path 'pages/api/hello.js' should be wrapped in backticks for clarity and to distinguish it from regular text",
     "errorRange": [
@@ -852,26 +832,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
   },
   "nextjs": {
     "backtickViolations": [
-      {
-        "errorContext": "pages/api",
-        "errorDetail": "Path 'pages/api' should be wrapped in backticks to indicate it's a file system reference",
-        "errorRange": [
-          26,
-          9,
-        ],
-        "fixInfo": {
-          "deleteCount": 9,
-          "editColumn": 26,
-          "insertText": "\`pages/api\`",
-        },
-        "lineNumber": 15,
-        "ruleDescription": "Require code snippets, folder names and directories to be wrapped in backticks.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "backtick-code-elements",
-          "BCE001",
-        ],
-      },
       {
         "errorContext": "pages/api/hello.js",
         "errorDetail": "File path 'pages/api/hello.js' should be wrapped in backticks for clarity and to distinguish it from regular text",

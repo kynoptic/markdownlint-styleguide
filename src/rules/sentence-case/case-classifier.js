@@ -420,8 +420,8 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       continue;
     }
 
-    // Skip preserved segments
-    if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
+    // Skip preserved segments (including when wrapped in parentheses like "(__PRESERVED_0__)")
+    if (word.includes('__PRESERVED_') && word.includes('__')) {
       continue;
     }
 
@@ -762,8 +762,8 @@ function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialC
       continue;
     }
 
-    // Skip preserved segments
-    if (word.startsWith('__PRESERVED_') && word.endsWith('__')) {
+    // Skip preserved segments (including when wrapped in parentheses like "(__PRESERVED_0__)")
+    if (word.includes('__PRESERVED_') && word.includes('__')) {
       continue;
     }
 

@@ -214,8 +214,10 @@ export const casingTerms = {
   'claude desktop': 'Claude Desktop',
   'agent skills': 'Agent Skills',
   'agent skill': 'Agent Skill',
-  skills: 'Skills',
+  // Note: "skills" as a standalone word is NOT included because it's a common English word
+  // Only "Agent Skills" as a phrase is a proper noun (Claude Code feature)
   opencode: 'OpenCode',
+  sharepoint: 'SharePoint',  // Microsoft SharePoint (camelCase brand name)
   powerpoint: 'PowerPoint',
   cloudflare: 'Cloudflare',
   codeberg: 'Codeberg',
@@ -355,6 +357,29 @@ export const casingTerms = {
   andes: 'Andes',
   mit: 'MIT',
 
+  // Days of the week (proper nouns, always capitalized)
+  sunday: 'Sunday',
+  monday: 'Monday',
+  tuesday: 'Tuesday',
+  wednesday: 'Wednesday',
+  thursday: 'Thursday',
+  friday: 'Friday',
+  saturday: 'Saturday',
+
+  // Months (proper nouns, always capitalized)
+  january: 'January',
+  february: 'February',
+  march: 'March',
+  april: 'April',
+  may: 'May',
+  june: 'June',
+  july: 'July',
+  august: 'August',
+  september: 'September',
+  october: 'October',
+  november: 'November',
+  december: 'December',
+
   // Language names (always capitalized as proper nouns)
   english: 'English',
   spanish: 'Spanish',
@@ -489,6 +514,14 @@ export const ambiguousTerms = {
     properForm: 'Edge',
     reason: 'Could be noun "edge" OR Microsoft Edge (the browser)'
   },
+  skills: {
+    properForm: 'Skills',
+    reason: 'Could be common noun "skills" OR Claude Skills feature'
+  },
+  skill: {
+    properForm: 'Skill',
+    reason: 'Could be common noun "skill" OR Claude Skill feature'
+  },
 };
 
 /**
@@ -570,7 +603,18 @@ const additionalBacktickIgnoredTerms = [
   'added/updated',
   'adapt/extend',
   'start/complete',
-  'lowest/most'
+  'lowest/most',
+  // Issue #round10: Additional prose patterns that are not file paths
+  'CSV/JSON/markdown',
+  'JSON/XML',
+  'HTML/CSS',
+  'JS/TS',
+  'pages/documents',
+  'files/folders',
+  'users/groups',
+  'roles/permissions',
+  'read/write/execute',
+  'owner/group/other'
 ];
 
 /**
