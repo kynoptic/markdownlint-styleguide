@@ -59,6 +59,7 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
 ### Dependency management
 
 Dependencies are automatically updated via Renovate:
+
 - **Security updates**: Created immediately when vulnerabilities detected
 - **Routine updates**: Weekly on Monday mornings
 - **Auto-merge**: Enabled for dev dependency patches/minors that pass CI
@@ -74,6 +75,36 @@ See `docs/dependency-management.md` for detailed workflow and override procedure
 2. Run tests with `npm test` (tests run directly against source).
 3. Validate the user experience with integration tests and performance suites as needed.
 4. No build step required - ES modules are distributed directly from `src/`.
+
+## False positive validation loop
+
+When improving the ruleset, use this validation loop to identify and fix false positives:
+
+1. **Run auto-fix on a consumer repository** (e.g., agent-playbook):
+
+   ```bash
+   cd /path/to/consumer-repo
+   npm install /path/to/markdownlint-trap  # Install local version
+   npx markdownlint-cli2 --fix "**/*.md"
+   ```
+
+2. **Review changes with `git diff`** to identify false positives:
+   - Abbreviation plurals incorrectly backticked (PRs, IDs, MCPs)
+   - Product/brand names incorrectly backticked (CrowdStrike, SharePoint)
+   - Common English phrases matched as code (e.g., "import them")
+   - Proper nouns incorrectly lowercased (English, Civil War)
+   - Filenames in headings incorrectly altered (`SKILL.md` → `Skill.md`)
+
+3. **Create failing tests** in `tests/features/false-positive-*.test.js` that capture the issues.
+
+4. **Fix the rules** by updating:
+   - `src/rules/shared-constants.js` for new terms in `casingTerms`, `camelCaseExemptions`, or `backtickIgnoredTerms`
+   - `src/rules/backtick-code-elements.js` for pattern exclusions
+   - `src/rules/sentence-case/case-classifier.js` for heading exemptions
+
+5. **Verify fixes** by running `npm test` and re-running auto-fix on the consumer.
+
+6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-trap fixes.
 
 ## Coding style and conventions
 

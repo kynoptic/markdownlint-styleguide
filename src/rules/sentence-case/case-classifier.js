@@ -135,6 +135,17 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
     return true;
   }
 
+  // Skip headings that START with an ALL-CAPS filename (e.g., "## SKILL.md format", "## README.md guidelines")
+  // These are conventional documentation filenames that should preserve their uppercase casing
+  // Note: We only match ALL-CAPS base names (like SKILL.md, README.md) to avoid exempting
+  // headings like "Node.js-Based tools" where Node.js is just a tech term, not a doc filename
+  // Match: ALLCAPS.ext or ALL_CAPS.ext or ALL-CAPS.ext (but not Node.js which has lowercase)
+  const firstWord = trimmedText.split(/\s+/)[0] || '';
+  const allCapsFilenamePattern = /^[A-Z][A-Z0-9_-]*\.[a-zA-Z]+$/;
+  if (allCapsFilenamePattern.test(firstWord)) {
+    return true;
+  }
+
   // Skip if mostly code content
   const codeContentRegex = /`[^`]+`|\([A-Z0-9]+\)/g;
   const matches = [...headingText.matchAll(codeContentRegex)];

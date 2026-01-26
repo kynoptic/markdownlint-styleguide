@@ -614,7 +614,8 @@ function backtickCodeElements(params, onError) {
 
                                              // common CLI commands
       // import statements - exclude common English words after "import"
-      /\bimport\s+(?!the|a|an|your|my|our|their|its|some|all|any|this|that|these|those|from|into|to)\w+/g,
+      // This catches "import pdfplumber" but not "import them" or "import new skills"
+      /\bimport\s+(?!the|a|an|your|my|our|their|its|some|all|any|this|that|these|those|from|into|to|new|old|more|them|it|something|everything|anything|nothing)\w+/g,
       // host:port patterns, avoids bible verses like "1:10" and WCAG ratios like "4.5:1"
       // Time ranges like "AM-12:30", "3-10:30" are filtered out separately
       // Negative lookbehind: not preceded by decimal number (WCAG ratios)

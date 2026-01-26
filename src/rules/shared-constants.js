@@ -332,6 +332,43 @@ export const casingTerms = {
   andes: 'Andes',
   mit: 'MIT',
 
+  // Language names (always capitalized as proper nouns)
+  english: 'English',
+  spanish: 'Spanish',
+  french: 'French',
+  german: 'German',
+  italian: 'Italian',
+  portuguese: 'Portuguese',
+  russian: 'Russian',
+  chinese: 'Chinese',
+  korean: 'Korean',
+  arabic: 'Arabic',
+  hindi: 'Hindi',
+  dutch: 'Dutch',
+  polish: 'Polish',
+  swedish: 'Swedish',
+  norwegian: 'Norwegian',
+  danish: 'Danish',
+  finnish: 'Finnish',
+  greek: 'Greek',
+  hebrew: 'Hebrew',
+  turkish: 'Turkish',
+  vietnamese: 'Vietnamese',
+  thai: 'Thai',
+  indonesian: 'Indonesian',
+  'american english': 'American English',
+  'british english': 'British English',
+
+  // Historical event names (proper nouns)
+  'revolutionary war': 'Revolutionary War',
+  'american revolutionary war': 'American Revolutionary War',
+  'civil war': 'Civil War',
+  'american civil war': 'American Civil War',
+  'world war': 'World War',
+  'world war i': 'World War I',
+  'world war ii': 'World War II',
+  'cold war': 'Cold War',
+
   // GitHub Markdown Alerts (must be all-caps per spec)
   note: 'NOTE',
   tip: 'TIP',
@@ -442,6 +479,14 @@ const additionalBacktickIgnoredTerms = [
   'VPNs',
   'URLs',
   'CDNs',
+  'IDs',
+  'MCPs',
+  'UUIDs',
+  'IDEs',
+  'SHAs',
+  'GUIs',
+  'CLIs',
+  'APIs',
   // Module system names (proper nouns)
   'CommonJS',
   'ESM',
@@ -627,6 +672,20 @@ export const camelCaseExemptions = new Set([
   // Security vendors
   'CrowdStrike', 'SentinelOne', 'CarbonBlack', 'FireEye', 'McAfee',
   'SonicWall', 'CheckPoint', 'PaloAlto', 'FortiNet', 'CyberArk',
+  // Backup and IT management tools
+  'CrashPlan', 'BackBlaze', 'SpiderOak', 'CloudBerry',
+  // Enterprise platforms
+  'ServiceNow', 'SharePoint', 'BigQuery', 'DataBricks', 'SnowFlake',
+  'HarvardKey', 'eCommons',
+  // Developer tools
+  'SpotBugs', 'OpenRewrite', 'SonarQube', 'SonarLint',
+  'truffleHog', 'GitLeaks', 'GitGuardian',
+  // Image/media formats and tools
+  'WebP', 'WebM', 'DevTools', 'ChromeDriver', 'GeckoDriver',
+  // Data/ML tools
+  'PyYAML', 'NumPy', 'SciPy', 'TensorFlow', 'PyTorch',
+  // General tech terms with unusual casing
+  'WiFi', 'HiDPI', 'WebRTC', 'WebGL', 'WebVR', 'WebXR',
   'InDesign', 'InCopy', 'QuarkXPress',
   'AutoCAD', 'SolidWorks', 'SketchUp',
   'CodePen', 'CodeSandbox', 'StackBlitz', 'StackOverflow',
