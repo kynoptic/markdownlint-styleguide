@@ -2,7 +2,7 @@
   // Recommended configuration for markdownlint-trap
   // Enables all custom rules with balanced strictness
   "customRules": [
-    "markdownlint-trap"
+    "./src/index.js"
   ],
   "config": {
     "MD013": false,

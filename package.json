@@ -41,7 +41,9 @@
     "unlink:projects": "bash scripts/unlink-from-projects.sh",
     "unlink:projects:dry": "bash scripts/unlink-from-projects.sh --dry-run",
     "prepare": "node scripts/prepare.mjs",
-    "validate": "npm run lint && npm test && echo '✅ All validation checks passed'"
+    "validate": "npm run lint && npm test && echo '✅ All validation checks passed'",
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\""
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
