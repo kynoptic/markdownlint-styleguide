@@ -401,6 +401,8 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
  */
 function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTerms, headingText, ambiguousTerms = {}) {
   const colonIndex = headingText.indexOf(':');
+  const emDashIndex = headingText.indexOf('—');
+  const ampersandIndex = headingText.indexOf('&');
 
   for (let i = startIndex + 1; i < words.length; i++) {
     if (phraseIgnore.has(i)) {
@@ -428,12 +430,49 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       continue;
     }
 
-    // Allow capitalization after colon
+    // Find the position of this word in the heading
     const wordPos = headingText.indexOf(word);
-    if (colonIndex !== -1 && colonIndex < 10 && wordPos > colonIndex) {
+
+    // Allow proper capitalization for the first word after colon (e.g., "Priority 1: Critical fixes")
+    // But only if the word is correctly cased (first letter uppercase, rest lowercase) or matches a special term
+    if (colonIndex !== -1 && wordPos > colonIndex) {
       const afterColon = headingText.slice(colonIndex + 1).trimStart();
       if (afterColon.startsWith(word)) {
-        continue;
+        // Check if word is correctly sentence-cased or matches expected special term casing
+        const expectedSentenceCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        const matchesSpecialTerm = expectedWordCasing && word === expectedWordCasing;
+        const isCorrectlyCased = word === expectedSentenceCase || isAcronym(word) || matchesSpecialTerm;
+        // Only skip if correctly cased AND no special term violation
+        if (isCorrectlyCased && !(expectedWordCasing && word !== expectedWordCasing)) {
+          continue;
+        }
+      }
+    }
+
+    // Allow proper capitalization for the first word after em-dash (e.g., "ADR 001 — Email template")
+    if (emDashIndex !== -1 && wordPos > emDashIndex) {
+      const afterEmDash = headingText.slice(emDashIndex + 1).trimStart();
+      if (afterEmDash.startsWith(word)) {
+        const expectedSentenceCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        const matchesSpecialTerm = expectedWordCasing && word === expectedWordCasing;
+        const isCorrectlyCased = word === expectedSentenceCase || isAcronym(word) || matchesSpecialTerm;
+        if (isCorrectlyCased && !(expectedWordCasing && word !== expectedWordCasing)) {
+          continue;
+        }
+      }
+    }
+
+    // Allow capitalization for the word after ampersand (e.g., "Body & Outer Container")
+    // This handles title-like headings with ampersand
+    if (ampersandIndex !== -1 && wordPos > ampersandIndex) {
+      const afterAmpersand = headingText.slice(ampersandIndex + 1).trimStart();
+      if (afterAmpersand.startsWith(word)) {
+        const expectedSentenceCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        const matchesSpecialTerm = expectedWordCasing && word === expectedWordCasing;
+        const isCorrectlyCased = word === expectedSentenceCase || isAcronym(word) || matchesSpecialTerm;
+        if (isCorrectlyCased && !(expectedWordCasing && word !== expectedWordCasing)) {
+          continue;
+        }
       }
     }
 

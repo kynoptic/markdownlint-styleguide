@@ -15,6 +15,18 @@
 export const casingTerms = {
   // Technical Terms & Acronyms
   ai: 'AI',
+  // File format acronyms (should stay uppercase)
+  docx: 'DOCX',
+  xlsx: 'XLSX',
+  pptx: 'PPTX',
+  pdf: 'PDF',
+  jpg: 'JPG',
+  jpeg: 'JPEG',
+  png: 'PNG',
+  gif: 'GIF',
+  svg: 'SVG',
+  csv: 'CSV',
+  pr: 'PR',  // Pull Request
   api: 'API',
   apis: 'APIs',
   e2e: 'E2E',  // End-to-End testing acronym
@@ -109,6 +121,7 @@ export const casingTerms = {
   nextjs: 'Next.js',
   'next.js': 'Next.js',
   'node.js': 'Node.js',
+  nodejs: 'Node.js',  // Common misspelling
   nuxt: 'Nuxt',
   perl: 'Perl',
   phoenix: 'Phoenix',
@@ -185,6 +198,7 @@ export const casingTerms = {
   anthropic: 'Anthropic',
   apache: 'Apache',
   apple: 'Apple',
+  'apple mail': 'Apple Mail',
   argocd: 'ArgoCD',
   atlassian: 'Atlassian',
   auth0: 'Auth0',
@@ -467,6 +481,14 @@ export const ambiguousTerms = {
     properForm: 'Changelog',
     reason: 'Could be "Changelog" (section title) OR "CHANGELOG" (filename reference)'
   },
+  make: {
+    properForm: 'Make',
+    reason: 'Could be verb "make" OR GNU Make (the build tool)'
+  },
+  edge: {
+    properForm: 'Edge',
+    reason: 'Could be noun "edge" OR Microsoft Edge (the browser)'
+  },
 };
 
 /**
@@ -666,6 +688,9 @@ export const camelCaseExemptions = new Set([
   'visionOS', 'AirPods', 'AirPlay', 'AirDrop', 'AirPrint', 'AirTag',
   'HomePod', 'FaceTime', 'QuickTime', 'FileVault', 'TimeMachine',
   'MacBook', 'MacPro', 'MacMini',
+
+  // Apple product names with specific casing
+  'AppleMail',
 
   // Other tech brands and products
   'eBay', 'eBook', 'eBooks', 'eReader', 'eLearning', 'eCommerce', 'eMail',

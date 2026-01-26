@@ -272,7 +272,9 @@ function isLikelyFilePath(str) {
     'source/target', 'from/to', 'client/server', 'local/remote', 'dev/prod',
     // Issue #89: Additional non-path patterns
     'integration/e2e', 'value/effort', 'feature/module', 'added/updated',
-    'adapt/extend', 'start/complete', 'lowest/most', 'pass/fail'
+    'adapt/extend', 'start/complete', 'lowest/most', 'pass/fail',
+    // Technology choice patterns (not paths)
+    'npm/node.js', 'client/device/os'
   ];
 
   // Check if this matches a common option pattern (case-insensitive)
@@ -691,6 +693,20 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
+        // Skip dotfile patterns that are actually document file extensions in a filename context
+        // e.g., "Template .docx" - the ".docx" is part of a filename with spaces, not a standalone dotfile
+        // Only applies to common document extensions (docx, pdf, xlsx, etc.) that often appear
+        // after filenames with spaces. Actual dotfiles like .env, .gitignore should still be flagged.
+        if (/^\.[\w.-]+$/.test(fullMatch) && start > 0) {
+          const beforeMatch = line.slice(0, start);
+          // Only skip if preceded by text AND it's a common document extension
+          // that typically appears after filenames with embedded spaces
+          const commonDocExtensions = /^\.(docx?|pdf|xlsx?|pptx?|odt|ods|odp|rtf|txt|csv)$/i;
+          if (/\w\s+$/.test(beforeMatch) && commonDocExtensions.test(fullMatch)) {
+            continue;
+          }
+        }
+
         // Skip if inside a code span
         if (isInCodeSpan(codeSpans, start, end)) {
           continue;
@@ -732,6 +748,19 @@ function backtickCodeElements(params, onError) {
         // Skip snake_case exemptions (locale codes like en_US, zh_CN, etc.)
         if (snakeCaseExemptions.has(fullMatch)) {
           continue;
+        }
+
+        // Skip snake_case identifiers that are part of email addresses
+        // (e.g., "julie_balise@hms.harvard.edu" - don't backtick "julie_balise")
+        if (/^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(fullMatch)) {
+          // Check if followed by @ (email local part)
+          if (end < line.length && line[end] === '@') {
+            continue;
+          }
+          // Check if preceded by < and part of an email in angle brackets
+          if (start > 0 && line[start - 1] === '<' && line.slice(end).includes('@')) {
+            continue;
+          }
         }
 
         // Skip date-like patterns (YYYY_MM_DD, backup_2024_03_20, etc.)

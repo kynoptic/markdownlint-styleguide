@@ -247,8 +247,10 @@ describe('Performance Optimization Tests', () => {
       expect(isInInlineCode('unclosed `code', 12)).toBe(true);
       expect(getInlineCodeSpans('unclosed `code')).toEqual([]);
       
-      // Adjacent backticks
-      expect(getInlineCodeSpans('test `` empty')).toEqual([[5, 7]]);
+      // Adjacent backticks (double backticks without matching close = not a code span per CommonMark)
+      expect(getInlineCodeSpans('test `` empty')).toEqual([]);
+      // Double backticks with matching close = valid code span
+      expect(getInlineCodeSpans('test ``code`` end')).toEqual([[5, 13]]);
       
       // Multiple fence types
       const mixedFences = [

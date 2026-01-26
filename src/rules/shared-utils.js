@@ -163,38 +163,70 @@ export function isInInlineCode(line, position) {
 
 /**
  * Extract all inline code spans from a line.
- * Optimized to handle nested backticks and complex patterns correctly.
- * 
+ * Properly handles multi-backtick delimiters (e.g., `` ` `` for including literal backticks).
+ *
  * @param {string} line - The line content
  * @returns {Array<[number, number]>} Array of [start, end] positions for code spans
  */
 export function getInlineCodeSpans(line) {
   const codeSpans = [];
-  
+
   // Fast path: no backticks means no code spans
   if (!line.includes('`')) {
     return codeSpans;
   }
-  
+
   let i = 0;
   const lineLength = line.length;
-  
+
   while (i < lineLength) {
     // Find the start of a potential code span
-    const startTick = line.indexOf('`', i);
-    if (startTick === -1) break;
-    
-    // Find the closing backtick
-    const endTick = line.indexOf('`', startTick + 1);
-    if (endTick === -1) break;
-    
-    // Add the code span (inclusive of backticks)
-    codeSpans.push([startTick, endTick + 1]);
-    
-    // Move past this code span
-    i = endTick + 1;
+    if (line[i] !== '`') {
+      i++;
+      continue;
+    }
+
+    // Count opening backticks
+    const startPos = i;
+    let openingCount = 0;
+    while (i < lineLength && line[i] === '`') {
+      openingCount++;
+      i++;
+    }
+
+    // Look for matching closing backticks (same count)
+    let found = false;
+    let searchPos = i;
+    while (searchPos < lineLength) {
+      const nextTick = line.indexOf('`', searchPos);
+      if (nextTick === -1) break;
+
+      // Count consecutive backticks at this position
+      let closingCount = 0;
+      let closePos = nextTick;
+      while (closePos < lineLength && line[closePos] === '`') {
+        closingCount++;
+        closePos++;
+      }
+
+      // If counts match, we found the closing delimiter
+      if (closingCount === openingCount) {
+        codeSpans.push([startPos, closePos]);
+        i = closePos;
+        found = true;
+        break;
+      }
+
+      // Otherwise, keep searching past these backticks
+      searchPos = closePos;
+    }
+
+    // If no matching close found, move past the opening backticks
+    if (!found) {
+      // i is already past the opening backticks from the counting loop
+    }
   }
-  
+
   return codeSpans;
 }
 
