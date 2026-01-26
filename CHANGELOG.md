@@ -7,23 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.5.0] - 2026-01-26
+
 ### Added
 
-- Three-tier autofix system with confidence-based categorization:
-  - **Auto-fix tier** (≥0.7 confidence): Applied automatically with high confidence
-  - **Needs-review tier** (0.3-0.7 confidence): Flagged for human/AI verification
-  - **Skip tier** (<0.3 confidence): Too uncertain, silently skipped
-- Needs-review reporter (`src/cli/needs-review-reporter.js`) for collecting and formatting ambiguous items
-- Machine-readable JSON output for AI agent consumption with explicit action instructions
-- Human-readable text reports with contextual decision guidance
-- Ambiguity detection for proper noun vs common noun disambiguation (Word, Go, Swift, Agent, Explore, SDK)
-- Test script for three-tier validation (`scripts/test-three-tier.js`)
-- Claude Code skill for reviewing lint ambiguities (`.claude/skills/review-lint-ambiguities.md`)
+- Three-tier autofix system with confidence-based categorization (auto-fix ≥0.7, needs-review 0.3-0.7, skip <0.3)
+- Needs-review reporter for flagging ambiguous terms like "Word", "Go", "Swift" for human/AI verification
+- Machine-readable JSON output for AI agent consumption
+- Setup wizard `--all` flag to enable CI, scripts, and hooks in one command
+- Setup wizard `--upgrade` flag to merge new config options while preserving customizations
+
+### Changed
+
+- Upgraded to Jest 30 and markdownlint 0.40
 
 ### Fixed
 
-- Sentence-case heading autofix now correctly preserves lowercase after multi-word special terms (e.g., "Agent Skills reference" not "Agent Skills Reference")
-- File and line number tracking in needs-review output for accurate location reporting
+- Sentence-case autofix now correctly preserves lowercase after multi-word special terms
+- Reduced false positives for proper nouns, abbreviations, and code spans
 
 ---
 
