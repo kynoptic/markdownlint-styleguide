@@ -117,7 +117,7 @@ Configuration validation and error reporting for rule options.
 Since `v1.7.0`, the project includes automated vulnerability scanning in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)):
 
 - **`npm audit`** scans production dependencies against the `npm advisory` database
-- **Osv-scanner** cross-references against the Open Source Vulnerabilities database
+- **osv-scanner** cross-references against the Open Source Vulnerabilities database
 - Builds fail on `high/critical` vulnerabilities in production dependencies
 - Scan results are archived as artifacts with 30-day retention
 - Exception policy documented in `SECURITY.md` for temporary waivers

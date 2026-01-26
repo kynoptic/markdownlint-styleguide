@@ -51,7 +51,7 @@ For each autofix decision, telemetry records:
 
 ### Console format
 
-```
+```text
 === Autofix Telemetry Summary ===
 
 Total decisions: 45

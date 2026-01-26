@@ -301,7 +301,11 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
           'well', 'over', 'under', 'self', 'non', 'pre', 'post', 'anti', 'pro', 'co',
           'how', 'step', 'in', 'on', 'off', 'out', 'up', 'down', 'all', 'one', 'two',
           'high', 'low', 'long', 'short', 'full', 'half', 'part', 'cross', 'multi',
-          'day', 'time', 'year', 'end', 'mid', 'top', 'sub', 're', 'de', 'un'
+          'day', 'time', 'year', 'end', 'mid', 'top', 'sub', 're', 'de', 'un',
+          // Technical compound words (not acronyms)
+          'rule', 'user', 'file', 'line', 'code', 'auto', 'type', 'real', 'open',
+          'zero', 'data', 'test', 'back', 'side', 'case', 'base', 'next', 'last',
+          'osv', 'npm', 'cli', 'api'  // Tool/tech names used as prefixes
         ];
         if (possibleAcronym.length >= 2 && possibleAcronym.length <= 4 &&
             !commonHyphenatedPrefixes.includes(possibleAcronym.toLowerCase())) {

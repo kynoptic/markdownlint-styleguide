@@ -556,6 +556,12 @@ function backtickCodeElements(params, onError) {
     if ((skipCodeBlocks && inCodeBlock) || /^\s*#/.test(line)) {
       continue;
     }
+
+    // Skip link reference definitions (e.g., "[name]: https://example.com")
+    // These are valid markdown syntax and URLs should not be wrapped in backticks
+    if (/^\s*\[[^\]]+\]:\s*\S/.test(line)) {
+      continue;
+    }
     
     // For math blocks, respect configuration but with nuanced handling
     if (skipMathBlocks && inMathBlock) {
@@ -593,12 +599,21 @@ function backtickCodeElements(params, onError) {
       /\b(?:PATH|HOME|TEMP|TMPDIR|USER|SHELL|PORT|HOST)\b/g, // env vars
       /\B--?[a-zA-Z][\w-]*\b/g,             // CLI flags
 
-      // common CLI commands like "git clone" or "npm install"
-      /\b(?:git|npm|pip|yarn|docker|brew|cargo|pnpm)\s+[a-z][\w-]*/g,
+      // common CLI commands - match actual subcommands, not prose words
+      // npm: install, run, start, test, build, init, publish, link, unlink, update, etc.
+      // git: clone, commit, push, pull, checkout, branch, merge, rebase, status, log, etc.
+      /\b(?:npm|yarn|pnpm)\s+(?:install|i|run|start|test|build|init|publish|link|unlink|update|add|remove|exec|create|ci|audit|outdated|ls|list|version|pack|cache|config|set|get)\b/g,
+      /\b(?:git)\s+(?:clone|commit|push|pull|fetch|checkout|branch|merge|rebase|status|log|diff|add|rm|mv|reset|stash|tag|remote|init|config|show|blame|bisect|cherry-pick|revert|clean|gc|prune|reflog)\b/g,
+      /\b(?:pip|pip3)\s+(?:install|uninstall|freeze|list|show|search|download|wheel|hash|check|config|cache|debug)\b/g,
+      /\b(?:docker)\s+(?:run|build|push|pull|exec|ps|images|logs|stop|start|rm|rmi|compose|network|volume|system|inspect|tag|login|logout)\b/g,
+      /\b(?:brew)\s+(?:install|uninstall|update|upgrade|search|list|info|doctor|cleanup|tap|untap|services|cask)\b/g,
+      /\b(?:cargo)\s+(?:build|run|test|bench|check|clean|doc|new|init|add|remove|update|publish|install|uninstall|search|tree|fmt|clippy)\b/g,
 
                                              // common CLI commands
-      /\bimport\s+\w+/g,                     // import statements
+      // import statements - exclude common English words after "import"
+      /\bimport\s+(?!the|a|an|your|my|our|their|its|some|all|any|this|that|these|those|from|into|to)\w+/g,
       // host:port patterns, avoids bible verses like "1:10" and WCAG ratios like "4.5:1"
+      // Time ranges like "AM-12:30", "3-10:30" are filtered out separately
       // Negative lookbehind: not preceded by decimal number (WCAG ratios)
       // Negative lookahead: not followed by just "1" (WCAG ratios end with :1)
       /\b(?!\d+:\d+\b)(?<!\d\.)[\w.-]+:(?!\d*1\b)\d+\b/g,
@@ -680,6 +695,11 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
+        // Skip time ranges and time-like patterns (AM-12:30, 3-10:30, 9:30, etc.)
+        if (/^(?:AM|PM|am|pm)?-?\d+-?\d*:\d+$/.test(fullMatch) || /^\d+-\d+:\d+$/.test(fullMatch)) {
+          continue;
+        }
+
         // Skip URLs in angle brackets (Markdown autolinks: <https://example.com>)
         if (start > 0 && line[start - 1] === '<' && end < line.length && line[end] === '>') {
           // Check if this looks like a URL autolink
@@ -708,6 +728,19 @@ function backtickCodeElements(params, onError) {
         // Skip camelCase exemptions (brand names like iPhone, eBay, etc.)
         if (camelCaseExemptions.has(fullMatch)) {
           continue;
+        }
+
+        // For PascalCase matches, only flag if they look like code identifiers
+        // (have technical suffixes) rather than brand names
+        const pascalCasePattern = /^[A-Z][a-z]+(?:[A-Z][a-z]+)+$/;
+        if (pascalCasePattern.test(fullMatch)) {
+          // Technical suffixes that indicate code identifiers
+          const codeSuffixes = /(?:Component|Service|Handler|Controller|Manager|Factory|Builder|Provider|Repository|Helper|Util|Utils|Client|Server|Worker|Task|Job|Event|Emitter|Listener|Observer|Error|Exception|Config|Options|Settings|State|Store|Model|View|Router|Route|Middleware|Plugin|Module|Package|Class|Interface|Type|Enum|Struct|Schema|Query|Mutation|Resolver|Action|Reducer|Selector|Hook|Context|Ref|Props|Params|Args|Result|Response|Request|Data|Item|List|Map|Set|Array|Object|String|Number|Boolean|Node|Element|Container|Wrapper|Layout|Page|Screen|Form|Input|Button|Table|Row|Cell|Column|Header|Footer|Sidebar|Modal|Dialog|Toast|Alert|Badge|Card|Panel|Tab|Menu|Nav|Link|Image|Icon|Avatar|Loader|Spinner|Progress|Slider|Toggle|Checkbox|Radio|Select|Option|Textarea|Label|Tooltip|Popover|Dropdown|Parser|Formatter|Validator|Serializer|Deserializer|Encoder|Decoder|Reader|Writer|Stream|Buffer|Cache|Pool|Queue|Stack|Tree|Graph|Iterator|Generator|Promise|Future|Callback|Delegate|Proxy|Adapter|Decorator|Facade|Strategy|Visitor|Command|Invoker|Receiver|Mediator|Memento|Prototype|Singleton|Bridge|Composite|Flyweight|Template|Chain|Interpreter)s?$/;
+          // Skip PascalCase words that don't have technical suffixes
+          // These are likely brand names, not code
+          if (!codeSuffixes.test(fullMatch)) {
+            continue;
+          }
         }
 
         // Skip Mc/Mac surname patterns (McDonald, MacArthur, etc.)

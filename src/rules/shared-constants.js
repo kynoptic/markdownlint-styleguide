@@ -130,6 +130,22 @@ export const casingTerms = {
   webpack: 'Webpack',
   zsh: 'Zsh',
 
+  // Build tools and automation
+  babel: 'Babel',
+  renovate: 'Renovate',
+  dependabot: 'Dependabot',
+  husky: 'Husky',
+  markdownlint: 'markdownlint',  // conventionally lowercase
+  rollup: 'Rollup',
+  esbuild: 'esbuild',
+  parcel: 'Parcel',
+  turbo: 'Turbo',
+  turborepo: 'Turborepo',
+  lerna: 'Lerna',
+  nx: 'Nx',
+  gulp: 'Gulp',
+  grunt: 'Grunt',
+
   // Databases
   cassandra: 'Cassandra',
   clickhouse: 'ClickHouse',
@@ -418,6 +434,17 @@ const additionalBacktickIgnoredTerms = [
   'e.g',
   'i.e',
   'CI/CD',
+  // Common acronym plurals (prose, not code identifiers)
+  'ADRs',
+  'PRs',
+  'LLMs',
+  'SDKs',
+  'VPNs',
+  'URLs',
+  'CDNs',
+  // Module system names (proper nouns)
+  'CommonJS',
+  'ESM',
   'Describe/test',
   'CSV/JSON',
   'Swagger/OpenAPI',
@@ -595,8 +622,11 @@ export const camelCaseExemptions = new Set([
   'TechCrunch', 'VentureBeat',
   'OpenAI', 'DeepMind', 'AlphaGo', 'AlphaFold', 'ChatGPT', 'MidJourney',
   'LaTeX', 'BibTeX', 'MiKTeX', 'XeTeX', 'LuaTeX', 'ConTeXt', // TeX-related
-  'DocuSign', 'SalesForce', 'HubSpot', 'MailChimp',
-  'LastPass', 'BitLocker', 'NordVPN', 'ExpressVPN',
+  'DocuSign', 'SalesForce', 'HubSpot', 'MailChimp', 'ServiceNow',
+  'LastPass', 'BitLocker', 'NordVPN', 'ExpressVPN', 'OnePassword',
+  // Security vendors
+  'CrowdStrike', 'SentinelOne', 'CarbonBlack', 'FireEye', 'McAfee',
+  'SonicWall', 'CheckPoint', 'PaloAlto', 'FortiNet', 'CyberArk',
   'InDesign', 'InCopy', 'QuarkXPress',
   'AutoCAD', 'SolidWorks', 'SketchUp',
   'CodePen', 'CodeSandbox', 'StackBlitz', 'StackOverflow',

@@ -170,7 +170,7 @@ Unit tests are essential here because:
 Added security job to CI workflow using:
 
 - **`npm audit`** - Scans against `npm advisory` database
-- **Osv-scanner** - Cross-references against Open Source Vulnerabilities database
+- **osv-scanner** - Cross-references against Open Source Vulnerabilities database
 
 **Configuration**:
 
