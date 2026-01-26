@@ -15,7 +15,8 @@ import { createSafeFixInfo } from '../autofix-safety.js';
  */
 export function toSentenceCase(text, specialCasedTerms) {
   const preserved = [];
-  const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\3|(\*|_)(.*?)\5/g;
+  // Preserve markup, code, links, versions, dates, bold, italic, and quoted text
+  const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\3|(\*|_)(.*?)\5|"[^"]+"|'[^']+'/g;
 
   let processed = text.replace(preservedSegmentsRegex, (m) => {
     preserved.push(m);
@@ -53,6 +54,10 @@ export function toSentenceCase(text, specialCasedTerms) {
 
     const lower = w.toLowerCase();
     if (specialCasedTerms[lower]) {
+      // Special term counts as the first visible word if we haven't seen one yet
+      if (!firstVisibleWordCased) {
+        firstVisibleWordCased = true;
+      }
       return specialCasedTerms[lower];
     }
 

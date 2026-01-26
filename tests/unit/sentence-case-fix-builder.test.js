@@ -83,9 +83,9 @@ describe("toSentenceCase", () => {
   });
 
   test("test_should_handle_special_term_at_start", () => {
-    // When special term is at start and all caps, subsequent word gets capitalized as first visible word
+    // When special term is at start, it counts as the first word so subsequent words are lowercased
     const result = toSentenceCase("JAVASCRIPT IS GREAT", defaultSpecialTerms);
-    expect(result).toBe("JavaScript Is great");
+    expect(result).toBe("JavaScript is great");
   });
 
   test("test_should_convert_lowercase_to_uppercase_for_all_caps_terms", () => {
@@ -116,6 +116,33 @@ describe("toSentenceCase", () => {
     const allCapsTerms = { patch: "PATCH", breaking: "BREAKING" };
     const result = toSentenceCase("Understanding PATCH and BREAKING changes", allCapsTerms);
     expect(result).toBeNull(); // Already correct
+  });
+
+  test("test_should_preserve_acronym_at_start", () => {
+    // Acronyms at the start should stay uppercase when in specialCasedTerms
+    const result = toSentenceCase("MCP Configuration Precedence Guide", { mcp: 'MCP' });
+    expect(result).toBe("MCP configuration precedence guide");
+  });
+
+  test("test_should_preserve_acronym_in_middle", () => {
+    // Acronyms in the middle should stay uppercase
+    const result = toSentenceCase("Using MCP For Configuration", { mcp: 'MCP' });
+    expect(result).toBe("Using MCP for configuration");
+  });
+
+  test("test_should_preserve_multiple_acronyms", () => {
+    const result = toSentenceCase("API And CLI Tools For MCP", { api: 'API', cli: 'CLI', mcp: 'MCP' });
+    expect(result).toBe("API and CLI tools for MCP");
+  });
+
+  test("test_should_preserve_double_quoted_text", () => {
+    const result = toSentenceCase('Scenario: "I Need Playwright" For Testing', {});
+    expect(result).toBe('Scenario: "I Need Playwright" for testing');
+  });
+
+  test("test_should_preserve_single_quoted_text", () => {
+    const result = toSentenceCase("When To Use 'Git' Vs GitHub", {});
+    expect(result).toBe("When to use 'Git' vs github");
   });
 });
 

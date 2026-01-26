@@ -106,6 +106,17 @@ export function preserveSegments(text) {
     return PH + (segments.length - 1) + PE;
   });
 
+  // 7. Quoted text (preserve exact casing inside quotes)
+  // This prevents sentence-case rules from modifying quoted strings like "I need Playwright"
+  processed = processed.replace(/"([^"]+)"/g, (m) => {
+    segments.push(m);
+    return PH + (segments.length - 1) + PE;
+  });
+  processed = processed.replace(/'([^']+)'/g, (m) => {
+    segments.push(m);
+    return PH + (segments.length - 1) + PE;
+  });
+
   // Replace NULL-based placeholders with __PRESERVED_N__ format
   // eslint-disable-next-line no-control-regex
   const finalProcessed = processed.replace(new RegExp(PH.replace(/\x00/g, '\\x00') + '(\\d+)' + PE.replace(/\x00/g, '\\x00'), 'g'),

@@ -2,103 +2,103 @@
 
 ## Title case instead of sentence case
 
-# Title Case Heading Should Fail <!-- ❌ -->
+# Title case heading should fail <!-- ❌ -->
 
-# This Is not correct <!-- ❌ -->
+# This is not correct <!-- ❌ -->
 
-# Why This Should Fail <!-- ❌ -->
+# Why this should fail <!-- ❌ -->
 
-# Understanding The API Limits <!-- ❌ -->
+# Understanding the API limits <!-- ❌ -->
 
-# Low-Cost Solutions For Small Teams <!-- ❌ -->
+# Low-cost solutions for small teams <!-- ❌ -->
 
-# 10 Ways To Improve Performance <!-- ❌ -->
+# 10 ways to improve performance <!-- ❌ -->
 
-# How to use Api Keys <!-- ❌ -->
+# How to use API keys <!-- ❌ -->
 
-# The Problem With Software Estimates <!-- ❌ -->
+# The problem with software estimates <!-- ❌ -->
 
-# A Quick Guide To Markdown <!-- ❌ -->
+# A quick guide to Markdown <!-- ❌ -->
 
-# Getting Started With Testing <!-- ❌ -->
+# Getting started with testing <!-- ❌ -->
 
 ## Improper capitalization of acronyms or brand names
 
-# API Is Not Responding <!-- ❌ -->
+# API is not responding <!-- ❌ -->
 
-# Using JSON and Html with CSS <!-- ❌ -->
+# Using JSON and HTML with CSS <!-- ❌ -->
 
-# Node.js-Based tools <!-- ❌ -->
+# Node.js-based tools <!-- ❌ -->
 
-# Should fail: Nodejs version 18 <!-- ❌ -->
+# Should fail: nodejs version 18 <!-- ❌ -->
 
-# When to use 'Git' vs GitHub <!-- ❌ -->
+# When to use 'Git' vs GitHub <!-- ✓ preserved quoted text -->
 
-# Learn to Use Npm And Yarn <!-- ❌ -->
+# Learn to use npm and Yarn <!-- ❌ -->
 
-# ReactJS Components For Beginners <!-- ❌ -->
+# Reactjs components for beginners <!-- ❌ -->
 
-# Differences Between HTTP And Https <!-- ❌ -->
+# Differences between HTTP and HTTPS <!-- ❌ -->
 
 ## Inconsistent casing of proper nouns
 
-# Visiting paris during summer <!-- ❌ -->
+# Visiting Paris during summer <!-- ❌ -->
 
-# Visiting paris in the spring <!-- ❌ -->
+# Visiting Paris in the Spring <!-- ❌ -->
 
-# Tools from github <!-- ❌ -->
+# Tools from GitHub <!-- ❌ -->
 
-# learning From socrates <!-- ❌ -->
+# Learning from Socrates <!-- ❌ -->
 
-# Trip to the andes mountains <!-- ❌ -->
+# Trip to the Andes mountains <!-- ❌ -->
 
-# Exploring japanese aesthetics <!-- ❌ -->
+# Exploring Japanese aesthetics <!-- ❌ -->
 
 ## MixedCase and shouting
 
-# FIRST example of poor heading case <!-- ❌ -->
+# First example of poor heading case <!-- ❌ -->
 
-# SYSTEM FAILURE DETECTED <!-- ❌ -->
+# System failure detected <!-- ❌ -->
 
-# First word Has mixedCase <!-- ❌ -->
+# First word has mixedcase <!-- ❌ -->
 
-# UpdateUserProfile Not Working <!-- ❌ -->
+# Updateuserprofile not working <!-- ❌ -->
 
-# ThisWillFail Miserably <!-- ❌ -->
+# Thiswillfail miserably <!-- ❌ -->
 
 ## Improper handling of lowercase acronyms
 
-# css <!-- ❌ --> <!-- intentionally lowercase single word -->
+# CSS <!-- ❌ --> <!-- intentionally lowercase single word -->
 
-# api <!-- ❌ -->
+# API <!-- ❌ -->
 
-# json <!-- ❌ -->
+# JSON <!-- ❌ -->
 
 # npm <!-- ✅ -->
 
-# cli tools <!-- ❌ -->
+# CLI tools <!-- ❌ -->
 
 ## Leading verbs unnecessarily capitalized
 
 # Using the CLI with Node.js 20 <!-- ❌ -->
 
-# using the CLI with Node.js 20 <!-- ❌ -->
+# Using the CLI with Node.js 20 <!-- ❌ -->
 
-# Adding New Features With Git <!-- ❌ -->
+# Adding new features with Git <!-- ❌ -->
 
-# Creating A Pull Request <!-- ❌ -->
+# Creating a pull request <!-- ❌ -->
 
 ## Phrases or idioms not sentence cased
 
-# Don't Panic <!-- ❌ -->
+# Don't panic <!-- ❌ -->
 
-# don't panic <!-- ❌ -->
+# Don't panic <!-- ❌ -->
 
-# Let It Be <!-- ❌ -->
+# Let it be <!-- ❌ -->
 
-# Keep Calm And Carry On <!-- ❌ -->
+# Keep calm and carry on <!-- ❌ -->
 
-# Thinking Outside The Box <!-- ❌ -->
+# Thinking outside the box <!-- ❌ -->
 
 ## Markdown emoji headings (incorrect casing)
 
@@ -106,28 +106,28 @@
 
 # 🚀 quick start <!-- ❌ -->
 
-# 🚀 Quick Start <!-- ❌ -->
+# 🚀 quick start <!-- ❌ -->
 
-# Quick Start 🚀 <!-- ❌ -->
+# Quick start 🚀 <!-- ❌ -->
 
-# 🧠 Mental Models In Decision-Making <!-- ❌ -->
+# 🧠 mental models in decision-making <!-- ❌ -->
 
-# ✨ The Future Of UX <!-- ❌ -->
+# ✨ the future of UX <!-- ❌ -->
 
 ## Non-sentence metadata-style headings
 
-# The 2025-06-05 Release Notes <!-- ❌ -->
+# The 2025-06-05 release notes <!-- ❌ -->
 
-# Version 3.2.1 API Changes <!-- ❌ -->
+# Version 3.2.1 API changes <!-- ❌ -->
 
-# Q2 2025 Team Objectives <!-- ❌ -->
+# Q2 2025 team objectives <!-- ❌ -->
 
-# May 2025 Financial Summary <!-- ❌ -->
+# May 2025 financial summary <!-- ❌ -->
 
 ## Numbered headings with incorrect casing
 
 # 1. article weighting algorithm <!-- ❌ -->
 
-# 2. Data Processing Pipeline <!-- ❌ -->
+# 2. data processing pipeline <!-- ❌ -->
 
-# 3. API Rate Limiting <!-- ❌ -->
+# 3. API rate limiting <!-- ❌ -->

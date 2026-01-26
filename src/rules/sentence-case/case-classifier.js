@@ -135,6 +135,13 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
     return true;
   }
 
+  // Skip file path headings (e.g., "#### docs/README.md", "### src/utils/helper.js")
+  // These are code identifiers that should preserve their original casing
+  const filePathPattern = /^[a-zA-Z_.~][-a-zA-Z0-9_./]*\.(js|mjs|cjs|ts|tsx|jsx|py|sh|bash|zsh|json|yaml|yml|md|txt|html|css|scss|less|xml|toml|ini|cfg|conf|env|sql|rb|go|rs|java|kt|swift|c|cpp|h|hpp|php|pl|r|lua|vim|el|ex|exs|erl|hs|scala|clj|groovy|gradle|make|cmake|dockerfile|gitignore|gitattributes|editorconfig|prettierrc|eslintrc|babelrc|nvmrc|npmrc)$/i;
+  if (filePathPattern.test(trimmedText)) {
+    return true;
+  }
+
   // Skip headings that START with an ALL-CAPS filename (e.g., "## SKILL.md format", "## README.md guidelines")
   // These are conventional documentation filenames that should preserve their uppercase casing
   // Note: We only match ALL-CAPS base names (like SKILL.md, README.md) to avoid exempting
@@ -429,6 +436,19 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       }
 
       const parts = word.split('-');
+
+      // Check if first part is a known special term (e.g., "Codex-compatible", "Claude-based")
+      // If so, validate the hyphenated word has correct casing: special term + lowercase suffix
+      const firstPartLower = parts[0].toLowerCase();
+      const expectedFirstPart = specialCasedTerms[firstPartLower];
+      if (expectedFirstPart && parts.length > 1) {
+        // First part is a product name or special term
+        if (parts[0] === expectedFirstPart && parts.slice(1).every(p => p === p.toLowerCase())) {
+          // Correctly cased: "Codex-compatible" where Codex is preserved and rest is lowercase
+          continue;
+        }
+      }
+
       if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
         return {
           isValid: false,

@@ -233,6 +233,26 @@ describe('Sentence-case false positives from agent-playbook', () => {
     });
   });
 
+  describe('file paths should preserve original casing', () => {
+    test('docs/README.md file path heading should be preserved', async () => {
+      const content = `#### docs/README.md`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('src/utils/helper.js file path heading should be preserved', async () => {
+      const content = `### src/utils/helper.js`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('.claude/settings.json file path heading should be preserved', async () => {
+      const content = `### .claude/settings.json`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+  });
+
   describe('Skills as proper noun should remain capitalized', () => {
     test('Claude Code Skills should remain capitalized', async () => {
       const content = `## Claude Code Skills overview`;
@@ -240,6 +260,90 @@ describe('Sentence-case false positives from agent-playbook', () => {
         specialTerms: ['Claude Code', 'Skills']
       });
       expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('acronyms at heading start should remain uppercase', () => {
+    test('MCP should remain uppercase at heading start', async () => {
+      const content = `# MCP configuration precedence guide`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      // MCP is an acronym and should stay uppercase, not become "Mcp"
+      expect(errors).toHaveLength(0);
+    });
+
+    test('API should remain uppercase at heading start', async () => {
+      const content = `## API reference documentation`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('CLI should remain uppercase at heading start', async () => {
+      const content = `### CLI installation guide`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('product names in headings should remain capitalized', () => {
+    test('Claude, Gemini, Codex in quoted heading text', async () => {
+      const content = `### Scenario: "Same setup across Claude, Gemini, Codex"`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      // Product names in quotes should not be lowercased
+      expect(errors).toHaveLength(0);
+    });
+
+    test('Playwright in quoted heading text', async () => {
+      const content = `### Scenario: "I need Playwright only in test projects"`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      // "I" and "Playwright" should not be lowercased
+      expect(errors).toHaveLength(0);
+    });
+
+    test('Codex-Compatible should preserve Codex capitalization', async () => {
+      const content = `### Strategy 3: Codex-compatible (global only)`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      // Codex is a product name and should stay capitalized
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('pronoun I should remain capitalized', () => {
+    test('I in quoted text should remain capitalized', async () => {
+      const content = `### Scenario: "I need this feature"`;
+      const errors = await lintWithRule(content, sentenceCaseHeading);
+      // The pronoun "I" should never be lowercased
+      const iErrors = errors.filter(e =>
+        e.errorDetail && e.errorDetail.includes('"I"') && e.errorDetail.includes('lowercase')
+      );
+      expect(iErrors).toHaveLength(0);
+    });
+  });
+});
+
+describe('BCE false positives - Round 2', () => {
+  describe('URLs should NOT be backticked', () => {
+    test('HTTPS URLs in prose should not be backticked', async () => {
+      const content = `- **Docs**: https://code.claude.com/docs/en/mcp.md`;
+      const errors = await lintWithRule(content, backtickCodeElements);
+      const urlErrors = errors.filter(e => e.context && e.context.includes('https://'));
+      expect(urlErrors).toHaveLength(0);
+    });
+
+    test('HTTP URLs should not be backticked', async () => {
+      const content = `Visit http://example.com for more info.`;
+      const errors = await lintWithRule(content, backtickCodeElements);
+      const urlErrors = errors.filter(e => e.context && e.context.includes('http://'));
+      expect(urlErrors).toHaveLength(0);
+    });
+  });
+
+  describe('dotfiles in paths should NOT be separately backticked', () => {
+    test('.claude in path should not be separately backticked', async () => {
+      const content = `Create in ~/.claude/skills: Develop the skill globally`;
+      const errors = await lintWithRule(content, backtickCodeElements);
+      // The whole path ~/.claude/skills might be backticked, but .claude alone should not
+      const dotClaudeErrors = errors.filter(e => e.context === '.claude');
+      expect(dotClaudeErrors).toHaveLength(0);
     });
   });
 });
