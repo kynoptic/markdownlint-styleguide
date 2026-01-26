@@ -50,6 +50,9 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
   let firstVisibleWordCased = false;
   const fixedWords = words.map((w) => {
     if (w.startsWith('__P_')) {
+      // Multi-word special terms (like "Agent Skills") count as having the first word
+      // so subsequent words should be lowercase
+      firstVisibleWordCased = true;
       return w;
     }
 
