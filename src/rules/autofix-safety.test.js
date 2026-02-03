@@ -1,5 +1,4 @@
 // @ts-check
-/* global describe, test, expect */
 
 import {
   shouldApplyAutofix,

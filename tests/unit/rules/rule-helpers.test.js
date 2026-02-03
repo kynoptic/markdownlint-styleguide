@@ -72,8 +72,8 @@ describe('extractConfig', () => {
     const context = createRuleContext(params, onError, 'my-rule', 'MR001');
 
     const schema = {
-      option1: (value) => typeof value === 'string' ? [] : [{ field: 'option1', message: 'must be string', value, expected: 'string' }], // eslint-disable-line no-unused-vars
-      option2: (value) => typeof value === 'boolean' ? [] : [{ field: 'option2', message: 'must be boolean', value, expected: 'boolean' }] // eslint-disable-line no-unused-vars
+      option1: (value) => typeof value === 'string' ? [] : [{ field: 'option1', message: 'must be string', value, expected: 'string' }],  
+      option2: (value) => typeof value === 'boolean' ? [] : [{ field: 'option2', message: 'must be boolean', value, expected: 'boolean' }]  
     };
 
     const config = extractConfig(context, schema);
@@ -116,7 +116,7 @@ describe('extractConfig', () => {
     const context = createRuleContext(params, onError, 'my-rule');
 
     const schema = {
-      option1: (value) => typeof value === 'string' ? [] : [{ field: 'option1', message: 'must be string', value, expected: 'string' }] // eslint-disable-line no-unused-vars
+      option1: (value) => typeof value === 'string' ? [] : [{ field: 'option1', message: 'must be string', value, expected: 'string' }]  
     };
 
     const config = extractConfig(context, schema, { option1: 'default' });
@@ -165,7 +165,7 @@ describe('extractConfig', () => {
     const context = createRuleContext(params, onError, 'my-rule');
 
     const schema = {
-      requiredField: (value) => typeof value === 'string' ? [] : [{ field: 'requiredField', message: 'must be string', value, expected: 'string' }] // eslint-disable-line no-unused-vars
+      requiredField: (value) => typeof value === 'string' ? [] : [{ field: 'requiredField', message: 'must be string', value, expected: 'string' }]  
     };
 
     // No defaults provided

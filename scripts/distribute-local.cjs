@@ -8,12 +8,10 @@ const jsonc = require('jsonc-parser');
 const { execSync } = require('child_process');
 
 function log(msg) {
-  // eslint-disable-next-line no-console
   console.log(`[distribute-local] ${msg}`);
 }
 
 function error(msg) {
-  // eslint-disable-next-line no-console
   console.error(`[distribute-local] ERROR: ${msg}`);
 }
 
@@ -46,7 +44,7 @@ function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
 }
 
-function cleanDirectory(dir) {
+function _cleanDirectory(dir) {
   if (!fs.existsSync(dir)) return;
   for (const name of fs.readdirSync(dir)) {
     if (name === '.git') continue;
@@ -55,7 +53,7 @@ function cleanDirectory(dir) {
   }
 }
 
-function copyFile(src, dest) {
+function _copyFile(src, dest) {
   ensureDir(path.dirname(dest));
   fs.copyFileSync(src, dest);
 }
@@ -145,7 +143,7 @@ function mergeJsonSettings(existingPath, newContent) {
     // Example: If existing has {config: {a: 1, b: 2}} and new has {config: {b: 3}},
     // result will be {config: {b: 3}}, not {config: {a: 1, b: 3}}.
     // For more complex merging needs, consider using lodash.merge or similar.
-    const merged = { ...existing, ...newData };
+    const _merged = { ...existing, ...newData };
 
     // Use strip-json-comments approach: keep template structure with comments,
     // then manually insert existing-only keys at the end

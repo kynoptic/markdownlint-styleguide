@@ -145,7 +145,7 @@ async function selectPreset(currentPreset) {
   return 'recommended'; // Default
 }
 
-function detectExistingConfig(targetPath) {
+function _detectExistingConfig(targetPath) {
   return fs.existsSync(targetPath);
 }
 
@@ -392,12 +392,12 @@ function configureNpmScripts(projectRoot, force, dryRun) {
   };
 
   let added = 0;
-  let skipped = 0;
+  let _skipped = 0;
 
   for (const [name, cmd] of Object.entries(scriptsToAdd)) {
     if (pkg.scripts[name] && !force) {
       log(`  ⚠ Script "${name}" already exists, skipping`, 'yellow');
-      skipped++;
+      _skipped++;
     } else {
       pkg.scripts[name] = cmd;
       added++;

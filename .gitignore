@@ -2,6 +2,9 @@
 dist/
 node_modules/
 
+# Legacy ESLint configs (use eslint.config.js)
+.eslintrc*
+
 # Build outputs
 coverage/
 dist/
