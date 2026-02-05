@@ -32,6 +32,7 @@ export default [
       'build/**',
       'lib/**',
       '.markdownlint-rules/**',
+      '.tmp/**',
       'validation-reports/**',
       'tests/tmp/**',
       'tests/fixtures/**',
