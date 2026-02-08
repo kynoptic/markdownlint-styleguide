@@ -19,5 +19,6 @@ export default {
     '/node_modules/',
     '/.tmp/',
     '/.test-dist/',
+    '/.markdownlint-rules/',
   ],
 };

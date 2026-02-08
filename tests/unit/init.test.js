@@ -3,6 +3,7 @@
  */
 
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import { parse as parseJsonc } from 'jsonc-parser';
@@ -270,19 +271,19 @@ describe('init.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('Install dependencies');
+      // "Install dependencies" only shown when cli2 is missing
       expect(output).toContain('Lint your markdown');
       expect(output).toContain('Enable auto-fix');
     });
 
-    it('should show GitHub-based installation instructions', () => {
+    it('should show GitHub-based documentation link', () => {
       const output = execSync('node ' + scriptPath + ' --preset recommended', {
         encoding: 'utf8',
         cwd: tempDir,
       });
 
-      // Should mention GitHub installation since not published to npm yet
-      expect(output).toContain('github:');
+      // Should reference GitHub repo in documentation section
+      expect(output).toContain('github.com/kynoptic/markdownlint-trap');
     });
   });
 
@@ -443,15 +444,28 @@ describe('init.cjs', () => {
     });
 
     it('should show warning when markdownlint-cli2 is not installed', () => {
-      // Run from temp dir where markdownlint-cli2 is not available
-      const output = execSync('node ' + scriptPath + ' --preset recommended', {
-        encoding: 'utf8',
-        cwd: tempDir,
-      });
+      // Run from an isolated temp dir with a minimal PATH that excludes
+      // npx/npm so checkDependency's `npx markdownlint-cli2 --version`
+      // fails. Use the absolute node path to bypass PATH for the script.
+      const isolatedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'init-test-'));
 
-      // Should warn about missing dependency
-      expect(output).toContain('markdownlint-cli2');
-      expect(output).toMatch(/not found|not installed|missing/i);
+      try {
+        const output = execSync(process.execPath + ' ' + scriptPath + ' --preset recommended', {
+          encoding: 'utf8',
+          cwd: isolatedDir,
+          env: {
+            PATH: '/usr/bin:/bin',
+            HOME: process.env.HOME,
+            TMPDIR: process.env.TMPDIR || '/tmp',
+          },
+        });
+
+        // Should warn about missing dependency
+        expect(output).toContain('markdownlint-cli2');
+        expect(output).toMatch(/not found|not installed|missing/i);
+      } finally {
+        fs.rmSync(isolatedDir, { recursive: true, force: true });
+      }
     });
 
     it('should show success when markdownlint-cli2 is installed', () => {

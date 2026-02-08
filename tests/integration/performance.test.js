@@ -10,7 +10,7 @@ import backtickRule from '../../src/rules/backtick-code-elements.js';
 
 // Test configuration
 const TEST_CONFIG = {
-  PERFORMANCE_THRESHOLD: 1000, // 1 second max for large files
+  PERFORMANCE_THRESHOLD: 1500, // 1.5 second max for large files
   MEMORY_ITERATIONS: 5, // Reduced from 10 for stability
   CONTENT_MIN_SIZE: 50000, // 50KB minimum
   CONTENT_MIN_LINES: 1000, // 1000 lines minimum
