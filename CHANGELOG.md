@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.0] - 2026-02-11
+
+Standardize preset defaults and expand casing dictionary.
+
+### Added
+
+- ADR, ADRs, and "GitHub Markdown Alerts" terms in the casing dictionary for correct sentence-case heading preservation
+
+### Fixed
+
+- Aligned list style defaults (MD004: dash, MD029: one) consistently across all three presets and their CLI/VS Code templates
+
+---
+
 ## [2.5.0] - 2026-01-26
 
 ### Added
@@ -436,7 +450,10 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.3.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...v2.1.0
