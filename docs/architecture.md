@@ -10,11 +10,13 @@ For architectural decisions and their rationale, see [Architecture Decision Reco
 - Distribution: Native ESM directly from `src/` (no transpilation since v2.3.0).
 - Entry point: `src/index.js` exports all rules.
 
-Consumers use the shareable preset `markdownlint-trap/recommended-config.jsonc`, which references rule files under `src/rules/`. Since v2.3.0, the project ships native ES modules without Babel transpilation.
+Consumers use one of three shareable presets (`basic`, `recommended`, `strict`), which reference rule files under `src/rules/`. Since v2.3.0, the project ships native ES modules without Babel transpilation.
 
-## Recommended config
+## Presets and templates
 
-`recommended-config.jsonc` declares `customRules` pointing to the compiled rules and a `config` block enabling rules (and some stock markdownlint rules). Other repos can simply set `"config.extends": "markdownlint-trap/recommended-config.jsonc"` in their `.markdownlint-cli2.jsonc`.
+Three root configs (`*-config.jsonc`) serve as shareable presets that consumers extend. They share common list style opinions (`MD004: dash`, `MD013: false`, `MD029: one`) and differ in which custom rules are enabled and how many standard rules are relaxed. See `docs/configuration.md` for the full comparison.
+
+Copy-paste templates in `templates/` mirror each preset for two environments: `markdownlint-cli2` (CLI) and VS Code settings (different config shape). Templates exist for tooling that does not support `extends`.
 
 ## Testing approach
 
@@ -25,7 +27,7 @@ The project employs a multi-layered testing strategy:
 - **Performance tests** (`tests/performance/`) ensure rules meet latency and memory thresholds
 - **External repository tests** (`tests/integration/external/`) validate rules against curated real-world projects
 
-Tests run directly against native ESM in `src/` using Jest's experimental ESM support. Since v2.3.0, no transpilation is required.
+Tests run directly against native ESM in `src/` using Jest's experimental ESM support. Since `v2.3.0`, no transpilation is required.
 
 > [!NOTE]
 > Intentional test overlap exists between unit and integration tests. Unit tests provide fast feedback and pinpoint failures, while integration tests catch unexpected interactions and ensure real-world compatibility.
@@ -109,7 +111,7 @@ Safety layer for auto-fix operations with confidence scoring and three-tier cate
 - Pattern strength (file paths, commands, technical indicators)
 - Ambiguity penalties for terms like "Word", "Go", "Swift", "Agent"
 - Context analysis (surrounding text, technical vs. natural language)
-- Rule-specific boosts (snake_case +0.25, camelCase +0.25, code paths +0.30)
+- Rule-specific boosts (`snake_case` +0.25, `camelCase` +0.25, code paths +0.30)
 
 **Needs-review reporter**: Items in the 0.3-0.7 confidence range are collected by `src/cli/needs-review-reporter.js` and output in human-readable text or machine-readable JSON format for AI agent processing.
 

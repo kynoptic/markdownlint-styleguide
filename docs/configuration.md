@@ -10,9 +10,26 @@ Getting started (most users)
 
 Presets
 
-- Basic: `markdownlint-trap/basic-config.jsonc` — minimal, high-signal rules
-- Recommended: `markdownlint-trap/recommended-config.jsonc` — balanced defaults
-- Strict: `markdownlint-trap/strict-config.jsonc` — maximal style + link hygiene
+All three presets share a common set of standard markdownlint opinions:
+
+| Rule | Setting | Rationale |
+|------|---------|-----------|
+| `MD004` | `dash` | Consistent unordered list marker |
+| `MD013` | `false` | Line length is universally noisy |
+| `MD029` | `one` | All-ones numbering is easy to reorder |
+
+The presets differ in which custom rules are enabled and how many standard rules are relaxed:
+
+| | Basic | Recommended | Strict |
+|---|---|---|---|
+| Custom rules | 2 (sentence-case, backticks) | All 5 | All 5 |
+| `MD041` first-line-h1 | off | off | **on** |
+| `MD024` duplicate heading | on | off | on |
+| `MD036` emphasis as heading | on | off | on |
+
+- **Basic** (`basic-config.jsonc`) — gentle onboarding with only high-signal custom rules
+- **Recommended** (`recommended-config.jsonc`) — all custom rules with pragmatic relaxations for real-world docs
+- **Strict** (`strict-config.jsonc`) — all custom rules, only `MD013` relaxed from the standard set
 
 Example
 
@@ -21,6 +38,15 @@ Example
   "config": { "extends": "markdownlint-trap/recommended-config.jsonc" }
 }
 ```
+
+Templates
+
+Copy-paste starters live in `templates/` for environments that don't support `extends`:
+
+- `markdownlint-cli2-*.jsonc` — for CLI usage (CI pipelines, pre-commit hooks)
+- `vscode-settings-*.jsonc` — for the VS Code markdownlint extension (different config shape)
+
+Templates mirror the root configs for their tier. Use `extends` when possible; use templates when your tooling requires a standalone config file.
 
 Visual: Configuration flow
 

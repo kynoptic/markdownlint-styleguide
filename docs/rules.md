@@ -26,7 +26,9 @@ Ensures headings (ATX: `#`) and bold text in list items follow sentence case: fi
   - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
   - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
 - Includes built-in support for multi-word product names:
-  - GitHub Products: GitHub Actions, GitHub Projects
+  - GitHub Products: GitHub Actions, GitHub Projects, GitHub Markdown Alerts
+- Includes built-in support for documentation acronyms:
+  - ADR, ADRs (Architecture Decision Records)
 - Recognizes emoji-prefixed headings and extended Unicode scripts (accented Latin, CJK, RTL) so internationalized documentation stays compliant.
 - Supports `ignoreAfterEmoji` option to exclude status markers and metadata after emoji from validation.
 - Skips code-heavy headings, `version/date-only` headings, and certain bracketed labels.
