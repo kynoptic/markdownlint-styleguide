@@ -12,7 +12,8 @@ markdownlint-trap is a Node.js project that ships a curated set of custom `markd
   - Complex rules may be split into submodules (e.g., `sentence-case/case-classifier.js`, `sentence-case/fix-builder.js`)
   - Shared utilities live in `src/rules/shared-heuristics.js`, `src/rules/shared-utils.js`, `src/rules/shared-constants.js`
   - Rule authoring helpers in `src/rules/rule-helpers.js` provide standardized config validation, logging, and fix wiring
-- **Scripts** reside in `scripts/` and root `*.jsonc` presets (`basic`, `recommended`, `strict`) configure rule bundles.
+- **Presets** are root `*-config.jsonc` files (`basic`, `recommended`, `strict`) that consumers extend. All share `MD004: dash`, `MD013: false`, `MD029: one`. Templates in `templates/` mirror each preset for CLI and VS Code. See `docs/configuration.md` for the tier comparison.
+- **Scripts** reside in `scripts/`.
 - **Tests** live under `tests/`:
   - Unit tests in `tests/unit/` and `src/rules/*.test.js` (fast, isolated component testing)
   - Feature specs in `tests/features/` (end-to-end rule validation)
