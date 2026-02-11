@@ -14,6 +14,8 @@
  */
 export const casingTerms = {
   // Technical Terms & Acronyms
+  adr: 'ADR',
+  adrs: 'ADRs',
   ai: 'AI',
   // File format acronyms (should stay uppercase)
   docx: 'DOCX',
@@ -348,6 +350,7 @@ export const casingTerms = {
   'create react app': 'Create React App',
   'google cloud platform': 'Google Cloud Platform',
   'github actions': 'GitHub Actions',
+  'github markdown alerts': 'GitHub Markdown Alerts',
   'github projects': 'GitHub Projects',
   'gitlab ci': 'GitLab CI',
   'microsoft azure': 'Microsoft Azure',
