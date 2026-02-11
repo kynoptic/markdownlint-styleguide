@@ -8,6 +8,8 @@
     // Keep core rules strict, but line length is universally ignored
     "default": true,
     "MD013": false, // line-length
+    "MD004": { "style": "dash" },
+    "MD029": { "style": "one" },
 
     // Enable all custom rules
     "sentence-case-heading": true,

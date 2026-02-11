@@ -8,6 +8,15 @@
   // Configure which markdownlint rules are enabled
   // Each rule can be set to true (enabled), false (disabled), or an object with options
   "markdownlint.config": {
+    // Enforce unordered list style - use dashes (-) for consistency
+    "MD004": { "style": "dash" },
+
+    // Disable line length limit - teams often have varying preferences
+    "MD013": false,
+
+    // Enforce all-ones list numbering (easy to reorder)
+    "MD029": { "style": "one" },
+
     // Enforce sentence case in ATX headings (e.g., "## Getting started" not "## Getting Started")
     // Preserves acronyms, proper nouns, and technical terms automatically
     "sentence-case-heading": true,

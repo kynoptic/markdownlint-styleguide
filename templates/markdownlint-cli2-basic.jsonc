@@ -5,6 +5,9 @@
     "markdownlint-trap"
   ],
   "config": {
+    "MD004": { "style": "dash" },
+    "MD013": false,
+    "MD029": { "style": "one" },
     "sentence-case-heading": true,
     "backtick-code-elements": true,
     "no-bare-url": false,

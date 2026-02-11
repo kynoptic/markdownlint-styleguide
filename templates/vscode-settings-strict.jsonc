@@ -12,28 +12,13 @@
     "default": true,
 
     // Disable line length limit (MD013) - teams often have varying preferences
-    // Re-enable if your team enforces line length: "MD013": { "line_length": 80 }
     "MD013": false,
 
-    // Allow duplicate headings (MD024) - common in long documents with repeated sections
-    // Enable for stricter duplicate detection: "MD024": { "siblings_only": true }
-    "MD024": false,
+    // Enforce all-ones list numbering (easy to reorder)
+    "MD029": { "style": "one" },
 
-    // Allow documents without top-level heading (MD041)
-    // Enable if all documents must start with # heading
-    "MD041": false,
-
-    // Enforce ordered list numbering style (MD029)
-    // "ordered" = sequential numbers (1, 2, 3), "one" = all 1s, "one_or_ordered" = either
-    "MD029": { "style": "ordered" },
-
-    // Enforce unordered list style (MD004)
-    // Use dashes (-) for consistency. Alternatives: "asterisk" (*), "plus" (+), "consistent"
+    // Enforce unordered list style - use dashes (-) for consistency
     "MD004": { "style": "dash" },
-
-    // Allow emphasis as pseudo-headings (MD036) - useful for styled text in lists
-    // Enable for stricter heading enforcement
-    "MD036": false,
 
     // === Custom markdownlint-trap rules ===
 
