@@ -374,8 +374,8 @@ function noDeadInternalLinks(params, onError) {
         // PERFORMANCE: File existence checks are now cached to avoid redundant fs.statSync calls
         // For directories, check if the directory exists
         // For files, check if the file exists (try with and without .md extension)
-        let exists = false;
-        
+        let exists;
+
         if (isDirectory) {
           exists = fileExists(resolvedPath);
         } else {

@@ -149,7 +149,6 @@ export async function findConfig(startDir = process.cwd()) {
     } catch {
       const parentDir = path.dirname(currentDir);
       if (parentDir === currentDir) {
-        searching = false;
         return null;
       }
       currentDir = parentDir;

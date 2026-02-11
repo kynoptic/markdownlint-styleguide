@@ -106,7 +106,7 @@ export async function processGitHubRepo(repoName, options) {
       execSync('gh repo clone ' + repoName + ' ' + tempDir, { stdio: 'pipe' });
     }
   } catch (error) {
-    throw new Error('Failed to clone repository ' + repoName + ': ' + error.message);
+    throw new Error('Failed to clone repository ' + repoName + ': ' + error.message, { cause: error });
   }
 
   // Process directory

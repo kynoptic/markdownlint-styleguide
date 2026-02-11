@@ -698,9 +698,9 @@ export function shouldApplyAutofix(ruleType, original, fixed = '', context = {},
     }
   }
 
-  let confidence = 0;
-  let heuristics = {};
-  let reason = '';
+  let confidence;
+  let heuristics;
+  let reason;
 
   switch (ruleType) {
     case 'sentence-case': {

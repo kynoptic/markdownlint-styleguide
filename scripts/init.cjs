@@ -681,7 +681,6 @@ async function init() {
     if (opts.vscode) {
       log(`  ${step}. Install VS Code markdownlint extension for real-time linting`);
       log('     https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint');
-      step++;
     }
 
     log('\n💡 Troubleshooting:', 'cyan');
