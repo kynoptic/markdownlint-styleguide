@@ -241,6 +241,36 @@ tests/fixtures/
 
 Feature tests reference fixtures via absolute paths. Integration tests also generate synthetic strings to validate specific edge cases.
 
+## False positive validation
+
+When improving the ruleset, use this validation loop to identify and fix false positives:
+
+1. **Run auto-fix on a consumer repository** (e.g., agent-playbook):
+
+   ```bash
+   cd /path/to/consumer-repo
+   npm install /path/to/markdownlint-trap  # Install local version
+   npx markdownlint-cli2 --fix "**/*.md"
+   ```
+
+2. **Review changes with `git diff`** to identify false positives:
+   - Abbreviation plurals incorrectly backticked (PRs, IDs, MCPs)
+   - Product/brand names incorrectly backticked (CrowdStrike, SharePoint)
+   - Common English phrases matched as code (e.g., "import them")
+   - Proper nouns incorrectly lowercased (English, Civil War)
+   - Filenames in headings incorrectly altered (`SKILL.md` → `Skill.md`)
+
+3. **Create failing tests** in `tests/features/false-positive-*.test.js` that capture the issues.
+
+4. **Fix the rules** by updating:
+   - `src/rules/shared-constants.js` for new terms in `casingTerms`, `camelCaseExemptions`, or `backtickIgnoredTerms`
+   - `src/rules/backtick-code-elements.js` for pattern exclusions
+   - `src/rules/sentence-case/case-classifier.js` for heading exemptions
+
+5. **Verify fixes** by running `npm test` and re-running auto-fix on the consumer.
+
+6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-trap fixes.
+
 ## Notes
 
 - Tests `import ESM` from `src/` directly via `babel-jest`; no build step is required before running tests.
