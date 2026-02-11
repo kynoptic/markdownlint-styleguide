@@ -7,10 +7,10 @@ For architectural decisions and their rationale, see [Architecture Decision Reco
 ## Source vs distribution
 
 - Source code: ES Modules under `src/`.
-- Distribution: Native ESM directly from `src/` (no transpilation since v2.3.0).
+- Distribution: Native ESM directly from `src/` (no transpilation since `v2.3.0`).
 - Entry point: `src/index.js` exports all rules.
 
-Consumers use one of three shareable presets (`basic`, `recommended`, `strict`), which reference rule files under `src/rules/`. Since v2.3.0, the project ships native ES modules without Babel transpilation.
+Consumers use one of three shareable presets (`basic`, `recommended`, `strict`), which reference rule files under `src/rules/`. Since `v2.3.0`, the project ships native ES modules without Babel transpilation.
 
 ## Presets and templates
 
@@ -140,7 +140,7 @@ Since `v1.7.0`, the project includes automated vulnerability scanning in the CI 
 
 ## Build
 
-Since v2.3.0, the project ships native ES modules without transpilation:
+Since `v2.3.0`, the project ships native ES modules without transpilation:
 
 - No build step required - source is distributed directly from `src/`
 - The package `files` field includes `src/`, `scripts/`, and `recommended-config.jsonc` for consumption

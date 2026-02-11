@@ -98,7 +98,7 @@ Wraps code-like tokens in prose with backticks to improve readability.
 Examples
 
 - Good: "Run `npm install` and edit `config.json`."
-- Bad: "Run npm install and edit config.json."
+- Bad: `"Run npm install and edit config.json."`
 
 Path detection heuristics
 
@@ -193,10 +193,10 @@ This word-boundary approach prevents false negatives where legitimate broken lin
 
 Examples
 
-- Good: `[Config](docs/configuration.md)`
-- Good (with placeholders): `[Documentation](URL)` when `allowPlaceholders: true`
-- Bad: `[Config](docs/missing.md)`
-- Bad (without placeholders): `[Documentation](URL)` when `allowPlaceholders: false`
+- Good: link to a file that exists
+- Good (with placeholders): link to `URL` when `allowPlaceholders: true`
+- Bad: link to a file that does not exist
+- Bad (without placeholders): link to `URL` when `allowPlaceholders: false`
 
 ---
 
