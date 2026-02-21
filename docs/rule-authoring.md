@@ -389,6 +389,7 @@ it('should_detect_violations', async () => {
 
 ## See also
 
-- `/Users/josephcasciano/Projects/markdownlint-trap/src/rules/rule-helpers.js` - Implementation
-- `/Users/josephcasciano/Projects/markdownlint-trap/src/rules/config-validation.js` - Validators
-- `/Users/josephcasciano/Projects/markdownlint-trap/tests/integration/rule-helpers-migration.test.js` - Examples
+- `src/rules/rule-helpers.js` -- implementation
+- `src/rules/config-validation.js` -- validators
+- `tests/integration/rule-helpers-migration.test.js` -- examples
+- `docs/extending.md` -- extension architecture, plugin packaging, and contribution workflow

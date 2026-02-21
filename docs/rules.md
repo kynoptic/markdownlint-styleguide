@@ -207,3 +207,11 @@ Replaces standalone `&` with "and" in prose for clarity.
 - Skips code blocks, inline code, links, and HTML entity contexts.
 - Respects configurable `exceptions` and includes common defaults (`R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`).
 - Auto-fix replaces `&` with `and`.
+
+---
+
+## See also
+
+- `docs/extending.md` -- how to create custom rules, package plugins, and contribute
+- `docs/rule-authoring.md` -- helpers contract API reference
+- `docs/configuration.md` -- preset tiers and configuration options
