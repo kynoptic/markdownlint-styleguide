@@ -111,6 +111,10 @@ Fixable: Yes (replace `&` with `and`).
 
 ---
 
+## Advanced configuration
+
+For autofix safety tuning, per-rule overrides, and troubleshooting configuration issues, see the [advanced configuration guide](advanced-configuration.md).
+
 ## Migration notes
 
 The following options are deprecated; use the replacements instead:

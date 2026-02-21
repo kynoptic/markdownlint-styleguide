@@ -59,6 +59,10 @@ Option C — `npm link` (local development)
 - Renovate: match `markdownlint-trap` and group under “markdownlint rules”.
 - Dependabot: allow the `markdownlint-trap` dependency; GitHub installs update on new tags.
 
+## Advanced configuration
+
+For per-rule overrides, autofix safety tuning, and common customization patterns, see the [advanced configuration guide](advanced-configuration.md).
+
 ## Troubleshooting
 
 - Cannot find `.markdownlint-rules` when extending the preset
