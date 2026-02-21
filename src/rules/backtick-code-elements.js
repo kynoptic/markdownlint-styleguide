@@ -24,6 +24,18 @@ import {
 import { getCodeBlockLines, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
 import { isDomainInProse } from './shared-heuristics.js';
 
+// Common English suffixes that look like CLI flags (#145)
+// These are ordinary morphemes, not command-line options.
+const englishSuffixes = new Set([
+  '-ism', '-ist', '-ize', '-ise',
+  '-tion', '-sion', '-ment', '-ness',
+  '-ful', '-less', '-able', '-ible',
+  '-ous', '-ive', '-al', '-ly',
+  '-er', '-or', '-en',
+  '-like', '-based', '-wise', '-ward',
+  '-gate', '-phobia', '-phobic'
+]);
+
 // Regex patterns used by helper functions
 const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
 const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
@@ -749,6 +761,11 @@ function backtickCodeElements(params, onError) {
         }
         // Skip if in ignored terms (default + user-configured)
         if (allIgnoredTerms.has(fullMatch)) {
+          continue;
+        }
+
+        // Skip common English suffixes that look like CLI flags (#145)
+        if (englishSuffixes.has(fullMatch.toLowerCase())) {
           continue;
         }
 
