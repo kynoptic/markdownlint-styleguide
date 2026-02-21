@@ -477,6 +477,15 @@ async function main() {
   }
 }
 
+export {
+  extractConfigSchema,
+  extractRuleNames,
+  extractRuleDescription,
+  generateRuleDoc,
+  RULE_METADATA,
+  CONFIG_OPTION_METADATA
+};
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
