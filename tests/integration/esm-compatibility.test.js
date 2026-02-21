@@ -33,7 +33,7 @@ describe('Native ESM compatibility', () => {
     
     expect(allRules.default).toBeDefined();
     expect(Array.isArray(allRules.default)).toBe(true);
-    expect(allRules.default.length).toBe(5);
+    expect(allRules.default.length).toBe(6);
     
     // Verify each rule has the expected structure
     allRules.default.forEach(rule => {
@@ -100,7 +100,7 @@ describe('Native ESM compatibility', () => {
     const rules = await import(mainPath);
     expect(rules.default).toBeDefined();
     expect(Array.isArray(rules.default)).toBe(true);
-    expect(rules.default.length).toBe(5);
+    expect(rules.default.length).toBe(6);
   });
 
   test('test_should_work_when_imported_by_rule_name', async () => {
@@ -168,7 +168,7 @@ describe('Backward compatibility', () => {
     // CJS consumers using dynamic import get the module with .default property
     expect(rules.default).toBeDefined();
     expect(Array.isArray(rules.default)).toBe(true);
-    expect(rules.default.length).toBe(5);
+    expect(rules.default.length).toBe(6);
 
     // Document the correct pattern for CJS consumers:
     // const rules = await import('markdownlint-trap');
@@ -189,7 +189,8 @@ describe('Backward compatibility', () => {
       'sentence-case-heading',
       'no-bare-url',
       'no-dead-internal-links',
-      'no-literal-ampersand'
+      'no-literal-ampersand',
+      'no-empty-list-items'
     ];
     
     const actualRuleNames = allRules.default.flatMap(rule => rule.names);

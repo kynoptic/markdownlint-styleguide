@@ -16,7 +16,8 @@
     "backtick-code-elements": true,
     "no-bare-url": true,
     "no-dead-internal-links": true,
-    "no-literal-ampersand": true
+    "no-literal-ampersand": true,
+    "no-empty-list-items": true
   }
 }
 
