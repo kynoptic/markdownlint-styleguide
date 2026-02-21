@@ -16,7 +16,29 @@
     "MD036": false, // no-emphasis-as-heading
 
     // Enable custom rules from this package
-    "sentence-case-heading": true,
+    "sentence-case-heading": {
+      "specialTerms": [
+        // Common acronyms
+        "LLM",
+        "NAS",
+        "PDF",
+        "UX",
+        // Major platforms
+        "Google Drive",
+        "Google Workspace",
+        "iCloud",
+        "Windows",
+        // Apple products
+        "Apple Music",
+        "Apple Photos",
+        "MacBook",
+        "MacBook Air",
+        // GitHub products
+        "GitHub Codespaces",
+        // Emphasis terms
+        "NOTE"
+      ]
+    },
     "backtick-code-elements": true,
     "no-bare-url": true,
     "no-dead-internal-links": true,
