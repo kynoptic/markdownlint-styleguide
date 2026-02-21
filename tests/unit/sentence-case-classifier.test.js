@@ -327,6 +327,31 @@ describe("validateHeading", () => {
     expect(result.isValid).toBe(false);
     expect(result.errorMessage).toMatch(/should be lowercase/i);
   });
+
+  test("allows digit-leading heading wrapped in HTML span anchor", () => {
+    // Issue #146: HTML span anchors followed by digit-leading text
+    const text = '<span id="note-1a-prose">1.a \u2014 Prose clarity</span>';
+    const result = validateHeading(text, defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("allows another digit-leading heading with HTML span", () => {
+    const text = '<span id="note-2b-citations">2.b \u2014 Inline citations</span>';
+    const result = validateHeading(text, defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("allows plain digit-leading heading without HTML", () => {
+    const text = "1.a \u2014 Prose clarity";
+    const result = validateHeading(text, defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("still validates HTML span with lowercase letter-leading text", () => {
+    const text = '<span id="anchor">lowercase heading</span>';
+    const result = validateHeading(text, defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+  });
 });
 
 describe("validateBoldText", () => {

@@ -241,8 +241,16 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
   }
 
   // Skip if year at start
-  const startsWithYear = /^\d{4}(?:\D|$)/.test(headingText);
-  if (startsWithYear) {
+  if (/^\d{4}(?:\D|$)/.test(headingText)) {
+    return { isValid: true };
+  }
+
+  // Skip first-word capitalisation when the heading starts with a numbered
+  // criterion identifier like "1.a", "2.b", "10.c" (issue #146).  After
+  // punctuation cleanup these split into separate tokens ("1" + "a"), so
+  // the first validation word is a single lowercase letter that was part
+  // of the numbering scheme, not a regular English word.
+  if (/^\d+[.)]\s*[a-z]\b/.test(headingText) && firstWord.length === 1) {
     return { isValid: true };
   }
 
@@ -628,20 +636,23 @@ function isAllCapsHeading(words) {
  * @returns {{cleanedText: string, textWithoutMarkup: string, processed: string, words: string[], hadLeadingEmoji: boolean} | null} Prepared text data or null if invalid.
  */
 function prepareTextForValidation(headingText) {
-  // First check exemptions on the original text before any cleaning
-  const textWithoutMarkup = headingText
+  // Strip HTML tags so anchor spans do not interfere with first-word detection (issue #146).
+  const textWithoutHtml = headingText.replace(/<[^>]+>/g, '').trim();
+
+  // First check exemptions on the cleaned text before any further cleaning
+  const textWithoutMarkup = textWithoutHtml
     .replace(/`[^`]+`/g, '')
     .replace(/\[([^\]]+)\]/g, '$1');
 
-  if (shouldExemptFromValidation(headingText, textWithoutMarkup)) {
+  if (shouldExemptFromValidation(textWithoutHtml, textWithoutMarkup)) {
     return null;
   }
 
   // Check if we had emoji at the start before cleaning
-  const hadLeadingEmoji = headingText.trim() !== stripLeadingSymbols(headingText.trim());
+  const hadLeadingEmoji = textWithoutHtml !== stripLeadingSymbols(textWithoutHtml);
 
   // Now clean the text for further processing
-  const cleanedText = stripLeadingSymbols(headingText);
+  const cleanedText = stripLeadingSymbols(textWithoutHtml);
   if (!cleanedText) {
     return null;
   }
