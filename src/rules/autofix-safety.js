@@ -197,7 +197,7 @@ function getFileExtension(filename) {
  * Uses three-tier thresholds for auto-fix (0.7), needs-review (0.3), and skip (<0.3).
  * @type {AutofixSafetyConfig}
  */
-const DEFAULT_SAFETY_CONFIG = {
+export const DEFAULT_SAFETY_CONFIG = {
   enabled: true,
   confidenceThreshold: THREE_TIER_THRESHOLDS.autoFix,  // 0.7 - high confidence auto-fix
   reviewThreshold: THREE_TIER_THRESHOLDS.needsReview,  // 0.3 - minimum for needs-review
@@ -207,6 +207,40 @@ const DEFAULT_SAFETY_CONFIG = {
   alwaysReview: [],  // Terms that should always go to needs-review tier
   neverFlag: []       // Terms that should never be flagged
 };
+
+/**
+ * Merge a per-rule safety configuration with the defaults.
+ * Array fields (safeWords, unsafeWords, alwaysReview, neverFlag) are concatenated
+ * with defaults (duplicates removed). Scalar fields override defaults.
+ * @param {Partial<AutofixSafetyConfig>|null|undefined} overrides - Per-rule overrides
+ * @returns {AutofixSafetyConfig} Merged configuration
+ */
+export function mergeAutofixSafetyConfig(overrides) {
+  if (!overrides || typeof overrides !== 'object') {
+    return { ...DEFAULT_SAFETY_CONFIG };
+  }
+
+  const merged = { ...DEFAULT_SAFETY_CONFIG };
+
+  // Scalar overrides
+  if (overrides.enabled !== undefined) merged.enabled = overrides.enabled;
+  if (overrides.confidenceThreshold !== undefined) merged.confidenceThreshold = overrides.confidenceThreshold;
+  if (overrides.reviewThreshold !== undefined) merged.reviewThreshold = overrides.reviewThreshold;
+  if (overrides.requireManualReview !== undefined) merged.requireManualReview = overrides.requireManualReview;
+
+  // Array fields: concatenate with defaults, deduplicate
+  const mergeArrays = (defaults, additions) => {
+    if (!additions || !Array.isArray(additions)) return [...defaults];
+    return [...new Set([...defaults, ...additions])];
+  };
+
+  merged.safeWords = mergeArrays(DEFAULT_SAFETY_CONFIG.safeWords, overrides.safeWords);
+  merged.unsafeWords = mergeArrays(DEFAULT_SAFETY_CONFIG.unsafeWords, overrides.unsafeWords);
+  merged.alwaysReview = mergeArrays(DEFAULT_SAFETY_CONFIG.alwaysReview, overrides.alwaysReview);
+  merged.neverFlag = mergeArrays(DEFAULT_SAFETY_CONFIG.neverFlag, overrides.neverFlag);
+
+  return merged;
+}
 
 /**
  * Calculate confidence score for a sentence case autofix.
@@ -760,6 +794,28 @@ export function shouldApplyAutofix(ruleType, original, fixed = '', context = {},
       reason: ambiguityResult.info.reason,
       properForm: ambiguityResult.info.properForm
     };
+  }
+
+  // Apply per-rule safeWords boost
+  if (config.safeWords && Array.isArray(config.safeWords) && originalStr) {
+    const originalLower = originalStr.toLowerCase();
+    if (config.safeWords.some(w => originalLower === w.toLowerCase())) {
+      const safeBoost = 0.3;
+      confidence = Math.min(1, confidence + safeBoost);
+      heuristics.safeWordBoost = safeBoost;
+      reason += ' (safe word match)';
+    }
+  }
+
+  // Apply per-rule unsafeWords penalty
+  if (config.unsafeWords && Array.isArray(config.unsafeWords) && originalStr) {
+    const originalLower = originalStr.toLowerCase();
+    if (config.unsafeWords.some(w => originalLower === w.toLowerCase())) {
+      const unsafePenalty = 0.5;
+      confidence = Math.max(0, confidence - unsafePenalty);
+      heuristics.unsafeWordPenalty = -unsafePenalty;
+      reason += ' (unsafe word match)';
+    }
   }
 
   // Force to needs-review tier if term is in alwaysReview list

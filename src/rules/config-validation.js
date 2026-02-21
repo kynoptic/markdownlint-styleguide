@@ -207,6 +207,90 @@ export function logValidationErrors(ruleName, errors, logger) {
 }
 
 /**
+ * Validates that a value is a number within a specified range.
+ * @param {number} min - Minimum allowed value (inclusive)
+ * @param {number} max - Maximum allowed value (inclusive)
+ * @returns {function(any, string): ValidationError[]} Validator function
+ */
+export function validateNumberInRange(min, max) {
+  return function(value, fieldName) {
+    const errors = [];
+
+    if (value === undefined || value === null) {
+      return errors;
+    }
+
+    if (typeof value !== 'number' || isNaN(value)) {
+      errors.push({
+        field: fieldName,
+        message: `${fieldName} must be a number`,
+        value: value,
+        expected: `number between ${min} and ${max}`
+      });
+      return errors;
+    }
+
+    if (value < min || value > max) {
+      errors.push({
+        field: fieldName,
+        message: `${fieldName} must be between ${min} and ${max}`,
+        value: value,
+        expected: `number between ${min} and ${max}`
+      });
+    }
+
+    return errors;
+  };
+}
+
+/**
+ * Schema for autofix safety configuration fields.
+ * @type {Object.<string, function(any, string): ValidationError[]>}
+ */
+const AUTOFIX_SAFETY_SCHEMA = {
+  enabled: validateBoolean,
+  confidenceThreshold: validateNumberInRange(0, 1),
+  reviewThreshold: validateNumberInRange(0, 1),
+  safeWords: validateStringArray,
+  unsafeWords: validateStringArray,
+  requireManualReview: validateBoolean,
+  alwaysReview: validateStringArray,
+  neverFlag: validateStringArray
+};
+
+/**
+ * Validates an autofix safety configuration object.
+ * Checks field types, ranges, and detects conflicts between safeWords and unsafeWords.
+ * @param {Object|null|undefined} config - The safety configuration to validate
+ * @returns {ValidationResult} Validation result with errors if any
+ */
+export function validateAutofixSafetyConfig(config) {
+  if (!config || typeof config !== 'object') {
+    return { isValid: true, errors: [] };
+  }
+
+  const result = validateConfig(config, AUTOFIX_SAFETY_SCHEMA, 'autofix-safety');
+
+  // Check for conflicts between safeWords and unsafeWords
+  if (Array.isArray(config.safeWords) && Array.isArray(config.unsafeWords)) {
+    const safeSet = new Set(config.safeWords.map(w => typeof w === 'string' ? w.toLowerCase() : ''));
+    for (const word of config.unsafeWords) {
+      if (typeof word === 'string' && safeSet.has(word.toLowerCase())) {
+        result.errors.push({
+          field: 'safeWords/unsafeWords',
+          message: `Word "${word}" appears in both safeWords and unsafeWords (conflict)`,
+          value: word,
+          expected: 'no overlap between safeWords and unsafeWords'
+        });
+        result.isValid = false;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
  * Creates a logger function that integrates with markdownlint's onError callback.
  * This allows configuration validation errors to be reported through the same
  * mechanism as rule violations, providing better integration with the host tool.
