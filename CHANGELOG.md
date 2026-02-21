@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0] - 2026-02-20
+
+New empty-list-items rule, per-rule autofix safety configuration, and reduced false positives.
+
+### Added
+
+- New `no-empty-list-items` rule to flag list items with no meaningful content
+- Per-rule autofix safety configuration allowing custom confidence thresholds per rule
+- Common special terms (e.g., technical abbreviations) added to recommended preset casing dictionary
+
+### Fixed
+
+- Sentence-case heading rule no longer flags digit-leading headings for capitalization
+- Backtick code elements rule no longer flags English suffixes (e.g., "'s", "'d") on CLI flags
+
+---
+
 ## [2.6.0] - 2026-02-11
 
 Standardize preset defaults and expand casing dictionary.
@@ -450,7 +467,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.3.0...v2.4.0

@@ -46,7 +46,7 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 
 ## Rule catalogue
 
-Five custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-urls`, `no-dead-internal-links`, `no-literal-ampersand`. Supporting modules: `rule-helpers`, `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `config-validation`. See `docs/rules.md` for full reference.
+Six custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-urls`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`. Supporting modules: `rule-helpers`, `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `config-validation`. See `docs/rules.md` for full reference.
 
 ## Testing
 

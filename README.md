@@ -46,6 +46,7 @@ npx markdownlint-cli2 "**/*.md"
 | `no-bare-url` | BU001 | Yes | Prevents bare URLs in content |
 | `no-dead-internal-links` | DL001 | No | Detects broken internal links |
 | `no-literal-ampersand` | NLA001 | Yes | Replaces `&` with "and" |
+| `no-empty-list-items` | ELI001 | Yes | Flags empty or whitespace-only list items |
 
 Auto-fixes use confidence scoring: high-confidence fixes apply automatically, ambiguous cases are flagged for review, and uncertain changes are skipped. See [rules reference](docs/rules.md) for full details.
 
