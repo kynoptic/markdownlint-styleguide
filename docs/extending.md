@@ -1,10 +1,10 @@
 # Extending markdownlint-trap
 
-How to create custom rules, package them as plugins, and contribute to the project.
+Create custom rules, package them as plugins, and contribute to the project.
 
 ## Rule anatomy
 
-Every markdownlint rule is a JavaScript object with a standard shape. The `no-empty-list-items` rule is a good minimal example:
+Every markdownlint rule is a JavaScript object with a standard shape. `no-empty-list-items` is a minimal example:
 
 ```javascript
 // src/rules/no-empty-list-items.js
@@ -85,9 +85,9 @@ fixInfo: {
 
 Set `deleteCount: -1` to delete the entire line.
 
-## Creating a rule with the helpers contract
+## Shared helpers contract
 
-For rules that need configuration validation, autofix safety scoring, or integrated logging, use the shared helpers. This is the recommended pattern for rules contributed to the project.
+Rules that need configuration validation, autofix safety scoring, or integrated logging should use the shared helpers. This pattern is recommended for contributed rules.
 
 ```javascript
 import {
@@ -107,30 +107,11 @@ export default {
     const context = createRuleContext(params, onError, "my-rule", "MR001");
     if (!context.isValid) return;
 
-    const schema = {
-      ignoredTerms: validateStringArray,
-      enabled: validateBoolean,
-    };
-    const config = extractConfig(context, schema, {
-      ignoredTerms: [],
-      enabled: true,
-    });
+    const config = extractConfig(context, { ignoredTerms: validateStringArray }, { ignoredTerms: [] });
 
     context.lines.forEach((line, index) => {
-      // Detect violations ...
-
-      const fixInfo = createFixInfo(context, {
-        column: 5,
-        length: 4,
-        replacement: "new text",
-      });
-
-      reportViolation(context, {
-        lineNumber: index + 1,
-        message: "Description of the violation",
-        context: "violation text",
-        fixInfo,
-      });
+      const fixInfo = createFixInfo(context, { column: 5, length: 4, replacement: "new text" });
+      reportViolation(context, { lineNumber: index + 1, message: "Description", context: "text", fixInfo });
     });
   },
 };
@@ -152,7 +133,18 @@ export default {
 | `getInlineCodeSpans` | `shared-utils.js` | Extract all inline code span ranges |
 | `stripLeadingDecorations` | `shared-utils.js` | Remove leading emoji from text |
 
-See `docs/rule-authoring.md` for the full helpers API reference.
+### Safety checks for autofixes
+
+Pass `ruleType` to `createFixInfo` to enable confidence scoring:
+
+```javascript
+const fixInfo = createFixInfo(context, {
+  column: start, length: text.length, replacement: `\`${text}\``,
+  ruleType: 'backtick', original: text, context: { line }
+});
+```
+
+Safety checks analyze pattern strength, ambiguity, and context to decide whether to apply a fix automatically, flag it for review, or skip it.
 
 ## Using rules as a consumer
 
@@ -168,7 +160,7 @@ In `.markdownlint-cli2.jsonc`:
 }
 ```
 
-This loads all built-in rules. To add your own rule alongside the defaults:
+This loads all built-in rules. Add your own rule alongside the defaults:
 
 ```jsonc
 {
@@ -197,7 +189,7 @@ const results = await lint({
 
 ## Rule registration and discovery
 
-Rules in this project are registered in `src/index.js`:
+Register rules in `src/index.js`:
 
 ```javascript
 import noEmptyListItems from "./rules/no-empty-list-items.js";
@@ -213,19 +205,19 @@ export default [
 ];
 ```
 
-The default export is an array of rule objects. Consumers pass this array to `markdownlint` via the `customRules` option, or presets reference the compiled bundle.
+The default export is an array of rule objects. Pass this array to `markdownlint` via the `customRules` option, or reference it through a preset.
 
-To add a new rule to the project:
+Add a new rule to the project:
 
 1. Create the rule file in `src/rules/`
 2. Import it in `src/index.js` and add it to the exported array
 3. Enable it in the appropriate preset config files (`basic-config.jsonc`, `recommended-config.jsonc`, `strict-config.jsonc`)
 
-External rules do not need to be registered here. Pass them to `markdownlint` via `customRules` in your own configuration.
+External rules do not need registration here. Pass them to `markdownlint` via `customRules` in your own configuration.
 
 ## Plugin packaging
 
-A plugin is a standalone npm package that exports one or more rule objects. No special plugin API is required because markdownlint rules are plain objects.
+A plugin is a standalone npm package that exports one or more rule objects. No special plugin API is needed because markdownlint rules are plain objects.
 
 ### Minimal plugin structure
 
@@ -259,7 +251,7 @@ export default [noTodoComments];
 }
 ```
 
-Consumers install and use the plugin:
+Install and use the plugin:
 
 ```bash
 npm install markdownlint-rule-my-plugin
@@ -274,7 +266,7 @@ npm install markdownlint-rule-my-plugin
 
 ### Reusing shared primitives
 
-If your plugin depends on markdownlint-trap utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-trap` as a peer dependency:
+If your plugin uses markdownlint-trap utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-trap` as a peer dependency:
 
 ```json
 {
@@ -295,11 +287,11 @@ import {
 } from "markdownlint-trap";
 ```
 
-The package exports these autofix safety components from its main entry point.
+The package exports autofix safety components from its main entry point.
 
 ## Testing expectations
 
-All rules (contributed or external) should follow the project's testing conventions.
+All rules (contributed or external) should follow the project testing conventions.
 
 ### Feature tests with fixtures
 
@@ -330,9 +322,9 @@ test("passes clean fixture without violations", async () => {
 
 ### What to test
 
-- **Passing cases**: valid markdown that should produce zero violations
+- **Passing cases**: valid markdown producing zero violations
 - **Failing cases**: invalid markdown with violations on expected lines
-- **Auto-fix output**: if the rule provides `fixInfo`, verify the transformation
+- **Auto-fix output**: if the rule provides `fixInfo`, verify the transformed output
 - **Configuration options**: each option changes behavior as documented
 - **Edge cases**: inline code, code blocks, links, emoji, and HTML comments
 
@@ -350,11 +342,11 @@ See `docs/testing.md` for the complete testing strategy.
 
 ### Proposal process
 
-1. **Open an issue** describing the rule: what it enforces, why it matters, and example violations
+1. **Open an issue** describing what the rule enforces, why it matters, and example violations
 2. **Label it** `enhancement` and `rule-proposal`
-3. **Discussion**: maintainers evaluate the proposal against these criteria:
-   - Does it catch a real, recurring problem in markdown documentation?
-   - Is it automatable with low false-positive rates?
+3. **Discussion**: maintainers evaluate against these criteria:
+   - Does the rule catch a real, recurring problem in markdown documentation?
+   - Can it be automated with low false-positive rates?
    - Does it overlap with existing markdownlint built-in rules?
    - Should it be a core rule or an external plugin?
 4. **Approval**: maintainers label the issue `accepted` and assign a rule ID
@@ -370,14 +362,14 @@ See `docs/testing.md` for the complete testing strategy.
 
 ### Implementation workflow
 
-Once a rule proposal is accepted:
+After a rule proposal is accepted:
 
 1. **Branch**: create `issue-<id>-<slug>` from `main`
 2. **Write tests first** (TDD): create fixtures in `tests/fixtures/<rule-name>/` and feature tests in `tests/features/<rule-name>.test.js`
-3. **Implement the rule** in `src/rules/<rule-name>.js` using kebab-case filename
-4. **Register it** in `src/index.js`
-5. **Enable it** in the appropriate preset configs
-6. **Document it** in `docs/rules.md` (behavior, configuration, examples)
+3. **Implement the rule** in `src/rules/<rule-name>.js` with a kebab-case filename
+4. **Register** in `src/index.js`
+5. **Enable** in the appropriate preset configs
+6. **Document** in `docs/rules.md` (behavior, configuration, examples)
 7. **Validate** against a consumer repository (see `docs/testing.md` for the false positive validation loop)
 8. **Submit PR** linking to the issue with "Closes #N"
 
@@ -388,11 +380,10 @@ Once a rule proposal is accepted:
 - Named exports for utility functions, default export for the rule object
 - JSDoc typedefs for public helpers
 - 2-space indentation
-- Use shared utilities (`shared-utils.js`, `config-validation.js`) instead of reimplementing common logic
+- Use shared utilities (`shared-utils.js`, `config-validation.js`) instead of reimplementing common patterns
 
 ## See also
 
-- `docs/rule-authoring.md` -- helpers contract API reference
 - `docs/rules.md` -- built-in rule catalogue
 - `docs/configuration.md` -- preset tiers and configuration options
 - `docs/testing.md` -- testing strategy and conventions

@@ -1,9 +1,9 @@
-# Rules
+# Rule catalogue
 
-This page describes each custom rule's behavior, ID, and fixability. See `docs/configuration.md` for configuration options.
+Each custom rule's behavior, ID, and fixability. See `docs/configuration.md` for configuration options.
 
 > [!NOTE]
-> Since `v1.7.0`, rules share common heuristics for acronym detection, markup preservation, and code span recognition. This ensures consistent behavior across the entire rule suite and prevents edge-case handling from drifting over time.
+> Since `v1.7.0`, rules share common heuristics for acronym detection, markup preservation, and code span recognition. Shared heuristics keep behavior consistent across rules and prevent edge-case handling from drifting.
 
 ## Summary
 
@@ -14,26 +14,27 @@ This page describes each custom rule's behavior, ID, and fixability. See `docs/c
 | `no-bare-url` | BU001 | Yes | Replace bare URLs with autolinks `<...>` |
 | `no-dead-internal-links` | DL001 | No | Validate internal file links and heading anchors |
 | `no-literal-ampersand` | NLA001 | Yes | Replace standalone `&` with "and" in prose |
+| `no-empty-list-items` | ELI001 | Yes | Remove empty list items (Word conversion artifacts) |
 
 ---
 
 ## `sentence-case-heading` (SC001)
 
-Ensures headings (ATX: `#`) and bold text in list items follow sentence case: first word capitalized, the rest lowercase, with exceptions for proper nouns, acronyms, and the pronoun "I".
+Enforces sentence case for headings (ATX: `#`) and bold text in list items: capitalize the first word, lowercase the rest, except proper nouns, acronyms, and "I".
 
 - Respects configured `specialTerms` and common technical terms (e.g., API, JSON, GitHub).
-- Includes built-in support for standard all-caps terminology:
+- Recognizes standard all-caps terminology:
   - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
   - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
-- Includes built-in support for multi-word product names:
+- Recognizes multi-word product names:
   - GitHub Products: GitHub Actions, GitHub Projects, GitHub Markdown Alerts
-- Includes built-in support for documentation acronyms:
+- Recognizes documentation acronyms:
   - ADR, ADRs (Architecture Decision Records)
-- Recognizes emoji-prefixed headings and extended Unicode scripts (accented Latin, CJK, RTL) so internationalized documentation stays compliant.
-- Supports `ignoreAfterEmoji` option to exclude status markers and metadata after emoji from validation.
+- Handles emoji-prefixed headings and extended Unicode scripts (accented Latin, CJK, RTL) for internationalized documentation.
+- With `ignoreAfterEmoji`, excludes status markers and metadata after emoji from validation.
 - Skips code-heavy headings, `version/date-only` headings, and certain bracketed labels.
-- Provides safe auto-fixes with guardrails.
-- Since `v1.7.0`: improved internal architecture with modular components for better maintainability and performance.
+- Auto-fixes safely with guardrails.
+- Since `v1.7.0`: modular internal architecture improves maintainability and performance.
 
 Configuration options
 
@@ -56,7 +57,7 @@ Examples
 
 Status markers with `ignoreAfterEmoji`
 
-When `ignoreAfterEmoji` is enabled, text after the first emoji is excluded from validation. This is useful for roadmaps and status tracking documents where emoji serve as visual separators between heading content and metadata.
+When `ignoreAfterEmoji` is enabled, the rule skips text after the first emoji. Use this for roadmaps and status tracking documents where emoji separate heading content from metadata.
 
 - Good with `ignoreAfterEmoji: true`: `## Task complete ✅ DONE`
 - Good with `ignoreAfterEmoji: true`: `## NOW (Current Sprint) ✅ COMPLETED`
@@ -65,35 +66,35 @@ When `ignoreAfterEmoji` is enabled, text after the first emoji is excluded from 
 
 Style note: formatting terminology
 
-When headings discuss formatting styles (bold, italic, underline), these words are treated as common nouns and should follow sentence case rules:
+Formatting style names (bold, italic, underline) are common nouns and follow sentence case:
 
 - Good: `## Using bold text`
 - Good: `## Applying italic formatting`
 - Bad: `## Using Bold text`
 - Bad: `## Applying Italic formatting`
 
-If you need to emphasize these terms, consider alternative phrasing:
+To emphasize these terms, use alternative phrasing:
 
 - `## Bold text formatting`
 - `## The Bold style`
 - `## Working with the Italic font style`
 
-This maintains consistency with sentence case principles while allowing natural expression of emphasis through word order and structure.
+Word order and structure convey emphasis while maintaining sentence case.
 
 ---
 
 ## `backtick-code-elements` (BCE001)
 
-Wraps code-like tokens in prose with backticks to improve readability.
+Wraps code-like tokens in prose with backticks for readability.
 
 - Detects commands, flags, file paths, filenames, function-like calls, env vars, and common tech references.
-- Avoids code spans, links, HTML comments, LaTeX math, angle bracket autolinks, and configured `ignoredTerms`.
-- Provides contextual error messages and safe auto-fixes.
-- Since `v1.7.0`: uses shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
-- Since `v1.7.1`: improved path detection to reduce false positives on
+- Skips code spans, links, HTML comments, LaTeX math, angle bracket autolinks, and configured `ignoredTerms`.
+- Reports contextual error messages and auto-fixes safely.
+- Since `v1.7.0`: shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
+- Since `v1.7.1`: improved path detection reduces false positives on
   non-path text containing slashes (e.g., "Integration/E2E", "Value/Effort",
   "pass/fail").
-- Since `v2.3.0`: distinguishes between domain names in prose and full URLs with protocols (issue #106).
+- Since `v2.3.0`: distinguishes domain names in prose from full URLs with protocols (issue #106).
 
 Examples
 
@@ -102,7 +103,7 @@ Examples
 
 Path detection heuristics
 
-The rule distinguishes between actual file paths and conceptual pairs or
+The rule distinguishes actual file paths from conceptual pairs and
 category labels:
 
 - ✅ Detected as paths: `src/components/Button.tsx`, `docs/api/endpoints.md`, `/etc/hosts`
@@ -111,25 +112,24 @@ category labels:
 
 Domain names vs. full URLs
 
-The rule treats domain names and full URLs differently based on context:
+The rule treats domain names and full URLs differently:
 
 - ✅ **Full URLs with protocol** require backticks: `http://example.com`, `https://github.com/user/repo`
 - ❌ **Domain names in prose** do NOT require backticks: "Visit GitHub.com", "Send email via Gmail.com"
 - ✅ **URLs in angle brackets** are autolinks (already marked up): `<https://example.com>` - not flagged
 
-This behavior ensures that product/service names like "Outlook.com" or "Microsoft365.com" used
-in prose are not incorrectly flagged, while bare URLs with protocols are properly wrapped for
-consistency and clickability.
+Product and service names like "Outlook.com" or "Microsoft365.com" in prose pass unflagged,
+while bare URLs with protocols must be wrapped for consistency and clickability.
 
 ---
 
 ## `no-bare-url` (BU001)
 
-Flags markdown-it linkified bare URLs and suggests wrapping them in angle brackets.
+Flags bare URLs linkified by markdown-it and suggests wrapping them in angle brackets.
 
 - Example: `https://example.com` → `<https://example.com>`
 - Respects optional `allowedDomains`.
-- Auto-fix inserts `<...>` around the original text.
+- Auto-fix wraps the URL in `<...>`.
 
 ---
 
@@ -137,10 +137,10 @@ Flags markdown-it linkified bare URLs and suggests wrapping them in angle bracke
 
 Detects broken internal links (relative paths and anchors).
 
-- Validates that the target file exists; for extensionless links, tries common markdown extensions.
+- Validates that the target file exists; for extensionless links, tries common Markdown extensions.
 - Optionally validates `#anchors` against extracted headings (GitHub-style slugs).
-- Supports placeholder pattern detection to avoid false positives in documentation templates.
-- Uses per-run caches for file stats and heading extraction for performance.
+- Detects placeholder patterns to avoid false positives in documentation templates.
+- Caches file stats and heading extraction per run for performance.
 - Not auto-fixable.
 
 Configuration options
@@ -167,13 +167,13 @@ Configuration options
 
 Placeholder detection
 
-When `allowPlaceholders` is enabled, the rule recognizes common placeholder patterns in documentation templates and example files, preventing false positives.
+When `allowPlaceholders` is enabled, the rule recognizes common placeholder patterns in documentation templates and example files to prevent false positives.
 
 **Matching strategy:**
 
 1. **Exact match** (case-insensitive): `URL` matches `url`, `URL`, `Url`
 2. **Path prefix match**: `path/to/` matches `path/to/file.md`, `path/to/image.png`
-3. **Word-boundary substring match**: Pattern must appear as a complete word segment separated by hyphens, underscores, dots, or slashes
+3. **Word-boundary substring match**: Pattern must appear as a complete word segment, separated by hyphens, underscores, dots, or slashes
 
 **Examples of word-boundary matching:**
 
@@ -182,7 +182,7 @@ When `allowPlaceholders` is enabled, the rule recognizes common placeholder patt
 - ✅ `link` matches: `link`, `my-link.md`, `docs/link/file.md`
 - ❌ `link` does NOT match: `unlinked.md`, `linking.md` (embedded within word)
 
-This word-boundary approach prevents false negatives where legitimate broken links are skipped because they contain placeholder keywords (e.g., `unlinked-page.md` containing "link").
+Word-boundary matching prevents false negatives where legitimate broken links would be skipped because they contain placeholder keywords (e.g., `unlinked-page.md` containing "link").
 
 **Use cases:**
 
@@ -202,7 +202,7 @@ Examples
 
 ## `no-literal-ampersand` (NLA001)
 
-Replaces standalone `&` with "and" in prose for clarity.
+Replaces standalone `&` with "and" in prose.
 
 - Skips code blocks, inline code, links, and HTML entity contexts.
 - Respects configurable `exceptions` and includes common defaults (`R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`).
@@ -210,8 +210,22 @@ Replaces standalone `&` with "and" in prose for clarity.
 
 ---
 
+## `no-empty-list-items` (ELI001)
+
+Detects list items with no content after the marker. Common in Word-to-Markdown conversions.
+
+- Checks both ordered and unordered lists via micromark tokens.
+- Auto-fix deletes the empty line.
+- No configuration options.
+
+Examples
+
+- Good: `- Item with content`
+- Bad: `- ` (marker followed by whitespace only)
+
+---
+
 ## See also
 
-- `docs/extending.md` -- how to create custom rules, package plugins, and contribute
-- `docs/rule-authoring.md` -- helpers contract API reference
+- `docs/extending.md` -- creating custom rules, helpers contract, plugins, and contributing
 - `docs/configuration.md` -- preset tiers and configuration options

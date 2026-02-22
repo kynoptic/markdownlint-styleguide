@@ -1,4 +1,4 @@
-# Configuration
+# Configuration and presets
 
 Getting started (most users)
 
@@ -18,7 +18,7 @@ All three presets share a common set of standard markdownlint opinions:
 | `MD013` | `false` | Line length is universally noisy |
 | `MD029` | `one` | All-ones numbering is easy to reorder |
 
-The presets differ in which custom rules are enabled and how many standard rules are relaxed:
+Presets differ in custom rule coverage and standard rule relaxations:
 
 | | Basic | Recommended | Strict |
 |---|---|---|---|
@@ -27,9 +27,9 @@ The presets differ in which custom rules are enabled and how many standard rules
 | `MD024` duplicate heading | on | off | on |
 | `MD036` emphasis as heading | on | off | on |
 
-- **Basic** (`basic-config.jsonc`) — gentle onboarding with only high-signal custom rules
-- **Recommended** (`recommended-config.jsonc`) — all custom rules with pragmatic relaxations for real-world docs
-- **Strict** (`strict-config.jsonc`) — all custom rules, only `MD013` relaxed from the standard set
+- **Basic** (`basic-config.jsonc`) — high-signal custom rules only
+- **Recommended** (`recommended-config.jsonc`) — all custom rules, pragmatic relaxations for real-world docs
+- **Strict** (`strict-config.jsonc`) — all custom rules, only `MD013` relaxed
 
 Example
 
@@ -41,12 +41,12 @@ Example
 
 Templates
 
-Copy-paste starters live in `templates/` for environments that don't support `extends`:
+Copy-paste starters in `templates/` for environments that lack `extends` support:
 
 - `markdownlint-cli2-*.jsonc` — for CLI usage (CI pipelines, pre-commit hooks)
 - `vscode-settings-*.jsonc` — for the VS Code markdownlint extension (different config shape)
 
-Templates mirror the root configs for their tier. Use `extends` when possible; use templates when your tooling requires a standalone config file.
+Templates mirror the root configs for each tier. Prefer `extends`; use templates when your tooling requires a standalone config file.
 
 Visual: Configuration flow
 
@@ -68,13 +68,13 @@ flowchart TD
 - `specialTerms`: string[] — Proper nouns and technical terms to preserve as-is.
 - Deprecated: `technicalTerms`, `properNouns` — Use `specialTerms` instead.
 
-Defaults: Uses built‑in dictionary of proper nouns and tech terms (no config needed for most teams). Fixable: Yes.
+Defaults: Built-in dictionary of proper nouns and tech terms covers most teams. Fixable: Yes.
 
 ---
 
 ## `backtick-code-elements` (BCE001)
 
-- `ignoredTerms`: string[] — Additional terms to ignore (in addition to built-in ignores).
+- `ignoredTerms`: string[] — Terms to ignore beyond the built-in list.
 - `skipCodeBlocks`: boolean (default: true) — Skip fenced/indented code blocks.
 - `skipMathBlocks`: boolean (default: true) — Skip LaTeX `$$` math blocks.
 
@@ -84,8 +84,8 @@ Fixable: Yes.
 
 ## `no-bare-url` (BU001)
 
-- `allowedDomains`: string[] — Domains allowed as bare URLs (skip reporting).
-- `skipCodeBlocks`: boolean (default: true) — Validated; currently no special handling needed.
+- `allowedDomains`: string[] — Domains exempt from bare URL reporting.
+- `skipCodeBlocks`: boolean (default: true) — Skip fenced/indented code blocks.
 
 Fixable: Yes (wrap in `<...>`). Requires markdown-it with `linkify: true`.
 
@@ -93,9 +93,9 @@ Fixable: Yes (wrap in `<...>`). Requires markdown-it with `linkify: true`.
 
 ## `no-dead-internal-links` (DL001)
 
-- `ignoredPaths`: string[] — Paths to ignore when checking targets.
+- `ignoredPaths`: string[] — Paths to exclude from link target checks.
 - `checkAnchors`: boolean (default: true) — Validate `#anchors` against headings.
-- `allowedExtensions`: string[] (default: ["`.md`", "`.markdown`"]) — Extensions to try for extensionless links.
+- `allowedExtensions`: string[] (default: ["`.md`", "`.markdown`"]) — Extensions to append when resolving extensionless links.
 
 Fixable: No.
 
@@ -103,7 +103,7 @@ Fixable: No.
 
 ## `no-literal-ampersand` (NLA001)
 
-- exceptions: string[] — Phrases where `&` is allowed (e.g., `R&D`). A default list is included: `R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`.
+- exceptions: string[] — Phrases where `&` is allowed (e.g., `R&D`). Defaults: `R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`.
 - `skipCodeBlocks`: boolean (default: true) — Skip fenced/indented code blocks.
 - `skipInlineCode`: boolean (default: true) — Skip inline code spans.
 
@@ -111,13 +111,98 @@ Fixable: Yes (replace `&` with `and`).
 
 ---
 
-## Advanced configuration
+## Autofix safety tuning
 
-For autofix safety tuning, per-rule overrides, and troubleshooting configuration issues, see the [advanced configuration guide](advanced-configuration.md).
+markdownlint-trap uses a three-tier confidence system to determine autofix safety.
+
+| Tier | Default threshold | Behavior |
+|------|-------------------|----------|
+| Auto-fix | >= 0.7 | Applied automatically with `--fix` |
+| Needs review | 0.3 -- 0.7 | Flagged for manual review, not applied |
+| Skip | < 0.3 | Too uncertain, not surfaced |
+
+### Adjust confidence thresholds
+
+```jsonc
+{
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "sentence-case-heading": {
+      "autofixSafety": {
+        "confidenceThreshold": 0.8,
+        "reviewThreshold": 0.4
+      }
+    }
+  }
+}
+```
+
+### Safe and unsafe words
+
+`safeWords` boosts confidence; `unsafeWords` penalizes:
+
+```jsonc
+{
+  "config": {
+    "backtick-code-elements": {
+      "autofixSafety": {
+        "safeWords": ["webpack", "babel", "eslint"],
+        "unsafeWords": ["spring", "rust", "swift"]
+      }
+    }
+  }
+}
+```
+
+### Force review or skip specific terms
+
+- `alwaysReview`: force matching terms into the needs-review tier regardless of confidence
+- `neverFlag`: suppress matching terms entirely (skip tier)
+
+### Disable safety checks entirely
+
+```jsonc
+{
+  "config": {
+    "sentence-case-heading": {
+      "autofixSafety": { "enabled": false }
+    }
+  }
+}
+```
+
+## Override individual rules
+
+Extend a preset and override specific rules:
+
+```jsonc
+{
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "sentence-case-heading": {
+      "specialTerms": ["GraphQL", "OAuth", "SSO"]
+    },
+    "no-literal-ampersand": false,
+    "MD024": true,
+    "no-dead-internal-links": {
+      "ignoredPaths": ["vendor", "third_party"]
+    }
+  }
+}
+```
+
+> [!WARNING]
+> Your overrides must be in the same `config` block as `extends`. A second `config` key silently replaces the first.
+
+### Debug autofix decisions
+
+```bash
+DEBUG=markdownlint-trap* npx markdownlint-cli2 --fix "**/*.md"
+```
 
 ## Migration notes
 
-The following options are deprecated; use the replacements instead:
+Deprecated options and their replacements:
 
 | Rule | Deprecated | Replacement |
 |------|------------|-------------|

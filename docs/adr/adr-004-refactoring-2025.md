@@ -1,4 +1,8 @@
-# Architecture decisions: v1.7.0 refactoring initiative
+# ADR 004: v1.7.0 refactoring initiative
+
+## Status
+
+Accepted
 
 Synthesized architectural decisions and rationale from the major refactoring work completed between `v1.7.0` and HEAD (commits through c4f9417).
 
@@ -320,7 +324,7 @@ This document exists because:
 
 Without explicit architecture documentation, the rationale for decisions gets lost over time. Future contributors may inadvertently undo improvements because they don't understand the original motivation.
 
-**Recommendation**: Update `docs/decisions/` with every significant architectural change (>500 LOC refactor, new module patterns, performance tradeoffs).
+**Recommendation**: Update `docs/adr/` with every significant architectural change (>500 LOC refactor, new module patterns, performance tradeoffs).
 
 ## References
 
@@ -335,7 +339,7 @@ Without explicit architecture documentation, the rationale for decisions gets lo
 ### Related documentation
 
 - `docs/architecture.md` - System architecture overview
-- `docs/refactoring/sentence-case-performance.md` - Performance analysis of modular refactor
+- `docs/architecture.md#performance-impact` - Performance analysis of modular refactor
 - `SECURITY.md` - Vulnerability scanning process and exception policy
 - `CLAUDE.md` - Agent handbook with development workflow
 

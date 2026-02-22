@@ -1,4 +1,4 @@
-# ADR 002: Automated dependency updates with Renovate
+# ADR 003: Automated dependency updates with Renovate
 
 ## Status
 

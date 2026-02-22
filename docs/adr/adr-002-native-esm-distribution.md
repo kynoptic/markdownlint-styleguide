@@ -1,4 +1,4 @@
-# ADR 001: Native ESM distribution without Babel transpilation
+# ADR 002: Native ESM distribution without Babel transpilation
 
 ## Status
 

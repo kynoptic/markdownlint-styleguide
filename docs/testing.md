@@ -1,6 +1,6 @@
-# Testing
+# Testing strategy and conventions
 
-How to run and understand the test suites for markdownlint-trap.
+Run and understand the test suites for markdownlint-trap.
 
 ## Commands
 
@@ -43,18 +43,18 @@ DEBUG=markdownlint-trap* npm test
 
 ## Testing strategy
 
-The project employs a **multi-layered testing approach** to balance rapid feedback with comprehensive validation:
+The project uses **multi-layered testing** to balance fast feedback with thorough validation:
 
 ### 🔬 Unit tests (`tests/unit/` and `src/rules/*.test.js`)
 
-Unit tests verify isolated component behavior with synthetic inputs:
+Unit tests verify isolated components with synthetic inputs:
 
-- **Purpose**: Fast feedback (~200ms total), precise failure diagnosis, and internal module validation
-- **Scope**: Individual functions and modules tested in isolation without markdownlint integration
-- **When to write**: For complex business logic, heuristics, validation functions, and utility modules
+- **Purpose**: Fast feedback (~200ms total), precise failure diagnosis, internal module validation
+- **Scope**: Individual functions and modules, isolated from markdownlint
+- **When to write**: Complex business logic, heuristics, validation functions, utility modules
 - **Naming**: `test_should_<behavior>_when_<condition>` format for readability
 
-**Example**: Testing case classification logic without invoking the full markdownlint pipeline:
+**Example**: Test case classification without the full markdownlint pipeline:
 
 ```javascript
 test('test_should_detect_title_case_when_multiple_words_capitalized', () => {
@@ -75,14 +75,14 @@ test('test_should_detect_title_case_when_multiple_words_capitalized', () => {
 
 ### 🧪 Feature tests (`tests/features/`)
 
-Feature tests validate end-to-end rule behavior with realistic markdown documents:
+Feature tests validate end-to-end rule behavior with realistic markdown:
 
-- **Purpose**: Validate complete rule integration with markdownlint, including parsing, violation detection, and auto-fix
+- **Purpose**: Validate complete rule integration with markdownlint: parsing, violation detection, and auto-fix
 - **Scope**: Full rule lifecycle from markdown input through markdownlint API to violation output
-- **When to write**: For every rule feature, edge case, and user-facing behavior
+- **When to write**: Every rule feature, edge case, and user-facing behavior
 - **Naming**: Descriptive test names matching expected behavior
 
-**Example**: Testing full rule integration with markdown fixtures:
+**Example**: Test full rule integration with markdown fixtures:
 
 ```javascript
 test('does not report violations for passing fixture', async () => {
@@ -108,18 +108,18 @@ test('does not report violations for passing fixture', async () => {
 
 Integration tests validate rules against real-world repositories and combined rule scenarios:
 
-- **Purpose**: Catch unexpected interactions, ensure performance at scale, validate against production use cases
+- **Purpose**: Catch unexpected interactions, verify performance at scale, validate production use cases
 - **Scope**: Multiple rules enabled simultaneously, large documents, external repositories
-- **When to write**: When adding new rules, changing shared utilities, or addressing performance concerns
+- **When to write**: Adding new rules, changing shared utilities, or addressing performance concerns
 - **Examples**: `curated-repos.test.js`, `rule-combinations.test.js`, `performance.test.js`
 
 ### ⚡ Performance tests (`tests/performance/`)
 
-Performance tests ensure rules meet latency and memory thresholds:
+Performance tests check that rules meet latency and memory thresholds:
 
-- **Purpose**: Prevent performance regressions, validate optimization changes, establish baseline metrics
-- **Scope**: Execution time, memory usage, garbage collection profiling, throughput measurements
-- **When to write**: After optimization work, when changing hot paths, or when adding new rules
+- **Purpose**: Prevent performance regressions, validate optimizations, establish baseline metrics
+- **Scope**: Execution time, memory usage, garbage collection profiling, throughput
+- **When to write**: After optimizations, when changing hot paths, or when adding new rules
 - **Documentation**: See `tests/performance/README.md` for detailed usage and interpretation guide
 
 Run with garbage collection profiling:
@@ -135,11 +135,11 @@ npm run test:performance:gc
 
 ## Test quality principles
 
-Following the global testing guidelines from `CLAUDE.md`:
+Follow the global testing guidelines from `CLAUDE.md`:
 
 ### Write behavioral tests
 
-Tests validate **observable behavior**, not implementation details:
+Test **observable behavior**, not implementation details:
 
 ```javascript
 // Good: Tests behavior
@@ -158,7 +158,7 @@ test('checks if preserveSegments was called', () => {
 
 ### Strategic mocking
 
-Mock **external dependencies** (file system, APIs), not internal business logic:
+Mock **external dependencies** (file system, APIs), not internal logic:
 
 - Maximum 5 mocks per test
 - 3:1 mock-to-assertion ratio
@@ -167,7 +167,7 @@ Mock **external dependencies** (file system, APIs), not internal business logic:
 
 ### Test both success and error paths
 
-Cover boundary conditions, invalid inputs, and failure modes:
+Cover boundaries, invalid inputs, and failure modes:
 
 ```javascript
 describe('when_confidence_is_below_threshold', () => {
@@ -182,15 +182,15 @@ describe('when_confidence_is_below_threshold', () => {
 ## Intentional test overlap
 
 > [!NOTE]
-> Unit and feature tests intentionally overlap in coverage. Unit tests provide fast feedback and pinpoint failures in isolated components, while feature tests ensure real-world integration works correctly. This redundancy catches different classes of bugs and improves debugging efficiency.
+> Unit and feature tests intentionally overlap. Unit tests give fast feedback and pinpoint failures in isolated components. Feature tests verify real-world integration. This redundancy catches different bug classes and speeds up debugging.
 
-**Example overlap**: `sentence-case-classifier.test.js` (unit) tests `validateHeading()` in isolation with synthetic inputs, while `sentence-case-passing.test.js` (feature) validates the same logic through the full markdownlint pipeline with realistic markdown documents.
+**Example overlap**: `sentence-case-classifier.test.js` (unit) tests `validateHeading()` in isolation with synthetic inputs. `sentence-case-passing.test.js` (feature) validates the same logic through the full markdownlint pipeline with realistic markdown.
 
 **Why both?**
 
-- Unit tests fail immediately when business logic breaks (~200ms feedback)
-- Feature tests catch integration issues (parsing, token extraction, markdownlint API interactions)
-- Different test styles catch different bug classes (logic errors vs. integration errors)
+- Unit tests fail immediately when logic breaks (~200ms feedback)
+- Feature tests catch integration issues (parsing, token extraction, markdownlint API)
+- Each layer catches different bug classes (logic errors vs. integration errors)
 
 See `docs/architecture.md` for architectural rationale.
 
@@ -207,27 +207,27 @@ All test files use the `*.test.js` suffix for Jest auto-discovery:
 
 ### Write unit tests when
 
-- Testing complex business logic in isolation (heuristics, classification, validation)
-- Rapid iteration on algorithms or decision trees
-- Precise failure diagnosis is critical (shared utilities, safety checks)
-- Testing boundary conditions without markdownlint overhead
+- Testing complex logic in isolation (heuristics, classification, validation)
+- Iterating rapidly on algorithms or decision trees
+- Precise failure diagnosis matters (shared utilities, safety checks)
+- Testing boundaries without markdownlint overhead
 
 ### Write feature tests when
 
 - Validating end-to-end rule behavior with real markdown
 - Testing auto-fix transformations and safety guardrails
-- Ensuring rule configuration options work correctly
-- Verifying edge cases with inline code, formatting, or emoji
+- Verifying rule configuration options
+- Covering edge cases with inline code, formatting, or emoji
 
 ### Write integration tests when
 
 - Testing multiple rules enabled together
 - Validating performance at scale
-- Ensuring real-world compatibility with external repositories
+- Verifying compatibility with external repositories
 
 ## Fixtures
 
-The `tests/fixtures/` directory contains markdown samples organized by rule:
+Markdown samples in `tests/fixtures/` are organized by rule:
 
 ```text
 tests/fixtures/
@@ -240,13 +240,13 @@ tests/fixtures/
 └── ...
 ```
 
-Feature tests reference fixtures via absolute paths. Integration tests also generate synthetic strings to validate specific edge cases.
+Feature tests reference fixtures via absolute paths. Integration tests also generate synthetic strings for specific edge cases.
 
 ## False positive validation
 
-When improving the ruleset, use this validation loop to identify and fix false positives:
+Use this validation loop to identify and fix false positives when improving rules:
 
-1. **Run auto-fix on a consumer repository** (e.g., agent-playbook):
+1. **Run auto-fix on a consumer repository** (e.g. agent-playbook):
 
    ```bash
    cd /path/to/consumer-repo
@@ -254,26 +254,26 @@ When improving the ruleset, use this validation loop to identify and fix false p
    npx markdownlint-cli2 --fix "**/*.md"
    ```
 
-2. **Review changes with `git diff`** to identify false positives:
+2. **Review changes with `git diff`** for false positives:
    - Abbreviation plurals incorrectly backticked (PRs, IDs, MCPs)
    - Product/brand names incorrectly backticked (CrowdStrike, SharePoint)
    - Common English phrases matched as code (e.g., "import them")
    - Proper nouns incorrectly lowercased (English, Civil War)
    - Filenames in headings incorrectly altered (`SKILL.md` → `Skill.md`)
 
-3. **Create failing tests** in `tests/features/false-positive-*.test.js` that capture the issues.
+3. **Create failing tests** in `tests/features/false-positive-*.test.js` capturing each issue.
 
-4. **Fix the rules** by updating:
+4. **Fix the rules** by updating the relevant source:
    - `src/rules/shared-constants.js` for new terms in `casingTerms`, `camelCaseExemptions`, or `backtickIgnoredTerms`
    - `src/rules/backtick-code-elements.js` for pattern exclusions
    - `src/rules/sentence-case/case-classifier.js` for heading exemptions
 
-5. **Verify fixes** by running `npm test` and re-running auto-fix on the consumer.
+5. **Verify fixes**: run `npm test` and re-run auto-fix on the consumer.
 
 6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-trap fixes.
 
 ## Notes
 
-- Tests `import ESM` from `src/` directly via `babel-jest`; no build step is required before running tests.
+- Tests import ESM from `src/` directly via `babel-jest`; no build step required.
 - The distribution `.markdownlint-rules/` is only used by consumers of the published package or the shareable preset.
-- All tests run in Node.js `>=18` (see `.nvmrc` for version requirements).
+- All tests run on Node.js `>=18` (see `.nvmrc`).

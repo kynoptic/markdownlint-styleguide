@@ -40,3 +40,9 @@ Files are named `adr-NNN-short-title.md` where:
 
 - [ADR-001: Autofix safety strategy](adr-001-autofix-safety-strategy.md) -
   Confidence-based safety system for preventing false positive autofixes
+- [ADR-002: Native ESM distribution](adr-002-native-esm-distribution.md) -
+  Eliminating Babel transpilation in favor of native ES modules
+- [ADR-003: Automated dependency updates](adr-003-automated-dependency-updates.md) -
+  Renovate-based automation for dependency management
+- [ADR-004: v1.7.0 refactoring initiative](adr-004-refactoring-2025.md) -
+  Architectural decisions from the modular decomposition refactor

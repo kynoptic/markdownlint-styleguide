@@ -1,22 +1,22 @@
-# External validation
+# External validation against real-world repos
 
-How to validate markdownlint-trap rules against external markdown sources to discover false positives, false negatives, and improvement opportunities.
+Validate markdownlint-trap rules against external markdown sources to discover false positives, false negatives, and improvement opportunities.
 
 ## Overview
 
-The external validation system allows you to test markdownlint-trap rules against:
+External validation tests markdownlint-trap rules against:
 
 - **Local files and directories** - Your own documentation projects
 - **GitHub repositories** - Public and private repos via `gh` CLI
 - **Filtered file sets** - Apply include/exclude patterns
 
-This helps identify:
+Validation reveals:
 
-- False positives (rules incorrectly flagging valid content)
+- False positives (rules flagging valid content)
 - False negatives (rules missing problematic content)
 - Autofix safety issues (unsafe fixes or blocked safe fixes)
 - Edge cases to add to test coverage
-- Patterns for rule improvements
+- Patterns for rule improvement
 
 ## Quick start
 
@@ -55,10 +55,10 @@ npm run validate:external
 
 ### 3. Review reports
 
-Reports are generated in the configured output directory (default: `validation-reports/`):
+Reports appear in the configured output directory (default: `validation-reports/`):
 
 - `validation-report.json` - Structured JSON for programmatic analysis
-- `validation-report.md` - Human-readable Markdown report
+- `validation-report.md` - Human-readable markdown report
 
 ## Configuration options
 
@@ -66,7 +66,7 @@ Reports are generated in the configured output directory (default: `validation-r
 
 #### Local sources
 
-Specify file paths or directories:
+Use file paths or directories:
 
 ```jsonc
 {
@@ -80,11 +80,11 @@ Specify file paths or directories:
 }
 ```
 
-Directories are processed recursively based on filters.
+Directories are scanned recursively, filtered by glob patterns.
 
 #### GitHub sources
 
-Specify repositories in `owner/repo` format:
+Use `owner/repo` format:
 
 ```jsonc
 {
@@ -100,8 +100,8 @@ Specify repositories in `owner/repo` format:
 Requirements:
 
 - `gh` CLI must be installed and authenticated
-- Private repositories require appropriate access permissions
-- Repositories are cloned to `.tmp/validation-repos/`
+- Private repositories require matching access permissions
+- Repositories clone to `.tmp/validation-repos/`
 
 ### Filters
 
@@ -124,7 +124,7 @@ Uses glob patterns:
 
 ### Reporting
 
-Configure report generation:
+Configure report output:
 
 ```jsonc
 {
@@ -139,8 +139,8 @@ Configure report generation:
 Options:
 
 - `format`: Array of `"json"` and/or `"markdown"`
-- `detailLevel`: `"summary"`, `"detailed"`, or `"full"` (currently all use detailed)
-- `outputDir`: Directory for report files (created if missing)
+- `detailLevel`: `"summary"`, `"detailed"`, or `"full"` (all currently produce detailed output)
+- `outputDir`: Directory for report files (created if it does not exist)
 
 ## Report structure
 
@@ -188,7 +188,7 @@ Options:
 
 ### Markdown report
 
-Human-readable format with:
+Human-readable format containing:
 
 - Summary statistics
 - Autofix analysis (if applicable)
@@ -201,22 +201,100 @@ Human-readable format with:
 ### Manual review
 
 1. Run validation against external sources
-2. Review Markdown report for patterns
+2. Review the markdown report for patterns
 3. Investigate false positives (valid content flagged as violations)
 4. Investigate false negatives (missing expected violations)
 5. Update rule logic or test coverage
 
-### Claude Code assisted analysis
+### AI-assisted analysis
 
-See `docs/claude-code-analysis.md` for instructions on using Claude Code to analyze validation reports and suggest improvements.
+Use Claude Code (or a similar AI assistant) to analyze validation reports:
+
+1. **Generate report** - Run `npm run validate:external` to produce `validation-reports/validation-report.json`
+2. **Request analysis** - Provide the report with specific goals (false positives, false negatives, autofix safety, edge cases)
+3. **Review findings** - The assistant returns pattern analysis, rule recommendations, new test cases, and priority rankings
+4. **Implement improvements** - Write failing tests for identified edge cases, update rule logic, adjust autofix thresholds
+5. **Re-validate** - Run `npm run validate:external` again and compare violation counts
+
+#### Analysis prompt templates
+
+**Comprehensive analysis**:
+
+```text
+Analyze validation-reports/validation-report.json:
+
+1. Group violations by rule name
+2. Identify top 3 rules with highest violation counts
+3. For each top rule, analyze violation patterns:
+   - Common contexts where violations occur
+   - False positive indicators (valid content flagged)
+   - False negative indicators (expected violations missing)
+4. Review autofix safety statistics:
+   - Safe fixes blocked (should be allowed)
+   - Unsafe fixes applied (should be blocked)
+5. Recommend priority improvements with test cases
+```
+
+**False positive investigation**:
+
+```text
+Analyze validation-reports/validation-report.json for false positives:
+
+1. Find violations that appear to be valid markdown content
+2. Look for patterns:
+   - Technical terms flagged as improper case
+   - Valid acronyms marked as errors
+   - Proper formatting incorrectly reported
+3. For each pattern, provide:
+   - Example violations from report
+   - Why the content is actually valid
+   - Suggested rule refinements
+   - Test cases to prevent regression
+```
+
+**Autofix safety analysis**:
+
+```text
+Analyze validation-reports/validation-report.json autofix statistics:
+
+1. Review autofixStats in summary:
+   - safeFixesAvailable (count)
+   - safeFixesBlocked (investigate why)
+   - unsafeFixesApplied (investigate why)
+
+2. For blocked safe fixes:
+   - Find examples in violations with autofixSafety.safe === false
+   - Analyze confidence scores and reasons
+   - Determine if confidence thresholds are too strict
+
+3. Recommend threshold adjustments with rationale
+```
+
+**Rule-specific deep dive**:
+
+```text
+Analyze violations for rule "sentence-case-heading" in validation-reports/validation-report.json:
+
+1. Count total violations for this rule
+2. Extract all violation contexts and details
+3. Categorize violations:
+   - Legitimate issues (correct violations)
+   - False positives (valid content flagged)
+   - Edge cases (unclear/ambiguous)
+4. Identify improvement opportunities:
+   - Heuristics to add/refine
+   - Edge cases to handle
+   - Test coverage gaps
+5. Provide specific code changes and test cases
+```
 
 ### Continuous validation
 
 Run validation regularly to:
 
 - Catch regressions before release
-- Validate rule changes against real-world content
-- Discover new edge cases from evolving documentation styles
+- Test rule changes against real-world content
+- Discover edge cases from evolving documentation styles
 
 ## Examples
 
@@ -282,15 +360,15 @@ Run validation regularly to:
 
 Error: `No configuration file found`
 
-Solution: Create `.markdownlint-trap-validation.jsonc` in your project root or a parent directory.
+Create `.markdownlint-trap-validation.jsonc` in the project root or a parent directory.
 
 ### GitHub clone failures
 
 Error: `Failed to clone repository`
 
-Solution:
+Fix:
 
-- Ensure `gh` CLI is installed (`brew install gh`)
+- Install `gh` CLI (`brew install gh`)
 - Authenticate with GitHub (`gh auth login`)
 - Verify repository name format (`owner/repo`)
 - Check access permissions for private repos
@@ -300,19 +378,18 @@ Solution:
 Check:
 
 - File paths are correct and accessible
-- Filters are not too restrictive
-- Directories contain markdown files matching patterns
+- Filters are not overly restrictive
+- Directories contain markdown files matching the glob patterns
 
 ### Report generation errors
 
-Ensure:
+Verify:
 
 - Output directory is writable
-- Sufficient disk space available
-- Valid report format specified (`json` or `markdown`)
+- Sufficient disk space exists
+- Report format is valid (`json` or `markdown`)
 
 ## Related documentation
 
 - `docs/testing.md` - Test strategy and integration tests
 - `docs/architecture.md` - Rule architecture and design decisions
-- `docs/claude-code-analysis.md` - AI-assisted analysis workflows
