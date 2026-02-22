@@ -11,8 +11,8 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 - `templates/` — CLI and VS Code config templates mirroring each preset
 - `tests/unit/`, `tests/features/`, `tests/integration/`, `tests/performance/` — Test layers
 - `tests/fixtures/` — Shared Markdown fixtures organized by rule
-- `docs/` — Architecture, testing strategy, rule authoring, configuration, decisions
-- `scripts/` — Maintenance and build scripts
+- `docs/` — Architecture, testing strategy, rule authoring, configuration, ADRs
+- `scripts/` — CLI, maintenance, and distribution scripts
 
 ## Command reference
 
@@ -27,16 +27,21 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 - `npm run test:integration:external` — Validate against external repositories.
 - `npm run test:performance` — Performance benchmarks.
 - `npm run lint` — ESLint checks.
+- `npm run lint:md` — Lint all Markdown.
+- `npm run lint:md:fix` — Auto-fix Markdown.
+- `npm run validate` — Run lint + test suite together.
 
 ### Targeted tests
 
 - `npm test -- --testNamePattern="test name"` — Run by name.
 - `npm test tests/features/specific-file.test.js` — Run single file.
 
-### Markdown linting
+### Utilities
 
-- `npx markdownlint-cli2 "**/*.md"` — Lint all Markdown.
-- `npx markdownlint-cli2 --fix "**/*.md"` — Auto-fix.
+- `npm run security` — Audit production dependencies.
+- `npm run doctor` — Diagnose installation issues.
+- `npm run docs:config` — Regenerate configuration docs.
+- `npm run validate:external` — Validate rules against external projects.
 
 ## Coding style
 
@@ -46,7 +51,7 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 
 ## Rule catalogue
 
-Six custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-urls`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`. Supporting modules: `rule-helpers`, `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `config-validation`. See `docs/rules.md` for full reference.
+Six custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-urls`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`. Supporting modules: `rule-helpers`, `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `autofix-telemetry`, `config-validation`. The `sentence-case/` subdirectory contains classifier and fix-builder internals. See `docs/rules.md` for full reference.
 
 ## Testing
 

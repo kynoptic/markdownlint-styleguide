@@ -67,12 +67,12 @@ See [configuration guide](docs/configuration.md) for presets, setup wizard optio
 
 ## Documentation
 
-- [Configuration](docs/configuration.md) — presets, wizard options, manual setup
-- [Rules reference](docs/rules.md) — detailed rule behavior and options
-- [Setup and usage](docs/setup.md) — using in other repos, `npm link`
-- [Architecture](docs/architecture.md) — project structure, autofix safety system
-- [Testing](docs/testing.md) — test strategy and conventions
-- [Beginner's guide](docs/beginners.md) — getting started from scratch
+- [Setup and installation](docs/setup.md) — getting started, consumption methods, distribution
+- [Configuration](docs/configuration.md) — presets, rule options, autofix safety tuning
+- [Rule catalogue](docs/rules.md) — rule IDs, behavior, and examples
+- [Extending and contributing](docs/extending.md) — custom rules, plugins, helpers contract
+- [Architecture](docs/architecture.md) — project structure, modules, performance
+- [Testing strategy](docs/testing.md) — test layers, conventions, validation
 
 ## Contributing
 

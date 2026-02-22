@@ -89,9 +89,9 @@ Standardize preset defaults and expand casing dictionary.
 - Comprehensive performance test suite covering autofix safety, rule performance, and memory stability
 - Automated dependency management via Renovate with weekly updates and security patch automation
 - Documentation for dependency management workflow in `docs/dependency-management.md`
-- Architectural decision record for native ESM distribution in `docs/decisions/adr-001-native-esm-distribution.md`
-- Architectural decision record for automated dependency updates in `docs/decisions/adr-002-automated-dependency-updates.md`
-- Rule authoring guide in `docs/rule-authoring.md` covering new helper utilities
+- Architectural decision record for native ESM distribution in `docs/adr/adr-002-native-esm-distribution.md`
+- Architectural decision record for automated dependency updates in `docs/adr/adr-003-automated-dependency-updates.md`
+- Rule authoring guide covering helper utilities (now in `docs/extending.md`)
 
 ### Changed
 

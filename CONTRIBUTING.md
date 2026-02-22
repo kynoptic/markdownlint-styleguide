@@ -4,7 +4,7 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 
 ## Project overview
 
-`markdownlint-trap` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It includes rules for sentence-case headings, backticked code elements, and bare URLs. The project is built with Node.js and uses a modern ESM-to-CommonJS build system.
+`markdownlint-trap` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It includes rules for sentence-case headings, backticked code elements, and bare URLs. The project is built with Node.js and ships native ES modules.
 
 ## Development setup
 
@@ -28,15 +28,8 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
     npm install
     ```
 
-3. **Build the project:**
-
-    ```bash
-    npm run build
-    ```
-
 ### Essential commands
 
-- `npm run build`: Transpile ESM source files to CommonJS format.
 - `npm test`: Run the Jest test suite.
 - `npm run lint`: Run ESLint on the codebase.
 - `npx markdownlint-cli2 "**/*.md"`: Lint markdown files.
@@ -44,18 +37,15 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 
 ### Test execution environment
 
-Tests run against the **raw ESM source code** in `src/`, not the transpiled CommonJS output. Jest uses `babel-jest` to transform the ESM modules on-the-fly during test execution, allowing tests to `import directly` from `src/rules/*.js` files. This means:
+Tests run against the **ES module source code** in `src/`. The project ships native ESM with no build step — source files are distributed directly. This means:
 
 - No build step is required before running tests
 - Tests validate the actual source code behavior
 - Changes to `src/` files are immediately testable
-- The transpiled `.markdownlint-rules/` directory is only used for distribution
 
 ## Project architecture
 
-- **Source code:** ES Modules (ESM) in `src/`.
-- **Distribution code:** CommonJS (`.cjs`) in `.markdownlint-rules/`.
-- **Build system:** Babel transpiles ESM to CommonJS.
+- **Source code:** ES Modules (ESM) in `src/`, distributed directly.
 - **Testing:** Jest with a fixture-based approach.
 - **Documentation:** Located in the `docs/` directory.
 

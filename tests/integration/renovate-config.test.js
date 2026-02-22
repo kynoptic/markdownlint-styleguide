@@ -338,8 +338,8 @@ describe('Renovate configuration', () => {
       const adrPath = join(
         projectRoot,
         'docs',
-        'decisions',
-        'adr-002-automated-dependency-updates.md'
+        'adr',
+        'adr-003-automated-dependency-updates.md'
       );
 
       expect(existsSync(docsPath)).toBe(true);
