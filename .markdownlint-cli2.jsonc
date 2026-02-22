@@ -1,6 +1,13 @@
 {
   // Recommended configuration for markdownlint-trap
   // Enables all custom rules with balanced strictness
+  "ignores": [
+    "node_modules/**",
+    "tests/fixtures/**",
+    ".claude/**",
+    ".windsurf/**",
+    ".github/ISSUE_TEMPLATE/**"
+  ],
   "customRules": [
     "./src/index.js"
   ],

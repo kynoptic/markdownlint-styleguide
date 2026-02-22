@@ -32,7 +32,7 @@ This creates `validation-reports/validation-report.json` with structured violati
 
 Provide the report to Claude Code with specific analysis goals:
 
-```
+```text
 Analyze validation-reports/validation-report.json and identify:
 
 1. False positive patterns - valid content incorrectly flagged
@@ -84,7 +84,7 @@ Compare new report to original:
 
 ### Comprehensive analysis
 
-```
+```text
 Analyze validation-reports/validation-report.json:
 
 1. Group violations by rule name
@@ -101,7 +101,7 @@ Analyze validation-reports/validation-report.json:
 
 ### False positive investigation
 
-```
+```text
 Analyze validation-reports/validation-report.json for false positives:
 
 1. Find violations that appear to be valid markdown content
@@ -118,7 +118,7 @@ Analyze validation-reports/validation-report.json for false positives:
 
 ### Autofix safety analysis
 
-```
+```text
 Analyze validation-reports/validation-report.json autofix statistics:
 
 1. Review autofixStats in summary:
@@ -136,7 +136,7 @@ Analyze validation-reports/validation-report.json autofix statistics:
 
 ### Rule-specific deep dive
 
-```
+```text
 Analyze violations for rule "sentence-case-heading" in validation-reports/validation-report.json:
 
 1. Count total violations for this rule
@@ -213,7 +213,8 @@ npm run validate:external
 ```
 
 Output:
-```
+
+```text
 External validation starting...
 Loading configuration from: .markdownlint-trap-validation.jsonc
 Processing local sources...
@@ -232,13 +233,13 @@ Markdown report written to: validation-reports/validation-report.md
 
 Prompt to Claude Code:
 
-```
+```text
 Analyze validation-reports/validation-report.json and identify the top 3 false positive patterns with examples and suggested fixes.
 ```
 
 ### Step 3: Claude Code response (example)
 
-```
+```text
 Based on analysis of validation-report.json, I found 3 false positive patterns:
 
 1. API acronyms flagged in sentence-case-heading (12 occurrences)
@@ -264,7 +265,7 @@ Would you like me to implement these fixes?
 
 ### Step 4: Implement with Claude Code
 
-```
+```text
 Yes, let's implement fix #1 for API acronyms. Write failing tests first, then update the classifier.
 ```
 
@@ -278,6 +279,7 @@ npm run validate:external
 ```
 
 Compare violation counts:
+
 - Before: 42 violations
 - After: 30 violations (12 false positives fixed)
 
@@ -342,7 +344,7 @@ When Claude Code identifies improvements:
 
 - Add findings to rule documentation
 - Update test coverage
-- Document edge cases in CLAUDE.md
+- Document edge cases in the agent handbook
 - Share patterns in team discussions
 
 ## Related documentation

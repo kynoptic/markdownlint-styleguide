@@ -65,12 +65,14 @@ export default {
 Creates a validated context object for rule execution. This is always the first step.
 
 **Parameters:**
+
 - `params` - markdownlint params object
 - `onError` - markdownlint error callback
 - `ruleName` - Name of the rule (e.g., 'sentence-case-heading')
 - `ruleCode` - Optional rule code (e.g., 'SC001')
 
 **Returns:** `RuleContext` object with:
+
 - `isValid` - Boolean indicating if parameters are valid
 - `lines` - Source lines array
 - `tokens` - Parsed tokens (if micromark parser used)
@@ -82,6 +84,7 @@ Creates a validated context object for rule execution. This is always the first 
 - `params` - Original params object for advanced use
 
 **Example:**
+
 ```javascript
 const context = createRuleContext(params, onError, 'my-rule', 'MR001');
 if (!context.isValid) return; // Early exit for invalid params
@@ -92,6 +95,7 @@ if (!context.isValid) return; // Early exit for invalid params
 Extracts and validates rule configuration with automatic fallback to defaults.
 
 **Parameters:**
+
 - `context` - Rule context from `createRuleContext`
 - `schema` - Validation schema with field validators
 - `defaults` - Default values for configuration fields
@@ -99,6 +103,7 @@ Extracts and validates rule configuration with automatic fallback to defaults.
 **Returns:** Validated configuration object
 
 **Example:**
+
 ```javascript
 const schema = {
   ignoredTerms: validateStringArray,
@@ -120,6 +125,7 @@ const config = extractConfig(context, schema, {
 Reports a rule violation with consistent formatting.
 
 **Parameters:**
+
 - `context` - Rule context from `createRuleContext`
 - `violation` - Object with:
   - `lineNumber` - Line number where violation occurs
@@ -129,6 +135,7 @@ Reports a rule violation with consistent formatting.
   - `range` - Optional range [column, length]
 
 **Example:**
+
 ```javascript
 reportViolation(context, {
   lineNumber: 5,
@@ -144,6 +151,7 @@ reportViolation(context, {
 Creates fix information with optional safety checks.
 
 **Parameters:**
+
 - `context` - Rule context from `createRuleContext`
 - `options` - Object with:
   - `column` - Column position (1-based)
@@ -156,6 +164,7 @@ Creates fix information with optional safety checks.
 **Returns:** Fix info object or null if safety check fails
 
 **Example:**
+
 ```javascript
 // Simple fix without safety checks
 const fixInfo = createFixInfo(context, {
@@ -184,6 +193,7 @@ Use validators from `config-validation.js`:
 - `validateNonNegativeNumber` - Validates non-negative number
 
 **Example schema:**
+
 ```javascript
 const schema = {
   ignoredTerms: validateStringArray,
@@ -208,6 +218,7 @@ const fixInfo = createFixInfo(context, {
 ```
 
 Safety checks analyze:
+
 - Common English words (low confidence for backtick wrapping)
 - Technical patterns (high confidence for backtick wrapping)
 - Context indicators (prose vs. code)
@@ -303,7 +314,7 @@ Compared to the legacy pattern, helpers provide:
 
 ## Migration from legacy pattern
 
-### Legacy pattern (before helpers):
+### Legacy pattern (before helpers)
 
 ```javascript
 function myRule(params, onError) {
@@ -335,7 +346,7 @@ function myRule(params, onError) {
 }
 ```
 
-### Modern pattern (with helpers):
+### Modern pattern (with helpers)
 
 ```javascript
 function myRule(params, onError) {

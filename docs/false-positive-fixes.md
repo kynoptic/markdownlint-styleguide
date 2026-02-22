@@ -6,7 +6,7 @@ This document describes the fixes implemented based on a comprehensive evaluatio
 
 ## Fixes implemented
 
-### 1. backtick-code-elements (bce001) - achieved ~85% accuracy
+### 1. `backtick-code-elements` (BCE001) - achieved ~85% accuracy
 
 #### Wcag contrast ratios (**p_0**:1, 3:1, 7:1)
 
@@ -48,7 +48,7 @@ if (/^\w+\([a-z]\)$/.test(fullMatch)) {
 
 **Result**: ✅ Pluralization patterns are no longer flagged.
 
-### 2. sentence-case-heading (sc001) - achieved ~95% accuracy
+### 2. `sentence-case-heading` (SC001) - achieved ~95% accuracy
 
 #### Removed incorrect conventional commit casing
 
@@ -90,7 +90,7 @@ breaking: 'BREAKING',
 
 **Result**: ✅ Configured terms maintain their casing in headings.
 
-### 3. no-dead-internal-links (dl001) - maintained 95% accuracy
+### 3. `no-dead-internal-links` (DL001) - maintained 95% accuracy
 
 #### Template placeholder detection
 

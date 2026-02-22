@@ -7,6 +7,7 @@ Accepted
 ## Context
 
 Manual dependency updates are time-consuming, error-prone, and often delayed, resulting in:
+
 - Security patches not applied promptly
 - Missing bug fixes and performance improvements
 - Growing gaps between current and latest versions, increasing update risks
@@ -14,6 +15,7 @@ Manual dependency updates are time-consuming, error-prone, and often delayed, re
 - Accumulated technical debt from outdated tooling
 
 The project currently has vulnerable dependencies detected by osv-scanner:
+
 - `glob` 11.0.3 → 11.1.0 (high severity)
 - `js-yaml` 4.1.0 → 4.1.1 (medium severity)
 - `js-yaml` 3.14.1 → 3.14.2 (medium severity, dev dependency)
@@ -25,6 +27,7 @@ We need an automated solution that balances keeping dependencies current with ma
 We will implement automated dependency management using **Renovate** with the following configuration:
 
 **Core capabilities:**
+
 - Automated PR creation for dependency updates with lockfile verification
 - Security updates prioritized and created immediately
 - Grouped updates for related packages (ESLint plugins, Jest ecosystem, etc.)
@@ -34,6 +37,7 @@ We will implement automated dependency management using **Renovate** with the fo
 - Changelog links and release notes in PR descriptions
 
 **Configuration priorities:**
+
 1. **Security first**: Immediate high-priority PRs for security advisories
 2. **Stability**: Separate security updates (immediate) from routine updates (batched weekly)
 3. **Quality gates**: All updates must pass CI (lint + full test suite)
@@ -45,12 +49,14 @@ We will implement automated dependency management using **Renovate** with the fo
 ### Option A: GitHub Dependabot
 
 **Pros:**
+
 - Native GitHub integration (zero setup beyond config file)
 - Built-in security alerts integration
 - Simpler configuration for basic use cases
 - No external service dependencies
 
 **Cons:**
+
 - Limited grouping capabilities (basic ecosystem grouping only)
 - No custom scheduling flexibility
 - Cannot auto-merge based on dependency type
@@ -60,11 +66,13 @@ We will implement automated dependency management using **Renovate** with the fo
 ### Option B: Manual updates with `npm outdated`
 
 **Pros:**
+
 - Complete control over update timing
 - No automation complexity
 - No risk of unexpected breaking changes
 
 **Cons:**
+
 - Time-consuming and error-prone
 - Security patches delayed
 - Inconsistent application across team
@@ -74,6 +82,7 @@ We will implement automated dependency management using **Renovate** with the fo
 ### Option C: Renovate (Selected)
 
 **Pros:**
+
 - Highly flexible grouping and scheduling
 - Auto-merge capabilities with custom rules
 - Rich PR descriptions with changelogs
@@ -83,6 +92,7 @@ We will implement automated dependency management using **Renovate** with the fo
 - Open source with active community
 
 **Cons:**
+
 - More complex configuration than Dependabot
 - Requires GitHub App installation
 - Steeper learning curve for advanced features
@@ -92,6 +102,7 @@ We will implement automated dependency management using **Renovate** with the fo
 ## Consequences
 
 **Positive:**
+
 - Security vulnerabilities patched within hours instead of weeks
 - Reduced maintainer burden for routine updates
 - Consistent, reproducible dependency management
@@ -100,6 +111,7 @@ We will implement automated dependency management using **Renovate** with the fo
 - Grouped updates reduce noise and review overhead
 
 **Negative:**
+
 - Initial setup and configuration effort
 - Team must learn Renovate configuration options
 - Potential for automated PRs to create noise if misconfigured
@@ -107,6 +119,7 @@ We will implement automated dependency management using **Renovate** with the fo
 - Auto-merge carries risk if tests have poor coverage
 
 **Mitigations:**
+
 - Comprehensive test suite already in place (unit, feature, integration, performance)
 - CI must pass before any auto-merge occurs
 - Manual review required for major versions and production dependencies
@@ -114,6 +127,7 @@ We will implement automated dependency management using **Renovate** with the fo
 - Document override procedures for emergency bypasses
 
 **Configuration strategy:**
+
 1. **Week 1**: Enable with manual review for all updates (no auto-merge)
 2. **Week 2**: Enable auto-merge for dev dependency patches only
 3. **Week 3**: Expand to auto-merge for production dependency patches (if confidence high)
@@ -141,6 +155,7 @@ Since Renovate runs as a GitHub App on actual dependency updates, traditional un
 5. **Edge cases**: Document expected behavior for conflicting updates and registry outages
 
 **Monitoring metrics:**
+
 - Time from security advisory to merged fix
 - Number of PRs per week (should decrease with grouping)
 - Auto-merge success rate (target: >90% for dev dependencies)
@@ -148,7 +163,7 @@ Since Renovate runs as a GitHub App on actual dependency updates, traditional un
 
 ## Documentation updates
 
-- Add "Dependency management" section to CLAUDE.md
+- Add "Dependency management" section to `CLAUDE.md`
 - Create `docs/dependency-management.md` explaining workflow
 - Update README with automated update badges (optional)
 - Document override procedures for emergency patches
@@ -156,7 +171,7 @@ Since Renovate runs as a GitHub App on actual dependency updates, traditional un
 ## References
 
 - Issue #76: Dependency updates lack automation and lockfile verification
-- Renovate documentation: https://docs.renovatebot.com/
-- Renovate configuration reference: https://docs.renovatebot.com/configuration-options/
-- GitHub Dependabot comparison: https://docs.renovatebot.com/migrating-to-renovate/
+- Renovate documentation: `https://docs.renovatebot.com/`
+- Renovate configuration reference: `https://docs.renovatebot.com/configuration-options/`
+- GitHub Dependabot comparison: `https://docs.renovatebot.com/migrating-to-renovate/`
 - Current security failures in CI (osv-scanner alerts)

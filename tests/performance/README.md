@@ -207,7 +207,7 @@ Tests autofix safety classifier performance:
 
 - `shouldApplyAutofix` execution time
 - `classifyConfidence` execution time
-- Individual heuristic functions (hasCodeIndicators, hasCommandPattern, etc.)
+- Individual heuristic functions (`hasCodeIndicators`, `hasCommandPattern`, etc.)
 - Batch processing performance
 - Baseline metrics for regression detection
 
@@ -250,8 +250,8 @@ If performance tests reveal issues:
 
 1. **Short-circuit evaluation** - Check fast heuristics first
 2. **Avoid redundant checks** - Cache regex matches
-3. **Use Set lookups** - O(1) instead of Array.includes O(n)
-4. **Minimize string operations** - toLowerCase() is expensive
+3. **Use Set lookups** - `O(1)` instead of Array.includes `O(n)`
+4. **Minimize string operations** - `toLowerCase()` is expensive
 
 ### General
 

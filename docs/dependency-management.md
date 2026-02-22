@@ -32,6 +32,7 @@ Updates are automatically merged if they meet ALL criteria:
 4. **No merge conflicts**
 
 **Manual review required for:**
+
 - Production dependencies (`dependencies` in `package.json`)
 - Major version updates (any dependency)
 - Updates that fail CI checks
@@ -40,6 +41,7 @@ Updates are automatically merged if they meet ALL criteria:
 ### Pull request format
 
 Renovate PRs include:
+
 - Package name, current version, and target version
 - Link to changelog and release notes
 - Full dependency change list
@@ -80,7 +82,7 @@ Key settings:
 3. **Verify CI status**: All checks must pass (lint, tests, security scan)
 4. **Check dependency dashboard**: View pending updates and priorities
 
-### Handling auto-merge
+### Handling Auto-merge
 
 **Dev dependency patches/minors** will auto-merge if CI passes. If you need to prevent this:
 
@@ -91,12 +93,14 @@ Key settings:
 ### Manual intervention scenarios
 
 **Scenario: Security update fails tests**
+
 1. Renovate creates PR immediately (labeled `security`, `dependencies`)
 2. CI fails due to breaking change in security patch
 3. Fix tests in the update branch OR pin to previous version temporarily
 4. Document in `osv-scanner.toml` if temporary ignore needed
 
 **Scenario: Major version with breaking changes**
+
 1. Renovate creates PR (labeled `major-version`, requires manual review)
 2. Review migration guide in release notes
 3. Update code to handle breaking changes
@@ -104,6 +108,7 @@ Key settings:
 5. Consider batching multiple major updates into a single maintenance PR
 
 **Scenario: Update conflicts with in-progress work**
+
 1. Close the Renovate PR with comment explaining conflict
 2. Re-open issue on Dependency Dashboard when ready
 3. Renovate will recreate PR on next schedule
@@ -156,12 +161,14 @@ Review metrics quarterly to tune configuration.
 ### Renovate not creating PRs
 
 **Possible causes:**
+
 - Schedule hasn't triggered yet (weekly on Monday)
 - Rate limit reached (`prConcurrentLimit: 5`)
 - Dependency ignored in config
 - GitHub App permissions issue
 
 **Solution:**
+
 1. Check Dependency Dashboard for status
 2. Verify `.github/renovate.json` syntax with JSON schema validator
 3. Manually trigger from dashboard if urgent
@@ -169,20 +176,23 @@ Review metrics quarterly to tune configuration.
 ### Auto-merge not working
 
 **Possible causes:**
+
 - CI checks haven't passed yet
 - Branch protection rules prevent auto-merge
 - Dependency is production (not dev)
 - Update is major version
 
 **Solution:**
+
 1. Check PR for auto-merge label and status
 2. Verify CI passed (all checks green)
 3. Check branch protection settings in repo settings
-4. Review packageRules in `renovate.json` for auto-merge criteria
+4. Review `packageRules` in `renovate.json` for auto-merge criteria
 
 ### Too many PRs at once
 
 **Solution:**
+
 1. Adjust `prConcurrentLimit` in config (currently 5)
 2. Add more package groups to batch related updates
 3. Change schedule to less frequent (e.g., biweekly)
@@ -191,13 +201,14 @@ Review metrics quarterly to tune configuration.
 ### Lockfile conflicts
 
 **Solution:**
+
 1. Renovate will automatically rebase and update lockfile
 2. If conflicts persist, close PR and reopen from dashboard
 3. For manual fixes: checkout branch, run `npm install`, push
 
 ## Configuration reference
 
-Full configuration options: https://docs.renovatebot.com/configuration-options/
+Full configuration options: `https://docs.renovatebot.com/configuration-options/`
 
 Common customizations:
 

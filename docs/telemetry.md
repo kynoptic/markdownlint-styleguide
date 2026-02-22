@@ -261,6 +261,7 @@ new AutofixTelemetry(config)
 ```
 
 Parameters:
+
 - `config.enabled` (boolean): Enable telemetry
 - `config.verbose` (boolean): Include verbose output
 - `config.outputFile` (string): Optional output file path

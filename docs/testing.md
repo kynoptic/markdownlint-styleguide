@@ -129,6 +129,7 @@ npm run test:performance:gc
 ```
 
 **Test files**:
+
 - `rule-performance.test.js` - Rule execution benchmarks for all custom rules
 - `autofix-safety.test.js` - Autofix safety classifier performance benchmarks
 

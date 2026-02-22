@@ -136,7 +136,7 @@ Standardize preset defaults and expand casing dictionary.
 ### Changed
 
 - Improved `backtick-code-elements` rule accuracy with sentence boundary detection:
-  - Detects sentence starters to prevent false positives on patterns like "computer.New" at sentence boundaries
+  - Detects sentence starters to prevent false positives on patterns like `computer.New` at sentence boundaries
   - Excludes time ranges (e.g., "AM-12:30", "3-10:30") from network address detection
   - More conservative false positive reduction strategy
 
