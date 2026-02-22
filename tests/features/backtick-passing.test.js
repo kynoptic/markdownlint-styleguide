@@ -63,6 +63,24 @@ test("does not flag regular prose with slashes as file path", async () => {
 /**
  * Verifies that common non-code terms like "et al." are not flagged as missing backticks.
  */
+test('does not flag plural acronym "PDFs" as a code identifier (#161)', async () => {
+  const markdown = "Include trigger terms (e.g., when the user mentions PDFs, forms, or document extraction)";
+  const options = {
+    customRules: [backtickRule],
+    strings: { "test.md": markdown },
+    resultVersion: 3,
+    config: { "backtick-code-elements": { detectPascalCase: true } },
+  };
+  const results = await lint(options);
+  const violations = results["test.md"] || [];
+  const ruleViolations = violations.filter(
+    (v) =>
+      v.ruleNames.includes("backtick-code-elements") ||
+      v.ruleNames.includes("BCE001"),
+  );
+  expect(ruleViolations).toHaveLength(0);
+});
+
 test('does not flag "et al." as missing backticks', async () => {
   const markdown =
     "As described by Smith et al., the results were significant.";

@@ -566,6 +566,7 @@ const additionalBacktickIgnoredTerms = [
   'GUIs',
   'CLIs',
   'APIs',
+  'PDFs',
   // Module system names (proper nouns)
   'CommonJS',
   'ESM',
