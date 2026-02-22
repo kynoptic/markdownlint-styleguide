@@ -96,35 +96,6 @@ Files modified:
 - README.md (5 changes)
 ```
 
-## Example session
-
-**User:** Review the lint suggestions for my docs
-
-**Agent:**
-
-1. Reads `needs-review.json`
-2. For each item:
-   - Reads surrounding context
-   - Determines if fix is appropriate
-   - Applies or rejects
-
-**Result:**
-
-```
-Processed needs-review items:
-
-docs/api.md:15 "Word Processing Features" -> "Word processing features"
-  Decision: REJECT - Context discusses Microsoft Word specifically
-
-README.md:42 "Go Templates" -> "Go templates"
-  Decision: ACCEPT - Generic template heading, not Go language specific
-  Applied fix.
-
-docs/setup.md:23 "import/export"
-  Decision: ACCEPT - This is a code context, backticks appropriate
-  Applied fix: `import/export`
-```
-
 ## Configuration
 
 The skill respects `.markdownlint-cli2.jsonc` configuration:
@@ -134,8 +105,10 @@ The skill respects `.markdownlint-cli2.jsonc` configuration:
   "customRules": ["markdownlint-trap"],
   "config": {
     "sentence-case-heading": {
-      "alwaysReview": ["Word", "Go", "Swift"],
-      "neverFlag": ["SharePoint", "JavaScript"]
+      "autofixSafety": {
+        "alwaysReview": ["Word", "Go", "Swift"],
+        "neverFlag": ["SharePoint", "JavaScript"]
+      }
     }
   }
 }
