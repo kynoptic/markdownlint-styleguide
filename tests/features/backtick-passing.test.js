@@ -121,6 +121,41 @@ test('flags multi-segment tilde path as complete unit (#162)', async () => {
   expect(ruleViolations[0].errorDetail).toMatch(/~\/Documents\/file\.txt/);
 });
 
+test('does not flag "import tool" or "import new" as code statements (#160)', async () => {
+  const markdown = "Use the import tool to bring in data. You can import new items from the list.";
+  const options = {
+    customRules: [backtickRule],
+    strings: { "test.md": markdown },
+    resultVersion: 3,
+  };
+  const results = await lint(options);
+  const violations = results["test.md"] || [];
+  const ruleViolations = violations.filter(
+    (v) =>
+      v.ruleNames.includes("backtick-code-elements") ||
+      v.ruleNames.includes("BCE001"),
+  );
+  expect(ruleViolations).toHaveLength(0);
+});
+
+test('flags actual code import like "import tokenizer" after word boundary fix (#160)', async () => {
+  const markdown = "You should use import tokenizer in your Python script.";
+  const options = {
+    customRules: [backtickRule],
+    strings: { "test.md": markdown },
+    resultVersion: 3,
+  };
+  const results = await lint(options);
+  const violations = results["test.md"] || [];
+  const ruleViolations = violations.filter(
+    (v) =>
+      v.ruleNames.includes("backtick-code-elements") ||
+      v.ruleNames.includes("BCE001"),
+  );
+  expect(ruleViolations.length).toBeGreaterThan(0);
+  expect(ruleViolations[0].errorDetail).toMatch(/import tokenizer/);
+});
+
 test('does not flag "et al." as missing backticks', async () => {
   const markdown =
     "As described by Smith et al., the results were significant.";
