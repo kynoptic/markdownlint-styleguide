@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.8.0] - 2026-02-22
+
+Add incremental linting cache and reduce false positives across rules.
+
+### Added
+
+- Incremental linting with file-level caching to skip unchanged files on repeat runs
+
+### Fixed
+
+- Import regex now uses word boundaries to prevent false matches on partial identifiers
+- English prefixes no longer trigger acronym detection in sentence-case headings
+- Tilde-prefixed paths correctly detected as code units in backtick rule
+- "skills" and "skill" treated as common words in sentence-case validation
+- ALL-CAPS filenames in headings no longer flagged by sentence-case rule
+- "PDFs" no longer flagged as unrecognized acronym plural
+
+### Security
+
+- Resolved minimatch ReDoS vulnerability in dev dependencies
+
+---
+
 ## [2.7.0] - 2026-02-20
 
 New empty-list-items rule, per-rule autofix safety configuration, and reduced false positives.
@@ -467,7 +490,8 @@ This release introduced three powerful new rules, configuration presets, and sig
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules.
 - Established the project documentation structure using the Diátaxis framework.
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...HEAD
+[2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.4.0...v2.5.0
