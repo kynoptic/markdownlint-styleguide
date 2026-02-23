@@ -81,6 +81,46 @@ test('does not flag plural acronym "PDFs" as a code identifier (#161)', async ()
   expect(ruleViolations).toHaveLength(0);
 });
 
+test('flags tilde paths as complete units, not partial dotfiles (#162)', async () => {
+  const markdown = "Edit the ~/.claude directory for configuration.";
+  const options = {
+    customRules: [backtickRule],
+    strings: { "test.md": markdown },
+    resultVersion: 3,
+  };
+  const results = await lint(options);
+  const violations = results["test.md"] || [];
+  const ruleViolations = violations.filter(
+    (v) =>
+      v.ruleNames.includes("backtick-code-elements") ||
+      v.ruleNames.includes("BCE001"),
+  );
+  // Should flag the full tilde path, not just the dotfile component
+  expect(ruleViolations.length).toBeGreaterThan(0);
+  const detail = ruleViolations[0].errorDetail;
+  expect(detail).toMatch(/~\/\.claude/);
+  expect(detail).not.toMatch(/^Configuration file '\.claude'/);
+});
+
+test('flags multi-segment tilde path as complete unit (#162)', async () => {
+  const markdown = "Save to ~/Documents/file.txt when done.";
+  const options = {
+    customRules: [backtickRule],
+    strings: { "test.md": markdown },
+    resultVersion: 3,
+  };
+  const results = await lint(options);
+  const violations = results["test.md"] || [];
+  const ruleViolations = violations.filter(
+    (v) =>
+      v.ruleNames.includes("backtick-code-elements") ||
+      v.ruleNames.includes("BCE001"),
+  );
+  expect(ruleViolations.length).toBeGreaterThan(0);
+  // Should reference the full ~/Documents/file.txt path
+  expect(ruleViolations[0].errorDetail).toMatch(/~\/Documents\/file\.txt/);
+});
+
 test('does not flag "et al." as missing backticks', async () => {
   const markdown =
     "As described by Smith et al., the results were significant.";

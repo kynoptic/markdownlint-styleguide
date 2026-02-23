@@ -615,6 +615,9 @@ function backtickCodeElements(params, onError) {
       //   [\w.-]+        - Final segment (filename or directory)
       //   (?=\s|$)       - Followed by whitespace or end of line (lookahead)
       /(?:^|(?<=\s))\/(?:[\w.-]+\/)*[\w.-]+(?=\s|$)/g,
+      // Issue #162: Tilde-prefixed home directory paths like ~/.claude/skills, ~/Documents
+      // Must be checked BEFORE dir/dotfile patterns to capture the full path as one unit
+      /(?:^|(?<=\s))~\/(?:[\w.-]+\/)*[\w.-]+/g,
       /\b(?:\.?\/?[\w.-]+\/)+[\w.-]+\b/g, // directory or file path
       /\b(?=[^\d\s])[\w.-]*[a-zA-Z][\w.-]*\.[a-zA-Z0-9]{1,5}\b/g, // file name with letters
       /\b[a-zA-Z][\w.-]*\([^)]*\)/g,       // simple function or command()
