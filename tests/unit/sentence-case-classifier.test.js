@@ -10,6 +10,10 @@ import {
   isAllCapsHeading,
   stripLeadingSymbols,
 } from "../../src/rules/sentence-case/case-classifier.js";
+import {
+  ambiguousTerms,
+  casingTerms,
+} from "../../src/rules/shared-constants.js";
 
 describe("stripLeadingSymbols", () => {
   test("test_should_remove_single_emoji_from_start_of_text", () => {
@@ -352,6 +356,16 @@ describe("validateHeading", () => {
     const result = validateHeading(text, defaultSpecialTerms);
     expect(result.isValid).toBe(false);
   });
+
+  test("treats 'skills' as a regular lowercase word (#157)", () => {
+    const result = validateHeading("Code skills", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("treats 'skill' as a regular lowercase word (#157)", () => {
+    const result = validateHeading("Agent skill overview", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
 });
 
 describe("validateBoldText", () => {
@@ -434,5 +448,33 @@ describe("validateBoldText", () => {
   test("test_should_handle_empty_bold_text", () => {
     const result = validateBoldText("", defaultSpecialTerms);
     expect(result.isValid).toBe(true); // Empty text should not error
+  });
+
+  test("treats 'skills' as a regular lowercase word in bold (#157)", () => {
+    const result = validateBoldText("Use skills", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("treats 'skill' as a regular lowercase word in bold (#157)", () => {
+    const result = validateBoldText("Analysis skill", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+});
+
+describe("issue #157: skills/skill not in special dictionaries", () => {
+  test("'skills' is not in ambiguousTerms", () => {
+    expect(ambiguousTerms).not.toHaveProperty("skills");
+  });
+
+  test("'skill' is not in ambiguousTerms", () => {
+    expect(ambiguousTerms).not.toHaveProperty("skill");
+  });
+
+  test("'skills' is not in casingTerms", () => {
+    expect(casingTerms).not.toHaveProperty("skills");
+  });
+
+  test("'skill' is not in casingTerms", () => {
+    expect(casingTerms).not.toHaveProperty("skill");
   });
 });

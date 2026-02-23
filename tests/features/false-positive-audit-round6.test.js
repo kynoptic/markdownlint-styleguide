@@ -65,8 +65,8 @@ describe('False positive fixes - Round 6', () => {
     });
   });
 
-  describe('sentence-case-heading (SC001) - Skills as proper noun', () => {
-    test('should NOT flag "Skills" when referring to Claude Skills feature', async () => {
+  describe('sentence-case-heading (SC001) - skills as common word (#157)', () => {
+    test('should flag "Skills" (capitalized) as a common word needing lowercase', async () => {
       const input = [
         '## The Skills architecture',
         '## Where Skills work',
@@ -83,7 +83,7 @@ describe('False positive fixes - Round 6', () => {
         customRules: [sentenceCaseHeading],
       });
 
-      expect(result.input).toHaveLength(0);
+      expect(result.input).toHaveLength(4);
     });
 
     test('should NOT flag "Agent Skills" as a compound proper noun', async () => {

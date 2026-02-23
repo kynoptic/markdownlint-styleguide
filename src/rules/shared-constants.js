@@ -517,14 +517,6 @@ export const ambiguousTerms = {
     properForm: 'Edge',
     reason: 'Could be noun "edge" OR Microsoft Edge (the browser)'
   },
-  skills: {
-    properForm: 'Skills',
-    reason: 'Could be common noun "skills" OR Claude Skills feature'
-  },
-  skill: {
-    properForm: 'Skill',
-    reason: 'Could be common noun "skill" OR Claude Skill feature'
-  },
   agent: {
     properForm: 'Agent',
     reason: 'Could be common noun "agent" OR Claude Agent feature/SDK'
