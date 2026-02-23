@@ -47,6 +47,18 @@ Configuration options
 }
 ```
 
+Product-specific proper nouns
+
+Words like "Skill", "Feature", or "Workspace" that your project uses as capitalized product terms should be added to `specialTerms`. The rule cannot distinguish between the common noun "skill" and a product concept "Skill" without project-specific context. Add them to your config:
+
+```jsonc
+{
+  "sentence-case-heading": {
+    "specialTerms": ["Skill", "Workspace", "Pipeline"]
+  }
+}
+```
+
 Examples
 
 - Good: `# Getting started with APIs`
@@ -221,7 +233,7 @@ Detects list items with no content after the marker. Common in Word-to-Markdown 
 Examples
 
 - Good: `- Item with content`
-- Bad: `- ` (marker followed by whitespace only)
+- Bad: `-` (marker followed by whitespace only)
 
 ---
 
