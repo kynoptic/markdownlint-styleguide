@@ -41,12 +41,41 @@ Example
 
 Templates
 
-Copy-paste starters in `templates/` for environments that lack `extends` support:
+Bootstrap starters in `templates/` for new consumer repos:
 
-- `markdownlint-cli2-*.jsonc` — for CLI usage (CI pipelines, pre-commit hooks)
+- `markdownlint-cli2-*.jsonc` — for CLI usage (CI pipelines, pre-commit hooks). Uses `extends` to inherit from the corresponding preset.
 - `vscode-settings-*.jsonc` — for the VS Code markdownlint extension (different config shape)
 
-Templates mirror the root configs for each tier. Prefer `extends`; use templates when your tooling requires a standalone config file.
+CLI templates use `extends` to inherit all rules from the preset. Distribution creates these once via `skipIfExists` and never overwrites them, so repo-specific overrides are preserved.
+
+## Consumer repo setup
+
+A consumer repo's `.markdownlint-cli2.jsonc` should extend the preset and add only repo-specific overrides:
+
+```jsonc
+{
+  "customRules": ["markdownlint-trap"],
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc",
+    // Repo-specific overrides below
+    "sentence-case-heading": {
+      "specialTerms": ["HarvardKey", "Okta"]
+    }
+  }
+}
+```
+
+When the preset is updated upstream, every consumer automatically inherits the new rules with no redistribution needed. To add repo-specific ignores, add them at the top level alongside `config`:
+
+```jsonc
+{
+  "ignores": ["vendor/**", "third_party/**"],
+  "customRules": ["markdownlint-trap"],
+  "config": {
+    "extends": "markdownlint-trap/recommended-config.jsonc"
+  }
+}
+```
 
 Visual: Configuration flow
 

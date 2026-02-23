@@ -131,8 +131,8 @@ describe('init.cjs', () => {
 
       const content = fs.readFileSync(cliConfig, 'utf8');
       expect(content).toContain('Basic configuration');
-      expect(content).toContain('sentence-case-heading');
-      expect(content).toContain('backtick-code-elements');
+      expect(content).toContain('extends');
+      expect(content).toContain('basic-config.jsonc');
     });
 
     it('should create CLI config with recommended preset', () => {
@@ -145,9 +145,8 @@ describe('init.cjs', () => {
 
       const content = fs.readFileSync(cliConfig, 'utf8');
       expect(content).toContain('Recommended configuration');
-      expect(content).toContain('sentence-case-heading');
-      expect(content).toContain('no-bare-url');
-      expect(content).toContain('no-dead-internal-links');
+      expect(content).toContain('extends');
+      expect(content).toContain('recommended-config.jsonc');
     });
 
     it('should create CLI config with strict preset', () => {
@@ -160,8 +159,8 @@ describe('init.cjs', () => {
 
       const content = fs.readFileSync(cliConfig, 'utf8');
       expect(content).toContain('Strict configuration');
-      expect(content).toContain('"default": true');
-      expect(content).toContain('sentence-case-heading');
+      expect(content).toContain('extends');
+      expect(content).toContain('strict-config.jsonc');
     });
   });
 
@@ -230,7 +229,7 @@ describe('init.cjs', () => {
       const content = fs.readFileSync(cliConfig, 'utf8');
       expect(content).not.toContain('"existing": true');
       expect(content).toContain('Basic configuration');
-      expect(content).toContain('sentence-case-heading');
+      expect(content).toContain('extends');
     });
 
     it('should merge VS Code settings with existing file', () => {
@@ -373,9 +372,8 @@ describe('init.cjs', () => {
       expect(updatedConfig.config['sentence-case-heading'].specialTerms).toContain('MyCustomTerm');
       expect(updatedConfig.config['sentence-case-heading'].specialTerms).toContain('AnotherTerm');
 
-      // Should add new rules that weren't in original
-      expect(updatedConfig.config['no-bare-url']).toBeDefined();
-      expect(updatedConfig.config['no-dead-internal-links']).toBeDefined();
+      // Should add extends from the preset template
+      expect(updatedConfig.config.extends).toContain('recommended-config.jsonc');
     });
 
     it('should add new scripts without overwriting existing ones', () => {

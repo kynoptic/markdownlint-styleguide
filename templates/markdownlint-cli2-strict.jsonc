@@ -1,21 +1,11 @@
 {
   // Strict configuration for markdownlint-trap
-  // Enables all custom rules plus standard markdownlint rules
+  // Inherits all rules from the strict preset
   "customRules": [
     "markdownlint-trap"
   ],
   "config": {
-    // Standard markdownlint rules
-    "default": true,
-    "MD013": false, // line-length
-    "MD029": { "style": "one" },
-    "MD004": { "style": "dash" },
-
-    // Custom rules from markdownlint-trap
-    "sentence-case-heading": true,
-    "backtick-code-elements": true,
-    "no-bare-url": true,
-    "no-dead-internal-links": true,
-    "no-literal-ampersand": true
+    "extends": "markdownlint-trap/strict-config.jsonc"
+    // Add repo-specific overrides below this line
   }
 }

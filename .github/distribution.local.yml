@@ -76,6 +76,7 @@ targets:
       # Edit this list to target your projects
       # - ~/Projects/my-project/.markdownlint-cli2.jsonc
     cleanDest: false
+    skipIfExists: true
 
   # Recommended CLI config
   - name: cli-recommended
@@ -85,6 +86,7 @@ targets:
     dest:
       - ~/Projects/*/.markdownlint-cli2.jsonc  # All projects
     cleanDest: false
+    skipIfExists: true
 
   # Strict CLI config
   - name: cli-strict
@@ -95,6 +97,7 @@ targets:
       # Edit this list to target your projects
       # - ~/Projects/api-docs/.markdownlint-cli2.jsonc
     cleanDest: false
+    skipIfExists: true
 
   # --------------------------------------
   # package.json Bootstrap

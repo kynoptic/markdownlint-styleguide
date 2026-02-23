@@ -307,7 +307,7 @@ function main() {
         }
 
         const cleanDest = t.cleanDest ?? cfg.defaults.cleanDest ?? false;
-        const merge = t.merge ?? false;
+        const merge = t.merge ?? cfg.defaults.merge ?? false;
         const createDirs = t.createDirs ?? cfg.defaults.createDirs ?? false;
         const skipIfExists = t.skipIfExists ?? false;
 
@@ -363,7 +363,7 @@ function main() {
           let finalContent = srcContent;
           if (dest.endsWith('package.json') && srcContent.includes('PLACEHOLDER_PROJECT_NAME')) {
             finalContent = customizePackageJson(srcContent, dest);
-          } else if (merge && dest.endsWith('.json')) {
+          } else if (merge && (dest.endsWith('.json') || dest.endsWith('.jsonc'))) {
             finalContent = mergeJsonSettings(dest, srcContent);
           }
 

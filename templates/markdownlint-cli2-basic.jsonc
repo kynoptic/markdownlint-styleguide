@@ -1,17 +1,11 @@
 {
   // Basic configuration for markdownlint-trap
-  // Enables core sentence case and backticks rules
+  // Inherits all rules from the basic preset
   "customRules": [
     "markdownlint-trap"
   ],
   "config": {
-    "MD004": { "style": "dash" },
-    "MD013": false,
-    "MD029": { "style": "one" },
-    "sentence-case-heading": true,
-    "backtick-code-elements": true,
-    "no-bare-url": false,
-    "no-dead-internal-links": false,
-    "no-literal-ampersand": false
+    "extends": "markdownlint-trap/basic-config.jsonc"
+    // Add repo-specific overrides below this line
   }
 }
