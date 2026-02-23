@@ -368,7 +368,9 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
           // Technical compound words (not acronyms)
           'rule', 'user', 'file', 'line', 'code', 'auto', 'type', 'real', 'open',
           'zero', 'data', 'test', 'back', 'side', 'case', 'base', 'next', 'last',
-          'osv', 'npm', 'cli', 'api'  // Tool/tech names used as prefixes
+          'osv', 'npm', 'cli', 'api',  // Tool/tech names used as prefixes
+          // Standard English prefixes (#159)
+          'semi', 'mega', 'mini', 'mono', 'poly', 'para', 'meta'
         ];
         if (possibleAcronym.length >= 2 && possibleAcronym.length <= 4 &&
             !commonHyphenatedPrefixes.includes(possibleAcronym.toLowerCase())) {

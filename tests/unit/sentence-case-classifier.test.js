@@ -478,3 +478,39 @@ describe("issue #157: skills/skill not in special dictionaries", () => {
     expect(casingTerms).not.toHaveProperty("skill");
   });
 });
+
+describe("issue #159: common English prefixes not flagged as acronyms", () => {
+  const defaultSpecialTerms = { api: "API", rest: "REST" };
+
+  test.each([
+    ["Auto-update", "auto"],
+    ["Semi-automatic", "semi"],
+    ["Mega-pixel", "mega"],
+    ["Mini-batch", "mini"],
+    ["Mono-repo", "mono"],
+    ["Poly-morphic", "poly"],
+    ["Para-normal", "para"],
+  ])("heading starting with %s is valid (prefix: %s)", (compound) => {
+    const result = validateHeading(`${compound} mode`, defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test.each([
+    ["Auto-update", "auto"],
+    ["Semi-automatic", "semi"],
+    ["Mega-pixel", "mega"],
+    ["Mini-batch", "mini"],
+    ["Mono-repo", "mono"],
+    ["Poly-morphic", "poly"],
+    ["Para-normal", "para"],
+  ])("bold text starting with %s is valid (prefix: %s)", (compound) => {
+    const result = validateBoldText(`${compound} mode`, defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("still flags actual misspelled acronyms like Yaml-based", () => {
+    const result = validateHeading("Yaml-based config", defaultSpecialTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/YAML/);
+  });
+});
