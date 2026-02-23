@@ -4,7 +4,6 @@ Use clear, solution-oriented title describing what the commits accomplish
 Example: "Add input validation for empty usernames"
 Avoid conventional commit format for PR titles (no "feat:", "fix:", etc.)
 -->
-<!-- markdownlint-disable MD041 -->
 
 ## Summary
 
