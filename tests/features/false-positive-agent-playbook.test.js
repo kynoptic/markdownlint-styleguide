@@ -231,6 +231,23 @@ describe('Sentence-case false positives from agent-playbook', () => {
       const errors = await lintWithRule(content, sentenceCaseHeading);
       expect(errors).toHaveLength(0);
     });
+
+    test('ALL-CAPS filename as non-first word should not be flagged', async () => {
+      const cases = [
+        { heading: '## About the LICENSE.md terms', word: 'LICENSE' },
+        { heading: '## Edit CONTRIBUTING.md now', word: 'CONTRIBUTING' },
+        { heading: '## See the SECURITY.md policy', word: 'SECURITY' },
+        { heading: '## Update your SKILL.md file', word: 'SKILL' },
+      ];
+
+      for (const { heading, word } of cases) {
+        const errors = await lintWithRule(heading, sentenceCaseHeading);
+        const filenameErrors = errors.filter(e =>
+          e.errorDetail && e.errorDetail.includes(`"${word}"`)
+        );
+        expect(filenameErrors).toHaveLength(0);
+      }
+    });
   });
 
   describe('file paths should preserve original casing', () => {

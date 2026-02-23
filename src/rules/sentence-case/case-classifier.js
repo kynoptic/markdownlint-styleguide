@@ -541,6 +541,15 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       }
     }
 
+    // Skip ALL-CAPS words that are part of a filename in the original text
+    // (e.g., "LICENSE" from "LICENSE.md" after dot removal in the clean step)
+    if (word === word.toUpperCase() && word.length > 1) {
+      const filenameInHeading = new RegExp(`\\b${word}\\.[a-zA-Z]+\\b`);
+      if (filenameInHeading.test(headingText)) {
+        continue;
+      }
+    }
+
     // Check general lowercase requirement
     if (
       word !== word.toLowerCase() &&
