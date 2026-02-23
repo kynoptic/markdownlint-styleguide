@@ -2,12 +2,3 @@
 # Documentation: https://google.github.io/osv-scanner/configuration/
 
 # Ignored vulnerabilities (use sparingly and document justification)
-
-# brace-expansion ReDoS in dev dependency
-# Low-severity (CVSS 3.1) vulnerability in development-only dependency
-# Does not affect production runtime; fix available in 1.1.12
-# Review for update during next dependency maintenance cycle
-[[IgnoredVulns]]
-id = "GHSA-v6h2-p8h4-qcjw"
-ignoreUntil = 2026-04-30
-reason = "Low-severity ReDoS in dev dependency brace-expansion; does not affect production; planned for update in dependency maintenance"
