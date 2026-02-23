@@ -170,6 +170,57 @@ const TECHNICAL_INDICATORS = [
 ];
 
 /**
+ * Precompiled regex for technical term detection in sentence case confidence.
+ * Hoisted to module scope to avoid recompilation on every call.
+ * @type {RegExp}
+ */
+const TECHNICAL_TERM_PATTERN = /\b(API|URL|HTML|CSS|JSON|XML|HTTP|HTTPS|SDK|CLI|GUI|UI|UX|SQL|NoSQL|REST|GraphQL|JWT|OAuth|CSRF|XSS|CORS|DNS|CDN|VPN|SSL|TLS|SSH|FTP|SMTP|POP|IMAP|TCP|UDP|IP|IPv4|IPv6|MAC|VLAN|LAN|WAN|WiFi|Bluetooth|USB|HDMI|GPU|CPU|RAM|SSD|HDD|OS|iOS|Android|Windows|Linux|macOS|Unix|AWS|Azure|GCP|Docker|Kubernetes|Git|GitHub|GitLab|npm|yarn|pip|conda|Maven|Gradle|Webpack|Rollup|Vite|React|Vue|Angular|Next|Nuxt|Express|Django|Flask|Rails|Laravel|Spring|Hibernate|MongoDB|PostgreSQL|MySQL|Redis|Elasticsearch|Kafka|RabbitMQ|Jenkins|CircleCI|GitHub Actions|Travis|Azure DevOps|Terraform|Ansible|Puppet|Chef|Vagrant|VMware|VirtualBox|Hyper-V|KVM|Xen|Node\.js|Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Swift|Kotlin|Scala|Ruby|PHP|Perl|R|MATLAB|Stata|SAS|SPSS|Tableau|PowerBI|Excel|Word|PowerPoint|Outlook|Teams|Slack|Discord|Zoom|WebEx|Skype|WhatsApp|Telegram|Signal|Firefox|Chrome|Safari|Edge|Opera|Brave|Tor|VPN|Proxy|Firewall|Antivirus|Malware|Ransomware|Phishing|Spear-phishing|Social engineering|Two-factor authentication|Multi-factor authentication|Single sign-on|Identity and access management|Role-based access control|Attribute-based access control|Discretionary access control|Mandatory access control|Bell-LaPadula|Biba|Clark-Wilson|Chinese Wall|Take-Grant|HRU|RBAC|ABAC|DAC|MAC|BLP|Biba|CW|TG|HRU)\b/gi;
+
+/**
+ * Precompiled patterns for definite natural language detection.
+ * Used in analyzeCodeVsNaturalLanguage to immediately disqualify common English words.
+ * @type {RegExp[]}
+ */
+const DEFINITELY_NOT_CODE = [
+  /^(a|an|the|and|or|but|if|then|else|when|where|why|how|who|what|which|that|this|these|those|here|there|now|today|yesterday|tomorrow)$/i,
+  /^(i|you|he|she|it|we|they|me|him|her|us|them|my|your|his|her|its|our|their)$/i,
+  /^(is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|could|should|may|might|can|must|shall)$/i,
+  /^(good|bad|big|small|new|old|first|last|next|previous|best|worst|better|worse|more|less|most|least)$/i,
+  /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|hundred|thousand)$/i
+];
+
+/**
+ * Precompiled strong code indicator patterns.
+ * Built from FILE_EXTENSION_KEYWORDS and COMMAND_KEYWORDS sets at module load time.
+ * @type {RegExp[]}
+ */
+const STRONG_CODE_INDICATORS = [
+  new RegExp(`\\.(${Array.from(FILE_EXTENSION_KEYWORDS).join('|')})$`, 'i'),
+  /^[A-Z_][A-Z0-9_]*$/, // ENVIRONMENT_VARIABLES
+  new RegExp(`^(${Array.from(COMMAND_KEYWORDS).join('|')})\\s`),
+  /\(.*\)$/, // Function calls
+  /^import\s+/,
+  /^from\s+.*import/,
+  /^\$[A-Z_]+$/, // Shell variables
+  /^--[a-z-]+$/, // Command flags
+  /\/.*\//, // Paths with slashes
+  /^\.[a-zA-Z]/ // Dotfiles
+];
+
+/**
+ * Precompiled moderate code indicator patterns.
+ * @type {RegExp[]}
+ */
+const MODERATE_CODE_INDICATORS = [
+  /[A-Z]{2,}/, // Contains acronyms
+  /_/, // Contains underscores
+  /\d/, // Contains numbers
+  /^[a-z]+[A-Z]/, // camelCase
+  /^[A-Z][a-z]+[A-Z]/, // PascalCase
+  /^[a-z-]{4,}$/ // kebab-case (only if longer than 3 chars)
+];
+
+/**
  * Extract file extension from a filename or path
  * @param {string} filename - The filename or path
  * @returns {string} The file extension (without the dot)
@@ -311,9 +362,9 @@ export function calculateSentenceCaseConfidence(original, fixed, context = {}) {
 
   // +0.1 per technical term (max +0.3): Slight confidence boost for technical content
   // Technical content often has specific capitalization rules that should be preserved
-  const technicalTermPattern = /\b(API|URL|HTML|CSS|JSON|XML|HTTP|HTTPS|SDK|CLI|GUI|UI|UX|SQL|NoSQL|REST|GraphQL|JWT|OAuth|CSRF|XSS|CORS|DNS|CDN|VPN|SSL|TLS|SSH|FTP|SMTP|POP|IMAP|TCP|UDP|IP|IPv4|IPv6|MAC|VLAN|LAN|WAN|WiFi|Bluetooth|USB|HDMI|GPU|CPU|RAM|SSD|HDD|OS|iOS|Android|Windows|Linux|macOS|Unix|AWS|Azure|GCP|Docker|Kubernetes|Git|GitHub|GitLab|npm|yarn|pip|conda|Maven|Gradle|Webpack|Rollup|Vite|React|Vue|Angular|Next|Nuxt|Express|Django|Flask|Rails|Laravel|Spring|Hibernate|MongoDB|PostgreSQL|MySQL|Redis|Elasticsearch|Kafka|RabbitMQ|Jenkins|CircleCI|GitHub Actions|Travis|Azure DevOps|Terraform|Ansible|Puppet|Chef|Vagrant|VMware|VirtualBox|Hyper-V|KVM|Xen|Node\.js|Python|Java|JavaScript|TypeScript|C\+\+|C#|Go|Rust|Swift|Kotlin|Scala|Ruby|PHP|Perl|R|MATLAB|Stata|SAS|SPSS|Tableau|PowerBI|Excel|Word|PowerPoint|Outlook|Teams|Slack|Discord|Zoom|WebEx|Skype|WhatsApp|Telegram|Signal|Firefox|Chrome|Safari|Edge|Opera|Brave|Tor|VPN|Proxy|Firewall|Antivirus|Malware|Ransomware|Phishing|Spear-phishing|Social engineering|Two-factor authentication|Multi-factor authentication|Single sign-on|Identity and access management|Role-based access control|Attribute-based access control|Discretionary access control|Mandatory access control|Bell-LaPadula|Biba|Clark-Wilson|Chinese Wall|Take-Grant|HRU|RBAC|ABAC|DAC|MAC|BLP|Biba|CW|TG|HRU)\b/gi;
-
-  const technicalMatches = (original.match(technicalTermPattern) || []).length;
+  // Reset lastIndex since TECHNICAL_TERM_PATTERN is a global regex reused across calls
+  TECHNICAL_TERM_PATTERN.lastIndex = 0;
+  const technicalMatches = (original.match(TECHNICAL_TERM_PATTERN) || []).length;
   if (technicalMatches > 0) {
     const boost = 0.1 * Math.min(technicalMatches, 3);
     heuristics.technicalTerms = boost;
@@ -544,52 +595,22 @@ export function analyzeCodeVsNaturalLanguage(text, context = {}) {
     shouldAutofix: false
   };
 
-  // Immediate disqualifiers for common natural language
-  const definitelyNotCode = [
-    /^(a|an|the|and|or|but|if|then|else|when|where|why|how|who|what|which|that|this|these|those|here|there|now|today|yesterday|tomorrow)$/i,
-    /^(i|you|he|she|it|we|they|me|him|her|us|them|my|your|his|her|its|our|their)$/i,
-    /^(is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|could|should|may|might|can|must|shall)$/i,
-    /^(good|bad|big|small|new|old|first|last|next|previous|best|worst|better|worse|more|less|most|least)$/i,
-    /^(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|hundred|thousand)$/i
-  ];
-
-  if (definitelyNotCode.some(pattern => pattern.test(text))) {
+  // Immediate disqualifiers for common natural language (precompiled at module level)
+  if (DEFINITELY_NOT_CODE.some(pattern => pattern.test(text))) {
     analysis.confidence = 0.1;
     analysis.reasons.push('Matches common English word pattern');
     return analysis;
   }
 
-  // Strong code indicators
-  const strongCodeIndicators = [
-    new RegExp(`\\.(${Array.from(FILE_EXTENSION_KEYWORDS).join('|')})$`, 'i'),
-    /^[A-Z_][A-Z0-9_]*$/, // ENVIRONMENT_VARIABLES
-    new RegExp(`^(${Array.from(COMMAND_KEYWORDS).join('|')})\\s`),
-    /\(.*\)$/, // Function calls
-    /^import\s+/,
-    /^from\s+.*import/,
-    /^\$[A-Z_]+$/, // Shell variables
-    /^--[a-z-]+$/, // Command flags
-    /\/.*\//, // Paths with slashes
-    /^\.[a-zA-Z]/ // Dotfiles
-  ];
-
-  const strongMatches = strongCodeIndicators.filter(pattern => pattern.test(text));
+  // Strong code indicators (precompiled at module level)
+  const strongMatches = STRONG_CODE_INDICATORS.filter(pattern => pattern.test(text));
   if (strongMatches.length > 0) {
     analysis.confidence += 0.4;
     analysis.reasons.push(`Strong code pattern: ${strongMatches.length} matches`);
   }
 
-  // Moderate code indicators
-  const moderateCodeIndicators = [
-    /[A-Z]{2,}/, // Contains acronyms
-    /_/, // Contains underscores
-    /\d/, // Contains numbers
-    /^[a-z]+[A-Z]/, // camelCase
-    /^[A-Z][a-z]+[A-Z]/, // PascalCase
-    /^[a-z-]{4,}$/ // kebab-case (only if longer than 3 chars)
-  ];
-
-  const moderateMatches = moderateCodeIndicators.filter(pattern => pattern.test(text));
+  // Moderate code indicators (precompiled at module level)
+  const moderateMatches = MODERATE_CODE_INDICATORS.filter(pattern => pattern.test(text));
   if (moderateMatches.length > 0) {
     analysis.confidence += 0.1 * moderateMatches.length;
     analysis.reasons.push(`Moderate code patterns: ${moderateMatches.length} matches`);
