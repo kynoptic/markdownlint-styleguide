@@ -4,6 +4,7 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
+    "./cache": "./src/cache/cached-lint.js",
     "./package.json": "./package.json"
   },
   "bin": {
