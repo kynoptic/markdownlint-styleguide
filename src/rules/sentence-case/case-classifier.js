@@ -16,6 +16,12 @@ import {
 } from '../shared-constants.js';
 
 /**
+ * Callout keywords that should follow normal sentence case rather than being
+ * forced to ALL_CAPS, even if they appear in specialCasedTerms as "NOTE" etc.
+ */
+const contextualAllCapsTerms = new Set(['note', 'tip', 'important', 'warning', 'caution']);
+
+/**
  * Code identifier patterns for detecting programming constructs in headings.
  * These should preserve their original casing (not be lowercased).
  */
@@ -198,7 +204,7 @@ function shouldExemptFromValidation(headingText, textWithoutMarkup) {
  */
 function findFirstValidationWord(words) {
   let firstIndex = 0;
-  const numeric = /^[-\d.,/]+$/;
+  const numeric = /^[-\d.,/]+$|^\d+[a-z]$/;
 
   while (
     firstIndex < words.length &&
@@ -262,8 +268,20 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
   // If there was a leading emoji, the first word after it should be treated as the first word
   // and follow standard first-word capitalization rules
   if (hadLeadingEmoji) {
+    // Skip kebab-case identifiers (e.g., "🚀 agent-playbook overview")
+    if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
+      return { isValid: true };
+    }
+
     // For first word after emoji, it should be capitalized (unless it's a special term)
     if (expectedFirstWordCasing) {
+      // Contextual ALL_CAPS terms accept sentence case after emoji too
+      if (contextualAllCapsTerms.has(firstWordLower)) {
+        const sentenceCased = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+        if (firstWord === sentenceCased || firstWord === expectedFirstWordCasing) {
+          return { isValid: true };
+        }
+      }
       // Known proper noun or technical term
       const firstWordWithoutParens = firstWord.replace(/[()]/g, '');
       if (firstWord !== expectedFirstWordCasing && firstWordWithoutParens !== expectedFirstWordCasing) {
@@ -289,6 +307,15 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
   }
 
   if (expectedFirstWordCasing) {
+    // Contextual ALL_CAPS terms (NOTE, TIP, etc.) should be accepted in sentence case
+    // when used as the first word (e.g., "Note about security" is valid)
+    if (contextualAllCapsTerms.has(firstWordLower)) {
+      const sentenceCased = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
+      if (firstWord === sentenceCased || firstWord === expectedFirstWordCasing) {
+        return { isValid: true };
+      }
+    }
+
     // Known proper noun or technical term
     // Allow parentheses around special terms like (TCO)
     const firstWordWithoutParens = firstWord.replace(/[()]/g, '');
@@ -379,6 +406,11 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
             errorMessage: `First word "${firstWord}" should be "${possibleAcronym}${incorrectAcronymMatch[2]}".`
           };
         }
+      }
+
+      // Skip kebab-case identifiers (e.g., "agent-playbook", "my-component")
+      if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
+        return { isValid: true };
       }
 
       // Regular sentence case
@@ -496,6 +528,11 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
     }
 
     if (expectedWordCasing) {
+      // Contextual ALL_CAPS terms (NOTE, TIP, etc.) accept lowercase in subsequent position
+      if (contextualAllCapsTerms.has(wordLower) && word === word.toLowerCase()) {
+        continue;
+      }
+
       // Known proper noun or technical term
       // Allow parentheses around special terms like (TCO)
       const wordWithoutParens = word.replace(/[()]/g, '');

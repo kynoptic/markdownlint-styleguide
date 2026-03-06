@@ -860,7 +860,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "fixInfo": {
           "deleteCount": 14,
           "editColumn": 4,
-          "insertText": "🚀 quick start",
+          "insertText": "🚀 Quick start",
         },
         "lineNumber": 6,
         "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
@@ -1815,7 +1815,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests gi
     "fixInfo": {
       "deleteCount": 14,
       "editColumn": 4,
-      "insertText": "🚀 quick start",
+      "insertText": "🚀 Quick start",
     },
     "lineNumber": 6,
     "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",

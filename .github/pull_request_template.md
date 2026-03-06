@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD041 -->
 <!--
 PR title guidance: Summarize the solution, not the problem
 Use clear, solution-oriented title describing what the commits accomplish

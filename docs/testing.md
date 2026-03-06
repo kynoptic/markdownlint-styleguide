@@ -274,6 +274,6 @@ Use this validation loop to identify and fix false positives when improving rule
 
 ## Notes
 
-- Tests import ESM from `src/` directly via `babel-jest`; no build step required.
+- Tests `import` ESM from `src/` directly via `babel-jest`; no build step required.
 - The distribution `.markdownlint-rules/` is only used by consumers of the published package or the shareable preset.
 - All tests run on Node.js `>=18` (see `.nvmrc`).

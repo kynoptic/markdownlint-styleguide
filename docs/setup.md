@@ -111,7 +111,7 @@ flowchart TD
 
 ### Option D: Global installation (works everywhere)
 
-Works in all projects, including non-Node.js projects.
+Works in all projects, including non-`Node.js` projects.
 
 ```bash
 # Automated via distribution script
@@ -251,7 +251,7 @@ Use the distribution script, which handles pnpm with `pnpm link <path>`:
 npm run link:projects
 ```
 
-### Non-Node.js projects not working
+### Projects without `Node.js` not working
 
 Use global installation (enabled by default):
 

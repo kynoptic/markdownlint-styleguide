@@ -479,6 +479,59 @@ describe("issue #157: skills/skill not in special dictionaries", () => {
   });
 });
 
+describe("issue #176: step prefixes like 5a", () => {
+  test("test_should_skip_step_prefix_5a_and_validate_next_word", () => {
+    const result = validateHeading("5a Create the initial structure", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_flag_lowercase_after_step_prefix", () => {
+    const result = validateHeading("5a create the initial structure", casingTerms);
+    expect(result.isValid).toBe(false);
+  });
+});
+
+describe("issue #185: kebab-case first words", () => {
+  test("test_should_accept_kebab_case_first_word", () => {
+    const result = validateHeading("agent-playbook overview", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_accept_multi_segment_kebab_case", () => {
+    const result = validateHeading("my-cool-component setup guide", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+});
+
+describe("issue #184: contextual ALL_CAPS callout keywords", () => {
+  test("test_should_allow_allcaps_callout_keywords", () => {
+    const result = validateHeading("NOTE about this feature", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_allow_allcaps_warning_keyword", () => {
+    const result = validateHeading("WARNING for users", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_accept_sentence_cased_note_as_first_word", () => {
+    const terms = { ...casingTerms, note: "NOTE" };
+    const result = validateHeading("Note about security", terms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_accept_lowercase_note_in_subsequent_position", () => {
+    const terms = { ...casingTerms, note: "NOTE" };
+    const result = validateHeading("Important note about security", terms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("test_should_accept_emoji_plus_kebab_case_first_word", () => {
+    const result = validateHeading("🚀 agent-playbook overview", casingTerms);
+    expect(result.isValid).toBe(true);
+  });
+});
+
 describe("issue #159: common English prefixes not flagged as acronyms", () => {
   const defaultSpecialTerms = { api: "API", rest: "REST" };
 

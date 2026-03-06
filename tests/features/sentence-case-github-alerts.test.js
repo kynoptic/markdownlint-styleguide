@@ -47,20 +47,14 @@ describe("sentence-case-heading: GitHub Alert keywords (issue #105)", () => {
     });
   });
 
-  test("should_suggest_uppercase_when_alert_keywords_not_uppercase", () => {
-    // Lines 22-26 have lowercase/title case alert keywords - should suggest uppercase
-    const lowercaseAlertLines = [22, 23, 24, 25, 26];
+  test("should_accept_sentence_cased_alert_keywords_in_headings (#184)", () => {
+    // Lines 22-26 have sentence-cased alert keywords — accepted since #184
+    const sentenceCasedAlertLines = [22, 23, 24, 25, 26];
     const violatingLines = violations.map((v) => v.lineNumber);
 
-    lowercaseAlertLines.forEach(line => {
-      expect(violatingLines).toContain(line);
+    sentenceCasedAlertLines.forEach(line => {
+      expect(violatingLines).not.toContain(line);
     });
-  });
-
-  test("should_provide_correct_suggestion_for_note", () => {
-    const noteViolation = violations.find(v => v.lineNumber === 22);
-    expect(noteViolation).toBeDefined();
-    expect(noteViolation.errorDetail).toMatch(/NOTE/i);
   });
 
   test.each(passingLines)(

@@ -97,7 +97,9 @@ describe("toSentenceCase", () => {
   test("test_should_fix_mixed_case_to_uppercase_for_all_caps_terms", () => {
     const allCapsTerms = { patch: "PATCH", important: "IMPORTANT" };
     const result = toSentenceCase("this is Important and uses Patch", allCapsTerms);
-    expect(result).toBe("This is IMPORTANT and uses PATCH");
+    // "important" is a contextual ALL_CAPS term, so it follows normal sentence case
+    // "patch" is not contextual, so it gets forced to PATCH
+    expect(result).toBe("This is important and uses PATCH");
   });
 
   test("test_should_handle_github_alert_terms", () => {
@@ -109,7 +111,8 @@ describe("toSentenceCase", () => {
       caution: "CAUTION"
     };
     const result = toSentenceCase("using note and warning alerts", allCapsTerms);
-    expect(result).toBe("Using NOTE and WARNING alerts");
+    // Contextual ALL_CAPS terms follow normal sentence case rules
+    expect(result).toBe("Using note and warning alerts");
   });
 
   test("test_should_preserve_already_correct_all_caps_terms", () => {
@@ -143,6 +146,42 @@ describe("toSentenceCase", () => {
   test("test_should_preserve_single_quoted_text", () => {
     const result = toSentenceCase("When To Use 'Git' Vs GitHub", {});
     expect(result).toBe("When to use 'Git' vs github");
+  });
+
+  test("test_should_preserve_contractions_like_dont_and_wont", () => {
+    const result = toSentenceCase("You Don't Know What You Won't Get", {});
+    expect(result).toBe("You don't know what you won't get");
+  });
+
+  test("test_should_preserve_contraction_before_quoted_text", () => {
+    const result = toSentenceCase("Don't Use The 'Old' Method", {});
+    expect(result).toBe("Don't use the 'Old' method");
+  });
+
+  test("test_should_still_preserve_actual_quoted_text", () => {
+    const result = toSentenceCase("Using The 'Quick' Method", {});
+    expect(result).toBe("Using the 'Quick' method");
+  });
+
+  test("test_should_handle_emoji_prefix_in_heading", () => {
+    const result = toSentenceCase("🚀 Getting Started With Tools", {});
+    expect(result).toBe("🚀 Getting started with tools");
+  });
+
+  test("test_should_handle_emoji_prefix_already_correct", () => {
+    const result = toSentenceCase("🚀 Getting started", {});
+    expect(result).toBeNull();
+  });
+
+  test("test_should_not_capitalize_kebab_case_first_word", () => {
+    const result = toSentenceCase("agent-playbook Overview", {});
+    expect(result).toBe("agent-playbook overview");
+  });
+
+  test("test_should_not_force_note_to_allcaps", () => {
+    const specialTerms = { note: "NOTE" };
+    const result = toSentenceCase("Important Note About Security", specialTerms);
+    expect(result).toBe("Important note about security");
   });
 });
 

@@ -17,10 +17,14 @@
 # WARNING about breaking changes <!-- ✅ -->
 # CAUTION when using this <!-- ✅ -->
 
-## Failing: Incorrect alert keywords (should suggest uppercase)
+## Passing: Sentence-cased alert keywords are acceptable in headings (#184)
 
-# Note about this feature <!-- ❌ -->
-# Tip for optimization <!-- ❌ -->
-# Important security consideration <!-- ❌ -->
-# Warning about breaking changes <!-- ❌ -->
-# Caution when using this <!-- ❌ -->
+# Note about this feature <!-- ✅ -->
+# Tip for optimization <!-- ✅ -->
+# Important security consideration <!-- ✅ -->
+# Warning about breaking changes <!-- ✅ -->
+# Caution when using this <!-- ✅ -->
+
+## Failing: All-lowercase headings still need sentence case
+
+# note about Improper Casing <!-- ❌ -->
