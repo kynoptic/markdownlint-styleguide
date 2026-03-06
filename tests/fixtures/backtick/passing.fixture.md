@@ -98,3 +98,22 @@ Use the lowest/most efficient approach <!-- ✅ -->
 The pass/fail criteria are documented <!-- ✅ -->
 Either/or decision points require review <!-- ✅ -->
 True/false configuration values <!-- ✅ -->
+
+## HTML semantic code tags should not trigger BCE001
+
+Press <kbd>Ctrl+C</kbd> to copy. <!-- ✅ -->
+The <code>NODE_ENV</code> variable controls the environment. <!-- ✅ -->
+Use <samp>error_output</samp> to check the result. <!-- ✅ -->
+The <var>user_name</var> parameter is required. <!-- ✅ -->
+
+## Pure alphabetic slash-separated words should not be flagged as paths
+
+Organize by features/options/settings in the configuration. <!-- ✅ -->
+The models/views/controllers pattern is common in MVC. <!-- ✅ -->
+Support create/update/delete operations on resources. <!-- ✅ -->
+
+## Bracket placeholders should not be flagged
+
+Use [some_variable] as a placeholder in templates. <!-- ✅ -->
+The [user_name] field is required in the config. <!-- ✅ -->
+See [api_key] in the settings panel. <!-- ✅ -->

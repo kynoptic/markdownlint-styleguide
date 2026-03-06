@@ -203,6 +203,26 @@ function inHtmlComment(text, start, end) {
 }
 
 /**
+ * Check if an index range falls inside an HTML semantic code tag.
+ * Handles <kbd>, <code>, <samp>, and <var> tags.
+ *
+ * @param {string} text - Line being evaluated.
+ * @param {number} start - Start index of match.
+ * @param {number} end - End index of match.
+ * @returns {boolean} True when the range is within a semantic code tag.
+ */
+function inHtmlSemanticTag(text, start, end) {
+  const semanticTagRegex = /<(kbd|code|samp|var)(?:\s[^>]*)?>[\s\S]*?<\/\1>/gi;
+  let m;
+  while ((m = semanticTagRegex.exec(text)) !== null) {
+    if (start >= m.index && end <= m.index + m[0].length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Check if an index range falls inside a LaTeX math expression.
  * Handles both inline ($...$) and block ($$...$$) math expressions.
  * Distinguishes between LaTeX math and shell variables like $value.
@@ -373,6 +393,14 @@ function isLikelyFilePath(str) {
   // If the majority of segments are prose words and there's no file extension, skip it
   const proseCount = segments.filter(s => proseListWords.has(s.toLowerCase())).length;
   if (proseCount >= segments.length - 1 && !/\.[^/]+$/.test(segments[segments.length - 1])) {
+    return false;
+  }
+
+  // If all segments (3+) are pure alphabetic words (3+ chars) with no file extensions,
+  // and it's not an absolute or relative path, it's likely natural language
+  const nonEmptySegments = segments.filter(s => s !== '');
+  const isAbsoluteOrRelative = /^[/~.]/.test(str);
+  if (!isAbsoluteOrRelative && nonEmptySegments.length >= 3 && nonEmptySegments.every(s => /^[a-zA-Z]{3,}$/.test(s)) && !nonEmptySegments.some(s => /\.\w+$/.test(s))) {
     return false;
   }
 
@@ -570,14 +598,14 @@ function backtickCodeElements(params, onError) {
       continue;
     }
 
-    // Detect $$ as math block fences.
-    if (line.trim() === '$$') {
-      inMathBlock = !inMathBlock;
+    // Skip lines that are in a code block or heading based on configuration
+    if ((skipCodeBlocks && inCodeBlock) || /^\s*#/.test(line)) {
       continue;
     }
 
-    // Skip lines that are in a code block or heading based on configuration
-    if ((skipCodeBlocks && inCodeBlock) || /^\s*#/.test(line)) {
+    // Detect $$ as math block fences (AFTER code block skip, so $$ inside code blocks is ignored)
+    if (line.trim() === '$$') {
+      inMathBlock = !inMathBlock;
       continue;
     }
 
@@ -735,8 +763,28 @@ function backtickCodeElements(params, onError) {
           continue;
         }
         // Skip if inside a Markdown link, wiki link, HTML comment, or angle bracket autolink
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end)) {
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end) || inHtmlSemanticTag(line, start, end)) {
           continue;
+        }
+
+        // Skip matches inside bracket placeholders [text] that are not part of links [text](url)
+        if (start > 0) {
+          const beforeMatch = line.lastIndexOf('[', start - 1);
+          if (beforeMatch !== -1) {
+            // Ensure no ] exists between the found [ and the match start
+            // (i.e., the match is actually inside this bracket pair)
+            const between = line.slice(beforeMatch + 1, start);
+            if (!between.includes(']')) {
+              const afterMatch = line.indexOf(']', end);
+              if (afterMatch !== -1) {
+                const afterBracket = line[afterMatch + 1];
+                // If ] is NOT followed by ( it's a reference label or placeholder, not a link
+                if (afterBracket !== '(') {
+                  continue;
+                }
+              }
+            }
+          }
         }
 
         // Skip country abbreviations like U.S, U.K, E.U (not filenames)
