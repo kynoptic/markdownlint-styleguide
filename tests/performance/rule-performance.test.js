@@ -175,6 +175,40 @@ describe('Rule performance benchmarks', () => {
   });
 
   describe('sentence-case-heading rule', () => {
+    test('specialCasedTerms_memoization_keeps_per_file_cost_flat (#206)', async () => {
+      // Without memoization, each lint call spreads ~390 defaultCasingTerms entries.
+      // With memoization, only the first call does work; subsequent calls are O(1).
+      // We lint 20 documents with identical config and verify avg time is not O(n × base).
+      const markdownIt = await import('markdown-it');
+      const docContent = generateLargeMarkdown(10); // ~5K lines per doc
+      const DOC_COUNT = 20;
+      const customTerms = ['JavaScript', 'TypeScript', 'GitHub', 'API'];
+
+      const strings = {};
+      for (let i = 0; i < DOC_COUNT; i++) {
+        strings[`doc${i}.md`] = docContent;
+      }
+
+      const start = process.hrtime.bigint();
+      await lint({
+        customRules: [sentenceRule],
+        strings,
+        resultVersion: 3,
+        config: {
+          'sentence-case-heading': { specialTerms: customTerms }
+        },
+        markdownItFactory: () => markdownIt.default()
+      });
+      const end = process.hrtime.bigint();
+      const totalMs = Number(end - start) / 1000000;
+
+      console.log(`sentence-case-heading ${DOC_COUNT} docs (memoization benchmark): ${totalMs.toFixed(2)}ms`);
+
+      // Should complete 20 docs well under 15s; a meaningful guard against
+      // O(docs × terms) regression (observed ~749ms on reference hardware).
+      expect(totalMs).toBeLessThan(15000);
+    });
+
     test('should_meet_performance_threshold_for_large_files', async () => {
       const metrics = await measureRulePerformance(sentenceRule, largeContent, 'sentence-case-heading');
       

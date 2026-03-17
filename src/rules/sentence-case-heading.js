@@ -37,6 +37,14 @@ import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-ca
 const _deprecationWarned = new Set();
 
 /**
+ * Cache for `specialCasedTerms` objects keyed on sorted user-term list (#206).
+ * `defaultCasingTerms` (~390 entries) is spread on every rule invocation without this
+ * cache, causing O(files × 390) object copies in a multi-file lint run.
+ * @type {Map<string, Record<string, string>>}
+ */
+const _specialCasedTermsCache = new Map();
+
+/**
  * Main rule implementation.
  * @param {import("markdownlint").RuleParams} params
  * @param {import("markdownlint").RuleOnError} onError
@@ -98,13 +106,22 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   
   const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
 
-  const specialCasedTerms = { ...defaultCasingTerms };
-  if (Array.isArray(allUserTerms)) { // User terms are added with their correct casing
+  // Memoize specialCasedTerms: spreading defaultCasingTerms (~390 entries) is O(n) per
+  // invocation. Cache keyed on sorted user terms so lint runs over many files pay the
+  // construction cost only once per unique config (#206).
+  const cacheKey = allUserTerms
+    .filter((t) => typeof t === 'string')
+    .sort()
+    .join('\x00');
+  let specialCasedTerms = _specialCasedTermsCache.get(cacheKey);
+  if (!specialCasedTerms) {
+    specialCasedTerms = { ...defaultCasingTerms };
     allUserTerms.forEach((term) => {
       if (typeof term === 'string') {
         specialCasedTerms[term.toLowerCase()] = term;
       }
     });
+    _specialCasedTermsCache.set(cacheKey, specialCasedTerms);
   }
 
   const safetyConfig = params.config?.autofix?.safety || {};
