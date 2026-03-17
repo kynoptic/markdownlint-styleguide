@@ -230,53 +230,6 @@ This is **intentional**, not redundant:
 - Unit tests with synthetic inputs: `"HTTP API"`, `"npm v2.0"`
 - Integration tests with real markdown: Full documents from external repositories
 
-### Build artifact drift detection
-
-**Decision**: Add pre-commit hooks to detect when source code changes without corresponding updates to built artifacts.
-
-**Context** ([commit 37ea4d9](https://github.com/kynoptic/markdownlint-trap/commit/37ea4d9)):
-
-Developers occasionally commit source changes in `src/` without running `npm run build`, causing the distribution in `.markdownlint-rules/` to drift out of sync.
-
-**Implementation**:
-
-Pre-commit hook runs:
-
-```bash
-npm run build
-git diff --exit-code .markdownlint-rules/
-```
-
-If the build produces changes, the commit is blocked with a message to run `npm run build` first.
-
-**Outcomes**:
-
-- ✅ Prevents accidental distribution drift
-- ✅ Ensures consumers always get up-to-date rules
-- ✅ Catches forgotten build step before push
-
-**Tradeoff**: Adds ~2-3s to commit time, but only when source files change.
-
-## Legacy constraints
-
-### Commonjs distribution requirement
-
-**Constraint**: markdownlint-cli2 requires rules to be exported as CommonJS, not ES modules.
-
-**Current approach**:
-
-- Write all source code as ES modules in `src/`
-- Transpile to CommonJS in `.markdownlint-rules/` via Babel
-- Ship both formats in the `npm package`
-
-**Why not pure ESM?**
-
-- markdownlint-cli2's configuration loader uses `require()`, not `import()`
-- Changing this would require upstream changes to markdownlint ecosystem
-- Many consumers use CommonJS-based build tools
-
-**Future consideration**: When markdownlint-cli2 supports native ESM rules, we can eliminate the build step entirely and ship pure ES modules.
-
 ### Node.js version targeting
 
 **Decision**: Target Node.js >= 20 (LTS) as the minimum supported version.
@@ -290,40 +243,6 @@ If the build produces changes, the commit is blocked with a message to run `npm 
 **Recorded in**: `.nvmrc`, `package.json` engines field, CI matrix
 
 ## Lessons learned
-
-### When to refactor
-
-Consider refactoring when:
-
-1. **File size exceeds ~500 LOC** with multiple distinct responsibilities
-2. **Tests are hard to write** because functions are tightly coupled
-3. **Behavioral drift occurs** between rules implementing similar logic
-4. **Performance degrades** due to code complexity
-5. **Debugging requires reading entire files** instead of targeted modules
-
-### Refactoring safety checklist
-
-From the sentence-case-heading refactor ([commit dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f)):
-
-- ✅ Run full test suite before starting
-- ✅ Create comprehensive unit tests for new modules
-- ✅ Ensure integration tests pass with identical behavior
-- ✅ Measure performance impact (before/after)
-- ✅ Document migration path for consumers
-- ✅ Verify bundle size impact
-- ✅ Update architecture documentation
-
-### Documentation as architectural artifact
-
-This document exists because:
-
-1. **Commit messages capture "what"** (files changed, lines added)
-2. **Code comments explain "how"** (implementation details)
-3. **Architecture docs explain "why"** (decisions, tradeoffs, alternatives)
-
-Without explicit architecture documentation, the rationale for decisions gets lost over time. Future contributors may inadvertently undo improvements because they don't understand the original motivation.
-
-**Recommendation**: Update `docs/adr/` with every significant architectural change (>500 LOC refactor, new module patterns, performance tradeoffs).
 
 ## References
 
