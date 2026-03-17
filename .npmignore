@@ -1,6 +1,8 @@
 # Development and documentation
 /tests/
 /docs/
+src/rules/*.test.js
+src/validation/
 
 # Editor and workflow configs
 .vscode/
