@@ -109,3 +109,33 @@ describe("BCE001 English suffix false positives (#145)", () => {
     expect(violations.length).toBeGreaterThan(0);
   });
 });
+
+describe("BCE001 English suffix false positives — gerund and past tense (#193)", () => {
+  test("does not flag -ing suffix in prose", async () => {
+    const violations = await getBCE001Violations(
+      "Use gerund form (verb + -ing) to describe continuous actions.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag -ed suffix in prose", async () => {
+    const violations = await getBCE001Violations(
+      "Past tense uses the -ed suffix in regular verbs.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag -est suffix in prose", async () => {
+    const violations = await getBCE001Violations(
+      "The superlative -est suffix appears in words like tallest.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags real CLI flags that happen to look like suffixes", async () => {
+    const violations = await getBCE001Violations(
+      "Run git log --oneline for a compact view.",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+  });
+});

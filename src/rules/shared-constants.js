@@ -781,6 +781,12 @@ export const camelCaseExemptions = new Set([
 
   // Names with Mc/Mac prefix (Scottish/Irish surnames)
   // Note: We use a regex pattern instead of listing all names
+
+  // Scientific and measurement terms (#192)
+  // These follow camelCase-like patterns (lowercase prefix + uppercase abbreviation)
+  // but are natural-language domain terms, not code identifiers.
+  'pH', 'mL', 'fMRI', 'mTOR', 'mTORC1', 'mTORC2', 'sgRNA', 'gRNA',
+  'mRNA', 'siRNA', 'miRNA', 'rRNA', 'tRNA', 'iPSC',
 ]);
 
 /**
