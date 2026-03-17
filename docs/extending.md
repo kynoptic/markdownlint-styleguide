@@ -85,63 +85,45 @@ fixInfo: {
 
 Set `deleteCount: -1` to delete the entire line.
 
-## Shared helpers contract
+## Shared utilities
 
-Rules that need configuration validation, autofix safety scoring, or integrated logging should use the shared helpers. This pattern is recommended for contributed rules.
+Rules `import` shared utilities directly. The following modules are available under `src/rules/`:
+
+| Module | Purpose |
+|--------|---------|
+| `config-validation.js` | Validate rule config options (`validateStringArray`, `validateBoolean`, etc.) |
+| `autofix-safety.js` | Confidence scoring for autofixes (`createSafeFixInfo`) |
+| `shared-utils.js` | Code block detection, inline code spans, emoji stripping |
+| `shared-heuristics.js` | Acronym detection, markup segment preservation |
+| `shared-constants.js` | Technical term dictionaries and default config values |
+
+### Config validation
 
 ```javascript
 import {
-  createRuleContext,
-  extractConfig,
-  reportViolation,
-  createFixInfo,
-} from "./rules/rule-helpers.js";
-import { validateStringArray, validateBoolean } from "./rules/config-validation.js";
-
-export default {
-  names: ["my-rule", "MR001"],
-  description: "Describe what the rule enforces",
-  tags: ["style"],
-  parser: "micromark",
-  function: (params, onError) => {
-    const context = createRuleContext(params, onError, "my-rule", "MR001");
-    if (!context.isValid) return;
-
-    const config = extractConfig(context, { ignoredTerms: validateStringArray }, { ignoredTerms: [] });
-
-    context.lines.forEach((line, index) => {
-      const fixInfo = createFixInfo(context, { column: 5, length: 4, replacement: "new text" });
-      reportViolation(context, { lineNumber: index + 1, message: "Description", context: "text", fixInfo });
-    });
-  },
-};
+  validateConfig,
+  validateStringArray,
+  validateBoolean,
+  logValidationErrors,
+  createMarkdownlintLogger,
+} from "./rules/config-validation.js";
 ```
-
-### Available helpers
-
-| Helper | Source | Purpose |
-|--------|--------|---------|
-| `createRuleContext` | `rule-helpers.js` | Validate params, create context object |
-| `extractConfig` | `rule-helpers.js` | Extract and validate config with defaults |
-| `reportViolation` | `rule-helpers.js` | Report errors with consistent formatting |
-| `createFixInfo` | `rule-helpers.js` | Build fix info with optional safety checks |
-| `validateStringArray` | `config-validation.js` | Validate `string[]` config fields |
-| `validateBoolean` | `config-validation.js` | Validate `boolean` config fields |
-| `validateNonNegativeNumber` | `config-validation.js` | Validate `number >= 0` config fields |
-| `getCodeBlockLines` | `shared-utils.js` | Detect which lines are inside code blocks |
-| `isInInlineCode` | `shared-utils.js` | Check if a position is inside backtick spans |
-| `getInlineCodeSpans` | `shared-utils.js` | Extract all inline code span ranges |
-| `stripLeadingDecorations` | `shared-utils.js` | Remove leading emoji from text |
 
 ### Safety checks for autofixes
 
-Pass `ruleType` to `createFixInfo` to enable confidence scoring:
+Wrap a `fixInfo` object with confidence scoring before returning it from a rule:
 
 ```javascript
-const fixInfo = createFixInfo(context, {
-  column: start, length: text.length, replacement: `\`${text}\``,
-  ruleType: 'backtick', original: text, context: { line }
-});
+import { createSafeFixInfo } from "./rules/autofix-safety.js";
+
+const fixInfo = createSafeFixInfo(
+  { editColumn: start, deleteCount: text.length, insertText: `\`${text}\`` },
+  'backtick',   // ruleType
+  text,         // original
+  `\`${text}\``, // fixed
+  { line },     // context
+  safetyConfig  // optional config override
+);
 ```
 
 Safety checks analyze pattern strength, ambiguity, and context to decide whether to apply a fix automatically, flag it for review, or skip it.
