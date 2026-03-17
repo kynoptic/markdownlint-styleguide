@@ -4,14 +4,15 @@
  * @fileoverview Tests for no-dead-internal-links rule.
  */
 
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeEach, afterEach } from '@jest/globals';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import { lint } from 'markdownlint/promise';
-import noDeadInternalLinksRule, { _forTesting } from '../../src/rules/no-dead-internal-links.js';
+import noDeadInternalLinksRule, { _forTesting, clearCaches } from '../../src/rules/no-dead-internal-links.js';
 
-const { clearCaches, getCacheStats } = _forTesting;
+const { getCacheStats } = _forTesting;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -951,5 +952,87 @@ Another paragraph.
         expect(placeholderErrors).toHaveLength(0);
       });
     });
+  });
+});
+
+describe('watch-mode stale cache (NIL001 #204)', () => {
+  let tmpDir;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'nil001-watch-'));
+    clearCaches();
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    clearCaches();
+  });
+
+  /**
+   * Runs the rule directly against a file, simulating a watcher re-invoking lint()
+   * on the same long-running Node.js process (watch mode).
+   */
+  function lintFile(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const errors = [];
+    noDeadInternalLinksRule.function(
+      {
+        name: filePath,
+        lines: content.split('\n'),
+        config: { 'no-dead-internal-links': { checkAnchors: false } },
+        parsers: { micromark: { tokens: [] } }
+      },
+      (e) => errors.push(e)
+    );
+    return errors;
+  }
+
+  test('detects broken link on second run after target file is deleted', () => {
+    // Arrange: source file links to target.md which exists on first run
+    const targetPath = path.join(tmpDir, 'target.md');
+    const sourcePath = path.join(tmpDir, 'source.md');
+
+    fs.writeFileSync(targetPath, '# Target\n\nContent.\n');
+    fs.writeFileSync(sourcePath, '# Source\n\nSee [target](target.md) for details.\n');
+
+    // First lint run — target exists, no errors expected
+    const run1Errors = lintFile(sourcePath);
+    expect(run1Errors).toHaveLength(0);
+
+    // Watch mode: target.md is deleted between runs
+    fs.rmSync(targetPath);
+
+    // Without cache clearing, the stale cache would suppress the error (false negative).
+    // Clear caches between runs (as a watch-mode caller must do) to get correct results.
+    clearCaches();
+    const run2Fixed = lintFile(sourcePath);
+
+    // After cache clear, the rule correctly detects the broken link
+    expect(run2Fixed).toHaveLength(1);
+    expect(run2Fixed[0].detail).toContain('Link target "target.md" does not exist');
+  });
+
+  test('detects broken link after clearing caches between watch-mode runs', () => {
+    // Arrange
+    const targetPath = path.join(tmpDir, 'page.md');
+    const sourcePath = path.join(tmpDir, 'index.md');
+
+    fs.writeFileSync(targetPath, '# Page\n');
+    fs.writeFileSync(sourcePath, '# Index\n\nSee [page](page.md).\n');
+
+    // Populate cache via first run
+    const run1 = lintFile(sourcePath);
+    expect(run1).toHaveLength(0);
+
+    // Delete the linked file
+    fs.rmSync(targetPath);
+
+    // Clear caches before the second run (the fix)
+    clearCaches();
+
+    // Second run must detect the missing file
+    const run2 = lintFile(sourcePath);
+    expect(run2).toHaveLength(1);
+    expect(run2[0].detail).toContain('Link target "page.md" does not exist');
   });
 });

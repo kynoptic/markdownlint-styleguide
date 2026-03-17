@@ -272,6 +272,42 @@ Use this validation loop to identify and fix false positives when improving rule
 
 6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-trap fixes.
 
+## False-positive audit round consolidation
+
+Audit rounds are numbered files (`false-positive-audit-round<N>.test.js`) created during the [false positive validation](#false-positive-validation) loop. Over time these accumulate and make the feature suite harder to navigate.
+
+### When to consolidate
+
+Consolidate when **any** of the following is true:
+
+- There are 5 or more closed audit rounds (rounds whose issues are fully resolved and whose tests all pass on `main`)
+- A set of rounds covers a single logical theme (e.g., rounds 2–4 all fix sentence-case proper-noun exemptions)
+- The total line count across candidate rounds exceeds 600 lines
+
+A round is eligible for consolidation only when its associated fixes are merged and all its tests are green on `main`. Do not consolidate an open or in-progress round.
+
+### How to consolidate
+
+1. Identify the rounds to consolidate (e.g., rounds 2–6).
+2. Create a new file: `tests/features/false-positive-consolidated-<theme>.test.js`
+   - `<theme>` is a short kebab-case label describing the shared subject (e.g., `sentence-case`, `backtick`, `mixed`).
+   - If the rounds cover unrelated themes, use `rounds-<first>-<last>` (e.g., `rounds-2-6`).
+3. Move all `describe` blocks and `test` cases from the source round files into the new consolidated file. Preserve the original `describe` labels so test names remain stable.
+4. Delete the source round files.
+5. Run `npm test` to confirm no tests are lost or broken.
+6. Commit: `test: consolidate false-positive audit rounds <first>–<last>`.
+
+### Naming convention
+
+| File pattern | Purpose |
+|---|---|
+| `false-positive-audit-round<N>.test.js` | Active, open audit round (in progress or recently merged) |
+| `false-positive-consolidated-<theme>.test.js` | Consolidated archive of closed rounds grouped by theme |
+| `false-positive-audit-fixes.test.js` | One-off fixes not tied to a numbered round |
+| `false-positive-agent-playbook.test.js` | Consumer-specific regression tests (named by repo) |
+
+Keep at most 4 open round files in `tests/features/` at any time. When a fifth round is merged, consolidate the oldest closed rounds before starting a new one.
+
 ## Notes
 
 - Tests `import` ESM from `src/` directly via `babel-jest`; no build step required.

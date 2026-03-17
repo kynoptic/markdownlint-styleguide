@@ -429,12 +429,25 @@ function noDeadInternalLinks(params, onError) {
 }
 
 /**
- * Clear performance caches. Useful for testing or manual cache management.
- * PERFORMANCE: Cache clearing is not typically needed in normal usage since
- * markdownlint runs are typically short-lived and caches are beneficial.
- * @private
+ * Clear performance caches between lint runs.
+ *
+ * Call this before each lint pass in watch mode to prevent stale-cache false
+ * negatives: if a linked file is deleted between runs, the cached "exists"
+ * result would otherwise suppress the broken-link error.
+ *
+ * Single-shot `lint()` calls (non-watch) do not need to call this; the
+ * caches are populated fresh at process start and benefit all files in the
+ * same run.
+ *
+ * @example
+ * // watch-mode integration
+ * import noDeadInternalLinks, { clearCaches } from './no-dead-internal-links.js';
+ * watcher.on('change', async () => {
+ *   clearCaches(); // invalidate before each pass
+ *   await lint({ ... });
+ * });
  */
-function clearCaches() {
+export function clearCaches() {
   fileExistenceCache.clear();
   headingCache.clear();
   contentCache.clear();
@@ -463,7 +476,7 @@ export default {
   fixable: false
 };
 
-// Test-only exports for internal cache management and monitoring
+// Re-export for test compatibility; prefer the named export `clearCaches` in new code
 export const _forTesting = {
   clearCaches,
   getCacheStats
