@@ -18,7 +18,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run lint
-      - run: npx markdownlint-cli2 || true
+      - run: npx markdownlint-cli2
       - run: npm test
       - name: Run performance tests
         run: npm run test:performance
