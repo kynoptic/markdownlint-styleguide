@@ -176,12 +176,14 @@ export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig, amb
  * @param {string} originalBoldText - The original bold text to fix
  * @param {string} fixedBoldText - The corrected bold text
  * @param {Object} safetyConfig - Safety configuration for autofix
+ * @param {number} [startIndex=0] - Character offset to begin searching from, used to
+ *   locate the correct occurrence when the same bold text appears multiple times on a line
  * @returns {object|undefined} Fix information or undefined if no fix available
  */
-export function buildBoldTextFix(line, originalBoldText, fixedBoldText, safetyConfig) {
-  // Find the position of the bold text within the line
-  const boldPattern = `**${originalBoldText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}**`;
-  const boldIndex = line.indexOf(boldPattern);
+export function buildBoldTextFix(line, originalBoldText, fixedBoldText, safetyConfig, startIndex = 0) {
+  // Use literal string search (indexOf) — no regex escaping needed
+  const boldPattern = `**${originalBoldText}**`;
+  const boldIndex = line.indexOf(boldPattern, startIndex);
 
   if (boldIndex === -1) {
     return undefined;

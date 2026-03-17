@@ -312,4 +312,30 @@ describe("buildBoldTextFix", () => {
     expect(result).not.toBeUndefined(); // Fix info is still created even if text is same
     expect(result.insertText).toBe(fixedBoldText);
   });
+
+  test("test_should_find_bold_text_containing_dot", () => {
+    // Regression: regex escaping was applied before indexOf (literal search),
+    // so "Next\.js" was never found in a line containing "Next.js"
+    const line = "- **Next.js** is a framework";
+    const originalBoldText = "Next.js";
+    const fixedBoldText = "Next.js";
+    const result = buildBoldTextFix(line, originalBoldText, fixedBoldText, defaultSafetyConfig);
+
+    expect(result).toBeDefined();
+    expect(result.editColumn).toBe(5); // After "- **"
+  });
+
+  test("test_should_find_second_occurrence_when_startIndex_provided", () => {
+    // Regression: indexOf always returned first occurrence, so the second **Bold Text**
+    // on the same line would generate a fixInfo pointing at the wrong column
+    const line = "**Bold Text** and **Bold Text** more";
+    const originalBoldText = "Bold Text";
+    const fixedBoldText = "Bold text";
+
+    const first = buildBoldTextFix(line, originalBoldText, fixedBoldText, defaultSafetyConfig, 0);
+    expect(first.editColumn).toBe(3); // position 0 + 3
+
+    const second = buildBoldTextFix(line, originalBoldText, fixedBoldText, defaultSafetyConfig, 13);
+    expect(second.editColumn).toBe(21); // position 18 + 3
+  });
 });
