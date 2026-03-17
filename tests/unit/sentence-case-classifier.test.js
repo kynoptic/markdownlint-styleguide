@@ -567,3 +567,38 @@ describe("issue #159: common English prefixes not flagged as acronyms", () => {
     expect(result.errorMessage).toMatch(/YAML/);
   });
 });
+
+describe("validateHeading — #205 repeated-word indexOf bug", () => {
+  const defaultSpecialTerms = { api: "API", javascript: "JavaScript" };
+
+  test("heading with repeated word after colon is valid — first word after colon may be capitalized", () => {
+    // "Fix" appears twice: once as first word, once as first word after colon.
+    // indexOf("Fix") returns position 0 (before colon), so after-colon exemption
+    // is incorrectly skipped → false positive. After fix, indexOf should find
+    // the second "Fix" at its real position (after the colon).
+    const result = validateHeading("Fix: Fix the issue", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("heading with repeated word after em-dash is valid", () => {
+    // Same issue but with em-dash boundary.
+    const result = validateHeading("Step — Step through the process", defaultSpecialTerms);
+    expect(result.isValid).toBe(true);
+  });
+});
+
+describe("validateHeading — #195 kebab-case exemption bypassed by specialTerms", () => {
+  const terms195 = { api: "API", javascript: "JavaScript", claude: "Claude", agent: "Agent" };
+  // When a special term like "claude" exists in specialCasedTerms, the hyphen
+  // base lookup finds it and fires an error before the kebab-case exemption is
+  // reached. Fix: check kebab-case pattern before applying the hyphen-base rule.
+  test("kebab-case heading is valid even when prefix matches a special term", () => {
+    const result = validateHeading("claude-code overview", terms195);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("kebab-case heading with multi-segment name is valid", () => {
+    const result = validateHeading("agent-playbook setup guide", terms195);
+    expect(result.isValid).toBe(true);
+  });
+});

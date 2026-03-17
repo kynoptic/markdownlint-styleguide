@@ -356,6 +356,12 @@ function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerm
     const hyphenExpected = specialCasedTerms[hyphenBase];
 
     if (hyphenExpected) {
+      // A pure kebab-case identifier (e.g. "claude-code") takes precedence over
+      // the hyphen-base special-term lookup so it is never incorrectly flagged
+      // as needing capitalisation (#195).
+      if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
+        return { isValid: true };
+      }
       const expected = hyphenExpected + firstWord.slice(hyphenExpected.length);
       if (firstWord !== expected) {
         return {
@@ -441,6 +447,14 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
   const emDashIndex = headingText.indexOf('—');
   const ampersandIndex = headingText.indexOf('&');
 
+  // Initialise search cursor past the first content word so repeated words
+  // resolve to their true position rather than the first occurrence (#205).
+  let searchPos = 0;
+  if (startIndex >= 0 && startIndex < words.length) {
+    const firstPos = headingText.indexOf(words[startIndex]);
+    if (firstPos !== -1) searchPos = firstPos + words[startIndex].length;
+  }
+
   for (let i = startIndex + 1; i < words.length; i++) {
     if (phraseIgnore.has(i)) {
       continue;
@@ -467,8 +481,10 @@ function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTe
       continue;
     }
 
-    // Find the position of this word in the heading
-    const wordPos = headingText.indexOf(word);
+    // Find this word's actual position using the running cursor to handle
+    // repeated words correctly (#205).
+    const wordPos = headingText.indexOf(word, searchPos);
+    if (wordPos !== -1) searchPos = wordPos + word.length;
 
     // Allow proper capitalization for the first word after colon (e.g., "Priority 1: Critical fixes")
     // But only if the word is correctly cased (first letter uppercase, rest lowercase) or matches a special term
