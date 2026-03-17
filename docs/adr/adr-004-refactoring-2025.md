@@ -279,14 +279,13 @@ If the build produces changes, the commit is blocked with a message to run `npm 
 
 ### Node.js version targeting
 
-**Decision**: Target Node.js >= 18 (LTS) as the minimum supported version.
+**Decision**: Target Node.js >= 20 (LTS) as the minimum supported version.
 
 **Rationale**:
 
-- Node.js 18 includes modern features (native fetch, test runner, watch mode)
-- LTS support runs through April 2025
-- Enterprise users typically stay on LTS versions
-- Allows use of modern JavaScript without excessive transpilation
+- Node.js 20 includes native fetch, the test runner, watch mode, and stable V8 improvements
+- Node.js 18 LTS reached end-of-life in April 2025
+- CI matrix runs on [20, 22]; older versions are not tested
 
 **Recorded in**: `.nvmrc`, `package.json` engines field, CI matrix
 

@@ -45,7 +45,7 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 
 ## Coding style
 
-- Node.js `>=18` (see `.nvmrc`). ES modules only, no transpilation.
+- Node.js `>=20` (see `.nvmrc`). ES modules only, no transpilation.
 - Kebab-case rule filenames. Named exports for utilities. 2-space indent.
 - JSDoc typedefs for public rule helpers.
 

@@ -36,7 +36,7 @@ We will implement a **confidence-based autofix safety system** as a separate arc
    - Ambiguity markers (e.g., very short words = low confidence)
    - Context indicators (e.g., technical vs. natural language surrounding text)
 
-3. **Conservative thresholds** - Default confidence threshold is 0.5, requiring moderate-to-high confidence before applying autofixes
+3. **Conservative thresholds** - Default confidence threshold is 0.7, requiring high confidence before applying autofixes
 
 4. **Transparent metadata** - Fix objects include `_safety` metadata for debugging and future enhancement
 
