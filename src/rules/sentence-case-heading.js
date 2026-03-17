@@ -30,7 +30,8 @@ import {
 } from './config-validation.js';
 import { stripLeadingDecorations, truncateAtEmoji, getCodeBlockLines } from './shared-utils.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
-import { validateHeading, validateBoldText } from './sentence-case/case-classifier.js';
+import { validateHeading } from './sentence-case/case-classifier.js';
+import { validateBoldText } from './sentence-case/bold-text-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
 
 /** Track which deprecation keys have been warned to avoid warning once per file. */

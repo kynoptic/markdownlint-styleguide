@@ -6,10 +6,10 @@ import { describe, test, expect } from "@jest/globals";
 import {
   prepareTextForValidation,
   validateHeading,
-  validateBoldText,
   isAllCapsHeading,
   stripLeadingSymbols,
 } from "../../src/rules/sentence-case/case-classifier.js";
+import { validateBoldText } from "../../src/rules/sentence-case/bold-text-classifier.js";
 import {
   ambiguousTerms,
   casingTerms,
