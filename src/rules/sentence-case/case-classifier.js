@@ -8,6 +8,7 @@
  */
 
 import { preserveSegments } from '../shared-heuristics.js';
+import { escapeRegExp } from '../shared-utils.js';
 import { UNICODE_LETTER_REGEX } from '../shared-constants.js';
 import { validateFirstWord, validateSubsequentWords } from './word-validators.js';
 
@@ -209,7 +210,7 @@ function validateProperPhrases(text, specialCasedTerms) {
     if (!phrase.includes(' ')) {
       continue;
     }
-    const regex = new RegExp(`\\b${phrase}\\b`, 'i');
+    const regex = new RegExp(`\\b${escapeRegExp(phrase)}\\b`, 'i');
     const match = regex.exec(text);
     if (match && match[0] !== expected) {
       return {

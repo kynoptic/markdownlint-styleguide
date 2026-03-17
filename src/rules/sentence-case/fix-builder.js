@@ -7,6 +7,7 @@
 
 import { createSafeFixInfo } from '../autofix-safety.js';
 import { stripLeadingSymbols } from './case-classifier.js';
+import { escapeRegExp } from '../shared-utils.js';
 import { contextualAllCapsTerms } from '../shared-constants.js';
 
 /**
@@ -39,7 +40,7 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
     }
 
     // Case-insensitive regex to find the phrase
-    const regex = new RegExp(`\\b${phraseLower}\\b`, 'gi');
+    const regex = new RegExp(`\\b${escapeRegExp(phraseLower)}\\b`, 'gi');
     processed = processed.replace(regex, () => {
       // Preserve the correctly-cased phrase
       preserved.push(phraseCorrect);

@@ -344,6 +344,15 @@ export function findFirstEmojiPosition(text) {
  * @param {boolean} ignoreAfterEmoji - Whether to truncate at emoji
  * @returns {{textForValidation: string, originalText: string, wasTruncated: boolean}} Truncation result
  */
+/**
+ * Escape special regex characters in a string for safe use in a RegExp constructor.
+ * @param {string} string - String to escape
+ * @returns {string} Escaped string safe for use in regex
+ */
+export function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function truncateAtEmoji(text, ignoreAfterEmoji) {
   if (!ignoreAfterEmoji) {
     return {
