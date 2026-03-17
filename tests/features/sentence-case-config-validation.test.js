@@ -5,7 +5,7 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import sentenceCaseHeading from '../../src/rules/sentence-case-heading.js';
+import sentenceCaseHeading, { _forTesting } from '../../src/rules/sentence-case-heading.js';
 
 // Mock console.error to capture validation messages
 const originalConsoleError = console.error;
@@ -14,6 +14,7 @@ let mockConsoleError;
 beforeEach(() => {
   mockConsoleError = jest.fn();
   console.error = mockConsoleError;
+  _forTesting.resetDeprecationWarnings();
 });
 
 afterEach(() => {

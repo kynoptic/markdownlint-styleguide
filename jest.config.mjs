@@ -20,5 +20,6 @@ export default {
     '/.tmp/',
     '/.test-dist/',
     '/.markdownlint-rules/',
+    '/.claude/worktrees/',
   ],
 };

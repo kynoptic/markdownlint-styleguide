@@ -3,12 +3,11 @@
  * @author 
  */
 
-import { 
-  validateStringArray, 
-  validateBoolean,
-  validateConfig, 
+import {
+  validateStringArray,
+  validateConfig,
   logValidationErrors,
-  createMarkdownlintLogger 
+  createMarkdownlintLogger
 } from './config-validation.js';
 import { createSafeFixInfo } from './autofix-safety.js';
 
@@ -104,8 +103,7 @@ export default {
 
       // Validate configuration
       const configSchema = {
-        allowedDomains: validateStringArray,
-        skipCodeBlocks: validateBoolean
+        allowedDomains: validateStringArray
       };
 
       const validationResult = validateConfig(config, configSchema, 'no-bare-url');
@@ -117,7 +115,6 @@ export default {
 
       // Extract configuration with defaults
       const allowedDomains = Array.isArray(config.allowedDomains) ? config.allowedDomains : [];
-      const skipCodeBlocks = typeof config.skipCodeBlocks === 'boolean' ? config.skipCodeBlocks : true; // eslint-disable-line no-unused-vars
       params.tokens.filter(t => t.type === "inline" && t.children).forEach(token => {
         token.children.forEach((child, childIndex) => {
           if (child.type === "link_open" && child.info === "auto" && child.markup !== "autolink") {

@@ -8,17 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run lint
       - run: npx markdownlint-cli2 || true
       - run: npm test
-      - run: npm run test:performance
-        name: Run performance tests
+      - name: Run performance tests
+        run: npm run test:performance
 
   security:
     runs-on: ubuntu-latest

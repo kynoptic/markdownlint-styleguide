@@ -114,7 +114,6 @@ Fixable: Yes.
 ## `no-bare-url` (BU001)
 
 - `allowedDomains`: string[] — Domains exempt from bare URL reporting.
-- `skipCodeBlocks`: boolean (default: true) — Skip fenced/indented code blocks.
 
 Fixable: Yes (wrap in `<...>`). Requires markdown-it with `linkify: true`.
 

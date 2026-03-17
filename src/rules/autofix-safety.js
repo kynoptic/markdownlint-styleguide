@@ -41,67 +41,33 @@ const COMMAND_KEYWORDS = new Set([
 ]);
 
 /**
- * Set of file extension keywords for efficient lookup
+ * Bare file extension strings used to identify code file references.
+ * Matched against the extension extracted from a filename (without the dot).
+ * Only genuine file format extensions are included — not filenames or pipeline names.
  * @type {Set<string>}
  */
-const FILE_EXTENSION_KEYWORDS = new Set([
-  'js', 'ts', 'jsx', 'tsx', 'py', 'java', 'c', 'cpp', 'cs', 'go', 'rs', 'rb',
-  'php', 'pl', 'sh', 'bash', 'zsh', 'fish', 'ps1', 'bat', 'cmd', 'sql', 'html',
-  'css', 'scss', 'sass', 'less', 'xml', 'json', 'yaml', 'yml', 'toml', 'ini',
-  'cfg', 'conf', 'config', 'env', 'gitignore', 'dockerignore', 'editorconfig',
-  'prettierrc', 'eslintrc', 'babelrc', 'tsconfigjson', 'packagejson', 'composerjson',
-  'gemfile', 'requirements.txt', 'pipfile', 'cargo.toml', 'go.mod', 'pom.xml',
-  'build.gradle', 'webpack.config.js', 'rollup.config.js', 'vite.config.js',
-  'next.config.js', 'nuxt.config.js', 'vue.config.js', 'angular.json',
-  'tsconfig.json', 'jest.config.js', 'cypress.json', 'playwright.config.js',
-  'storybook', 'readme.md', 'changelog.md', 'license', 'contributing.md',
-  'code_of_conduct.md', 'security.md', 'pull_request_template.md',
-  'issue_template.md', 'funding.yml', 'dependabot.yml', 'codeql.yml', 'ci.yml',
-  'cd.yml', 'deploy.yml', 'release.yml', 'test.yml', 'build.yml', 'lint.yml',
-  'format.yml', 'security.yml', 'audit.yml', 'update.yml', 'backup.yml',
-  'restore.yml', 'migrate.yml', 'seed.yml', 'rollback.yml', 'status.yml',
-  'health.yml', 'monitor.yml', 'alert.yml', 'log.yml', 'trace.yml', 'debug.yml',
-  'profile.yml', 'benchmark.yml', 'load.yml', 'stress.yml', 'smoke.yml',
-  'integration.yml', 'unit.yml', 'e2e.yml', 'acceptance.yml', 'contract.yml',
-  'mutation.yml', 'property.yml', 'snapshot.yml', 'visual.yml', 'accessibility.yml',
-  'performance.yml', 'compliance.yml', 'governance.yml', 'risk.yml', 'review.yml',
-  'approval.yml', 'merge.yml', 'conflict.yml', 'rebase.yml', 'cherry-pick.yml',
-  'tag.yml', 'branch.yml', 'commit.yml', 'push.yml', 'pull.yml', 'fetch.yml',
-  'clone.yml', 'fork.yml', 'star.yml', 'watch.yml', 'follow.yml', 'sponsor.yml',
-  'donate.yml', 'support.yml', 'contact.yml', 'feedback.yml', 'report.yml',
-  'request.yml', 'suggestion.yml', 'idea.yml', 'proposal.yml', 'rfc.yml',
-  'adr.yml', 'decision.yml', 'meeting.yml', 'agenda.yml', 'minutes.yml',
-  'action.yml', 'task.yml', 'todo.yml', 'done.yml', 'progress.yml', 'news.yml',
-  'announcement.yml', 'version.yml', 'migration.yml', 'upgrade.yml', 'downgrade.yml',
-  'patch.yml', 'hotfix.yml', 'bugfix.yml', 'feature.yml', 'enhancement.yml',
-  'improvement.yml', 'optimization.yml', 'refactor.yml', 'cleanup.yml',
-  'maintenance.yml', 'deprecation.yml', 'removal.yml', 'addition.yml',
-  'modification.yml', 'change.yml', 'fix.yml', 'repair.yml', 'recover.yml',
-  'archive.yml', 'export.yml', 'import.yml', 'sync.yml', 'transfer.yml',
-  'copy.yml', 'move.yml', 'delete.yml', 'remove.yml', 'purge.yml', 'clean.yml',
-  'clear.yml', 'reset.yml', 'restart.yml', 'reload.yml', 'refresh.yml',
-  'renew.yml', 'regenerate.yml', 'rebuild.yml', 'recreate.yml', 'redeploy.yml',
-  'republish.yml', 'reprocess.yml', 'rerun.yml', 'retry.yml', 'resume.yml',
-  'pause.yml', 'stop.yml', 'start.yml', 'enable.yml', 'disable.yml',
-  'activate.yml', 'deactivate.yml', 'install.yml', 'uninstall.yml', 'setup.yml',
-  'configure.yml', 'initialize.yml', 'finalize.yml', 'complete.yml', 'finish.yml',
-  'end.yml', 'close.yml', 'launch.yml', 'execute.yml', 'run.yml', 'invoke.yml',
-  'call.yml', 'trigger.yml', 'schedule.yml', 'queue.yml', 'process.yml',
-  'handle.yml', 'manage.yml', 'control.yml', 'observe.yml', 'track.yml',
-  'measure.yml', 'analyze.yml', 'evaluate.yml', 'assess.yml', 'validate.yml',
-  'verify.yml', 'confirm.yml', 'approve.yml', 'reject.yml', 'accept.yml',
-  'decline.yml', 'allow.yml', 'deny.yml', 'grant.yml', 'revoke.yml',
-  'assign.yml', 'unassign.yml', 'allocate.yml', 'deallocate.yml', 'reserve.yml',
-  'release.yml', 'lock.yml', 'unlock.yml', 'secure.yml', 'unsecure.yml',
-  'protect.yml', 'unprotect.yml', 'encrypt.yml', 'decrypt.yml', 'sign.yml',
-  'authenticate.yml', 'authorize.yml', 'login.yml', 'logout.yml', 'signin.yml',
-  'signout.yml', 'register.yml', 'unregister.yml', 'subscribe.yml',
-  'unsubscribe.yml', 'join.yml', 'leave.yml', 'enter.yml', 'exit.yml',
-  'connect.yml', 'disconnect.yml', 'link.yml', 'unlink.yml', 'bind.yml',
-  'unbind.yml', 'attach.yml', 'detach.yml', 'mount.yml', 'unmount.yml',
-  'load.yml', 'unload.yml', 'save.yml', 'persist.yml', 'store.yml',
-  'retrieve.yml', 'fetch.yml', 'get.yml', 'set.yml', 'put.yml', 'post.yml',
-  'patch.yml', 'head.yml', 'options.yml', 'trace.yml'
+const CODE_FILE_EXTENSIONS = new Set([
+  // Source code
+  'js', 'ts', 'jsx', 'tsx', 'mjs', 'cjs',
+  'py', 'rb', 'java', 'c', 'cpp', 'cs', 'go', 'rs', 'swift', 'kt', 'scala',
+  'php', 'pl', 'lua', 'r', 'ex', 'exs', 'erl', 'hs', 'clj', 'fs', 'fsx',
+  // Shell
+  'sh', 'bash', 'zsh', 'fish', 'ps1', 'bat', 'cmd',
+  // Query and data
+  'sql', 'graphql', 'gql',
+  // Markup and style
+  'html', 'htm', 'css', 'scss', 'sass', 'less', 'xml', 'svg', 'vue', 'svelte',
+  // Config and data formats
+  'json', 'jsonc', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'env',
+  // Docs
+  'md', 'mdx', 'rst', 'txt',
+  // Build artifacts and lock files
+  'lock', 'sum',
+  // Compiled / binary descriptors
+  'wasm', 'so', 'dll', 'dylib',
+  // Dotfile names matched as extensions via getFileExtension() on `.name` paths
+  'gitignore', 'dockerignore', 'gitattributes', 'npmignore',
+  'editorconfig', 'prettierrc', 'eslintrc', 'babelrc', 'stylelintrc',
 ]);
 
 /**
@@ -191,11 +157,11 @@ const DEFINITELY_NOT_CODE = [
 
 /**
  * Precompiled strong code indicator patterns.
- * Built from FILE_EXTENSION_KEYWORDS and COMMAND_KEYWORDS sets at module load time.
+ * Built from CODE_FILE_EXTENSIONS and COMMAND_KEYWORDS sets at module load time.
  * @type {RegExp[]}
  */
 const STRONG_CODE_INDICATORS = [
-  new RegExp(`\\.(${Array.from(FILE_EXTENSION_KEYWORDS).join('|')})$`, 'i'),
+  new RegExp(`\\.(${Array.from(CODE_FILE_EXTENSIONS).join('|')})$`, 'i'),
   /^[A-Z_][A-Z0-9_]*$/, // ENVIRONMENT_VARIABLES
   new RegExp(`^(${Array.from(COMMAND_KEYWORDS).join('|')})\\s`),
   /\(.*\)$/, // Function calls
@@ -454,7 +420,7 @@ function getCommandConfidence(text) {
   }
 
   // File extensions
-  if (FILE_EXTENSION_KEYWORDS.has(getFileExtension(text))) {
+  if (CODE_FILE_EXTENSIONS.has(getFileExtension(text))) {
     confidence += 0.2; // File extension references
   }
 

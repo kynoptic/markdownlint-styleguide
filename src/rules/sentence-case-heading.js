@@ -33,6 +33,9 @@ import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading, validateBoldText } from './sentence-case/case-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
 
+/** Track which deprecation keys have been warned to avoid warning once per file. */
+const _deprecationWarned = new Set();
+
 /**
  * Main rule implementation.
  * @param {import("markdownlint").RuleParams} params
@@ -84,10 +87,12 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   // Note: These are deprecation warnings (not configuration errors), using console.warn
   // to maintain compatibility with existing tooling that may capture console output.
   // These warnings are informational and don't prevent the rule from functioning.
-  if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0) {
+  if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0 && !_deprecationWarned.has('technicalTerms')) {
+    _deprecationWarned.add('technicalTerms');
     console.warn('⚠️  Deprecation warning [sentence-case-heading]: "technicalTerms" is deprecated. Please use "specialTerms" instead.');
   }
-  if (config.properNouns && Array.isArray(config.properNouns) && config.properNouns.length > 0) {
+  if (config.properNouns && Array.isArray(config.properNouns) && config.properNouns.length > 0 && !_deprecationWarned.has('properNouns')) {
+    _deprecationWarned.add('properNouns');
     console.warn('⚠️  Deprecation warning [sentence-case-heading]: "properNouns" is deprecated. Please use "specialTerms" instead.');
   }
   
@@ -318,4 +323,8 @@ export default {
   tags: ['headings', 'style', 'custom', 'basic'],
   parser: 'micromark',
   function: basicSentenceCaseHeadingFunction
+};
+
+export const _forTesting = {
+  resetDeprecationWarnings: () => _deprecationWarned.clear()
 };

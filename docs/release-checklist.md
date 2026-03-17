@@ -124,7 +124,7 @@ Both humans and AI agents use this checklist:
 ### For AI agents
 
 - [ ] **Verify all automated checks** pass before proceeding
-- [ ] **Use git-commit-release-prepare agent** for atomic release workflow
+- [ ] **Use atomic release workflow**: commit changelog and version bump together
 - [ ] **Validate semantic versioning** against evidence
 - [ ] **Generate changelog entries** from conventional commits
 - [ ] **Run dry-run validation** before publishing

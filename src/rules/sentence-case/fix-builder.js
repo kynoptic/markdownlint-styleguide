@@ -7,8 +7,7 @@
 
 import { createSafeFixInfo } from '../autofix-safety.js';
 import { stripLeadingSymbols } from './case-classifier.js';
-
-const contextualAllCapsTerms = new Set(['note', 'tip', 'important', 'warning', 'caution']);
+import { contextualAllCapsTerms } from '../shared-constants.js';
 
 /**
  * Converts a string to sentence case, respecting preserved segments and multi-word special terms.

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Enforce Conventional Commits format and body style
+
+build-tools/quality-checks/check-commit-body.sh "$1"

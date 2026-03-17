@@ -12,14 +12,9 @@ import {
   UNICODE_LETTER_REGEX,
   UNICODE_UPPERCASE_REGEX,
   camelCaseExemptions,
-  mcMacNamePattern
+  mcMacNamePattern,
+  contextualAllCapsTerms
 } from '../shared-constants.js';
-
-/**
- * Callout keywords that should follow normal sentence case rather than being
- * forced to ALL_CAPS, even if they appear in specialCasedTerms as "NOTE" etc.
- */
-const contextualAllCapsTerms = new Set(['note', 'tip', 'important', 'warning', 'caution']);
 
 /**
  * Code identifier patterns for detecting programming constructs in headings.

@@ -85,16 +85,15 @@ flowchart TD
   ```
 
 - Run: `npx markdownlint-cli2 "**/*.md"` (add `--fix` to auto-fix)
-- Note: Git installs run `prepare`, which builds compiled rules. If lifecycle scripts are disabled, use a tag that includes compiled files or use Option B.
 
-### Option B: Git submodule (no lifecycle scripts needed)
+### Option B: Git submodule
 
 - Add: `git submodule add https://github.com/kynoptic/markdownlint-trap tools/markdownlint-trap`
 - Configure `.markdownlint-cli2.jsonc`:
 
   ```jsonc
   {
-    "customRules": ["./tools/markdownlint-trap/.markdownlint-rules"],
+    "customRules": ["./tools/markdownlint-trap/src/index.js"],
     "config": { "extends": "./tools/markdownlint-trap/basic-config.jsonc" },
     "globs": ["**/*.md", "!node_modules/**/*", "!dist/**/*"]
   }
@@ -223,9 +222,9 @@ cd ~/any-project
 markdownlint-cli2 --help
 ```
 
-### Cannot find `.markdownlint-rules` when extending the preset
+### Cannot find custom rules when extending the preset
 
-Lifecycle scripts must run so `prepare` builds the compiled rules. Otherwise, install from a tag that includes compiled files, or use Option B (submodule).
+Confirm that `markdownlint-trap` is installed (`npm list markdownlint-trap`) and that `.markdownlint-cli2.jsonc` references `customRules: ["markdownlint-trap"]` or the correct submodule path for Option B.
 
 ### No violations but expected rules
 
@@ -272,8 +271,7 @@ Update markdownlint-trap across all projects:
 # Pull latest changes
 git pull
 
-# Rebuild and redistribute
-npm run build
+# Redistribute
 npm run dist:local
 ```
 
