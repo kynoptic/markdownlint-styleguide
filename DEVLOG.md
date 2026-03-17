@@ -6,6 +6,19 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ---
 
+## [2.9.0] - 2026-03-17
+
+Module decomposition and dependency updates.
+
+- Decomposed `backtick-code-elements.js` into `backtick/detection-helpers.js` and `backtick/error-messages.js` — file exceeded 500 LOC threshold per ADR-004
+- Extracted `bold-text-classifier.js` and `word-validators.js` from `case-classifier.js` for testability
+- Memoized `specialCasedTerms` construction in BCE001 to avoid per-invocation rebuilds
+- Added Husky `commit-msg` hook and body-format checker to enforce conventional commit style locally
+- Updated `.nvmrc` from 14 to 20 to match engine requirement
+- Dependency updates: eslint ^10.0.3, jest ^30.3.0, lint-staged ^16.4.0, globals ^17.4.0
+
+---
+
 ## [2.8.0] - 2026-02-22
 
 Security dependency update.

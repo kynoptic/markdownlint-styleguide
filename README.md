@@ -15,7 +15,7 @@ Visit [our documentation](https://example.com) for docs and tutorials.
 ## Quick start
 
 > [!IMPORTANT]
-> Requires Node.js 18+ and npm.
+> Requires Node.js 20+ and npm.
 
 ```bash
 npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2

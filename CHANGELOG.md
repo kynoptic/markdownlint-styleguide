@@ -6,6 +6,26 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [2.9.0] - 2026-03-17
+
+Config inheritance for distribution presets and false positive reductions across rules.
+
+### Added
+
+- Config inheritance via `extends` property, allowing preset tiers to compose and override cleanly
+
+### Changed
+
+- Minimum Node.js version raised to 20 (Node 18 reached end-of-life April 2025)
+
+### Fixed
+
+- Backtick rule no longer flags English suffixes like `-ing`, `-ed`, and `-est` as CLI flags
+- Sentence-case rule correctly handles method names like `indexOf` and kebab-case exemptions
+- Dead-link rule no longer serves stale results in watch mode after files change
+
+---
+
 ## [2.8.0] - 2026-02-22
 
 Add incremental linting cache and reduce false positives across rules.
