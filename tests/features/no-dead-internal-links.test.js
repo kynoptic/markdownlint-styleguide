@@ -90,6 +90,8 @@ function runRuleWithContent(markdown, fileName, config = {}) {
 }
 
 describe('no-dead-internal-links rule', () => {
+  beforeEach(() => clearCaches());
+
   const fixturesDir = path.resolve(__dirname, '../fixtures/no-dead-internal-links');
   const passingFixture = path.join(fixturesDir, 'passing.fixture.md');
   const failingFixture = path.join(fixturesDir, 'failing.fixture.md');
