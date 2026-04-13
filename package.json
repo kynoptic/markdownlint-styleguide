@@ -5,7 +5,10 @@
   "exports": {
     ".": "./src/index.js",
     "./cache": "./src/cache/cached-lint.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./recommended-config.jsonc": "./recommended-config.jsonc",
+    "./basic-config.jsonc": "./basic-config.jsonc",
+    "./strict-config.jsonc": "./strict-config.jsonc"
   },
   "bin": {
     "markdownlint-trap": "./scripts/cli.cjs"
