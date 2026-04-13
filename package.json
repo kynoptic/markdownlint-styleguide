@@ -7,6 +7,7 @@
     "./cache": "./src/cache/cached-lint.js",
     "./package.json": "./package.json",
     "./recommended-config.jsonc": "./recommended-config.jsonc",
+    "./recommended-markdownlint.jsonc": "./recommended-markdownlint.jsonc",
     "./basic-config.jsonc": "./basic-config.jsonc",
     "./strict-config.jsonc": "./strict-config.jsonc"
   },
@@ -21,6 +22,7 @@
     "scripts/distribute-local.cjs",
     "templates",
     "recommended-config.jsonc",
+    "recommended-markdownlint.jsonc",
     "basic-config.jsonc",
     "strict-config.jsonc"
   ],
