@@ -1,0 +1,43 @@
+name: PR checklist gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for bypass label
+        id: bypass
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          if echo "$LABELS" | grep -q 'skip-checklist'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for unchecked items
+        if: steps.bypass.outputs.skip == 'false'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Strip optional items (lines ending with *(optional)* or <!-- optional -->)
+          FILTERED=$(echo "$PR_BODY" | grep -v '\*(optional)\*' | grep -v '<!--\s*optional\s*-->')
+
+          # Count unchecked items
+          UNCHECKED=$(echo "$FILTERED" | grep -cE '^\s*- \[ \]' || true)
+
+          if [ "$UNCHECKED" -gt 0 ]; then
+            echo "❌ $UNCHECKED unchecked checklist item(s) found:"
+            echo ""
+            echo "$FILTERED" | grep -nE '^\s*- \[ \]' | sed 's/^/  /'
+            echo ""
+            echo "To bypass: add the 'skip-checklist' label to this PR (rare — requires a real reason)."
+            echo "To exclude an item: append *(optional)* to the line — only when no automation path exists."
+            echo "Default: attempt the item via CLI, browser automation, or other tooling before marking it optional."
+            exit 1
+          fi
+
+          echo "✅ All checklist items are checked."

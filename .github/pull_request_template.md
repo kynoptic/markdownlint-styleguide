@@ -1,9 +1,15 @@
-<!-- markdownlint-disable MD041 -->
 <!--
 PR title guidance: Summarize the solution, not the problem
 Use clear, solution-oriented title describing what the commits accomplish
 Example: "Add input validation for empty usernames"
 Avoid conventional commit format for PR titles (no "feat:", "fix:", etc.)
+
+Checklist guidance: every item is in scope by default. Walk the tier ladder
+before marking anything *(optional)*: CLI → browser automation
+(mcp__claude-in-chrome__*) → other MCP/API tooling → human verification.
+Reserve *(optional)* for items that genuinely require human judgment with
+no automation path (subjective design review, third-party UI behind SSO
+with no API, physical hardware). Don't check a box you didn't verify.
 -->
 
 ## Summary
@@ -25,9 +31,11 @@ Brief description of the changes and the problem being solved:
 
 ### Manual testing
 
+<!-- "Manual" describes how a human would verify these — not an exemption from automation.
+Drive UI flows with mcp__claude-in-chrome__* before treating anything as human-only. -->
 - [ ] Tested with representative data
 - [ ] Edge cases and error conditions verified
-- [ ] Performance impact assessed (if applicable)
+- [ ] Performance impact assessed *(optional — quantitative judgment)*
 
 ### Test coverage
 
@@ -40,7 +48,6 @@ Brief description of the changes and the problem being solved:
 
 - List any breaking changes to public APIs
 - Include migration steps or configuration changes needed
-- Document deprecation timeline if applicable
 
 ## Performance and reliability
 
@@ -50,19 +57,16 @@ Brief description of the changes and the problem being solved:
 
 ## Code quality
 
-- [ ] Type annotations added for new code (if applicable to language)
-- [ ] Documentation added for public APIs
+- [ ] Type annotations added for new code
 - [ ] Error handling implemented with clear messages
 - [ ] Functions maintain single responsibility
-- [ ] Code quality hooks pass without modification
 
 ## Documentation
 
-- [ ] Updated relevant documentation
-- [ ] Added/updated documentation for public APIs
-- [ ] Updated configuration examples if needed
-- [ ] Created or updated ADR for significant architectural decisions
-- [ ] Updated changelog if user-facing changes made
+<!-- ADRs belong before this PR (design time). Changelog and migration guides belong at release time. -->
+- [ ] Docstrings added for new public functions
+- [ ] API documentation updated if public APIs added or changed
+- [ ] README updated if public-facing behavior changed
 
 ## Conventional commit compliance
 
