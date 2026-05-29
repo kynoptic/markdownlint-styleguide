@@ -48,7 +48,7 @@ describe('backtick-code-elements: domain names vs. full URLs', () => {
     expect(domainOnlyErrors).toHaveLength(0);
   });
 
-  test('should flag full URLs with protocol', async () => {
+  test('should NOT flag full URLs with protocol (handled by no-bare-url)', async () => {
     const options = {
       strings: {
         'domain-names.md': fixtureContent
@@ -63,14 +63,14 @@ describe('backtick-code-elements: domain names vs. full URLs', () => {
     const results = await lint(options);
     const errors = results['domain-names.md'] || [];
 
-    // Full URLs with protocol SHOULD be flagged
+    // Bare URLs (with protocol) are the domain of the separate no-bare-url rule,
+    // so BCE001 must not flag them as code elements or file paths.
     const urlErrors = errors.filter(err => {
       const context = err.errorContext;
       return context && (context.includes('http://') || context.includes('https://'));
     });
 
-    // We should have at least 7 URL violations (from the fixture)
-    expect(urlErrors.length).toBeGreaterThanOrEqual(7);
+    expect(urlErrors).toHaveLength(0);
   });
 
   test('should distinguish between domain names and URLs in mixed content', async () => {
@@ -96,7 +96,7 @@ Check Gmail.com for updates, then refer to https://mail.google.com/mail/u/0/.
     const results = await lint(options);
     const errors = results['mixed.md'] || [];
 
-    // Only URLs with protocol should be flagged
+    // Bare URLs with protocol are handled by no-bare-url, not BCE001.
     const urlErrors = errors.filter(err => {
       const context = err.errorContext;
       return context && (context.includes('http://') || context.includes('https://'));
@@ -111,7 +111,7 @@ Check Gmail.com for updates, then refer to https://mail.google.com/mail/u/0/.
       );
     });
 
-    expect(urlErrors.length).toBeGreaterThanOrEqual(2);
+    expect(urlErrors).toHaveLength(0);
     expect(domainOnlyErrors).toHaveLength(0);
   });
 

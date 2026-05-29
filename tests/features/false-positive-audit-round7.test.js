@@ -53,7 +53,7 @@ describe('False positive fixes - Round 7', () => {
       expect(result.input).toHaveLength(0);
     });
 
-    test('should STILL flag bare URLs not in links', async () => {
+    test('should NOT flag bare URLs (handled by no-bare-url)', async () => {
       const input = 'Visit https://example.com/path for more info.';
 
       const result = await lint({
@@ -65,8 +65,9 @@ describe('False positive fixes - Round 7', () => {
         customRules: [backtickCodeElements],
       });
 
-      // Bare URLs should still be flagged
-      expect(result.input.length).toBeGreaterThan(0);
+      // Bare URLs are the domain of the separate no-bare-url rule, so BCE001
+      // must not flag them as code elements or file paths.
+      expect(result.input).toHaveLength(0);
     });
   });
 

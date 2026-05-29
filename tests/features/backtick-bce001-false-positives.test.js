@@ -79,26 +79,25 @@ describe("BCE001 scientific and measurement terms (#192)", () => {
   });
 });
 
-describe("BCE001 URL path component not double-flagged (#194)", () => {
-  // The path component of a bare URL (e.g. "code.claude.com/docs/en/mcp.md") should
-  // not produce a SECOND violation separate from the full URL itself. Each bare URL
-  // in prose should produce at most one violation (for the full URL with protocol).
-  test("bare https URL produces at most one violation", async () => {
+describe("BCE001 URL path component not flagged (#194)", () => {
+  // Bare URLs are not BCE001's concern (handled by the no-bare-url rule), so the
+  // path component of a bare URL must never produce a path violation.
+  test("bare https URL produces no violation", async () => {
     const violations = await getBCE001Violations(
       "See https://code.claude.com/docs/en/mcp.md for details.",
     );
-    expect(violations).toHaveLength(1);
+    expect(violations).toHaveLength(0);
   });
 
-  test("bare https URL with directory path produces at most one violation", async () => {
+  test("bare https URL with directory path produces no violation", async () => {
     const violations = await getBCE001Violations(
       "Docs: https://github.com/settings/tokens",
     );
-    expect(violations).toHaveLength(1);
+    expect(violations).toHaveLength(0);
   });
 
   test("path component alone (without protocol) inside a URL is not separately flagged", async () => {
-    // The sub-path "code.claude.com/docs/en/mcp.md" should not appear as a SECOND errorContext
+    // The sub-path "code.claude.com/docs/en/mcp.md" should not appear as an errorContext
     const violations = await getBCE001Violations(
       "See https://code.claude.com/docs/en/mcp.md for details.",
     );
@@ -113,6 +112,76 @@ describe("BCE001 URL path component not double-flagged (#194)", () => {
       "Edit the file at src/rules/backtick-code-elements.js.",
     );
     expect(violations.length).toBeGreaterThan(0);
+  });
+});
+
+describe("BCE001 bare URLs are never flagged as paths", () => {
+  // BCE001 must not treat http(s):// URLs (or other URI schemes) as filesystem
+  // paths. Bare URLs are the domain of the separate no-bare-url rule.
+  test("does not flag a bare https URL in prose", async () => {
+    const violations = await getBCE001Violations(
+      "See https://example.com/docs for details.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag a bare https URL with a directory path", async () => {
+    const violations = await getBCE001Violations(
+      "Docs: https://github.com/settings/tokens",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag an http URL", async () => {
+    const violations = await getBCE001Violations(
+      "Visit http://example.org/path/to/page now.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag an ftp URL", async () => {
+    const violations = await getBCE001Violations(
+      "Mirror at ftp://ftp.example.com/pub/file.tar.gz here.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not report a path-only violation for the URL path component", async () => {
+    const violations = await getBCE001Violations(
+      "See https://code.claude.com/docs/en/mcp.md for details.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags actual file paths", async () => {
+    const violations = await getBCE001Violations(
+      "Edit the file at src/rules/backtick-code-elements.js.",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+  });
+});
+
+describe("BCE001 slash-joined prose words with apostrophes", () => {
+  // A slash-joined word list containing an apostrophe (e.g. an ordinary prose
+  // token like "stop/don't/wait/wrong/undo/actually") must not be flagged, and
+  // no autofix may ever insert a backtick inside a word.
+  test("does not flag a slash list containing an apostrophe", async () => {
+    const violations = await getBCE001Violations(
+      "stop/don't/wait/wrong/undo/actually",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not split mid-token at the apostrophe", async () => {
+    const violations = await getBCE001Violations(
+      "Use stop/don't/wait/wrong/undo/actually as the prompts.",
+    );
+    // No violation should wrap a fragment that begins mid-word (e.g. "t/wait/...")
+    const midToken = violations.filter((v) =>
+      typeof v.errorContext === "string" && /^t\//.test(v.errorContext),
+    );
+    expect(midToken).toHaveLength(0);
+    expect(violations).toHaveLength(0);
   });
 });
 

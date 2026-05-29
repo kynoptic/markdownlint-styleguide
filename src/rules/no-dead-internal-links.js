@@ -29,7 +29,8 @@ const contentCache = new Map(); // filepath -> string (file content)
 
 /**
  * Convert a heading text to an anchor format used in GitHub-flavored markdown.
- * This follows GitHub's algorithm for converting headings to anchors.
+ * Follows GitHub's punctuation handling (strip, don't hyphenate); note that
+ * accented Latin letters are dropped here whereas GitHub retains them.
  * @param {string} heading - The heading text
  * @returns {string} The anchor-formatted heading
  */
@@ -41,8 +42,12 @@ function headingToAnchor(heading) {
     .replace(/<[^>]+>/g, '')
     // Remove markdown formatting
     .replace(/[*_`[\]]/g, '')
-    // Replace spaces and special chars with hyphens
-    .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
+    // Remove every character that is not a word char, CJK, whitespace, or hyphen.
+    // GitHub (and markdownlint MD051) strips punctuation rather than hyphenating it,
+    // so "evals.json" becomes "evalsjson" and "don't" becomes "dont".
+    .replace(/[^\w\u4e00-\u9fa5\s-]+/g, '')
+    // Collapse runs of whitespace into single hyphens
+    .replace(/\s+/g, '-')
     // Remove leading/trailing hyphens
     .replace(/^-+|-+$/g, '');
 }
@@ -91,6 +96,23 @@ function extractHeadings(content) {
   }
 
   return headings;
+}
+
+/**
+ * Replace the contents of inline code spans with spaces so that links inside
+ * backtick-delimited spans are not scanned. Column offsets are preserved by
+ * substituting equal-length whitespace, keeping reported ranges accurate.
+ *
+ * Handles variable-length backtick runs per CommonMark: a span opened with N
+ * backticks closes on the next run of exactly N backticks.
+ * @param {string} line - A single line of markdown (already outside any fence)
+ * @returns {string} The line with inline code span contents blanked out
+ */
+function maskInlineCode(line) {
+  // Match a backtick run of length N, the shortest content, then a backtick
+  // run of exactly N (CommonMark inline code). Blank out the whole span.
+  const spanPattern = /(`+)([\s\S]*?)\1(?!`)/g;
+  return line.replace(spanPattern, (whole) => ' '.repeat(whole.length));
 }
 
 /**
@@ -315,16 +337,58 @@ function noDeadInternalLinks(params, onError) {
   // Pattern to match markdown links: [text](url)
   // PERFORMANCE: Regex compilation is cached by V8, so this is not a bottleneck
   const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
-  
+
+  // Track fenced code blocks so links inside them are not scanned.
+  // A fence opens on a line of three or more backticks or tildes and closes
+  // on the next line of the same fence character (length >= the opener).
+  let inFence = false;
+  let fenceChar = '';
+  let fenceLen = 0;
+
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
-    const line = lines[i];
-    
+    const rawLine = lines[i];
+
+    // Detect fence open/close markers (allow up to 3 leading spaces of indent).
+    const fenceMatch = rawLine.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      const marker = fenceMatch[1];
+      const markerChar = marker[0];
+      if (!inFence) {
+        inFence = true;
+        fenceChar = markerChar;
+        fenceLen = marker.length;
+        continue;
+      }
+      // Closing fence: same char and at least as long, with no info string.
+      if (markerChar === fenceChar && marker.length >= fenceLen && rawLine.trim() === marker) {
+        inFence = false;
+        fenceChar = '';
+        fenceLen = 0;
+        continue;
+      }
+    }
+
+    // Skip every line inside a fenced code block.
+    if (inFence) {
+      continue;
+    }
+
+    // Mask inline code spans so links inside backticks are not scanned.
+    // Replacing span contents with spaces preserves column offsets for ranges.
+    const line = maskInlineCode(rawLine);
+
     let match;
     while ((match = linkPattern.exec(line)) !== null) {
       // const linkText = match[1]; // unused for now
-      const linkUrl = match[2];
+      let linkUrl = match[2];
       const columnStart = match.index + 1;
+
+      // Strip a single pair of angle brackets from the destination:
+      // [text](<path with spaces.md>) -> "path with spaces.md".
+      if (linkUrl.startsWith('<') && linkUrl.endsWith('>')) {
+        linkUrl = linkUrl.slice(1, -1);
+      }
       
       // Skip external links (http://, https://, mailto:, etc.)
       if (/^[a-z]+:/.test(linkUrl)) {

@@ -598,10 +598,9 @@ Mixed Content-123 (Test)
     });
 
     test('ignores lines that look like setext but are not headings', () => {
+      // The "====" below has a blank line above it (not preceded by heading
+      // text), so it must not be treated as a setext underline.
       const markdown = `
-This is not a heading because there's no text above
-===================================================
-
 Regular paragraph text.
 
 ====
@@ -609,14 +608,14 @@ Another paragraph.
 
 ---
 
-[Link to fake heading](#this-is-not-a-heading-because-theres-no-text-above)
+[Link to fake heading](#regular-paragraph-text)
 `;
 
       const errors = runRuleWithContent(markdown, testFile);
 
       // Should not recognize the fake heading
       expect(errors).toHaveLength(1);
-      expect(errors[0].detail).toContain('Heading anchor "#this-is-not-a-heading-because-theres-no-text-above" not found in current file');
+      expect(errors[0].detail).toContain('Heading anchor "#regular-paragraph-text" not found in current file');
     });
 
     test('validates setext headings in external files', () => {
@@ -953,6 +952,128 @@ Another paragraph.
 
         expect(placeholderErrors).toHaveLength(0);
       });
+    });
+  });
+
+  describe('GitHub slug algorithm (punctuation removal)', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    test('removes punctuation rather than converting it to hyphens', () => {
+      const markdown = `
+# evals.json
+
+[Link to dotted heading](#evalsjson)
+[Link to old hyphenated form](#evals-json)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // "evals.json" -> "evalsjson" (dot removed, not hyphenated)
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Heading anchor "#evals-json" not found in current file');
+    });
+
+    test('removes apostrophes and keeps word boundaries', () => {
+      const markdown = `
+# Words that work vs don't
+
+[Correct anchor](#words-that-work-vs-dont)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('converts ordinary spaced headings to hyphenated slugs', () => {
+      const markdown = `
+# Some Heading
+
+[Correct anchor](#some-heading)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+  });
+
+  describe('code-block blindness', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    test('does not report links inside fenced code blocks', () => {
+      const markdown = [
+        '# Heading',
+        '',
+        '```markdown',
+        '[Title](non-existent-file.md)',
+        '```',
+        ''
+      ].join('\n');
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('does not report links inside tilde-fenced code blocks', () => {
+      const markdown = [
+        '# Heading',
+        '',
+        '~~~',
+        '[Title](non-existent-file.md)',
+        '~~~',
+        ''
+      ].join('\n');
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('does not report links inside inline code spans', () => {
+      const markdown = 'Use the form `[x](non-existent-file.md)` in your docs.';
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('still reports real links outside code', () => {
+      const markdown = [
+        '```',
+        '[InCode](ignored-file.md)',
+        '```',
+        '',
+        '[Real](non-existent-file.md)'
+      ].join('\n');
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "non-existent-file.md" does not exist');
+    });
+  });
+
+  describe('angle-bracket destinations', () => {
+    const testFile = path.join(fixturesDir, 'test-file.md');
+
+    test('resolves angle-bracket-wrapped destinations with spaces', () => {
+      const markdown = '[x](<dir/Some File.md>)';
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // dir/Some File.md exists, so no error after stripping < >
+      expect(errors).toHaveLength(0);
+    });
+
+    test('still reports missing angle-bracket-wrapped destinations', () => {
+      const markdown = '[x](<dir/Missing File.md>)';
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "dir/Missing File.md" does not exist');
     });
   });
 });

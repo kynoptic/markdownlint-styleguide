@@ -16,6 +16,32 @@ import {
 } from '../shared-constants.js';
 
 /**
+ * Acronyms that are commonly miswritten in title case as the first segment of a
+ * hyphenated compound (e.g. "Yaml-based" → "YAML-based"). Only prefixes in this
+ * set are flagged as misspelled acronyms; any other capitalized hyphenated first
+ * word (e.g. "Repo-specific", "Per-step", "Tie-breaker") is a normal word and is
+ * left alone. Keys are lowercase; values are the canonical all-caps form.
+ */
+const KNOWN_HYPHEN_PREFIX_ACRONYMS = new Map([
+  ['yaml', 'YAML'],
+  ['json', 'JSON'],
+  ['toml', 'TOML'],
+  ['xml', 'XML'],
+  ['html', 'HTML'],
+  ['css', 'CSS'],
+  ['sql', 'SQL'],
+  ['api', 'API'],
+  ['rest', 'REST'],
+  ['http', 'HTTP'],
+  ['csv', 'CSV'],
+  ['url', 'URL'],
+  ['cli', 'CLI'],
+  ['sdk', 'SDK'],
+  ['jwt', 'JWT'],
+  ['saas', 'SaaS']
+]);
+
+/**
  * Code identifier patterns for detecting programming constructs in headings.
  * These should preserve their original casing (not be lowercased).
  */
@@ -200,7 +226,11 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
       if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
         return { isValid: true };
       }
-      const expected = hyphenExpected + firstWord.slice(hyphenExpected.length);
+      // The prefix must use the special-term casing and every hyphenated suffix
+      // segment must be lowercase (e.g. "Node.js-based" is valid, "Node.js-Based"
+      // is not). Lowercasing the suffix yields the expected form.
+      const prefixLen = firstWord.toLowerCase().indexOf(hyphenBase) + hyphenBase.length;
+      const expected = hyphenExpected + firstWord.slice(prefixLen).toLowerCase();
       if (firstWord !== expected) {
         return {
           isValid: false,
@@ -217,32 +247,19 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
         return { isValid: true };
       }
 
-      // Check for incorrect acronym-prefix forms (e.g., "Yaml-based", "Api-driven", "Json-based")
-      // Only flag if it looks like a misspelled acronym (short, matches common patterns)
-      const incorrectAcronymMatch = /^([A-Z][a-z]{1,3})(-[a-z].*)$/.exec(firstWord);
+      // Check for incorrect acronym-prefix forms (e.g., "Yaml-based", "Api-driven", "Json-based").
+      // A capitalized hyphenated first word is only a misspelled acronym when its first
+      // segment is a recognized acronym (see KNOWN_HYPHEN_PREFIX_ACRONYMS). Ordinary
+      // capitalized words like "Repo-specific" or "Per-step" have an uppercase first
+      // letter and are valid sentence case, so they are not flagged (#bug-1).
+      const incorrectAcronymMatch = /^([A-Z][a-z]+)(-[a-z].*)$/.exec(firstWord);
       if (incorrectAcronymMatch) {
-        const possibleAcronym = incorrectAcronymMatch[1].toUpperCase();
-        // Only flag if the uppercase version would be a valid acronym (2-4 chars)
-        // AND it doesn't look like a normal word (exclude common words like "Well", "Over", "Under", etc.)
-        // Common English words that appear as hyphenated prefixes - NOT acronyms
-        // e.g., "How-to", "Step-by-step", "In-person", "Self-service"
-        const commonHyphenatedPrefixes = [
-          'well', 'over', 'under', 'self', 'non', 'pre', 'post', 'anti', 'pro', 'co',
-          'how', 'step', 'in', 'on', 'off', 'out', 'up', 'down', 'all', 'one', 'two',
-          'high', 'low', 'long', 'short', 'full', 'half', 'part', 'cross', 'multi',
-          'day', 'time', 'year', 'end', 'mid', 'top', 'sub', 're', 'de', 'un',
-          // Technical compound words (not acronyms)
-          'rule', 'user', 'file', 'line', 'code', 'auto', 'type', 'real', 'open',
-          'zero', 'data', 'test', 'back', 'side', 'case', 'base', 'next', 'last',
-          'osv', 'npm', 'cli', 'api',  // Tool/tech names used as prefixes
-          // Standard English prefixes (#159)
-          'semi', 'mega', 'mini', 'mono', 'poly', 'para', 'meta'
-        ];
-        if (possibleAcronym.length >= 2 && possibleAcronym.length <= 4 &&
-            !commonHyphenatedPrefixes.includes(possibleAcronym.toLowerCase())) {
+        const prefixLower = incorrectAcronymMatch[1].toLowerCase();
+        const canonicalAcronym = KNOWN_HYPHEN_PREFIX_ACRONYMS.get(prefixLower);
+        if (canonicalAcronym && canonicalAcronym !== incorrectAcronymMatch[1]) {
           return {
             isValid: false,
-            errorMessage: `First word "${firstWord}" should be "${possibleAcronym}${incorrectAcronymMatch[2]}".`
+            errorMessage: `First word "${firstWord}" should be "${canonicalAcronym}${incorrectAcronymMatch[2]}".`
           };
         }
       }
@@ -316,6 +333,13 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
 
     // Skip possessive words (likely part of proper nouns like "Patel's")
     if (word.endsWith("'s") || word.endsWith("\u2019s")) {
+      continue;
+    }
+
+    // Treat a dotted identifier (e.g. "Claude.ai", "Node.js") as a single product
+    // or domain token. When it has no matching special term it is left as-is so a
+    // segment like "ai" is never independently flagged (#bug-3).
+    if (!expectedWordCasing && /^[A-Za-z][A-Za-z0-9]*\.[A-Za-z][A-Za-z0-9.]*$/.test(word)) {
       continue;
     }
 
@@ -399,6 +423,12 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
 
     // Check hyphenated words
     if (word.includes('-')) {
+      // A hyphenated special term (e.g. "Anglo-Saxon") matches as a whole token, so
+      // no sub-segment is independently checked for lowercase casing (#bug-4).
+      if (expectedWordCasing && word === expectedWordCasing) {
+        continue;
+      }
+
       // Check if this is an acronym-prefixed compound (e.g., "YAML-based", "API-driven", "HTML/CSS-based", "SQL/NoSQL-hybrid")
       // Pattern: ALL_CAPS acronym (2-4 letters, no lowercase) optionally with slash-separated acronyms, then hyphen and lowercase
       const acronymPrefixMatch = /^([A-Z]{2,4}(?:\/[A-Z][a-z]+)?(?:\/[A-Z]{2,})*)(-[a-z].*)$/.exec(word);
@@ -436,6 +466,14 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
       if (filenameInHeading.test(headingText)) {
         continue;
       }
+    }
+
+    // Exempt digit-bearing tokens that are NOT title-cased words: units,
+    // versions, and all-caps product names ("25KB", "BCE-500", "PM2", "v1.5")
+    // are not subject to sentence-case casing. A title-cased word with an
+    // incidental digit ("Database2") still falls through to the check (#bug-2).
+    if (/\d/.test(word) && !/^[A-Z][a-z]/.test(word)) {
+      continue;
     }
 
     // Check general lowercase requirement

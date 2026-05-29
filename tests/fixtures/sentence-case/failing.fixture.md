@@ -80,7 +80,7 @@
 
 ## Leading verbs unnecessarily capitalized
 
-# Using the CLI with Node.js 20 <!-- ❌ -->
+# Using the CLI With Node.js 20 <!-- ❌ -->
 
 # using the CLI with Node.js 20 <!-- ❌ -->
 

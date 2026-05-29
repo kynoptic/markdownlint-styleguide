@@ -1401,20 +1401,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
     },
     "sentenceViolations": [
       {
-        "errorContext": "Building a REST API with Node.js and Express",
-        "errorDetail": "Word "Node" in heading should be lowercase.",
-        "errorRange": null,
-        "fixInfo": null,
-        "lineNumber": 1,
-        "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "sentence-case-heading",
-          "SC001",
-        ],
-        "severity": "error",
-      },
-      {
         "errorContext": "Table of Contents",
         "errorDetail": "Word "Contents" in heading should be lowercase.",
         "errorRange": null,
@@ -1514,24 +1500,6 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
           "insertText": "Testing your API",
         },
         "lineNumber": 97,
-        "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
-        "ruleInformation": null,
-        "ruleNames": [
-          "sentence-case-heading",
-          "SC001",
-        ],
-        "severity": "error",
-      },
-      {
-        "errorContext": "Using PM2",
-        "errorDetail": "Word "PM2" in heading should be lowercase.",
-        "errorRange": null,
-        "fixInfo": {
-          "deleteCount": 9,
-          "editColumn": 5,
-          "insertText": "Using pm2",
-        },
-        "lineNumber": 113,
         "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
         "ruleInformation": null,
         "ruleNames": [
@@ -2170,20 +2138,6 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
     "severity": "error",
   },
   {
-    "errorContext": "Building a REST API with Node.js and Express",
-    "errorDetail": "Word "Node" in heading should be lowercase.",
-    "errorRange": null,
-    "fixInfo": null,
-    "lineNumber": 1,
-    "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "sentence-case-heading",
-      "SC001",
-    ],
-    "severity": "error",
-  },
-  {
     "errorContext": "Table of Contents",
     "errorDetail": "Word "Contents" in heading should be lowercase.",
     "errorRange": null,
@@ -2283,24 +2237,6 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests tu
       "insertText": "Testing your API",
     },
     "lineNumber": 97,
-    "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
-    "ruleInformation": null,
-    "ruleNames": [
-      "sentence-case-heading",
-      "SC001",
-    ],
-    "severity": "error",
-  },
-  {
-    "errorContext": "Using PM2",
-    "errorDetail": "Word "PM2" in heading should be lowercase.",
-    "errorRange": null,
-    "fixInfo": {
-      "deleteCount": 9,
-      "editColumn": 5,
-      "insertText": "Using pm2",
-    },
-    "lineNumber": 113,
     "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
     "ruleInformation": null,
     "ruleNames": [

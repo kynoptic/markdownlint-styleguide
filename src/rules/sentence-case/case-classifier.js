@@ -271,8 +271,17 @@ function prepareTextForValidation(headingText) {
   }
 
   const { processed } = preserveSegments(cleanedText);
+  // Protect dotted identifiers (e.g. "Claude.ai") so the cleanup below does not
+  // split them on the dot. A DOT_SENTINEL survives the special-char replacement
+  // and is restored to "." once the text is split into words, keeping the dotted
+  // identifier a single token for special-term matching (#bug-3).
+  const DOT_SENTINEL = '\x01';
+  const dottedProtected = processed.replace(
+    /([A-Za-z0-9])\.(?=[A-Za-z0-9])/g,
+    `$1${DOT_SENTINEL}`
+  );
   // Clean text but preserve the __PRESERVED_N__ markers
-  const clean = processed
+  const clean = dottedProtected
     .replace(/[#*~!+={}|:;"<>,.?\\]/g, ' ') // Remove special chars but keep underscores for preserved segments
     .trim();
 
@@ -280,7 +289,10 @@ function prepareTextForValidation(headingText) {
     return null;
   }
 
-  const words = clean.split(/\s+/).filter((w) => w.length > 0);
+  const words = clean
+    .split(/\s+/)
+    .filter((w) => w.length > 0)
+    .map((w) => w.replace(new RegExp(DOT_SENTINEL, 'g'), '.'));
 
   // Skip if all words are preserved segments - this means the heading is all markup
   if (words.every((w) => w.startsWith('__PRESERVED_') && w.endsWith('__'))) {

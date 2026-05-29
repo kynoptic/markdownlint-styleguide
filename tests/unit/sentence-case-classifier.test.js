@@ -602,3 +602,113 @@ describe("validateHeading — #195 kebab-case exemption bypassed by specialTerms
     expect(result.isValid).toBe(true);
   });
 });
+
+describe("validateHeading — hyphenated first word is correctly capitalized", () => {
+  // A hyphenated first word whose first segment is already capitalized must not
+  // be flagged. The first alphabetic character is uppercase, so it is valid.
+  // Previously the misspelled-acronym heuristic treated common words like "Repo"
+  // and "Per" as acronyms and demanded "REPO-specific", "PER-step", etc.
+  test.each([
+    "Repo-specific workflow notes",
+    "Per-step structure",
+    "Tie-breaker checks",
+    "Held-out test set",
+    "Word-sense disambiguation",
+    "Cohort-specific deadlines",
+    "Hard-coded counts",
+    "New-before-old violations",
+    "Per-module baselines",
+  ])("heading %s is valid", (heading) => {
+    const result = validateHeading(heading, casingTerms, ambiguousTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("still flags a misspelled acronym prefix like Yaml-based", () => {
+    const result = validateHeading("Yaml-based config", casingTerms, ambiguousTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/YAML/);
+  });
+
+  test("still flags a misspelled acronym prefix like Json-based", () => {
+    const result = validateHeading("Json-based config", casingTerms, ambiguousTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/JSON/);
+  });
+
+  test("bold list-label with hyphenated capitalized first word is valid", () => {
+    const result = validateBoldText(
+      "Word-sense disambiguation",
+      casingTerms,
+      ambiguousTerms,
+    );
+    expect(result.isValid).toBe(true);
+  });
+});
+
+describe("validateHeading — all-caps check ignores tokens with digits/symbols", () => {
+  // The all-caps lowercase heuristic must not flag tokens that are not purely
+  // alphabetic. "25KB" and "BCE-500" contain digits and should be exempt.
+  test("heading ending in a size token like 25KB is valid", () => {
+    const result = validateHeading(
+      "Under 200 lines and ~25KB",
+      casingTerms,
+      ambiguousTerms,
+    );
+    expect(result.isValid).toBe(true);
+  });
+
+  test("heading with an era range token like BCE-500 is valid", () => {
+    const result = validateHeading(
+      "Ancient history 3000 BCE-500 CE",
+      casingTerms,
+      ambiguousTerms,
+    );
+    expect(result.isValid).toBe(true);
+  });
+
+  test("all-caps product token with a digit like PM2 is valid", () => {
+    const result = validateHeading("Using PM2", casingTerms, ambiguousTerms);
+    expect(result.isValid).toBe(true);
+  });
+
+  // Guard: a title-cased word with an incidental digit is still a violation —
+  // the digit exemption must not silently accept "Database2".
+  test("title-cased word with a digit like Database2 is still flagged", () => {
+    const result = validateHeading(
+      "Querying the Database2 store",
+      casingTerms,
+      ambiguousTerms,
+    );
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/Database2/);
+  });
+});
+
+describe("validateHeading — dotted product token treated as one token", () => {
+  // "Claude.ai" must not split into "Claude" + "ai" with "ai" flagged as "AI".
+  test("Claude.ai is not split so 'ai' is not flagged", () => {
+    const result = validateHeading(
+      "Visit Claude.ai today",
+      casingTerms,
+      ambiguousTerms,
+    );
+    expect(result.isValid).toBe(true);
+  });
+
+  test("Claude.ai matches a whole-token specialTerm", () => {
+    const terms = { ...casingTerms, "claude.ai": "Claude.ai" };
+    const result = validateHeading("Visit claude.ai today", terms, ambiguousTerms);
+    expect(result.isValid).toBe(false);
+    expect(result.errorMessage).toMatch(/Claude\.ai/);
+  });
+});
+
+describe("validateHeading — hyphenated special term matches whole token", () => {
+  // With "Anglo-Saxon" as a special term, "Anglo-Saxon" must validate as a whole
+  // so "Saxon" is not independently flagged as needing lowercase.
+  test("Anglo-Saxon special term does not flag its second segment", () => {
+    const terms = { ...casingTerms, "anglo-saxon": "Anglo-Saxon" };
+    const result = validateHeading("Latinate Anglo-Saxon roots", terms, ambiguousTerms);
+    expect(result.isValid).toBe(true);
+  });
+});

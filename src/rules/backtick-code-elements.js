@@ -22,7 +22,6 @@ import {
 import { getCodeBlockLines, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
 import { isDomainInProse } from './shared-heuristics.js';
 import {
-  trimUrlTrailingPunctuation,
   inMarkdownLink,
   inWikiLink,
   inHtmlComment,
@@ -136,10 +135,6 @@ function backtickCodeElements(params, onError) {
     const codeSpans = getInlineCodeSpans(line);
 
     const patterns = [
-      // Issue #106: Full URLs with protocol (http://, https://, ftp://, etc.)
-      // Must be checked BEFORE domain patterns to avoid false negatives
-      /\b(?:https?|ftp|ftps|file):\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g,
-
       // Issue #89: Absolute Unix paths like /etc/hosts, /mnt/usb, /usr/local/bin
       // Pattern breakdown:
       //   (?:^|(?<=\s))  - Start of line or preceded by whitespace (lookbehind)
@@ -220,23 +215,26 @@ function backtickCodeElements(params, onError) {
         let start = match.index;
         let end = start + fullMatch.length;
 
-
-        // For URLs, trim trailing punctuation that's likely sentence-ending
-        // This handles cases like "(https://example.com/path)." in prose
-        if (/^(?:https?|ftp|ftps|file):\/\//i.test(fullMatch)) {
-          const trimmed = trimUrlTrailingPunctuation(fullMatch);
-          if (trimmed !== fullMatch) {
-            fullMatch = trimmed;
-            end = start + fullMatch.length;
-          }
-        }
-
         // Skip if this range overlaps with an already-flagged range
         const overlapsWithFlagged = flaggedRanges.some(([flaggedStart, flaggedEnd]) => {
           // Check for any overlap: start is before flagged end AND end is after flagged start
           return start < flaggedEnd && end > flaggedStart;
         });
         if (overlapsWithFlagged) {
+          continue;
+        }
+
+        // Skip matches that begin mid-word because an apostrophe (or other
+        // non-word character the regex cannot cross) split an ordinary token.
+        // For prose like "stop/don't/wait/wrong/undo/actually" the path pattern
+        // would otherwise start the match at "t/wait/..." and wrap a backtick
+        // inside the word. A real path never starts immediately after a letter +
+        // apostrophe, so treat that as prose, never as a code element.
+        if (
+          start >= 2 &&
+          (line[start - 1] === "'" || line[start - 1] === '’') &&
+          /[\w]/.test(line[start - 2])
+        ) {
           continue;
         }
 
@@ -398,36 +396,23 @@ function backtickCodeElements(params, onError) {
         if (inLatexMath(line, start, end)) {
           continue;
         }
-        // Check if this match is part of a full URL
-        // We want to flag the ENTIRE URL (with protocol), not skip it
-        // But we should skip individual components (like just the path part)
-        const urlRegex = /https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/g;
+        // Skip any match that falls inside a bare URL. Bare URLs (and their host,
+        // path, and query components) are the domain of the separate no-bare-url
+        // rule, so BCE001 must never report them as code elements or file paths.
+        const urlRegex = /(?:https?|ftp|ftps|file):\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+/gi;
         let urlMatch;
-        let isPartOfUrl = false;
-        let isFullUrl = false;
+        let isInUrl = false;
 
         while ((urlMatch = urlRegex.exec(line)) !== null) {
           const urlStart = urlMatch.index;
           const urlEnd = urlMatch.index + urlMatch[0].length;
-
-          // Check if this match is inside the URL
           if (start >= urlStart && end <= urlEnd) {
-            // Determine whether this match is the full URL (includes protocol) or just a
-            // sub-component (host/path/query). Check the match text itself rather than using
-            // a fixed offset, which was fragile when the path started right after :// (#194).
-            if (/^(?:https?|ftp|ftps|file):\/\//i.test(fullMatch)) {
-              // This is the full URL with protocol - we want to flag it
-              isFullUrl = true;
-            } else {
-              // This is just a part of the URL (path, query, etc.) - skip it
-              isPartOfUrl = true;
-            }
+            isInUrl = true;
             break;
           }
         }
 
-        // Skip if this is just a part of a URL (not the full URL with protocol)
-        if (isPartOfUrl && !isFullUrl) {
+        if (isInUrl) {
           continue;
         }
 
