@@ -346,7 +346,7 @@ function backtickCodeElements(params, onError) {
         }
 
         // Skip snake_case identifiers that are part of email addresses
-        // (e.g., "julie_balise@hms.harvard.edu" - don't backtick "julie_balise")
+        // (e.g., "jordan_lee@example.edu" - don't backtick "jordan_lee")
         if (/^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(fullMatch)) {
           // Check if followed by @ (email local part)
           if (end < line.length && line[end] === '@') {

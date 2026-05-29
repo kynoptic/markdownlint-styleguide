@@ -1,7 +1,7 @@
 /**
  * @fileoverview Tests for false positives discovered across multiple repos (Round 9).
- * Issues found during 2026-01-26 validation loop on eml-to-text, hms-it-quarterly-newsletter,
- * and word-to-markdown-converter repositories.
+ * Issues found during a validation loop on several real-world repositories, including
+ * email-conversion and document-conversion projects.
  */
 
 import { lint } from 'markdownlint/promise';
@@ -156,11 +156,11 @@ describe('Sentence-case false positives - Round 9', () => {
 describe('BCE false positives - Round 9', () => {
   describe('Email addresses should NOT have usernames backticked', () => {
     test('Email username should not be backticked', async () => {
-      const content = `**To:** Balise, Julie K <julie_balise@hms.harvard.edu>`;
+      const content = `**To:** Lee, Jordan K <jordan_lee@example.edu>`;
       const errors = await lintWithRule(content, backtickCodeElements);
-      // "julie_balise" is part of an email, not code
+      // "jordan_lee" is part of an email, not code
       const emailErrors = errors.filter(e =>
-        e.errorContext && e.errorContext.includes('julie_balise')
+        e.errorContext && e.errorContext.includes('jordan_lee')
       );
       expect(emailErrors).toHaveLength(0);
     });

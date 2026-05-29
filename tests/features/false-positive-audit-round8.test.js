@@ -1,6 +1,6 @@
 /**
- * @fileoverview Tests for false positives discovered in agent-playbook repository (Round 8).
- * Issues found during 2026-01-26 validation loop.
+ * @fileoverview Tests for false positives discovered in a consumer repository (Round 8).
+ * Issues found during a validation loop.
  */
 
 import { lint } from 'markdownlint/promise';

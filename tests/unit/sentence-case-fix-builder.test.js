@@ -174,8 +174,8 @@ describe("toSentenceCase", () => {
   });
 
   test("test_should_not_capitalize_kebab_case_first_word", () => {
-    const result = toSentenceCase("agent-playbook Overview", {});
-    expect(result).toBe("agent-playbook overview");
+    const result = toSentenceCase("consumer-repo Overview", {});
+    expect(result).toBe("consumer-repo overview");
   });
 
   test("test_should_not_force_note_to_allcaps", () => {

@@ -1,9 +1,9 @@
 /**
  * @feature False Positive Audit - Round 10
  *
- * Tests for false positives discovered in validation loop on 2026-01-26.
- * Issues found across: agent-playbook, word-to-markdown-converter,
- * hms-it-markdown-drafts repos.
+ * Tests for false positives discovered in a validation loop.
+ * Issues found across a consumer repository and other real-world projects,
+ * including document-conversion and markdown-drafting repos.
  */
 import { lint } from 'markdownlint/promise';
 import sentenceCaseHeading from '../../src/rules/sentence-case-heading.js';
@@ -121,10 +121,10 @@ describe('Round 10 False Positives - Sentence Case Rule', () => {
     });
 
     test('organization names can be preserved with custom specialTerms config', async () => {
-      // Organization names like "Harvard University Archives" require custom configuration
+      // Organization names like "Example University Archives" require custom configuration
       // because we can't automatically detect whether "University Archives" is part of
       // a proper noun or just generic text. Users should add these as specialTerms.
-      const content = '### Harvard University Archives';
+      const content = '### Example University Archives';
 
       // Without custom config, the rule will lowercase common words
       const errorsWithoutConfig = await lintWithRule(content, sentenceCaseHeading);
@@ -132,7 +132,7 @@ describe('Round 10 False Positives - Sentence Case Rule', () => {
 
       // With custom config, the full phrase is preserved
       const errorsWithConfig = await lintWithRule(content, sentenceCaseHeading, {
-        specialTerms: ['Harvard University Archives']
+        specialTerms: ['Example University Archives']
       });
       expect(errorsWithConfig.length).toBe(0); // No errors when configured
     });

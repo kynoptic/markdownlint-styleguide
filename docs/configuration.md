@@ -59,7 +59,7 @@ A consumer repo's `.markdownlint-cli2.jsonc` should extend the preset and add on
     "extends": "markdownlint-trap/recommended-config.jsonc",
     // Repo-specific overrides below
     "sentence-case-heading": {
-      "specialTerms": ["HarvardKey", "Okta"]
+      "specialTerms": ["AcmeKey", "Okta"]
     }
   }
 }

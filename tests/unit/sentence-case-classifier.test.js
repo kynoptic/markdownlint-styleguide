@@ -493,7 +493,7 @@ describe("issue #176: step prefixes like 5a", () => {
 
 describe("issue #185: kebab-case first words", () => {
   test("test_should_accept_kebab_case_first_word", () => {
-    const result = validateHeading("agent-playbook overview", casingTerms);
+    const result = validateHeading("consumer-repo overview", casingTerms);
     expect(result.isValid).toBe(true);
   });
 
@@ -527,7 +527,7 @@ describe("issue #184: contextual ALL_CAPS callout keywords", () => {
   });
 
   test("test_should_accept_emoji_plus_kebab_case_first_word", () => {
-    const result = validateHeading("🚀 agent-playbook overview", casingTerms);
+    const result = validateHeading("🚀 consumer-repo overview", casingTerms);
     expect(result.isValid).toBe(true);
   });
 });
@@ -598,7 +598,7 @@ describe("validateHeading — #195 kebab-case exemption bypassed by specialTerms
   });
 
   test("kebab-case heading with multi-segment name is valid", () => {
-    const result = validateHeading("agent-playbook setup guide", terms195);
+    const result = validateHeading("consumer-repo setup guide", terms195);
     expect(result.isValid).toBe(true);
   });
 });

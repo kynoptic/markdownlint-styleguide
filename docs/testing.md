@@ -246,7 +246,7 @@ Feature tests reference fixtures via absolute paths. Integration tests also gene
 
 Use this validation loop to identify and fix false positives when improving rules:
 
-1. **Run auto-fix on a consumer repository** (e.g. agent-playbook):
+1. **Run auto-fix on a consumer repository**:
 
    ```bash
    cd /path/to/consumer-repo
@@ -304,7 +304,7 @@ A round is eligible for consolidation only when its associated fixes are merged 
 | `false-positive-audit-round<N>.test.js` | Active, open audit round (in progress or recently merged) |
 | `false-positive-consolidated-<theme>.test.js` | Consolidated archive of closed rounds grouped by theme |
 | `false-positive-audit-fixes.test.js` | One-off fixes not tied to a numbered round |
-| `false-positive-agent-playbook.test.js` | Consumer-specific regression tests (named by repo) |
+| `false-positive-consumer-repo.test.js` | Consumer-specific regression tests (named by repo) |
 
 Keep at most 4 open round files in `tests/features/` at any time. When a fifth round is merged, consolidate the oldest closed rounds before starting a new one.
 

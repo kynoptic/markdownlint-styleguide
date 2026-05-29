@@ -1,5 +1,5 @@
 /**
- * @fileoverview Tests for false positives discovered in agent-playbook repository.
+ * @fileoverview Tests for false positives discovered in a consumer repository.
  * These tests capture specific patterns that were incorrectly flagged during auto-fix.
  */
 
@@ -26,7 +26,7 @@ async function lintWithRule(content, rule, config = {}) {
   return result.test || [];
 }
 
-describe('BCE false positives from agent-playbook', () => {
+describe('BCE false positives from a consumer repo', () => {
   describe('abbreviation plurals should NOT be flagged', () => {
     const abbreviationPlurals = [
       'PRs',
@@ -66,7 +66,7 @@ describe('BCE false positives from agent-playbook', () => {
       'CrowdStrike',
       'ServiceNow',
       'SharePoint',
-      'HarvardKey',
+      'AcmeKey',
       'BigQuery',
       'PyYAML',
       'WebP',
@@ -91,7 +91,7 @@ describe('BCE false positives from agent-playbook', () => {
     });
 
     test('SharePoint in documentation context', async () => {
-      const content = `Creates internal documentation pages for the HMS IT SharePoint intranet.`;
+      const content = `Creates internal documentation pages for the IT SharePoint intranet.`;
       const errors = await lintWithRule(content, backtickCodeElements);
       const relevantErrors = errors.filter(e => e.context === 'SharePoint');
       expect(relevantErrors).toHaveLength(0);
@@ -142,11 +142,11 @@ describe('BCE false positives from agent-playbook', () => {
     });
   });
 
-  describe('eCommons and institutional names should NOT be flagged', () => {
-    test('eCommons should not require backticks', async () => {
-      const content = `| HMS account | eCommons account |`;
+  describe('eWidget and institutional names should NOT be flagged', () => {
+    test('eWidget should not require backticks', async () => {
+      const content = `| Org account | eWidget account |`;
       const errors = await lintWithRule(content, backtickCodeElements);
-      const relevantErrors = errors.filter(e => e.context === 'eCommons');
+      const relevantErrors = errors.filter(e => e.context === 'eWidget');
       expect(relevantErrors).toHaveLength(0);
     });
   });
@@ -161,7 +161,7 @@ describe('BCE false positives from agent-playbook', () => {
   });
 });
 
-describe('Sentence-case false positives from agent-playbook', () => {
+describe('Sentence-case false positives from a consumer repo', () => {
   describe('language names should remain capitalized', () => {
     test('English should remain capitalized in headings', async () => {
       // "American English" - English is a language name (proper noun)

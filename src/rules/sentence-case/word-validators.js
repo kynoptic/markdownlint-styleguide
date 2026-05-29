@@ -127,7 +127,7 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
   // If there was a leading emoji, the first word after it should be treated as the first word
   // and follow standard first-word capitalization rules
   if (hadLeadingEmoji) {
-    // Skip kebab-case identifiers (e.g., "🚀 agent-playbook overview")
+    // Skip kebab-case identifiers (e.g., "🚀 consumer-repo overview")
     if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
       return { isValid: true };
     }
@@ -264,7 +264,7 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
         }
       }
 
-      // Skip kebab-case identifiers (e.g., "agent-playbook", "my-component")
+      // Skip kebab-case identifiers (e.g., "consumer-repo", "my-component")
       if (/^[a-z][a-z0-9]*(-[a-z][a-z0-9]*)+$/.test(firstWord)) {
         return { isValid: true };
       }

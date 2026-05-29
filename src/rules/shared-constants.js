@@ -762,7 +762,6 @@ export const camelCaseExemptions = new Set([
   'CrashPlan', 'BackBlaze', 'SpiderOak', 'CloudBerry',
   // Enterprise platforms
   'ServiceNow', 'SharePoint', 'BigQuery', 'DataBricks', 'SnowFlake',
-  'HarvardKey', 'eCommons',
   // Developer tools
   'SpotBugs', 'OpenRewrite', 'SonarQube', 'SonarLint',
   'truffleHog', 'GitLeaks', 'GitGuardian',

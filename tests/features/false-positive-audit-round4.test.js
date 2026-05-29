@@ -33,7 +33,7 @@ describe('False positive fixes - Round 4', () => {
     });
 
     test('should flag full URLs but NOT treat path+period as filename', async () => {
-      const input = 'Check https://harvardmed.service-now.com/stat.';
+      const input = 'Check https://example.service-now.com/stat.';
 
       const result = await lint({
         strings: { input },

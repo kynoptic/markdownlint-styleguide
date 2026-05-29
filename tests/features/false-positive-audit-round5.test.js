@@ -1,6 +1,6 @@
 /**
- * Round 5 false positive fixes based on GitHub repos audit.
- * Patterns identified from agent-playbook, promptorium, and other repos.
+ * Round 5 false positive fixes based on a real-world repos audit.
+ * Patterns identified from a consumer repository and other projects.
  */
 import { lint } from 'markdownlint/promise';
 import sentenceCaseHeading from '../../src/rules/sentence-case-heading.js';

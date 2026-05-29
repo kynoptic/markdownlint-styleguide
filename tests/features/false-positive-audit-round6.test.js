@@ -1,6 +1,6 @@
 /**
  * Round 6 false positive fixes based on comprehensive pattern analysis.
- * Patterns identified from agent-playbook, promptorium, and other repos.
+ * Patterns identified from a consumer repository and other projects.
  */
 import { lint } from 'markdownlint/promise';
 import sentenceCaseHeading from '../../src/rules/sentence-case-heading.js';
