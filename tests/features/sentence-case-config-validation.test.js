@@ -82,6 +82,26 @@ describe('sentence-case-heading configuration validation', () => {
       expect(mockConsoleError).not.toHaveBeenCalled();
     });
 
+    test('accepts valid acronyms array', () => {
+      const config = {
+        acronyms: ['CEFR', 'WYSIWYG', 'API']
+      };
+
+      runRuleWithConfig(config);
+      expect(mockConsoleError).not.toHaveBeenCalled();
+    });
+
+    test('logs error for non-array acronyms', () => {
+      const config = {
+        acronyms: 'not an array'
+      };
+
+      const errors = runRuleWithConfig(config);
+      const configErrors = errors.filter(error => error.detail.includes('Configuration Error'));
+      expect(configErrors).toHaveLength(1);
+      expect(configErrors[0].detail).toContain('acronyms must be an array of strings');
+    });
+
     test('accepts valid specialTerms array', () => {
       const config = {
         specialTerms: ['iPhone', 'macOS', 'GitHub']
@@ -339,7 +359,7 @@ describe('sentence-case-heading configuration validation', () => {
       }
     });
 
-    test('shows warning for deprecated properNouns configuration', () => {
+    test('shows warning for deprecated specialTerms configuration', () => {
       const originalWarn = console.warn;
       const warnings = [];
       console.warn = (...args) => {
@@ -348,19 +368,19 @@ describe('sentence-case-heading configuration validation', () => {
 
       try {
         const config = {
-          properNouns: ["GitHub", "OAuth"]
+          specialTerms: ["GitHub", "OAuth"]
         };
 
         const markdown = '# Test heading';
         runRuleWithConfig(config, markdown);
 
-        expect(warnings.some(w => w.includes('properNouns" is deprecated'))).toBe(true);
+        expect(warnings.some(w => w.includes('specialTerms" is deprecated'))).toBe(true);
       } finally {
         console.warn = originalWarn;
       }
     });
 
-    test('does not show warnings for modern specialTerms configuration', () => {
+    test('does not warn for first-class properNouns configuration', () => {
       const originalWarn = console.warn;
       const warnings = [];
       console.warn = (...args) => {
@@ -369,7 +389,50 @@ describe('sentence-case-heading configuration validation', () => {
 
       try {
         const config = {
-          specialTerms: ["API", "GitHub"]
+          properNouns: ["Craft", "Node"]
+        };
+
+        const markdown = '# Test heading';
+        runRuleWithConfig(config, markdown);
+
+        expect(warnings.some(w => w.includes('properNouns" is deprecated'))).toBe(false);
+      } finally {
+        console.warn = originalWarn;
+      }
+    });
+
+    test('does not warn for first-class acronyms configuration', () => {
+      const originalWarn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => {
+        warnings.push(args.join(' '));
+      };
+
+      try {
+        const config = {
+          acronyms: ["CEFR", "WYSIWYG"]
+        };
+
+        const markdown = '# Test heading';
+        runRuleWithConfig(config, markdown);
+
+        expect(warnings.some(w => w.includes('deprecated'))).toBe(false);
+      } finally {
+        console.warn = originalWarn;
+      }
+    });
+
+    test('does not show warnings for modern acronyms and properNouns configuration', () => {
+      const originalWarn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => {
+        warnings.push(args.join(' '));
+      };
+
+      try {
+        const config = {
+          acronyms: ["API", "CEFR"],
+          properNouns: ["GitHub", "Craft"]
         };
 
         const markdown = '# Test heading';

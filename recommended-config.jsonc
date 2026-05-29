@@ -17,12 +17,16 @@
 
     // Enable custom rules from this package
     "sentence-case-heading": {
-      "specialTerms": [
-        // Common acronyms
+      // Acronyms must be uppercase; the lowercase form is flagged and fixed.
+      "acronyms": [
         "LLM",
         "NAS",
         "PDF",
         "UX",
+        "NOTE"
+      ],
+      // Proper nouns allow a capitalized form without flagging a lowercase homograph.
+      "properNouns": [
         // Major platforms
         "Google Drive",
         "Google Workspace",
@@ -34,9 +38,7 @@
         "MacBook",
         "MacBook Air",
         // GitHub products
-        "GitHub Codespaces",
-        // Emphasis terms
-        "NOTE"
+        "GitHub Codespaces"
       ]
     },
     "backtick-code-elements": true,

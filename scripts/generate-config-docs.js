@@ -88,20 +88,26 @@ const RULE_METADATA = {
  * Configuration option metadata
  */
 const CONFIG_OPTION_METADATA = {
+  acronyms: {
+    type: 'string[]',
+    description: 'Acronyms that must be uppercase. The lowercase or mixed-case form is flagged and fixed to the configured uppercase form',
+    default: '[]',
+    example: '["API", "CEFR", "WYSIWYG"]'
+  },
+  properNouns: {
+    type: 'string[]',
+    description: 'Proper nouns whose capitalized form is allowed. The lowercase common-word homograph (e.g. "craft" for "Craft") is NOT flagged',
+    default: '[]',
+    example: '["Craft", "Node", "Timing"]'
+  },
   specialTerms: {
     type: 'string[]',
-    description: 'Terms that should maintain their exact casing in headings',
-    default: '["API", "APIs", "CSS", "HTML", "HTTP", "HTTPS", "JavaScript", "JSON", "REST", "SDK", "SQL", "URL", "URLs", "XML"]',
-    example: '["API", "GitHub", "OAuth"]'
+    description: '**Deprecated**: Alias for `properNouns`. Use `properNouns` for allowed-capitalization terms or `acronyms` for terms that must be uppercase',
+    deprecated: true
   },
   technicalTerms: {
     type: 'string[]',
-    description: '**Deprecated**: Use `specialTerms` instead',
-    deprecated: true
-  },
-  properNouns: {
-    type: 'string[]', 
-    description: '**Deprecated**: Use `specialTerms` instead',
+    description: '**Deprecated**: Use `acronyms` or `properNouns` instead',
     deprecated: true
   },
   ignoredTerms: {
@@ -426,15 +432,20 @@ Some configuration options have been deprecated in favor of more consistent nami
 
 | Rule | Deprecated Option | New Option | Migration |
 |------|------------------|------------|-----------|
-| \`sentence-case-heading\` | \`technicalTerms\` | \`specialTerms\` | Rename the option |
-| \`sentence-case-heading\` | \`properNouns\` | \`specialTerms\` | Rename the option |
+| \`sentence-case-heading\` | \`specialTerms\` | \`acronyms\` / \`properNouns\` | Split terms by whether they must be uppercase (acronyms) or merely allow a capitalized form (proper nouns) |
+| \`sentence-case-heading\` | \`technicalTerms\` | \`acronyms\` / \`properNouns\` | Same split as above |
+
+\`specialTerms\` (and the older \`technicalTerms\`) forced casing both ways: adding a
+proper noun to allow its capitalized form also flagged the legitimate lowercase
+homograph. The split separates "casing that is required" (\`acronyms\`) from
+"casing that is allowed" (\`properNouns\`). \`specialTerms\` continues to work as a
+deprecated alias for \`properNouns\`.
 
 **Before:**
 \`\`\`json
 {
   "sentence-case-heading": {
-    "technicalTerms": ["API", "REST"],
-    "properNouns": ["GitHub", "OAuth"]
+    "specialTerms": ["API", "CEFR", "Craft", "Node"]
   }
 }
 \`\`\`
@@ -443,7 +454,8 @@ Some configuration options have been deprecated in favor of more consistent nami
 \`\`\`json
 {
   "sentence-case-heading": {
-    "specialTerms": ["API", "REST", "GitHub", "OAuth"]
+    "acronyms": ["API", "CEFR"],
+    "properNouns": ["Craft", "Node"]
   }
 }
 \`\`\`

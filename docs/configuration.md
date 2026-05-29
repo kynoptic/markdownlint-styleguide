@@ -59,7 +59,8 @@ A consumer repo's `.markdownlint-cli2.jsonc` should extend the preset and add on
     "extends": "markdownlint-trap/recommended-config.jsonc",
     // Repo-specific overrides below
     "sentence-case-heading": {
-      "specialTerms": ["AcmeKey", "Okta"]
+      "acronyms": ["SSO", "OIDC"],
+      "properNouns": ["Acme", "Okta"]
     }
   }
 }
@@ -94,8 +95,9 @@ flowchart TD
 
 ## `sentence-case-heading` (SC001)
 
-- `specialTerms`: string[] — Proper nouns and technical terms to preserve as-is.
-- Deprecated: `technicalTerms`, `properNouns` — Use `specialTerms` instead.
+- `acronyms`: string[] — Acronyms that must be uppercase. The lowercase or mixed-case form is flagged and fixed to the configured uppercase form (e.g. `cefr` → `CEFR`).
+- `properNouns`: string[] — Proper nouns whose capitalized form is allowed. The lowercase common-word homograph is **not** flagged, so adding `Craft` permits both `Craft` and the everyday word `craft`.
+- Deprecated: `specialTerms` — Alias for `properNouns`; existing configs keep working. `technicalTerms` is also deprecated. Prefer `acronyms` for terms that must be uppercase and `properNouns` for terms that merely allow a capitalized form.
 
 Defaults: Built-in dictionary of proper nouns and tech terms covers most teams. Fixable: Yes.
 
@@ -234,4 +236,6 @@ Deprecated options and their replacements:
 
 | Rule | Deprecated | Replacement |
 |------|------------|-------------|
-| `sentence-case-heading` | `technicalTerms`, `properNouns` | `specialTerms` |
+| `sentence-case-heading` | `specialTerms`, `technicalTerms` | `acronyms` (must be uppercase) and `properNouns` (capitalized form allowed) |
+
+`specialTerms` forced casing both ways — adding a proper noun to allow its capitalized form also flagged the lowercase homograph. Split terms into `acronyms` for casing that is required and `properNouns` for casing that is merely allowed. `specialTerms` continues to work as a deprecated alias for `properNouns`.

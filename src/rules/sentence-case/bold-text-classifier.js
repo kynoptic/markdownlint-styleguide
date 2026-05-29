@@ -20,6 +20,54 @@ import {
 } from './case-classifier.js';
 
 /**
+ * Determines whether a hyphenated compound is acceptable in bold text because
+ * every segment is individually valid: a lowercase word, the pronoun "I", a
+ * short acronym, or a segment whose uppercased form is a configured acronym or
+ * special term (e.g. "high-CEFR", "FAQ-shaped", "API-wide"). At least one
+ * segment must be a configured term or acronym so ordinary mixed-case compounds
+ * like "Bad-Word" are still flagged (#233 Part B.2).
+ * @param {string} word The hyphenated token to check.
+ * @param {Object} specialCasedTerms Special casing terms dictionary.
+ * @returns {boolean} True when the compound should be left alone.
+ */
+function isAcceptableHyphenatedCompound(word, specialCasedTerms) {
+  if (!word.includes('-')) {
+    return false;
+  }
+  const segments = word.split('-');
+  if (segments.length < 2) {
+    return false;
+  }
+
+  let sawConfiguredOrAcronym = false;
+  for (const segment of segments) {
+    if (segment === '') {
+      return false;
+    }
+    // Plain lowercase segment is always acceptable.
+    if (segment === segment.toLowerCase()) {
+      continue;
+    }
+    // A segment matching a configured term's exact casing (acronym or proper
+    // noun) is acceptable, e.g. "CEFR", "FAQ", "API", "Saxon".
+    const configured = specialCasedTerms[segment.toLowerCase()];
+    if (configured && segment === configured) {
+      sawConfiguredOrAcronym = true;
+      continue;
+    }
+    // A short all-caps acronym is acceptable even when not explicitly configured.
+    if (isAcronym(segment)) {
+      sawConfiguredOrAcronym = true;
+      continue;
+    }
+    // Any other non-lowercase segment (e.g. "Bad", "Word") is a violation.
+    return false;
+  }
+
+  return sawConfiguredOrAcronym;
+}
+
+/**
  * Performs stricter validation for bold text in list items.
  * @param {string[]} words Array of words to validate.
  * @param {string} cleanedText The cleaned text.
@@ -89,6 +137,12 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
       continue;
     }
 
+    // A hyphenated special term (e.g. "Anglo-Saxon") matches as a whole token, so
+    // no sub-segment is independently checked for lowercase casing (#233 Part B.2).
+    if (expectedWordCasing && word === expectedWordCasing && word.includes('-')) {
+      continue;
+    }
+
     // For bold text, be stricter about acronyms - only allow known technical terms
     if (expectedWordCasing) {
       // Known proper noun or technical term
@@ -138,6 +192,25 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
         ];
 
         if (!allowedCapitalizedWords.includes(word)) {
+          // Exempt digit-bearing tokens that are NOT title-cased words: units,
+          // versions, and all-caps product names ("25KB", "BCE-500", "PM2") are
+          // not subject to the all-caps or lowercase checks. This mirrors the
+          // heading path's digit exemption, which was missing here (#233 Part B.1).
+          // A title-cased word with an incidental digit ("Database2") still falls
+          // through to the checks below.
+          if (/\d/.test(word) && !/^[A-Z][a-z]/.test(word)) {
+            continue;
+          }
+
+          // A hyphenated compound is acceptable when every segment is itself
+          // acceptable: a lowercase word or a segment whose uppercased form is a
+          // configured acronym / special term (e.g. "high-CEFR", "FAQ-shaped",
+          // "API-wide"). This whole-token reasoning previously only ran on the
+          // heading path (#233 Part B.2).
+          if (word.includes('-') && isAcceptableHyphenatedCompound(word, specialCasedTerms)) {
+            continue;
+          }
+
           // Check for all-caps violations (but allow known acronyms from specialCasedTerms)
           if (word === word.toUpperCase() && word.length > 1 && UNICODE_UPPERCASE_REGEX.test(word) && !expectedWordCasing) {
             return {
@@ -159,6 +232,15 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
 
     // Check hyphenated words
     if (word.includes('-')) {
+      // Whole-token special-term and acceptable-compound matches already passed
+      // above; skip the per-segment lowercase check for those (#233 Part B.2).
+      if (expectedWordCasing && word === expectedWordCasing) {
+        continue;
+      }
+      if (isAcceptableHyphenatedCompound(word, specialCasedTerms)) {
+        continue;
+      }
+
       const parts = word.split('-');
       if (parts.length > 1 && parts[1] !== parts[1].toLowerCase()) {
         return {

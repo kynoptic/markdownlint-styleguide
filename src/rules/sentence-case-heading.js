@@ -4,17 +4,26 @@
  * Custom markdownlint rule that enforces sentence case for headings.
  *
  * Configuration:
- * - specialTerms: Array of terms with specific capitalization (e.g., ["JavaScript", "API", "GitHub"])
+ * - acronyms: Array of acronyms that must be uppercase (e.g., ["API", "CEFR",
+ *   "WYSIWYG"]). The lowercase or mixed-case form is flagged and fixed to the
+ *   configured uppercase form.
+ * - properNouns: Array of proper nouns whose capitalized form is allowed
+ *   (e.g., ["Craft", "Node", "Timing"]). The lowercase common-word homograph
+ *   (e.g. "craft", "node") is NOT flagged, so a proper noun and its everyday
+ *   lowercase usage can coexist without whack-a-mole configuration.
  * - ignoreAfterEmoji: Boolean to ignore text after the first emoji (default: false)
  *
- * Deprecated (use specialTerms instead):
- * - technicalTerms: Legacy option, use specialTerms
- * - properNouns: Legacy option, use specialTerms
+ * Deprecated:
+ * - specialTerms: Alias for `properNouns`. Retained for backward compatibility;
+ *   prefer `properNouns` for allowed-capitalization terms and `acronyms` for
+ *   terms that must be uppercase.
+ * - technicalTerms: Legacy forcing option; prefer `acronyms` or `properNouns`.
  *
  * Example configuration:
  * {
  *   "sentence-case-heading": {
- *     "specialTerms": ["JavaScript", "TypeScript", "API", "GitHub", "OAuth"],
+ *     "acronyms": ["API", "CEFR", "WYSIWYG"],
+ *     "properNouns": ["Craft", "Node", "Timing"],
  *     "ignoreAfterEmoji": true
  *   }
  * }
@@ -69,9 +78,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
   // Validate configuration
   const configSchema = {
+    acronyms: validateStringArray,
+    properNouns: validateStringArray,
     specialTerms: validateStringArray,
     technicalTerms: validateStringArray,
-    properNouns: validateStringArray,
     ignoreAfterEmoji: validateBoolean
   };
 
@@ -86,26 +96,42 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   // Get ignoreAfterEmoji option (default: false for backward compatibility)
   const ignoreAfterEmoji = typeof config.ignoreAfterEmoji === 'boolean' ? config.ignoreAfterEmoji : false;
 
-  // Support both new `specialTerms` and old `technicalTerms`/`properNouns` for user config
-  // Only use valid arrays; fall back to empty arrays for invalid config
+  // Term routing (#233):
+  // - acronyms: must be uppercase. Registered as forcing terms in
+  //   specialCasedTerms so the lowercase/mixed form is flagged and fixed.
+  // - properNouns: the capitalized form is allowed, but the lowercase
+  //   common-word homograph must NOT be flagged. The canonical casing is
+  //   registered in specialCasedTerms (so the capitalized form and multi-word
+  //   phrases are recognized) AND the lowercase single-word key is registered
+  //   as an "allowed both ways" term so the homograph passes.
+  // - specialTerms: deprecated alias for properNouns (backward compatibility).
+  // - technicalTerms: legacy forcing option, treated like acronyms.
+  // Only use valid arrays; fall back to empty arrays for invalid config.
+  const userAcronyms = Array.isArray(config.acronyms) ? config.acronyms : [];
+  const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
   const userSpecialTerms = Array.isArray(config.specialTerms) ? config.specialTerms : [];
   const userTechnicalTerms = Array.isArray(config.technicalTerms) ? config.technicalTerms : [];
-  const userProperNouns = Array.isArray(config.properNouns) ? config.properNouns : [];
-  
-  // Show deprecation warnings for old configuration keys
+
+  // Show deprecation warnings for old configuration keys.
   // Note: These are deprecation warnings (not configuration errors), using console.warn
   // to maintain compatibility with existing tooling that may capture console output.
   // These warnings are informational and don't prevent the rule from functioning.
+  if (config.specialTerms && Array.isArray(config.specialTerms) && config.specialTerms.length > 0 && !_deprecationWarned.has('specialTerms')) {
+    _deprecationWarned.add('specialTerms');
+    console.warn('⚠️  Deprecation warning [sentence-case-heading]: "specialTerms" is deprecated. Use "properNouns" for allowed-capitalization terms or "acronyms" for terms that must be uppercase.');
+  }
   if (config.technicalTerms && Array.isArray(config.technicalTerms) && config.technicalTerms.length > 0 && !_deprecationWarned.has('technicalTerms')) {
     _deprecationWarned.add('technicalTerms');
-    console.warn('⚠️  Deprecation warning [sentence-case-heading]: "technicalTerms" is deprecated. Please use "specialTerms" instead.');
+    console.warn('⚠️  Deprecation warning [sentence-case-heading]: "technicalTerms" is deprecated. Use "acronyms" or "properNouns" instead.');
   }
-  if (config.properNouns && Array.isArray(config.properNouns) && config.properNouns.length > 0 && !_deprecationWarned.has('properNouns')) {
-    _deprecationWarned.add('properNouns');
-    console.warn('⚠️  Deprecation warning [sentence-case-heading]: "properNouns" is deprecated. Please use "specialTerms" instead.');
-  }
-  
-  const allUserTerms = [...userSpecialTerms, ...userTechnicalTerms, ...userProperNouns];
+
+  // Forcing terms: acronyms and the legacy technicalTerms enforce exact casing.
+  const forcingTerms = [...userAcronyms, ...userTechnicalTerms];
+  // Allowed-both-ways terms: properNouns and the deprecated specialTerms alias.
+  const allowedTerms = [...userProperNouns, ...userSpecialTerms];
+  // Every user term still seeds specialCasedTerms so the canonical capitalized
+  // form (and multi-word phrases) are recognized and never lowercased.
+  const allUserTerms = [...forcingTerms, ...allowedTerms];
 
   // Memoize specialCasedTerms: spreading defaultCasingTerms (~390 entries) is O(n) per
   // invocation. Cache keyed on sorted user terms so lint runs over many files pay the
@@ -123,6 +149,29 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       }
     });
     _specialCasedTermsCache.set(cacheKey, specialCasedTerms);
+  }
+
+  // Build the effective "allowed both ways" map: built-in ambiguous terms plus
+  // single-word proper nouns (and specialTerms alias). A proper noun registered
+  // here lets both its capitalized form and its lowercase homograph pass (#233).
+  // Multi-word proper nouns ("Claude Code") are left to specialCasedTerms phrase
+  // matching, since the allowed-both-ways skip only applies to single tokens.
+  let effectiveAmbiguousTerms = ambiguousTerms;
+  const allowedSingleWords = allowedTerms.filter(
+    (t) => typeof t === 'string' && !t.includes(' ')
+  );
+  if (allowedSingleWords.length > 0) {
+    effectiveAmbiguousTerms = { ...ambiguousTerms };
+    allowedSingleWords.forEach((term) => {
+      const key = term.toLowerCase();
+      // Do not override a built-in ambiguous entry.
+      if (!effectiveAmbiguousTerms[key]) {
+        effectiveAmbiguousTerms[key] = {
+          properForm: term,
+          reason: 'User-configured proper noun (allowed capitalized; lowercase homograph not flagged)'
+        };
+      }
+    });
   }
 
   const safetyConfig = params.config?.autofix?.safety || {};
@@ -150,7 +199,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       lineNumber,
       detail,
       context: headingText,
-      fixInfo: buildHeadingFix(line, fixTarget, specialCasedTerms, safetyConfig, ambiguousTerms)
+      fixInfo: buildHeadingFix(line, fixTarget, specialCasedTerms, safetyConfig, effectiveAmbiguousTerms)
     });
   }
 
@@ -165,7 +214,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   function reportForBoldText(detail, lineNumber, boldText, line, textForValidation) {
     // If ignoreAfterEmoji is enabled and text was truncated, only fix the part before emoji
     const fixTarget = (ignoreAfterEmoji && textForValidation) ? textForValidation : boldText;
-    const fixedText = toSentenceCase(fixTarget, specialCasedTerms, ambiguousTerms);
+    const fixedText = toSentenceCase(fixTarget, specialCasedTerms, effectiveAmbiguousTerms);
 
     onError({
       lineNumber,
@@ -194,7 +243,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Apply ignoreAfterEmoji truncation if enabled
     const { textForValidation } = truncateAtEmoji(boldText, ignoreAfterEmoji);
 
-    const validationResult = validateBoldText(textForValidation, specialCasedTerms, ambiguousTerms);
+    const validationResult = validateBoldText(textForValidation, specialCasedTerms, effectiveAmbiguousTerms);
 
     if (!validationResult.isValid) {
       reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine, textForValidation);
@@ -217,7 +266,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Apply ignoreAfterEmoji truncation if enabled
     const { textForValidation } = truncateAtEmoji(headingText, ignoreAfterEmoji);
 
-    const validationResult = validateHeading(textForValidation, specialCasedTerms, ambiguousTerms);
+    const validationResult = validateHeading(textForValidation, specialCasedTerms, effectiveAmbiguousTerms);
 
     if (!validationResult.isValid) {
       // Use cleanedText (emoji stripped) for error context to match original behavior

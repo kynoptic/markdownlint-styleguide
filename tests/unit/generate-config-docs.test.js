@@ -345,13 +345,13 @@ describe('generate-config-docs', () => {
 
     test('should_skip_deprecated_options_in_example_config', () => {
       const schema = {
-        specialTerms: { type: 'string[]', validator: 'validateStringArray' },
-        technicalTerms: { type: 'string[]', validator: 'validateStringArray' }
+        acronyms: { type: 'string[]', validator: 'validateStringArray' },
+        specialTerms: { type: 'string[]', validator: 'validateStringArray' }
       };
       const doc = generateRuleDoc('sentence-case-heading', schema, '', ['sentence-case-heading']);
-      // technicalTerms is deprecated, should not appear in example config values
-      // but specialTerms should appear with its example
-      expect(doc).toContain('"specialTerms"');
+      // specialTerms is deprecated, should not appear in example config values
+      // but acronyms (first-class) should appear with its example
+      expect(doc).toContain('"acronyms"');
     });
 
     test('should_handle_option_with_no_metadata', () => {
@@ -409,7 +409,12 @@ describe('generate-config-docs', () => {
 
     test('should_mark_deprecated_options', () => {
       expect(CONFIG_OPTION_METADATA.technicalTerms.deprecated).toBe(true);
-      expect(CONFIG_OPTION_METADATA.properNouns.deprecated).toBe(true);
+      expect(CONFIG_OPTION_METADATA.specialTerms.deprecated).toBe(true);
+    });
+
+    test('should_treat_acronyms_and_proper_nouns_as_first_class', () => {
+      expect(CONFIG_OPTION_METADATA.acronyms.deprecated).toBeUndefined();
+      expect(CONFIG_OPTION_METADATA.properNouns.deprecated).toBeUndefined();
     });
 
     test('should_have_defaults_for_non_deprecated_options', () => {
