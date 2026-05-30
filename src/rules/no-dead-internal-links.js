@@ -30,8 +30,8 @@ const contentCache = new Map(); // filepath -> string (file content)
 
 /**
  * Convert a heading text to an anchor format used in GitHub-flavored markdown.
- * Follows GitHub's punctuation handling (strip, don't hyphenate); note that
- * accented Latin letters are dropped here whereas GitHub retains them.
+ * Follows GitHub's punctuation handling (strip, don't hyphenate) and retains
+ * Unicode letters such as accented Latin characters, matching GitHub.
  * @param {string} heading - The heading text
  * @returns {string} The anchor-formatted heading
  */
@@ -43,10 +43,11 @@ function headingToAnchor(heading) {
     .replace(/<[^>]+>/g, '')
     // Remove markdown formatting
     .replace(/[*_`[\]]/g, '')
-    // Remove every character that is not a word char, CJK, whitespace, or hyphen.
-    // GitHub (and markdownlint MD051) strips punctuation rather than hyphenating it,
+    // Remove every character that is not a Unicode letter, number, mark,
+    // underscore, whitespace, or hyphen. GitHub keeps accented Latin letters
+    // (Di\u00e1taxis -> di\u00e1taxis) but strips punctuation rather than hyphenating it,
     // so "evals.json" becomes "evalsjson" and "don't" becomes "dont".
-    .replace(/[^\w\u4e00-\u9fa5\s-]+/g, '')
+    .replace(/[^\p{L}\p{N}\p{M}_\s-]+/gu, '')
     // Collapse runs of whitespace into single hyphens
     .replace(/\s+/g, '-')
     // Remove leading/trailing hyphens
@@ -506,5 +507,6 @@ export default {
 // Re-export for test compatibility; prefer the named export `clearCaches` in new code
 export const _forTesting = {
   clearCaches,
-  getCacheStats
+  getCacheStats,
+  headingToAnchor
 };
