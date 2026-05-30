@@ -94,6 +94,53 @@ export function mergeAutofixSafetyConfig(overrides) {
 }
 
 /**
+ * Detect whether a backtick autofix would corrupt content (issue #234).
+ *
+ * Two corruption modes are rejected outright, independent of which BCE001
+ * pattern produced the match:
+ * 1. URL wrapping — wrapping a bare URL (scheme-prefixed like `https://...`
+ *    or `www.`-prefixed) in a code span turns a clickable link into dead code.
+ * 2. Intra-token insertion — a match that begins partway through a word (because
+ *    a regex could not cross an apostrophe or letter boundary) would insert a
+ *    backtick inside the word, e.g. "don'`t/wait`".
+ *
+ * @param {string} original - The matched token the fix would wrap.
+ * @param {Object} context - Fix context; `context.line` is the source line.
+ * @returns {{ corrupting: boolean, reason?: string }} Whether the fix corrupts.
+ */
+export function detectBacktickCorruption(original, context = {}) {
+  const token = typeof original === 'string' ? original : String(original || '');
+  if (!token) {
+    return { corrupting: false };
+  }
+
+  // URL wrapping: scheme-prefixed or bare www. URLs must never be code spans.
+  if (/^(?:https?|ftp|ftps|file):\/\//i.test(token) || /^www\.[\w-]+\.[\w-]/i.test(token)) {
+    return { corrupting: true, reason: 'Fix would wrap a bare URL in a code span' };
+  }
+
+  // Intra-token insertion: the match starts mid-word inside the source line.
+  // A real code element never begins immediately after a letter+apostrophe or a
+  // bare letter; that signals the regex split an ordinary prose word.
+  const line = typeof context.line === 'string' ? context.line : '';
+  if (line) {
+    const idx = line.indexOf(token);
+    if (idx > 0) {
+      const prev = line[idx - 1];
+      const prevPrev = idx >= 2 ? line[idx - 2] : '';
+      const startsAlnum = /[A-Za-z0-9]/.test(token[0]);
+      const afterApostrophe = (prev === "'" || prev === '’') && /\w/.test(prevPrev);
+      const afterLetter = /[A-Za-z0-9]/.test(prev);
+      if (startsAlnum && (afterApostrophe || afterLetter)) {
+        return { corrupting: true, reason: 'Fix would insert a backtick inside a token' };
+      }
+    }
+  }
+
+  return { corrupting: false };
+}
+
+/**
  * Detect ambiguous terms in text and return ambiguity information.
  * @param {string} text - Text to analyze
  * @returns {{ isAmbiguous: boolean, term?: string, info?: Object, type?: string }} Ambiguity info
@@ -358,6 +405,27 @@ export function createSafeFixInfo(originalFixInfo, ruleType, original, fixed, co
 
   // Use the existing safety check system for all rules
   const safetyCheck = shouldApplyAutofix(ruleType, original, fixed, context, config);
+
+  // For backtick rules, reject content-corrupting fixes before anything else
+  // (issue #234): URL wrapping and intra-token backtick insertion are never safe.
+  if (ruleType === 'backtick') {
+    const corruption = detectBacktickCorruption(original, context);
+    if (corruption.corrupting) {
+      const telemetry = getTelemetry();
+      telemetry.recordDecision({
+        rule: ruleType,
+        original,
+        fixed,
+        confidence: 0,
+        applied: false,
+        reason: corruption.reason,
+        heuristics: safetyCheck.heuristics,
+        file: context.file,
+        line: context.line
+      });
+      return null;
+    }
+  }
 
   // For backtick rules, also run the advanced analysis for additional insights
   let advancedAnalysis = null;
