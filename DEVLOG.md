@@ -6,6 +6,23 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ---
 
+## [3.0.0] - 2026-05-30
+
+Shared line-scanning context, autofix confidence scoring, and tooling consolidation.
+
+- Added `shared-context.js`, a shared line-scanning context helper used across rules — see ADR-005
+- Added `autofix-confidence.js` confidence-scoring module and split `autofix-safety.js` into focused modules
+- Removed the `rule-helpers.js` facade and its migration tests; callers now use the named utilities directly
+- Retired the config-docs generator (`scripts/generate-config-docs.js`) and the `docs:config` script — `docs/configuration.md` is hand-maintained
+- Added a false-positive regression corpus and a docs-consistency guard test
+- Added a PR checklist gate workflow for Gitea and GitHub
+- Updated `.nvmrc` to 24; CI installs with `npm ci` and enforces the markdown lint gate
+- Disabled the Renovate dependency dashboard
+- Scrubbed consumer-specific identity strings from fixtures and tests
+- Dependency updates: eslint ^10.1.0, prettier ^3.8.3, minimatch ^10.2.5; regenerated lockfile to v3
+
+---
+
 ## [2.9.0] - 2026-03-17
 
 Module decomposition and dependency updates.
@@ -264,7 +281,9 @@ Documentation structure established.
 
 - Established the project documentation structure using the Diátaxis framework
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
+[2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0

@@ -6,6 +6,39 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [3.0.0] - 2026-05-30
+
+New date-time-consistency rule and importable config presets, with the runtime floor raised to Node 24.
+
+### Added
+
+- New `date-time-consistency` rule that validates weekday names, timezone abbreviations, and UTC offsets against the calendar date they accompany, with autofix; enabled in all presets
+- Config presets importable directly as package subpaths (`recommended-config.jsonc`, `basic-config.jsonc`, `strict-config.jsonc`, `recommended-markdownlint.jsonc`)
+- Flat `recommended-markdownlint.jsonc` config for composing rules through markdownlint's `extends`
+- Sentence-case rule accepts separate `acronyms` and `properNouns` lists for finer casing control
+- Dead-link rule resolves internal links from a configurable `linkBase` root
+
+### Changed
+
+- Minimum Node.js version raised to 24.16.0 — Node 20 and 22 are no longer supported
+- `markdownlint-cli2` peer dependency floor raised to 0.22.1
+- Sentence-case `specialTerms` option deprecated in favor of `acronyms` and `properNouns` (the old option still works)
+
+### Fixed
+
+- Backtick rule autofix no longer corrupts surrounding content when rewriting code spans
+- Sentence-case rule resolves misfires on reopened first words and other residual false positives
+- Dead-link rule preserves Unicode letters when generating heading slugs
+- Dead-link rule targets the correct bold span when a heading repeats the same text
+
+### Migration
+
+- Upgrade your runtime to Node.js 24.16.0 or later
+- Upgrade `markdownlint-cli2` to 0.22.1 or later if you pin it
+- Replace any `specialTerms` configuration with `acronyms` and/or `properNouns`
+
+---
+
 ## [2.9.0] - 2026-03-17
 
 Config inheritance for distribution presets and false positive reductions across rules.
@@ -428,7 +461,9 @@ Initial release.
 - Initial release of `markdownlint-custom-rules`
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
+[2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0
