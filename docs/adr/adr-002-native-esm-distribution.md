@@ -67,10 +67,10 @@ We will eliminate the Babel transpilation step and ship native ES modules direct
 
 **Negative:**
 
-- Potential compatibility issues with very old Node.js versions (pre-18)
-  - Mitigation: `package.json` already enforces `"engines": { "node": ">=18" }`
+- Potential compatibility issues with very old Node.js versions
+  - Mitigation: `package.json` enforces `"engines": { "node": ">=20" }`
 - Consumers on legacy systems may need to upgrade
-  - Mitigation: Node.js 18 is already LTS; 14 and 16 are EOL
+  - Mitigation: Node.js 20 is LTS; 18 and earlier are EOL
 
 **Testing:**
 
