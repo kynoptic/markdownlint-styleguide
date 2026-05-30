@@ -141,6 +141,19 @@ Fixable: Yes (replace `&` with `and`).
 
 ---
 
+## `date-time-consistency` (DTC001)
+
+- `timezone`: string (default: `America/New_York`) — IANA timezone the numbered date is interpreted in.
+- `defaultYear`: number | null (default: `null`) — Year assumed when a date omits it; `null` uses the current year.
+
+Off by default in the `basic` preset; on in `recommended` and `strict`.
+
+Fixable: Yes for weekday, abbreviation, and offset mismatches. DST transition edge hours (skipped or ambiguous) are flagged lint-only.
+
+See the [rule reference](rules.md) for the validation model and examples.
+
+---
+
 ## Autofix safety tuning
 
 markdownlint-trap uses a three-tier confidence system to determine autofix safety.

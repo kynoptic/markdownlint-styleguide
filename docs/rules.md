@@ -15,6 +15,7 @@ Each custom rule's behavior, ID, and fixability. See `docs/configuration.md` for
 | `no-dead-internal-links` | DL001 | No | Validate internal file links and heading anchors |
 | `no-literal-ampersand` | NLA001 | Yes | Replace standalone `&` with "and" in prose |
 | `no-empty-list-items` | ELI001 | Yes | Remove empty list items (Word conversion artifacts) |
+| `date-time-consistency` | DTC001 | Yes | Validate weekdays, `EST`/`EDT`, and UTC offsets against the date |
 
 ---
 
@@ -234,6 +235,41 @@ Examples
 
 - Good: `- Item with content`
 - Bad: `-` (marker followed by whitespace only)
+
+---
+
+## `date-time-consistency` (DTC001)
+
+Validates written weekdays, `EST`/`EDT` style abbreviations, and `(UTC±n)` offsets against the numbered calendar date in a configured IANA timezone. The numbered date is authoritative.
+
+- Parses `[<Weekday>,] <Month> <Day>[, <Year>]` in full and abbreviated forms, with ordinal suffixes (`15th`).
+- Binds each time phrase (`<hh>[:<mm>] <AM|PM> <abbr>[ (UTC±n)]`) to the nearest preceding date on the line.
+- Validates and auto-fixes three facts from the date: the weekday, the DST abbreviation (`EST`/`EDT`), and the UTC offset (`EST` = `UTC-5`, `EDT` = `UTC-4`).
+- Flags daylight-saving transition edge hours as lint-only (no auto-fix): the skipped hour on spring-forward (does not exist) and the repeated hour on fall-back (ambiguous). The correct adjacent time is author-dependent.
+- Skips dates inside fenced code blocks, inline code, and frontmatter.
+- When a year is omitted, assumes `defaultYear` (or the current year when `null`) and notes the assumption in the finding.
+- Zone resolution uses `Intl.DateTimeFormat`; no timezone-data dependency.
+
+Configuration options
+
+```jsonc
+{
+  "date-time-consistency": {
+    "timezone": "America/New_York",  // IANA zone (default: America/New_York)
+    "defaultYear": null              // null = current year when year omitted
+  }
+}
+```
+
+Off by default in the `basic` preset; on in `recommended` and `strict`.
+
+Examples
+
+- Good: `Saturday, November 15, 2025, at 3:00 PM EST (UTC-5)`
+- Bad (weekday): `Thursday, November 15, 2025` (November 15, 2025 is a Saturday)
+- Bad (abbreviation + offset): `Saturday, November 15, 2025, at 3:00 PM EDT (UTC-4)` (November is `EST (UTC-5)`)
+- Lint-only (skipped hour): `Sunday, March 9, 2025, at 2:30 AM EDT`
+- Lint-only (ambiguous hour): `Sunday, November 2, 2025, at 1:30 AM EDT`
 
 ---
 

@@ -45,6 +45,12 @@
     "no-bare-url": true,
     "no-dead-internal-links": true,
     "no-literal-ampersand": true,
-    "no-empty-list-items": true
+    "no-empty-list-items": true,
+    "date-time-consistency": {
+      // Numbered dates are authoritative; weekdays, EST/EDT, and UTC offsets
+      // are validated and fixed against this IANA zone.
+      "timezone": "America/New_York",
+      "defaultYear": null
+    }
   }
 }

@@ -14,7 +14,10 @@
 
     // Enable a small, high-signal set of custom rules
     "sentence-case-heading": true,
-    "backtick-code-elements": true
+    "backtick-code-elements": true,
+
+    // Off by default; opt in via recommended/strict presets
+    "date-time-consistency": false
   }
 }
 

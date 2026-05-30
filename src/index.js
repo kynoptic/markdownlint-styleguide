@@ -4,6 +4,7 @@ import noBareUrls from './rules/no-bare-urls.js';
 import noDeadInternalLinks from './rules/no-dead-internal-links.js';
 import noLiteralAmpersand from './rules/no-literal-ampersand.js';
 import noEmptyListItems from './rules/no-empty-list-items.js';
+import dateTimeConsistency from './rules/date-time-consistency.js';
 
 // Export incremental linting cache
 export { cachedLint } from './cache/cached-lint.js';
@@ -24,4 +25,4 @@ export {
  * Export all custom rules as a single array for markdownlint.
  * @type {import('markdownlint').Rule[]}
  */
-export default [backtickCodeElements, sentenceCaseHeading, noBareUrls, noDeadInternalLinks, noLiteralAmpersand, noEmptyListItems];
+export default [backtickCodeElements, sentenceCaseHeading, noBareUrls, noDeadInternalLinks, noLiteralAmpersand, noEmptyListItems, dateTimeConsistency];

@@ -17,7 +17,11 @@
     "no-bare-url": true,
     "no-dead-internal-links": true,
     "no-literal-ampersand": true,
-    "no-empty-list-items": true
+    "no-empty-list-items": true,
+    "date-time-consistency": {
+      "timezone": "America/New_York",
+      "defaultYear": null
+    }
   }
 }
 

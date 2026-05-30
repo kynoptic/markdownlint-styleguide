@@ -81,6 +81,19 @@ const RULE_METADATA = {
         '[Broken Link](nonexistent.md)'
       ]
     }
+  },
+  'date-time-consistency': {
+    description: 'Validates weekdays, timezone abbreviations, and UTC offsets against the numbered calendar date',
+    examples: {
+      valid: [
+        'Saturday, November 15, 2025, at 3:00 PM EST (UTC-5)',
+        'Wednesday, January 1, 2025'
+      ],
+      invalid: [
+        'Thursday, November 15, 2025',
+        'Saturday, November 15, 2025, at 3:00 PM EDT (UTC-4)'
+      ]
+    }
   }
 };
 
