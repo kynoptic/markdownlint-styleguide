@@ -27,6 +27,7 @@ export default [
   {
     ignores: [
       'node_modules/**',
+      '.claude/**',
       'coverage/**',
       'dist/**',
       'build/**',
