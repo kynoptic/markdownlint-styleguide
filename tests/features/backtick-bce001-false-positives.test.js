@@ -207,3 +207,40 @@ describe("BCE001 ellipsis-joined prose words (#196)", () => {
     expect(violations.length).toBeGreaterThan(0);
   });
 });
+
+describe("BCE001 import-homograph prose (#236)", () => {
+  test("does not flag 'import with' in ordinary prose", async () => {
+    const violations = await getBCE001Violations(
+      "Large-scale import with deduplication runs nightly.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'import images' in ordinary prose", async () => {
+    const violations = await getBCE001Violations(
+      "You can import images from the shared folder.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'import image' in ordinary prose", async () => {
+    const violations = await getBCE001Violations(
+      "Use the panel to import image assets quickly.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags a real module import like 'import pdfplumber'", async () => {
+    const violations = await getBCE001Violations(
+      "Add import pdfplumber at the top of the script.",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+  });
+
+  test("still flags a real filename like fill_form.py in prose", async () => {
+    const violations = await getBCE001Violations(
+      "Run fill_form.py to populate the document.",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+  });
+});
