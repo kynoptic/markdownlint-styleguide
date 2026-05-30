@@ -211,8 +211,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {string} boldText - Bold text in question.
    * @param {string} line - Original source line.
    * @param {string} textForValidation - Text that was validated (may be truncated if ignoreAfterEmoji).
+   * @param {number} [matchStart=0] - Offset of the flagged bold span in the line, used to
+   *   disambiguate the occurrence when the same bold phrase appears more than once.
    */
-  function reportForBoldText(detail, lineNumber, boldText, line, textForValidation) {
+  function reportForBoldText(detail, lineNumber, boldText, line, textForValidation, matchStart = 0) {
     // If ignoreAfterEmoji is enabled and text was truncated, only fix the part before emoji
     const fixTarget = (ignoreAfterEmoji && textForValidation) ? textForValidation : boldText;
     const fixedText = toSentenceCase(fixTarget, specialCasedTerms, effectiveAmbiguousTerms);
@@ -221,7 +223,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       lineNumber,
       detail,
       context: `**${textForValidation || boldText}**`,
-      fixInfo: fixedText ? buildBoldTextFix(line, fixTarget, fixedText, safetyConfig) : undefined
+      fixInfo: fixedText ? buildBoldTextFix(line, fixTarget, fixedText, safetyConfig, matchStart) : undefined
     });
   }
 
@@ -230,8 +232,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {string} boldText The bold text to validate.
    * @param {number} lineNumber The line number of the text.
    * @param {string} sourceLine The full source line.
+   * @param {number} [matchStart=0] Offset of the bold span within sourceLine.
    */
-  function validateBoldTextInContext(boldText, lineNumber, sourceLine) {
+  function validateBoldTextInContext(boldText, lineNumber, sourceLine, matchStart = 0) {
     if (!boldText || !boldText.trim()) {
       return;
     }
@@ -247,7 +250,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     const validationResult = validateBoldText(textForValidation, specialCasedTerms, effectiveAmbiguousTerms);
 
     if (!validationResult.isValid) {
-      reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine, textForValidation);
+      reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine, textForValidation, matchStart);
     }
   }
 
@@ -376,8 +379,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       // Skip empty text
       if (!textToValidate) continue;
 
-      // Use the unified validation logic
-      validateBoldTextInContext(textToValidate, lineNumber, line);
+      // Use the unified validation logic; pass the span offset so the autofix
+      // targets this occurrence even if the same bold phrase repeats on the line.
+      validateBoldTextInContext(textToValidate, lineNumber, line, matchStart);
 
       // Only validate the first bold text in the list item (which we already confirmed is at the start)
       break;

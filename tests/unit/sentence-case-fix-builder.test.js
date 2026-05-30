@@ -338,4 +338,27 @@ describe("buildBoldTextFix", () => {
     const second = buildBoldTextFix(line, originalBoldText, fixedBoldText, defaultSafetyConfig, 13);
     expect(second.editColumn).toBe(21); // position 18 + 3
   });
+
+  test("test_should_target_flagged_occurrence_when_duplicate_bold_on_line", () => {
+    // Regression for #221: when the same bold phrase appears twice on one line
+    // and the SECOND occurrence is the flagged violation, the fix must rewrite
+    // that span — not the first one indexOf would otherwise return.
+    const line = "- **Foo Bar** and **Foo Bar** end";
+    const originalBoldText = "Foo Bar";
+    const fixedBoldText = "Foo bar";
+
+    const secondOccurrence = line.indexOf("**Foo Bar**", 5);
+    const result = buildBoldTextFix(
+      line,
+      originalBoldText,
+      fixedBoldText,
+      defaultSafetyConfig,
+      secondOccurrence,
+    );
+
+    // editColumn is 1-based and points just after the opening "**" of the
+    // SECOND occurrence (offset 18), so 18 + 3 = 21.
+    expect(result).toBeDefined();
+    expect(result.editColumn).toBe(21);
+  });
 });
