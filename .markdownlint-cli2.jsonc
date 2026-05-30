@@ -6,7 +6,8 @@
     "tests/fixtures/**",
     ".claude/**",
     ".windsurf/**",
-    ".github/ISSUE_TEMPLATE/**"
+    ".github/ISSUE_TEMPLATE/**",
+    ".github/pull_request_template.md"
   ],
   "customRules": [
     "./src/index.js"
