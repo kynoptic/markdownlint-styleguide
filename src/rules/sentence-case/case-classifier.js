@@ -7,7 +7,7 @@
  * All functions return validation results without side effects (no onError calls).
  */
 
-import { preserveSegments } from '../shared-heuristics.js';
+import { isAcronym, preserveSegments } from '../shared-heuristics.js';
 import { escapeRegExp } from '../shared-utils.js';
 import { UNICODE_LETTER_REGEX } from '../shared-constants.js';
 import { validateFirstWord, validateSubsequentWords } from './word-validators.js';
@@ -227,15 +227,29 @@ function validateProperPhrases(text, specialCasedTerms) {
 /**
  * Determine if all non-acronym words are uppercase.
  * @param {string[]} words - Words extracted from the heading.
+ * @param {string} [cleanedText] - The cleaned heading text, used to detect a
+ *   single whitespace-free term that punctuation cleanup split into multiple
+ *   short-acronym tokens (e.g. "TL;DR").
  * @returns {boolean} True when every relevant word is uppercase.
  */
-function isAllCapsHeading(words) {
+function isAllCapsHeading(words, cleanedText) {
   const relevant = words.filter(
     (w) =>
       w.length > 1 &&
       !(w.startsWith('__PRESERVED_') && w.endsWith('__'))
   );
   const allCaps = relevant.filter((w) => w === w.toUpperCase());
+  // A heading that is solely a single whitespace-free term split into short
+  // acronyms by punctuation cleanup (e.g. "TL;DR" -> ["TL", "DR"]) is a known
+  // acronym/term, not shouting prose, so it is not flagged as all caps (#245).
+  if (
+    typeof cleanedText === 'string' &&
+    !/\s/.test(cleanedText.trim()) &&
+    relevant.length > 0 &&
+    relevant.every((w) => isAcronym(w))
+  ) {
+    return false;
+  }
   return (
     relevant.length > 1 &&
     allCaps.length === relevant.length &&
@@ -332,7 +346,7 @@ function performWordValidation(words, cleanedText, phraseIgnore, hadLeadingEmoji
   }
 
   // Check for all caps heading
-  if (isAllCapsHeading(words)) {
+  if (isAllCapsHeading(words, cleanedText)) {
     return {
       isValid: false,
       errorMessage: 'Heading should not be in all caps.'

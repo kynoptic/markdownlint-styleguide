@@ -9,8 +9,8 @@
  */
 
 import { isAcronym } from '../shared-heuristics.js';
-import { UNICODE_UPPERCASE_REGEX } from '../shared-constants.js';
-import { validateFirstWord } from './word-validators.js';
+import { UNICODE_UPPERCASE_REGEX, contextualAllCapsTerms } from '../shared-constants.js';
+import { isAcceptableHyphenatedCompound, validateFirstWord } from './word-validators.js';
 import {
   findFirstValidationWord,
   getProperPhraseIndices,
@@ -18,54 +18,6 @@ import {
   prepareTextForValidation,
   validateProperPhrases
 } from './case-classifier.js';
-
-/**
- * Determines whether a hyphenated compound is acceptable in bold text because
- * every segment is individually valid: a lowercase word, the pronoun "I", a
- * short acronym, or a segment whose uppercased form is a configured acronym or
- * special term (e.g. "high-CEFR", "FAQ-shaped", "API-wide"). At least one
- * segment must be a configured term or acronym so ordinary mixed-case compounds
- * like "Bad-Word" are still flagged (#233 Part B.2).
- * @param {string} word The hyphenated token to check.
- * @param {Object} specialCasedTerms Special casing terms dictionary.
- * @returns {boolean} True when the compound should be left alone.
- */
-function isAcceptableHyphenatedCompound(word, specialCasedTerms) {
-  if (!word.includes('-')) {
-    return false;
-  }
-  const segments = word.split('-');
-  if (segments.length < 2) {
-    return false;
-  }
-
-  let sawConfiguredOrAcronym = false;
-  for (const segment of segments) {
-    if (segment === '') {
-      return false;
-    }
-    // Plain lowercase segment is always acceptable.
-    if (segment === segment.toLowerCase()) {
-      continue;
-    }
-    // A segment matching a configured term's exact casing (acronym or proper
-    // noun) is acceptable, e.g. "CEFR", "FAQ", "API", "Saxon".
-    const configured = specialCasedTerms[segment.toLowerCase()];
-    if (configured && segment === configured) {
-      sawConfiguredOrAcronym = true;
-      continue;
-    }
-    // A short all-caps acronym is acceptable even when not explicitly configured.
-    if (isAcronym(segment)) {
-      sawConfiguredOrAcronym = true;
-      continue;
-    }
-    // Any other non-lowercase segment (e.g. "Bad", "Word") is a violation.
-    return false;
-  }
-
-  return sawConfiguredOrAcronym;
-}
 
 /**
  * Performs stricter validation for bold text in list items.
@@ -140,6 +92,14 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
     // A hyphenated special term (e.g. "Anglo-Saxon") matches as a whole token, so
     // no sub-segment is independently checked for lowercase casing (#233 Part B.2).
     if (expectedWordCasing && word === expectedWordCasing && word.includes('-')) {
+      continue;
+    }
+
+    // Contextual ALL_CAPS terms (NOTE, TIP, CAUTION, etc.) double as ordinary
+    // lowercase prose words. When such a word appears lowercase in a non-first
+    // bold position it is normal prose, not the alert keyword, so it is not
+    // forced to all caps. This mirrors the heading subsequent-word path (#245).
+    if (contextualAllCapsTerms.has(wordLower) && word === word.toLowerCase()) {
       continue;
     }
 

@@ -80,6 +80,49 @@ export function isCodeIdentifier(word) {
 }
 
 /**
+ * Determines whether a hyphenated compound is acceptable because every segment
+ * is individually valid: a lowercase word, a short acronym, or a segment whose
+ * casing matches a configured acronym or proper noun (e.g. "high-CEFR",
+ * "issue-PR", "FAQ-shaped"). At least one segment must be a configured term or
+ * acronym so ordinary mixed-case compounds like "issue-Relationship" still flag
+ * (#233 Part B.2, extended to the heading subsequent-word path in #245).
+ * @param {string} word The hyphenated token to check.
+ * @param {Object} specialCasedTerms Special casing terms dictionary.
+ * @returns {boolean} True when the compound should be left alone.
+ */
+export function isAcceptableHyphenatedCompound(word, specialCasedTerms) {
+  if (!word.includes('-')) {
+    return false;
+  }
+  const segments = word.split('-');
+  if (segments.length < 2) {
+    return false;
+  }
+
+  let sawConfiguredOrAcronym = false;
+  for (const segment of segments) {
+    if (segment === '') {
+      return false;
+    }
+    if (segment === segment.toLowerCase()) {
+      continue;
+    }
+    const configured = specialCasedTerms[segment.toLowerCase()];
+    if (configured && segment === configured) {
+      sawConfiguredOrAcronym = true;
+      continue;
+    }
+    if (isAcronym(segment)) {
+      sawConfiguredOrAcronym = true;
+      continue;
+    }
+    return false;
+  }
+
+  return sawConfiguredOrAcronym;
+}
+
+/**
  * Validates the first word's capitalization.
  * @param {string} firstWord The first word to validate.
  * @param {number} firstIndex Index of the first word.
@@ -269,6 +312,26 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
         return { isValid: true };
       }
 
+      // A hyphenated first word is valid sentence case when its first segment
+      // is a properly capitalized word (satisfying the first-word requirement)
+      // and every later segment is lowercase, a configured proper noun, or an
+      // acronym (e.g. "Word-Markdown", "Non-Italian"). A later segment that is a
+      // plain capitalized word ("Well-Known") is still flagged (#245).
+      if (firstWord.includes('-')) {
+        const segs = firstWord.split('-');
+        const firstSegCapitalized = /^[A-Z][a-z]*$/.test(segs[0]);
+        const restValid = segs.slice(1).every((seg) => {
+          if (seg === '') return false;
+          if (seg === seg.toLowerCase()) return true;
+          const configured = specialCasedTerms[seg.toLowerCase()];
+          if (configured && seg === configured) return true;
+          return isAcronym(seg);
+        });
+        if (firstSegCapitalized && restValid && segs.length > 1) {
+          return { isValid: true };
+        }
+      }
+
       // Regular sentence case
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
@@ -434,6 +497,13 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
       const acronymPrefixMatch = /^([A-Z]{2,4}(?:\/[A-Z][a-z]+)?(?:\/[A-Z]{2,})*)(-[a-z].*)$/.exec(word);
       if (acronymPrefixMatch) {
         // This is valid - acronym prefix with lowercase suffix
+        continue;
+      }
+
+      // A compound whose every segment is a lowercase word or a configured
+      // acronym/proper noun (e.g. "high-CEFR", "issue-PR") is acceptable. This
+      // whole-token reasoning previously ran only on the bold path (#245).
+      if (isAcceptableHyphenatedCompound(word, specialCasedTerms)) {
         continue;
       }
 
