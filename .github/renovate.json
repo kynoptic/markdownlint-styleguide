@@ -150,10 +150,7 @@
     "platformAutomerge": true,
     "commitMessageAction": "Update"
   },
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Dependency updates dashboard",
-  "dependencyDashboardHeader": "This dashboard tracks all pending dependency updates. PRs are created automatically based on the schedule and grouping rules defined in `.github/renovate.json`.",
-  "dependencyDashboardFooter": "For urgent security updates or to override the schedule, you can manually create PRs from this dashboard.",
+  "dependencyDashboard": false,
   "ignoreDeps": [],
   "ignorePaths": [
     "**/node_modules/**",

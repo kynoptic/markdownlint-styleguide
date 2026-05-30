@@ -205,20 +205,8 @@ describe('Renovate configuration', () => {
   });
 
   describe('dependency dashboard', () => {
-    test('should_enable_dependency_dashboard', () => {
-      expect(config.dependencyDashboard).toBe(true);
-    });
-
-    test('should_have_custom_title', () => {
-      expect(config.dependencyDashboardTitle).toBe(
-        'Dependency updates dashboard'
-      );
-    });
-
-    test('should_have_header_and_footer', () => {
-      expect(config.dependencyDashboardHeader).toBeDefined();
-      expect(config.dependencyDashboardHeader).toContain('.github/renovate.json');
-      expect(config.dependencyDashboardFooter).toBeDefined();
+    test('should_disable_dependency_dashboard', () => {
+      expect(config.dependencyDashboard).toBe(false);
     });
   });
 
