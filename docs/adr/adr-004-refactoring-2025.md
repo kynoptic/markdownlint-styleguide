@@ -4,270 +4,48 @@
 
 Accepted
 
-Synthesized architectural decisions and rationale from the major refactoring work completed between `v1.7.0` and HEAD (commits through c4f9417).
+## Context
 
-## Overview
+The `v1.7.0`+ refactoring addressed maintainability problems in the custom markdownlint rule suite: monolithic rule files, duplicated heuristics causing behavioral drift, and thin test coverage on safety-critical autofix logic.
 
-This document captures the "why" behind significant architectural changes introduced during the `v1.7.0`+ refactoring initiative. These decisions represent lessons learned about maintainability, testing, and code organization in a custom markdownlint rule suite.
-
-## 🏗️ Architecture decisions
+## Decisions
 
 ### Modular rule decomposition
 
-**Decision**: Break down monolithic rule files (>1,000 LOC) into composable modules with single responsibilities.
+Break rule files exceeding ~500 LOC or holding more than three distinct responsibilities (parsing, validation, fixing) into composable single-responsibility modules.
 
-**Context**: The `sentence-case-heading` rule grew to 1,111 lines over time, making it difficult to:
+`sentence-case-heading` was split from 1,111 LOC into an orchestration entry point plus `token-extraction.js`, `case-classifier.js`, and `fix-builder.js` ([commit dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f)).
 
-- Understand the flow of validation logic
-- Write targeted unit tests for specific functions
-- Debug failures without reading the entire file
-- Onboard new contributors
-
-**Implementation** ([commit dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f)):
-
-```text
-sentence-case-heading.js (1,111 LOC)
-  ↓
-sentence-case-heading.js (266 LOC, orchestration)
-  ├── token-extraction.js (36 LOC)
-  ├── case-classifier.js (721 LOC)
-  └── fix-builder.js (127 LOC)
-```
-
-**Outcomes**:
-
-- ✅ 76% reduction in main file complexity
-- ✅ 762 unit tests added for individual components
-- ✅ 78% faster concurrent execution (1,450ms → 330ms)
-- ✅ V8 can better optimize smaller, focused functions
-- ✅ No breaking changes for external consumers
-
-**Tradeoffs**:
-
-- Additional module boundaries add minimal overhead (~1-2%)
-- Bundle size increased by ~5% due to module wrapper code
-- More files to navigate during initial code exploration
-
-**When to apply**: Consider modular decomposition when a rule exceeds ~500 LOC or contains more than 3 distinct responsibilities (e.g., parsing, validation, fixing).
+**Consequences**: 76% reduction in main-file complexity and no breaking changes for consumers, at the cost of additional module boundaries (~1-2% overhead) and a ~5% bundle-size increase from wrapper code. Modularization also improved concurrent execution from ~1,450ms to ~330ms — V8 inlines and optimizes smaller functions more aggressively, so performance does not justify monolithic files.
 
 ### Consolidated shared heuristics
 
-**Decision**: Extract common detection and preservation logic into a centralized `shared-heuristics.js` module rather than duplicating implementations across rules.
+Centralize common detection and preservation logic in `src/rules/shared-heuristics.js` rather than duplicating it across rules ([commit c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417)).
 
-**Context**: Prior to consolidation, two rules maintained separate implementations:
+Before consolidation, `sentence-case-heading` and `backtick-code-elements` carried separate `isAcronym()` and markup-preservation implementations, producing behavioral drift on number-bearing terms like `PM2` and `IPv4` (Issue #66). The shared module exposes `isAcronym`, `preserveSegments`, `restoreSegments`, and `isInsideCodeSpan`.
 
-- `sentence-case-heading` had `isAcronym()` and `preserveMarkupSegments()`
-- `backtick-code-elements` had similar but slightly different logic
+**Consequences**: single source of truth and consistent term handling, at the cost of tighter coupling — changes to shared heuristics affect every consuming rule and require regression testing. Future rules must import from `shared-heuristics.js` rather than re-implement the logic.
 
-This caused **behavioral drift** where PM2-style terms (containing numbers like `PM2`, `IPv4`) were handled inconsistently.
+### Autofix safety unit tests
 
-**Implementation** ([commit c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417)):
+Cover the `autofix-safety.js` confidence-scoring and manual-review thresholds with behavioral unit tests rather than relying on integration tests alone ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)).
 
-Created `src/rules/shared-heuristics.js` with:
+Unit tests exercise boundary conditions (e.g. exactly 50% confidence) in ~200ms and pinpoint which confidence function broke, where an integration test would require a full markdown document and the entire rule pipeline (~2s).
 
-- `isAcronym(word)` - Detects short acronyms (≤4 uppercase letters)
-- `preserveSegments(text)` - Unified markup preservation
-- `restoreSegments(processed, segments)` - Inverse operation
-- `isInsideCodeSpan(line, start, end)` - Code span detection
+### Test pyramid with intentional overlap
 
-**Outcomes**:
-
-- ✅ Eliminates behavioral drift between rules
-- ✅ PM2-style terms now handled consistently
-- ✅ 210 unit tests document shared behavior
-- ✅ Single source of truth for common patterns
-- ✅ Easier to extend heuristics across all rules
-
-**Tradeoffs**:
-
-- Rules now depend on shared module (tighter coupling)
-- Changes to shared heuristics affect multiple rules
-- Requires careful testing to avoid regressions
-
-> [!IMPORTANT]
-> Future rules **must** `import from` `shared-heuristics.js` rather than duplicating logic. Update the shared module if the heuristic needs refinement.
-
-**Historical context**: This refactor directly addresses Issue #66 ("Consolidate shared heuristics to prevent drift"), which documented the PM2 inconsistency as a real-world failure case.
-
-### Autofix safety layer with unit tests
-
-**Decision**: Implement comprehensive unit tests for the autofix safety layer to validate confidence scoring and manual review thresholds.
-
-**Context**: The `autofix-safety.js` module makes critical decisions about when to apply automatic fixes:
-
-- Should this fix be applied automatically?
-- What confidence level does this transformation have?
-- Does this look like code vs. natural language?
-
-These decisions were previously tested only through integration tests, making it difficult to verify edge cases and boundary conditions.
-
-**Implementation** ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)):
-
-Added 568 behavioral unit tests covering:
-
-- `shouldApplyAutofix()` - Confidence thresholds, manual review flags
-- `createSafeFixInfo()` - Safety metadata generation, fix blocking
-- `calculateSentenceCaseConfidence()` - Structural changes, technical terms
-- `calculateBacktickConfidence()` - File paths, commands, natural language
-- `analyzeCodeVsNaturalLanguage()` - Code detection heuristics
-
-**Outcomes**:
-
-- ✅ Documents expected behavior for all confidence scenarios
-- ✅ Fast feedback on safety logic changes (~200ms test run)
-- ✅ Precise failure diagnosis when confidence scoring breaks
-- ✅ Prevents incorrect autofixes through comprehensive validation
-
-**Rationale for unit vs. integration**:
-
-Unit tests are essential here because:
-
-1. **Rapid iteration**: Testing confidence thresholds through integration tests requires creating full markdown documents and running the entire rule pipeline (~2s)
-2. **Edge case coverage**: Unit tests easily exercise boundary conditions like "exactly 50% confidence" or "one technical term in 10 words"
-3. **Clear failure messages**: When a unit test fails, it's immediately clear which confidence function broke
-
-## ⚡ Performance considerations
-
-### V8 optimization through modularization
-
-**Observation**: Breaking the monolithic `sentence-case-heading` rule into modules **improved** performance by 78% in concurrent execution tests.
-
-**Analysis**:
-
-1. **Better inlining**: V8's JIT compiler can more aggressively inline smaller, focused functions
-2. **Improved branch prediction**: Simpler control flow in each module reduces mispredictions
-3. **Cache locality**: Related functions co-located in modules improve CPU cache hit rates
-4. **Reduced code complexity**: V8's optimization heuristics work better on smaller functions
-
-**Measured impact**:
-
-- Before: ~1,450ms for concurrent rule execution
-- After: ~330ms for concurrent rule execution
-- Threshold: 1,500ms (now at 78% headroom)
-
-**Takeaway**: Performance concerns should **not** discourage modular architecture. Modern JavaScript engines optimize modular code very effectively.
-
-### Performance testing strategy
-
-**Decision**: Maintain performance regression tests with conservative thresholds.
-
-**Current thresholds**:
-
-```javascript
-{
-  concurrentExecution: 1500, // Current: ~330ms (78% headroom)
-  singleDocument: 500,        // Current: ~255ms (49% headroom)
-  memoryGrowth: 1.0,          // Current: ~0.4MB (60% headroom)
-}
-```
-
-**Rationale**: Headroom allows natural code evolution without constant threshold adjustments, while still catching genuine performance regressions.
-
-## 🔐 Security considerations
+Maintain overlapping unit and integration layers deliberately. Unit tests verify isolated components with synthetic inputs; integration tests verify end-to-end behavior on realistic documents. The overlap is not redundant — the layers catch different failure modes (logic errors versus composition errors) and offer different feedback speeds.
 
 ### Automated vulnerability scanning
 
-**Decision**: Integrate automated vulnerability scanning into the CI pipeline to detect and prevent security issues before they reach production.
-
-**Implementation** ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)):
-
-Added security job to CI workflow using:
-
-- **`npm audit`** - Scans against `npm advisory` database
-- **osv-scanner** - Cross-references against Open Source Vulnerabilities database
-
-**Configuration**:
-
-- Fails builds on high/critical vulnerabilities in production dependencies
-- Excludes dev dependencies from blocking checks (`--omit=dev`)
-- Uploads scan results as artifacts (30-day retention)
-- Exception policy in `SECURITY.md` for temporary waivers
-
-**Rationale**:
-
-- Proactive detection prevents vulnerable dependencies from reaching users
-- Audit trail provides compliance evidence
-- Exception policy balances security with pragmatic development needs
-- Running in parallel with build job avoids extending CI time
-
-> [!CAUTION]
-> The exception policy exists for legitimate cases (no patch available, breaking changes required). Exceptions must include expiry dates and be reviewed quarterly.
-
-## 🔧 Tooling choices
-
-### Test pyramid strategy
-
-**Decision**: Adopt a deliberate test pyramid with intentional overlap between unit and integration tests.
-
-**Structure**:
-
-```text
-    Integration Tests (497 tests)
-           /\
-          /  \
-         /    \
-        /      \
-       /________\
-    Unit Tests (762 tests)
-```
-
-**Overlap strategy**:
-
-- **Unit tests** verify isolated component behavior with synthetic inputs
-- **Integration tests** verify end-to-end behavior with realistic documents
-
-**Rationale for overlap**:
-
-This is **intentional**, not redundant:
-
-1. **Rapid feedback**: Unit tests run in ~200ms vs ~2s for integration
-2. **Precise failure diagnosis**: Unit test failures pinpoint exact module
-3. **Regression safety**: Integration tests catch unexpected interactions
-4. **Different failure modes**: Unit tests catch logic errors, integration tests catch composition errors
-
-**Example**: The `toSentenceCase()` function has both:
-
-- Unit tests with synthetic inputs: `"HTTP API"`, `"npm v2.0"`
-- Integration tests with real markdown: Full documents from external repositories
+Run `npm audit` and osv-scanner in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)). Builds fail on high/critical vulnerabilities in production dependencies; dev dependencies are excluded (`--omit=dev`). `SECURITY.md` defines the exception policy — waivers require expiry dates and quarterly review.
 
 ### Node.js version targeting
 
-**Decision**: Target Node.js >= 20 (LTS) as the minimum supported version.
-
-**Rationale**:
-
-- Node.js 20 includes native fetch, the test runner, watch mode, and stable V8 improvements
-- Node.js 18 LTS reached end-of-life in April 2025
-- CI matrix runs on [20, 22]; older versions are not tested
-
-**Recorded in**: `.nvmrc`, `package.json` engines field, CI matrix
-
-## Lessons learned
+Target Node.js >= 20 (LTS) as the minimum supported version, recorded in `.nvmrc`, the `package.json` engines field, and the CI matrix ([20, 22]). Node.js 20 provides native fetch, the test runner, and watch mode; Node.js 18 LTS reached end-of-life in April 2025.
 
 ## References
 
-### Key commits
-
-- [dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f) - Break down monolithic sentence-case-heading rule
-- [c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417) - Consolidate shared heuristics to prevent drift
-- [61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511) - Add comprehensive autofix-safety unit tests
-- [9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695) - Add automated vulnerability scanning to CI
-- [1e80f7c](https://github.com/kynoptic/markdownlint-trap/commit/1e80f7c) - Add unit tests for internal validation functions
-
-### Related documentation
-
-- `docs/architecture.md` - System architecture overview
-- `docs/architecture.md#performance-impact` - Performance analysis of modular refactor
-- `SECURITY.md` - Vulnerability scanning process and exception policy
-- `CLAUDE.md` - Agent handbook with development workflow
-
-### Issues addressed
-
-- #66 - Consolidate shared heuristics to prevent drift
-- #64 - Break down monolithic sentence-case-heading rule
-- #68 - Add comprehensive unit tests for autofix safety layer
-- #75 - Add automated vulnerability scanning to CI pipeline
-
----
-
-**Document history**: Created 2025-10-30 as part of architecture knowledge capture initiative. Synthesized from commit messages, code comments, and performance documentation.
+- [System architecture overview](../architecture.md)
+- [Vulnerability scanning process](../../SECURITY.md)
+- Issues addressed: #66, #64, #68, #75
