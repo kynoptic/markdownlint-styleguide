@@ -239,6 +239,18 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
+        // Skip matches truncated mid-word by a non-ASCII letter. The patterns
+        // use ASCII `\w`/`\b`, so a Unicode letter (e.g. the schwa in a
+        // pronunciation gloss like "-pəl") forms a false word boundary and the
+        // matcher captures only the leading fragment ("-p"). When the character
+        // immediately after the match is a letter or combining mark, the match
+        // is part of a longer word, not a code element (#269). Test the
+        // remainder so astral-plane letters (surrogate pairs) are matched as
+        // whole code points, not a lone surrogate half.
+        if (end < line.length && /^[\p{L}\p{M}]/u.test(line.slice(end))) {
+          continue;
+        }
+
         // For the path pattern, apply extra heuristics to avoid false positives
         // on natural language like "read/write" or "pass/fail".
         // Only apply this check to patterns that are actually path-matching patterns
