@@ -141,11 +141,15 @@ describe('Incremental linting performance benchmarks', () => {
   });
 
   test('test_should_handle_multiple_files_efficiently', async () => {
-    // Create 20 files
+    // Create 20 substantial files. Trivial files make the cache's saving smaller
+    // than CI timing noise (GC, scheduler), which flips the warm-vs-cold check;
+    // sizeable per-file content keeps the saving well above that noise floor.
     const files = [];
     for (let i = 0; i < 20; i++) {
       const fp = path.join(tempDir, `multi-${i}.md`);
-      fs.writeFileSync(fp, `# Document ${i}\n\nContent for document ${i}.\n`);
+      const content = generateLargeDocument(25)
+        .replace('# Performance benchmark document', `# Document ${i}`);
+      fs.writeFileSync(fp, content);
       files.push(fp);
     }
 
@@ -157,19 +161,24 @@ describe('Incremental linting performance benchmarks', () => {
       cache: { enabled: true, location: cacheDir }
     };
 
-    // Cold run
+    // Cold run — full lint, populates cache
     const coldStart = process.hrtime.bigint();
-    await cachedLint(opts);
+    const coldResults = await cachedLint(opts);
     const coldDuration = Number(process.hrtime.bigint() - coldStart) / 1_000_000;
 
-    // Warm run
+    // Warm run — served from cache, skips parsing and rule execution
     const warmStart = process.hrtime.bigint();
-    await cachedLint(opts);
+    const warmResults = await cachedLint(opts);
     const warmDuration = Number(process.hrtime.bigint() - warmStart) / 1_000_000;
 
     console.log(`Multi-file cold: ${coldDuration.toFixed(2)}ms, warm: ${warmDuration.toFixed(2)}ms`);
 
+    // Cache must return the same results it computed on the cold run
+    for (const fp of files) {
+      expect(warmResults[fp]).toEqual(coldResults[fp]);
+    }
+
     // Warm run should be faster
     expect(warmDuration).toBeLessThan(coldDuration);
-  });
+  }, 30000);
 });
