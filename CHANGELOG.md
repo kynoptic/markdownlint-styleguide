@@ -6,6 +6,16 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [3.0.1] - 2026-05-30
+
+Fix a sentence-case false positive on contraction first words.
+
+### Fixed
+
+- Sentence-case rule no longer flags a correctly capitalized contraction such as `Don't` as the first word when a later word in the same heading or bold list item is also a contraction (e.g. `it's`)
+
+---
+
 ## [3.0.0] - 2026-05-30
 
 New date-time-consistency rule and importable config presets, with the runtime floor raised to Node 24.
@@ -461,7 +471,8 @@ Initial release.
 - Initial release of `markdownlint-custom-rules`
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
 [2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0

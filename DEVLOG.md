@@ -6,6 +6,15 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ---
 
+## [3.0.1] - 2026-05-30
+
+Root-cause fix and regression coverage for the sentence-case contraction false positive.
+
+- Anchored single-quote preservation in `preserveSegments` to word boundaries — bare contraction apostrophes were being paired as quote delimiters, preserving the span between them and mangling the first word (#267)
+- Added feature tests covering contraction first words alongside later contractions, possessives, and genuine single-quoted phrases including ones with interior contractions
+
+---
+
 ## [3.0.0] - 2026-05-30
 
 Shared line-scanning context, autofix confidence scoring, and tooling consolidation.
@@ -281,7 +290,8 @@ Documentation structure established.
 
 - Established the project documentation structure using the Diátaxis framework
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
 [2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0
