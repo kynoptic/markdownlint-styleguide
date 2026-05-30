@@ -111,3 +111,67 @@ describe('SC001 contextualAllCaps not forced in ordinary prose (issue #245)', ()
     expect(violations.length).toBeGreaterThan(0);
   });
 });
+
+describe('SC001 apostrophe first word (issue #245 reopen)', () => {
+  test('test_should_not_flag_apostrophe_first_word_in_heading', async () => {
+    const violations = await lintMarkdown("## Don't consolidate if it's referenced");
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_not_flag_apostrophe_first_word_in_bold', async () => {
+    const violations = await lintMarkdown("- **Don't use the delete command**");
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_not_flag_curly_apostrophe_first_word_in_bold', async () => {
+    const violations = await lintMarkdown('- **Don’t use the delete command**');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_still_flag_lowercase_apostrophe_first_word', async () => {
+    const violations = await lintMarkdown("## don't consolidate the agents");
+    expect(violations.length).toBeGreaterThan(0);
+    expect(violations[0].errorDetail).toMatch(/first word/i);
+  });
+});
+
+describe('SC001 backticked code first word (issue #245 reopen)', () => {
+  test('test_should_not_flag_backticked_code_first_word_in_heading', async () => {
+    const violations = await lintMarkdown('## `.env.example` present and clean');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_not_flag_backticked_code_first_word_in_bold', async () => {
+    const violations = await lintMarkdown('- **`.env.example` present and clean**');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_not_flag_backticked_code_first_word_in_numbered_list', async () => {
+    const violations = await lintMarkdown('6. `.env.example` present and clean');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_still_flag_plain_lowercase_first_word_in_heading', async () => {
+    const violations = await lintMarkdown('## converter for code files');
+    expect(violations.length).toBeGreaterThan(0);
+    expect(violations[0].errorDetail).toMatch(/first word/i);
+  });
+});
+
+describe('SC001 bracketed placeholder first word (issue #245 reopen)', () => {
+  test('test_should_not_flag_bracketed_placeholder_first_word_in_heading', async () => {
+    const violations = await lintMarkdown('## [Project Name] task report');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_not_flag_bracketed_placeholder_first_word_in_bold', async () => {
+    const violations = await lintMarkdown('- **[Project Name] task report**');
+    expect(violations).toHaveLength(0);
+  });
+
+  test('test_should_still_flag_plain_lowercase_first_word_without_bracket', async () => {
+    const violations = await lintMarkdown('## converter handles the reports');
+    expect(violations.length).toBeGreaterThan(0);
+    expect(violations[0].errorDetail).toMatch(/first word/i);
+  });
+});
