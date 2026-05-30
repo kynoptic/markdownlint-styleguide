@@ -3,6 +3,9 @@
   // Enables all custom rules with balanced strictness
   "ignores": [
     "node_modules/**",
+    ".tmp/**",
+    "tests/.tmp/**",
+    "validation-reports/**",
     "tests/fixtures/**",
     ".claude/**",
     ".windsurf/**",
