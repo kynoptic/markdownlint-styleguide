@@ -111,7 +111,7 @@ Integration tests validate rules against real-world repositories and combined ru
 - **Purpose**: Catch unexpected interactions, verify performance at scale, validate production use cases
 - **Scope**: Multiple rules enabled simultaneously, large documents, external repositories
 - **When to write**: Adding new rules, changing shared utilities, or addressing performance concerns
-- **Examples**: `curated-repos.test.js`, `rule-combinations.test.js`, `performance.test.js`
+- **Examples**: `curated-repos.test.js`, `rule-combinations.test.js`, `real-world-patterns.test.js`
 
 ### ⚡ Performance tests (`tests/performance/`)
 

@@ -33,8 +33,8 @@ This exposes the `global.gc()` function for manual garbage collection between te
 ### Run specific test file
 
 ```bash
-npm test tests/performance/rule-performance.test.js
-npm test tests/performance/autofix-safety.test.js
+npm run test:performance -- tests/performance/rule-performance.test.js
+npm run test:performance -- tests/performance/autofix-safety.test.js
 ```
 
 ## Performance thresholds
@@ -186,9 +186,11 @@ test('benchmark_specific_function', () => {
 
 ```text
 tests/performance/
-├── README.md                     # This file
-├── rule-performance.test.js      # Rule execution benchmarks
-└── autofix-safety.test.js        # Safety classifier benchmarks
+├── README.md                       # This file
+├── rule-performance.test.js        # Rule execution benchmarks
+├── autofix-safety.test.js          # Safety classifier benchmarks
+├── incremental-linting.test.js     # Cache warm-vs-cold benchmarks
+└── shared-utils-performance.test.js # Code-block / inline-code detection benchmarks
 ```
 
 ### rule-performance.test.js
@@ -210,6 +212,22 @@ Tests autofix safety classifier performance:
 - Individual heuristic functions (`hasCodeIndicators`, `hasCommandPattern`, etc.)
 - Batch processing performance
 - Baseline metrics for regression detection
+
+### incremental-linting.test.js
+
+Tests the linting cache's warm-vs-cold behavior:
+
+- Single-file and multi-file cache savings
+- Warm-run results match cold-run results
+
+### shared-utils-performance.test.js
+
+Tests `shared-utils` detection performance (correctness lives in
+`tests/integration/shared-utils-detection.test.js`):
+
+- Code-block detection on large documents
+- Inline-code detection and span extraction
+- Cache memory stability
 
 ## Adding new performance tests
 

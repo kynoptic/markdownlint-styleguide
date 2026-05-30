@@ -21,5 +21,10 @@ export default {
     '/.test-dist/',
     '/.markdownlint-rules/',
     '/.claude/worktrees/',
+    // Wall-clock benchmarks run only via the isolated single-worker config
+    // (npm run test:performance / jest.config.performance.mjs). In this default
+    // parallel suite they share the CPU with every other worker, which inflates
+    // their timing measurements past the thresholds and flakes the pre-push gate.
+    '/tests/performance/',
   ],
 };
