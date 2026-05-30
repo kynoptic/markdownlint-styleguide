@@ -6,6 +6,17 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ---
 
+## [3.0.2] - 2026-05-30
+
+Root-cause fix and regression coverage for the BCE001 non-ASCII flag false positive.
+
+- Skip a flag match when the following character is a Unicode letter or combining mark — ASCII word boundaries truncated hyphenated words like `-pəl` and flagged the `-p` fragment (#269)
+- Tested the match remainder against astral-plane (surrogate-pair) letters so supplementary-plane characters are handled
+- Added feature tests for schwa, diaeresis, bold-adjacent, and astral-plane cases
+- Stabilized the flaky multi-file caching benchmark
+
+---
+
 ## [3.0.1] - 2026-05-30
 
 Root-cause fix and regression coverage for the sentence-case contraction false positive.
@@ -290,7 +301,8 @@ Documentation structure established.
 
 - Established the project documentation structure using the Diátaxis framework
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.1...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.2...HEAD
+[3.0.2]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
 [2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
