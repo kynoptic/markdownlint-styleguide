@@ -53,7 +53,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 ## Documentation updates
 
 - [ ] **Update version references** in documentation
-- [ ] **Regenerate config documentation**: `npm run docs:config`
+- [ ] **Review config documentation**: confirm `docs/configuration.md` (hand-maintained) reflects any rule or preset changes
 - [ ] **Update `README.md`** if new features need documentation
 - [ ] **Verify example configurations** still work
 - [ ] **Update rule documentation** if rules have changed

@@ -7,7 +7,7 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 ## Repository layout
 
 - `src/rules/` — Individual rule implementations and shared modules; entry point `src/index.js`
-- `*-config.jsonc` — Preset tiers (`basic`, `recommended`, `strict`); see `docs/configuration.md`
+- `*-config.jsonc` — Preset tiers (`basic`, `recommended`, `strict`); documented in the hand-maintained `docs/configuration.md`
 - `templates/` — CLI and VS Code config templates mirroring each preset
 - `tests/unit/`, `tests/features/`, `tests/integration/`, `tests/performance/` — Test layers
 - `tests/fixtures/` — Shared Markdown fixtures organized by rule
@@ -40,7 +40,6 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 
 - `npm run security` — Audit production dependencies.
 - `npm run doctor` — Diagnose installation issues.
-- `npm run docs:config` — Regenerate configuration docs.
 - `npm run validate:external` — Validate rules against external projects.
 
 ## Coding style

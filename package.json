@@ -36,7 +36,6 @@
     "validate:external": "node scripts/validate-external.js",
     "lint": "eslint .",
     "security": "npm audit --omit=dev --audit-level=high",
-    "docs:config": "node scripts/generate-config-docs.js",
     "doctor": "node scripts/doctor.cjs",
     "dist:local": "node scripts/distribute-local.cjs",
     "dist:local:dry": "node scripts/distribute-local.cjs --dry-run",
