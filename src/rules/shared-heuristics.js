@@ -112,7 +112,14 @@ export function preserveSegments(text) {
     segments.push(m);
     return PH + (segments.length - 1) + PE;
   });
-  processed = processed.replace(/'([^']+)'/g, (m) => {
+  // Single-quoted strings only at word boundaries: the opening quote must follow
+  // the start or an opening delimiter, and the closing quote must precede the end
+  // or a closing delimiter. This avoids pairing contraction/possessive apostrophes
+  // (e.g. the ' in "Don't" with the ' in "it's"), which would otherwise preserve
+  // the span between them and mangle the surrounding words (#267). The lazy inner
+  // match still allows interior apostrophes, so a genuine quoted phrase that
+  // contains a contraction (e.g. 'I don't know') is preserved as one segment.
+  processed = processed.replace(/(?<=^|[\s([{])'(.+?)'(?=$|[\s)\]}.,;:!?])/g, (m) => {
     segments.push(m);
     return PH + (segments.length - 1) + PE;
   });
