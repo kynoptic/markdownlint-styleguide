@@ -4,13 +4,13 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 
 ## Project overview
 
-`markdownlint-trap` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It includes rules for sentence-case headings, backticked code elements, and bare URLs. The project is built with Node.js and ships native ES modules.
+`markdownlint-trap` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It ships rules covering sentence-case headings, backticked code elements, link validation, prose style, and date-time consistency. The project is built with Node.js and ships native ES modules.
 
 ## Development setup
 
 ### Prerequisites
 
-- Node.js v18+
+- Node.js v24+ (`>=24.16.0`)
 - npm (included with Node.js)
 
 ### Installation
@@ -83,7 +83,7 @@ For more details, see the [architecture](./docs/architecture.md) and [testing gu
 
 ## Coding guidelines
 
-- Use ES modules compatible with Node.js v18+.
+- Use ES modules compatible with Node.js v24+ (`>=24.16.0`).
 - Document all functions with JSDoc comments.
 - Follow existing coding style and conventions.
 - Write clear, descriptive commit messages following conventional commit format.

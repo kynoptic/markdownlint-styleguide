@@ -22,7 +22,7 @@ Break rule files exceeding ~500 LOC or holding more than three distinct responsi
 
 Centralize common detection and preservation logic in `src/rules/shared-heuristics.js` rather than duplicating it across rules ([commit c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417)).
 
-Before consolidation, `sentence-case-heading` and `backtick-code-elements` carried separate `isAcronym()` and markup-preservation implementations, producing behavioral drift on number-bearing terms like `PM2` and `IPv4` (Issue #66). The shared module exposes `isAcronym`, `preserveSegments`, `restoreSegments`, and `isInsideCodeSpan`.
+Before consolidation, `sentence-case-heading` and `backtick-code-elements` carried separate `isAcronym()` and markup-preservation implementations, producing behavioral drift on number-bearing terms like `PM2` and `IPv4` (Issue #66). The shared module exposes `isAcronym`, `preserveSegments`, `restoreSegments`, and `isInsideCodeSpan`. Document line/offset context detection later moved out of `shared-heuristics.js` into `shared-context.js`; the term and markup heuristics remain in `shared-heuristics.js`.
 
 **Consequences**: single source of truth and consistent term handling, at the cost of tighter coupling — changes to shared heuristics affect every consuming rule and require regression testing. Future rules must import from `shared-heuristics.js` rather than re-implement the logic.
 
@@ -42,7 +42,7 @@ Run `npm audit` and osv-scanner in the CI pipeline ([commit 9bea695](https://git
 
 ### Node.js version targeting
 
-Target Node.js >= 20 (LTS) as the minimum supported version, recorded in `.nvmrc`, the `package.json` engines field, and the CI matrix ([20, 22]). Node.js 20 provides native fetch, the test runner, and watch mode; Node.js 18 LTS reached end-of-life in April 2025.
+Target Node.js >= 24.16.0 (active LTS) as the minimum supported version, recorded in `.nvmrc`, the `package.json` engines field, and the CI matrix ([24]). Node.js 24 provides native fetch, the test runner, and watch mode; Node.js 20 LTS has reached end-of-life.
 
 ## References
 

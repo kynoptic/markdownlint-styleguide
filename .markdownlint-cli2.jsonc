@@ -21,7 +21,8 @@
       "style": "asterisk"
     },
     "sentence-case-heading": {
-      "specialTerms": [
+      // Terms that MUST be uppercase
+      "acronyms": [
         // Acronyms and abbreviations
         "ADR",
         "ADRs",
@@ -33,6 +34,16 @@
         "HTML",
         "JSON",
         "PATCH",
+        // File and document type conventions
+        "CHANGELOG",
+        "README",
+        // All-caps emphasis terms (style convention in guidelines)
+        "FORBIDDEN",
+        "IMPORTANT",
+        "WARNING"
+      ],
+      // Terms whose capitalized form is merely allowed
+      "properNouns": [
         // Technology and product names (always proper nouns)
         "Git",
         "GitHub",
@@ -45,18 +56,11 @@
         "GitHub Projects",
         "GitHub Project",
         "GitHub Markdown Alerts",
-        // File and document type conventions
-        "CHANGELOG",
-        "README",
         // Compound technical terms (with hyphens)
         "Auto-merge",
         "Behavior-focused",
         "Rule-specific",
-        "osv-scanner",
-        // All-caps emphasis terms (style convention in guidelines)
-        "FORBIDDEN",
-        "IMPORTANT",
-        "WARNING"
+        "osv-scanner"
       ]
     },
     "MD036": false,

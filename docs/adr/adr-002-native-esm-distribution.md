@@ -16,7 +16,7 @@ However, the build pipeline introduced several maintenance challenges:
 - Additional tooling overhead (Babel dependencies and configuration)
 - Developer experience friction from mandatory build steps
 
-Since Node.js 18+ and modern markdownlint versions (0.38.0+) now fully support native ESM, the transpilation layer became unnecessary technical debt.
+Since modern Node.js and markdownlint versions (0.38.0+) now fully support native ESM, the transpilation layer became unnecessary technical debt.
 
 ## Decision
 
@@ -68,9 +68,9 @@ We will eliminate the Babel transpilation step and ship native ES modules direct
 **Negative:**
 
 - Potential compatibility issues with very old Node.js versions
-  - Mitigation: `package.json` enforces `"engines": { "node": ">=20" }`
+  - Mitigation: `package.json` enforces `"engines": { "node": ">=24.16.0" }`
 - Consumers on legacy systems may need to upgrade
-  - Mitigation: Node.js 20 is LTS; 18 and earlier are EOL
+  - Mitigation: Node.js 24 is active LTS; 20 and earlier are EOL
 
 **Testing:**
 

@@ -43,7 +43,7 @@ DEBUG=markdownlint-trap* npm test
 
 ## Testing strategy
 
-The project uses **multi-layered testing** to balance fast feedback with thorough validation:
+The project uses multi-layered testing to balance fast feedback with thorough validation. All tests run on Node.js `>=24.16.0` (see `.nvmrc`).
 
 ### 🔬 Unit tests (`tests/unit/` and `src/rules/*.test.js`)
 
@@ -64,14 +64,14 @@ test('test_should_detect_title_case_when_multiple_words_capitalized', () => {
 });
 ```
 
-**Current unit test coverage** (2,022 lines total):
+Representative unit test files:
 
-- `src/rules/autofix-safety.test.js` (568 lines) - Safety layer confidence scoring and decision logic
-- `tests/unit/sentence-case-classifier.test.js` (313 lines) - Case classification and validation heuristics
-- `tests/unit/sentence-case-heading-functions.test.js` (482 lines) - Internal validation functions
-- `tests/unit/sentence-case-fix-builder.test.js` (219 lines) - Auto-fix generation and transformations
-- `tests/unit/sentence-case-token-extraction.test.js` (230 lines) - Token parsing from ATX headings
-- `tests/unit/shared-heuristics.test.js` (210 lines) - Shared utility functions (acronym detection, segment preservation)
+- `src/rules/autofix-safety.test.js` - Safety layer confidence scoring and decision logic
+- `tests/unit/sentence-case-classifier.test.js` - Case classification and validation heuristics
+- `tests/unit/sentence-case-heading-functions.test.js` - Internal validation functions
+- `tests/unit/sentence-case-fix-builder.test.js` - Auto-fix generation and transformations
+- `tests/unit/sentence-case-token-extraction.test.js` - Token parsing from ATX headings
+- `tests/unit/shared-heuristics.test.js` - Shared utility functions (acronym detection, segment preservation)
 
 ### 🧪 Feature tests (`tests/features/`)
 
@@ -186,13 +186,9 @@ describe('when_confidence_is_below_threshold', () => {
 
 **Example overlap**: `sentence-case-classifier.test.js` (unit) tests `validateHeading()` in isolation with synthetic inputs. `sentence-case-passing.test.js` (feature) validates the same logic through the full markdownlint pipeline with realistic markdown.
 
-**Why both?**
+### Rationale for two test layers
 
-- Unit tests fail immediately when logic breaks (~200ms feedback)
-- Feature tests catch integration issues (parsing, token extraction, markdownlint API)
-- Each layer catches different bug classes (logic errors vs. integration errors)
-
-See `docs/architecture.md` for architectural rationale.
+Unit tests fail immediately when logic breaks, giving fast feedback. Feature tests catch integration issues across parsing, token extraction, and the markdownlint API. Each layer catches a different bug class: logic errors surface in unit tests, integration errors in feature tests. See the [rule architecture overview](architecture.md) for the design rationale.
 
 ## Test file naming conventions
 
@@ -274,42 +270,22 @@ Use this validation loop to identify and fix false positives when improving rule
 
 ## False-positive audit round consolidation
 
-Audit rounds are numbered files (`false-positive-audit-round<N>.test.js`) created during the [false positive validation](#false-positive-validation) loop. Over time these accumulate and make the feature suite harder to navigate.
+Audit rounds are numbered files (`false-positive-audit-round<N>.test.js`) created during the [false positive validation](#false-positive-validation) loop. They accumulate over time and make the feature suite harder to navigate, so fold closed rounds into themed archives.
 
-### When to consolidate
+A round is eligible for consolidation only when its fixes are merged and all its tests are green on `main`. Consolidate when several closed rounds share a logical theme or when their combined size dominates the suite. Do not consolidate an open or in-progress round.
 
-Consolidate when **any** of the following is true:
-
-- There are 5 or more closed audit rounds (rounds whose issues are fully resolved and whose tests all pass on `main`)
-- A set of rounds covers a single logical theme (e.g., rounds 2–4 all fix sentence-case proper-noun exemptions)
-- The total line count across candidate rounds exceeds 600 lines
-
-A round is eligible for consolidation only when its associated fixes are merged and all its tests are green on `main`. Do not consolidate an open or in-progress round.
-
-### How to consolidate
-
-1. Identify the rounds to consolidate (e.g., rounds 2–6).
-2. Create a new file: `tests/features/false-positive-consolidated-<theme>.test.js`
-   - `<theme>` is a short kebab-case label describing the shared subject (e.g., `sentence-case`, `backtick`, `mixed`).
-   - If the rounds cover unrelated themes, use `rounds-<first>-<last>` (e.g., `rounds-2-6`).
-3. Move all `describe` blocks and `test` cases from the source round files into the new consolidated file. Preserve the original `describe` labels so test names remain stable.
-4. Delete the source round files.
-5. Run `npm test` to confirm no tests are lost or broken.
-6. Commit: `test: consolidate false-positive audit rounds <first>–<last>`.
+To consolidate, create `tests/features/false-positive-consolidated-<theme>.test.js` (use `rounds-<first>-<last>` when the rounds cover unrelated themes), move every `describe` block and `test` case from the source files into it while preserving the original labels, delete the source files, then run `npm test` to confirm nothing is lost.
 
 ### Naming convention
 
 | File pattern | Purpose |
 |---|---|
-| `false-positive-audit-round<N>.test.js` | Active, open audit round (in progress or recently merged) |
-| `false-positive-consolidated-<theme>.test.js` | Consolidated archive of closed rounds grouped by theme |
+| `false-positive-audit-round<N>.test.js` | Open audit round (in progress or just merged) |
+| `false-positive-consolidated-<theme>.test.js` | Archive of closed rounds grouped by theme |
 | `false-positive-audit-fixes.test.js` | One-off fixes not tied to a numbered round |
 | `false-positive-consumer-repo.test.js` | Consumer-specific regression tests (named by repo) |
-
-Keep at most 4 open round files in `tests/features/` at any time. When a fifth round is merged, consolidate the oldest closed rounds before starting a new one.
 
 ## Notes
 
 - Tests `import` ESM from `src/` directly via `babel-jest`; no build step required.
 - The distribution `.markdownlint-rules/` is only used by consumers of the published package or the shareable preset.
-- All tests run on Node.js `>=20` (see `.nvmrc`).

@@ -2,145 +2,157 @@
 
 How the project is structured and consumed.
 
-For architectural decisions and their rationale, see [Architecture Decision Records](adr/).
+For architectural decisions and their rationale, see the [decision records](adr/).
 
 ## Source vs distribution
 
 - Source code: ES Modules under `src/`.
-- Distribution: Native ESM directly from `src/` (no transpilation since `v2.3.0`).
+- Distribution: native ESM directly from `src/`, no transpilation.
 - Entry point: `src/index.js` exports all rules.
 
-Consumers use one of three shareable presets (`basic`, `recommended`, `strict`), which reference rule files under `src/rules/`. Since `v2.3.0`, the project ships native ES modules without Babel transpilation.
+Consumers use one of three shareable presets (`basic`, `recommended`, `strict`), which reference rule files under `src/rules/`.
 
 ## Presets and templates
 
 Three root configs (`*-config.jsonc`) serve as shareable presets that consumers extend. All share list style opinions (`MD004: dash`, `MD013: false`, `MD029: one`) but differ in which custom rules are enabled and how many standard rules are relaxed. See `docs/configuration.md` for the full comparison.
 
-Copy-paste templates in `templates/` mirror each preset for two environments: `markdownlint-cli2` (CLI) and VS Code settings (different config shape). Use templates when tooling does not support `extends`.
+Copy-paste templates in `templates/` mirror each preset for two environments: `markdownlint-cli2` (CLI) and VS Code settings (a different config shape). Use templates when tooling does not support `extends`.
 
 ## Testing approach
 
 Four test layers validate behavior at different granularities:
 
-- **Unit tests** (`tests/unit/`) verify isolated components with synthetic inputs, giving rapid feedback (~200ms) and precise failure diagnosis
+- **Unit tests** (`tests/unit/`) verify isolated components with synthetic inputs, giving rapid feedback and precise failure diagnosis
 - **Integration tests** (`tests/features/`) validate end-to-end rule behavior with realistic documents
 - **Performance tests** (`tests/performance/`) enforce latency and memory thresholds
 - **External repository tests** (`tests/integration/external/`) validate rules against curated real-world projects
 
-Tests run directly against native ESM in `src/` using Jest's experimental ESM support. Since `v2.3.0`, no transpilation is needed.
+Tests run directly against native ESM in `src/` using Jest's experimental ESM support.
 
 > [!NOTE]
 > Unit and integration tests intentionally overlap. Unit tests pinpoint failures quickly; integration tests catch unexpected interactions and confirm real-world compatibility.
 
 ## Module architecture
 
-### 🏗️ Modular rule design
+### Modular rule design
 
-Since `v1.7.0`, complex rules use composable, single-responsibility modules. The `sentence-case-heading` rule exemplifies this architecture:
+Complex rules use composable, single-responsibility modules. Two rules demonstrate the pattern by splitting their internals into a dedicated subdirectory.
 
-- **Main rule file** (`src/rules/sentence-case-heading.js`, 266 lines) - Orchestrates markdownlint integration and coordinates modules
-- **Token extraction** (`src/rules/sentence-case/token-extraction.js`, 36 lines) - Parses and extracts plain text from ATX headings
-- **Case classification** (`src/rules/sentence-case/case-classifier.js`, 721 lines) - Validates sentence case rules
-- **Fix generation** (`src/rules/sentence-case/fix-builder.js`, 127 lines) - Generates auto-fix transformations with safety checks
+The `sentence-case-heading` rule (`src/rules/sentence-case-heading.js`) orchestrates markdownlint integration and coordinates the modules under `src/rules/sentence-case/`:
 
-**Rationale**: The original 1,111-line monolithic rule file was difficult to maintain and test. Splitting it into focused modules achieved:
+- **`bold-text-classifier.js`** - Classifies bold spans that should be treated as headings
+- **`case-classifier.js`** - Validates sentence case rules
+- **`fix-builder.js`** - Generates auto-fix transformations with safety checks
+- **`token-extraction.js`** - Parses and extracts plain text from ATX headings
+- **`word-validators.js`** - Per-word checks for acronyms, proper nouns, and exemptions
 
-- 76% reduction in main file complexity (1,111 → 266 lines)
-- 762 unit tests covering individual components
-- 78% faster concurrent execution (~1,450ms → ~330ms) from better V8 optimization
-- Clearer module boundaries simplify debugging and maintenance
+The `backtick-code-elements` rule (`src/rules/backtick-code-elements.js`) follows the same shape with modules under `src/rules/backtick/`:
 
-See [commit dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f) for the refactoring commit.
+- **`detection-helpers.js`** - Identifies code-like tokens that should be wrapped in backticks
+- **`error-messages.js`** - Builds the violation messages and fix suggestions
 
-### Performance impact
-
-The modular refactor improved concurrent rule execution from ~1,450ms to ~330ms (78% faster). Single-document processing (~255ms) and memory footprint (~0.4MB for 10 documents) stayed the same. V8 optimizes smaller, focused functions more aggressively: better inlining, simpler control flow for branch prediction, and improved CPU cache locality from co-located functions within each module.
+**Rationale**: a single large rule file is hard to maintain and test. Splitting each rule into focused modules sharpens module boundaries, isolates unit tests, and lets V8 optimize smaller functions more aggressively.
 
 ## Shared utilities
 
-Shared modules consolidate common heuristics so behavior stays consistent and code does not drift:
+Shared modules consolidate common heuristics so behavior stays consistent and code does not drift.
+
+> [!IMPORTANT]
+> Rules **must** import from shared modules rather than duplicating logic. Duplication causes behavioral drift across the rule suite.
+
+### `src/rules/shared-context.js`
+
+Document-wide positional context for line-scanning rules. `buildLineContext(lines)` scans the document once and returns a `LineContext` whose predicates answer where a given line or position sits:
+
+- `isInFencedCode(lineNumber)` - inside a fenced code block
+- `isInInlineCode(lineNumber, column)` - inside an inline code span
+- `isInLinkDestination(lineNumber, column)` - inside a link or image destination
+- `isInHtmlComment(lineNumber)` - inside an HTML comment
+- `isInFrontmatter(lineNumber)` - inside YAML/TOML frontmatter
+- `isInCode(lineNumber, column)` - inside any code context (fenced or inline)
+- `isInProse(lineNumber, column)` - outside code, links, comments, and frontmatter
+
+Line-scanning rules build this context once per document instead of re-implementing fence, code, and link detection. It backs `backtick-code-elements`, `date-time-consistency`, `sentence-case-heading`, `no-literal-ampersand`, and `no-dead-internal-links`.
 
 ### `src/rules/shared-heuristics.js`
 
-Detection and preservation logic shared across multiple rules ([commit c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417)):
+Single-line range checks and prose heuristics shared across rules:
 
-- `isAcronym(word)` - Detects short acronyms (≤4 uppercase letters) for sentence case exemptions
-- `preserveSegments(text)` - Replaces code spans, links, version numbers, dates, and formatting with placeholders
-- `restoreSegments(processed, segments)` - Restores preserved segments after processing
-- `isInsideCodeSpan(line, start, end)` - Checks whether a position range falls within backticks
+- `isInsideCodeSpan(line, start, end)` - checks whether a position range on one line falls within backticks
+- `isAcronym(word)` - detects short acronyms (≤4 uppercase letters) for sentence case exemptions
+- `isDomainInProse(text)` - distinguishes a domain name used as prose from a literal URL
+- `preserveSegments(text)` / `restoreSegments(processed, segments)` - swap code spans, links, version numbers, dates, and formatting for placeholders and back
 
-**Why consolidate?** Before this refactor, `sentence-case-heading` and `backtick-code-elements` maintained separate acronym detection and markup preservation implementations. The duplication caused behavioral drift: PM2-style terms (containing numbers) were handled inconsistently. The shared module keeps behavior identical across all rules and cuts maintenance work.
+Detection splits along a clear seam: `shared-heuristics.js` answers single-line range and prose questions; document-wide positional context lives in `shared-context.js`. Rules that only need to test one line's range stay on `isInsideCodeSpan`; rules that walk the whole document build a `LineContext`.
 
 ### `src/rules/shared-utils.js`
 
-Performance-optimized utilities for code block detection and inline code processing:
-
-- Fast-path optimizations for common cases
-- Efficient string scanning algorithms
-- Memoization for repeated operations
+Performance-optimized utilities for code block detection and inline code processing: fast-path optimizations for common cases, efficient string scanning, and memoization for repeated operations.
 
 ### `src/rules/shared-constants.js`
 
-Centralized term dictionaries and configuration constants:
+Centralized term dictionaries and configuration constants: special-cased technical terms (e.g., `npm`, `API`, `CSS`), proper noun dictionaries, and default configuration values.
 
-- Special-cased technical terms (e.g., "npm", "API", "CSS")
-- Proper noun dictionaries
-- Default configuration values
+### Acronyms vs proper nouns
+
+`sentence-case-heading` and `backtick-code-elements` split term configuration into two keys:
+
+- `acronyms` - terms that **must** be uppercase (e.g., `API`, `CSS`)
+- `properNouns` - terms whose capitalized form is merely **allowed** (e.g., `GitHub`)
+
+The legacy `specialTerms` key is deprecated; supplying it emits a console warning. Use the two-key split instead.
+
+### `src/rules/autofix-confidence.js`
+
+Pure confidence scoring. Given a candidate fix and its context, it returns a score from 0 (definitely unsafe) to 1 (definitely safe) with no side effects:
+
+- `calculateSentenceCaseConfidence()` - analyzes structural changes and technical terms
+- `calculateBacktickConfidence()` - distinguishes code from natural language
+
+Both functions are re-exported from `autofix-safety.js`, which layers tier decisions on top of the raw scores.
 
 ### `src/rules/autofix-safety.js`
 
-Safety layer for auto-fix operations with confidence scoring and three-tier categorization. Prevents false positive corrections while surfacing ambiguous cases for review.
-
-**Purpose**: Separates safety decisions from rule validation logic. Rules focus on detecting violations; the safety module determines when autofixes apply automatically, need human review, or should be skipped.
-
-**Three-tier autofix system**:
+Safety layer for auto-fix operations. It consumes the scores from `autofix-confidence.js` and maps them to a three-tier outcome, keeping safety decisions separate from rule validation logic. Rules detect violations; this module decides when a fix applies automatically, needs review, or is skipped.
 
 | Tier | Confidence | Behavior |
 |------|------------|----------|
 | Auto-fix | ≥ 0.7 | Applied automatically with high confidence |
-| Needs-review | 0.3 - 0.7 | Flagged for human/AI verification |
+| Needs-review | 0.3 – 0.7 | Flagged for human/AI verification |
 | Skip | < 0.3 | Too uncertain, silently skipped |
 
-**Functions**:
+Key functions:
 
-- `shouldApplyAutofix()` - Evaluates confidence and returns tier classification with ambiguity info
-- `createSafeFixInfo()` - Generates safety metadata and reports needs-review items
-- `classifyTier()` - Determines which tier a fix belongs to based on confidence
-- `detectAmbiguity()` - Identifies terms that could be proper or common nouns
-- `calculateSentenceCaseConfidence()` - Analyzes structural changes and technical terms
-- `calculateBacktickConfidence()` - Distinguishes code vs. natural language
+- `shouldApplyAutofix()` - evaluates confidence and returns the tier with ambiguity info
+- `createSafeFixInfo()` - generates safety metadata and reports needs-review items
+- `classifyTier()` - maps a confidence score to its tier
+- `detectAmbiguity()` - identifies terms that could be proper or common nouns
 
-**Confidence scoring**: Each autofix receives a score from 0 (definitely unsafe) to 1 (definitely safe). Scores incorporate:
+Scores incorporate pattern strength (file paths, commands, technical indicators), ambiguity penalties for terms like `Word`, `Go`, `Swift`, and `Agent`, surrounding-context analysis, and rule-specific boosts for `snake_case`, `camelCase`, and code paths.
 
-- Pattern strength (file paths, commands, technical indicators)
-- Ambiguity penalties for terms like "Word", "Go", "Swift", "Agent"
-- Context analysis (surrounding text, technical vs. natural language)
-- Rule-specific boosts (`snake_case` +0.25, `camelCase` +0.25, code paths +0.30)
+`src/cli/needs-review-reporter.js` collects items in the needs-review range and emits them as human-readable text or machine-readable JSON for agent processing.
 
-**Needs-review reporter**: `src/cli/needs-review-reporter.js` collects items in the 0.3-0.7 confidence range and outputs them as human-readable text or machine-readable JSON for AI agent processing.
-
-**Testing**: 568+ behavioral unit tests cover boundary conditions and decision logic.
-
-**Rationale**: See [ADR-001](adr/adr-001-autofix-safety-strategy.md) for design decisions, alternatives considered, and tradeoffs.
+**Rationale**: see [ADR-001](adr/adr-001-autofix-safety-strategy.md) for design decisions, alternatives, and tradeoffs.
 
 ### `src/rules/config-validation.js`
 
 Configuration validation and error reporting for rule options.
 
-> [!IMPORTANT]
-> Rules **must** `import from` shared modules rather than duplicating logic. Duplication causes behavioral drift across the rule suite.
+### `src/rules/autofix-telemetry.js`
+
+Records autofix tier outcomes for analysis of how often fixes apply, defer, or skip.
 
 ## Security architecture
 
-Since `v1.7.0`, CI runs automated vulnerability scanning ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)):
+CI runs automated vulnerability scanning:
 
-- **`npm audit`** scans production dependencies against the `npm advisory` database
+- **`npm audit`** scans production dependencies against the npm advisory database
 - **osv-scanner** cross-references the Open Source Vulnerabilities database
-- Builds fail on `high/critical` vulnerabilities in production dependencies
-- Scan results are archived as artifacts with 30-day retention
+- Builds fail on high or critical vulnerabilities in production dependencies
+- Scan results are archived as artifacts with a retention window
 - Exception policy documented in `SECURITY.md` for temporary waivers
 
-**Rationale**: Proactive scanning blocks vulnerable dependencies from reaching production and leaves an audit trail for compliance.
+**Rationale**: proactive scanning blocks vulnerable dependencies from reaching production and leaves an audit trail for compliance.
 
 ## Performance guidance
 
@@ -152,8 +164,8 @@ Since `v1.7.0`, CI runs automated vulnerability scanning ([commit 9bea695](https
 
 ## Build
 
-Since `v2.3.0`, the project ships native ES modules without transpilation:
+The project ships native ES modules without a build step:
 
-- No build step -- source distributes directly from `src/`
+- Source distributes directly from `src/`; there is no transpilation
 - The package `files` field includes `src/`, `scripts/`, and `recommended-config.jsonc`
 - Pre-commit hooks run linting and tests before each commit

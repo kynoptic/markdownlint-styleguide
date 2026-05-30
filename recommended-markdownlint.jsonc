@@ -12,12 +12,18 @@
 
   // Custom rules from markdownlint-trap
   "sentence-case-heading": {
-    "specialTerms": [
+    // Terms that MUST be uppercase
+    "acronyms": [
       // Common acronyms
       "LLM",
       "NAS",
       "PDF",
       "UX",
+      // Emphasis terms
+      "NOTE"
+    ],
+    // Terms whose capitalized form is merely allowed
+    "properNouns": [
       // Major platforms
       "Google Drive",
       "Google Workspace",
@@ -29,9 +35,7 @@
       "MacBook",
       "MacBook Air",
       // GitHub products
-      "GitHub Codespaces",
-      // Emphasis terms
-      "NOTE"
+      "GitHub Codespaces"
     ]
   },
   "backtick-code-elements": true,

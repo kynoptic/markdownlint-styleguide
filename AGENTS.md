@@ -45,13 +45,13 @@ markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case head
 
 ## Coding style
 
-- Node.js `>=20` (see `.nvmrc`). ES modules only, no transpilation.
+- Node.js `>=24.16.0` (see `.nvmrc`). ES modules only, no transpilation.
 - Kebab-case rule filenames. Named exports for utilities. 2-space indent.
 - JSDoc typedefs for public rule helpers.
 
 ## Rule catalogue
 
-Six custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-urls`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`. Supporting modules: `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `autofix-telemetry`, `config-validation`. The `sentence-case/` subdirectory contains classifier and fix-builder internals. See `docs/rules.md` for full reference.
+Seven custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-url`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`, `date-time-consistency`. Supporting modules: `shared-context` (line-scanning context helper), `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `autofix-confidence`, `autofix-telemetry`, `config-validation`. The `sentence-case/` and `backtick/` subdirectories contain classifier and fix-builder internals. See `docs/rules.md` for full reference.
 
 ## Testing
 

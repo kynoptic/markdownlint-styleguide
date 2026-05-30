@@ -3,7 +3,7 @@
 This directory contains Architecture Decision Records (ADRs) documenting
 significant architectural choices in the markdownlint-trap project.
 
-## What is an ADR?
+## About ADRs
 
 An ADR captures the context, decision, alternatives, and consequences of an
 important architectural choice. ADRs help future maintainers understand why
@@ -46,3 +46,5 @@ Files are named `adr-NNN-short-title.md` where:
   Renovate-based automation for dependency management
 - [ADR-004: v1.7.0 refactoring initiative](adr-004-refactoring-2025.md) -
   Architectural decisions from the modular decomposition refactor
+- [ADR-005: Shared line-scanning context helper](adr-005-shared-line-scanning-context.md) -
+  Centralized document context detection shared across rules

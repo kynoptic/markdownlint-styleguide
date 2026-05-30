@@ -11,27 +11,9 @@ Every markdownlint rule is a JavaScript object with a standard shape. `no-empty-
 
 function noEmptyListItems(params, onError) {
   const tokens = params.parsers?.micromark?.tokens || [];
-
-  for (const token of tokens) {
-    if (token.type !== "listUnordered" && token.type !== "listOrdered") {
-      continue;
-    }
-
-    const children = token.children || [];
-    for (let i = 0; i < children.length; i++) {
-      if (children[i].type !== "listItemPrefix") continue;
-
-      const next = children[i + 1];
-      if (!next || next.type !== "content") {
-        onError({
-          lineNumber: children[i].startLine,
-          detail: "Empty list item found",
-          context: params.lines[children[i].startLine - 1].trim(),
-          fixInfo: { deleteCount: -1 },
-        });
-      }
-    }
-  }
+  // Walk list tokens; for each listItemPrefix with no following content,
+  // report an error with fixInfo to delete the empty item.
+  // ...
 }
 
 export default {
@@ -59,31 +41,23 @@ export default {
 - `params.parsers.micromark.tokens` -- parsed token tree (when `parser: "micromark"`)
 - `params.config` -- user configuration for the rule
 
-### Reporting errors
+### Reporting errors and fixes
 
-Call `onError()` with:
+Call `onError()` with the violation location and an optional `fixInfo` describing the edit:
 
 ```javascript
 onError({
-  lineNumber: 5,          // 1-based line number
-  detail: "What is wrong", // shown to the user
-  context: "the bad text", // snippet for context
-  range: [column, length], // optional highlight range
-  fixInfo: { ... },        // optional auto-fix (see below)
+  lineNumber: 5,             // 1-based line number
+  detail: "What is wrong",   // shown to the user
+  context: "the bad text",   // snippet for context
+  range: [column, length],   // optional highlight range
+  fixInfo: {                 // optional auto-fix
+    editColumn: 3,           // 1-based column
+    deleteCount: 5,          // characters to remove (-1 deletes the whole line)
+    insertText: "replacement",
+  },
 });
 ```
-
-### Auto-fix via `fixInfo`
-
-```javascript
-fixInfo: {
-  editColumn: 3,           // 1-based column
-  deleteCount: 5,          // characters to remove
-  insertText: "replacement" // text to insert
-}
-```
-
-Set `deleteCount: -1` to delete the entire line.
 
 ## Shared utilities
 
@@ -93,6 +67,7 @@ Rules `import` shared utilities directly. The following modules are available un
 |--------|---------|
 | `config-validation.js` | Validate rule config options (`validateStringArray`, `validateBoolean`, etc.) |
 | `autofix-safety.js` | Confidence scoring for autofixes (`createSafeFixInfo`) |
+| `shared-context.js` | Build document line context once via `buildLineContext`; query `isInCode`, `isInInlineCode`, `isInLinkDestination`, `isInFrontmatter` |
 | `shared-utils.js` | Code block detection, inline code spans, emoji stripping |
 | `shared-heuristics.js` | Acronym detection, markup segment preservation |
 | `shared-constants.js` | Technical term dictionaries and default config values |
@@ -100,60 +75,52 @@ Rules `import` shared utilities directly. The following modules are available un
 ### Config validation
 
 ```javascript
-import {
-  validateConfig,
-  validateStringArray,
-  validateBoolean,
-  logValidationErrors,
-  createMarkdownlintLogger,
-} from "./rules/config-validation.js";
+import { validateConfig, validateStringArray, validateBoolean } from "./rules/config-validation.js";
 ```
+
+### Context detection
+
+A rule that scans lines must know whether a position sits in code, a link, a comment, or frontmatter before flagging it. Build the context once per document and query it:
+
+```javascript
+import { buildLineContext } from "./rules/shared-context.js";
+
+const ctx = buildLineContext(params.lines);
+if (ctx.isInCode(lineNumber, column)) return; // skip code spans and fences
+if (ctx.isInLinkDestination(lineNumber, column)) return; // skip URLs
+```
+
+Reuse this instead of re-implementing fence, inline-code, or link scanning per rule.
 
 ### Safety checks for autofixes
 
-Wrap a `fixInfo` object with confidence scoring before returning it from a rule:
+Wrap a `fixInfo` with confidence scoring before returning it. `createSafeFixInfo(fixInfo, ruleType, original, fixed, context, safetyConfig?)` analyzes pattern strength, ambiguity, and context to decide whether the fix applies automatically, needs review, or is skipped:
 
 ```javascript
 import { createSafeFixInfo } from "./rules/autofix-safety.js";
 
 const fixInfo = createSafeFixInfo(
   { editColumn: start, deleteCount: text.length, insertText: `\`${text}\`` },
-  'backtick',   // ruleType
-  text,         // original
-  `\`${text}\``, // fixed
-  { line },     // context
-  safetyConfig  // optional config override
+  "backtick",
+  text,
+  `\`${text}\``,
+  { line },
 );
 ```
 
-Safety checks analyze pattern strength, ambiguity, and context to decide whether to apply a fix automatically, flag it for review, or skip it.
+## Using a custom rule alongside the presets
 
-## Using rules as a consumer
-
-### With `markdownlint-cli2`
-
-In `.markdownlint-cli2.jsonc`:
+Add your own rule next to the built-ins. With `markdownlint-cli2`, extend a preset and list the rule under `customRules`:
 
 ```jsonc
+// .markdownlint-cli2.jsonc
 {
-  "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  }
-}
-```
-
-This loads all built-in rules. Add your own rule alongside the defaults:
-
-```jsonc
-{
-  "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
-  },
+  "config": { "extends": "markdownlint-trap/recommended-config.jsonc" },
   "customRules": ["./my-rules/no-todo-comments.js"]
 }
 ```
 
-### With the `markdownlint` API
+With the `markdownlint` API, spread the exported array and append your rule:
 
 ```javascript
 import { lint } from "markdownlint/promise";
@@ -163,11 +130,11 @@ import myCustomRule from "./my-rules/no-todo-comments.js";
 const results = await lint({
   files: ["README.md"],
   customRules: [...markdownlintTrap, myCustomRule],
-  config: {
-    "no-todo-comments": { severity: "warn" },
-  },
+  config: { "no-todo-comments": { severity: "warn" } },
 });
 ```
+
+For preset selection and configuration, see `docs/configuration.md`.
 
 ## Rule registration and discovery
 
@@ -184,6 +151,7 @@ export default [
   noDeadInternalLinks,
   noLiteralAmpersand,
   noEmptyListItems,
+  dateTimeConsistency,
 ];
 ```
 
@@ -199,45 +167,27 @@ External rules do not need registration here. Pass them to `markdownlint` via `c
 
 ## Plugin packaging
 
-A plugin is a standalone npm package that exports one or more rule objects. No special plugin API is needed because markdownlint rules are plain objects.
+A plugin is a standalone npm package that exports one or more rule objects. No special plugin API is needed because markdownlint rules are plain objects. Structure it like the main package: rule files and an `index.js` under `src/`, tests under `tests/`.
 
-### Minimal plugin structure
-
-```text
-markdownlint-rule-my-plugin/
-  src/
-    no-todo-comments.js
-    index.js
-  tests/
-    no-todo-comments.test.js
-  package.json
-```
-
-`src/index.js`:
+`src/index.js` aggregates the rules:
 
 ```javascript
 import noTodoComments from "./no-todo-comments.js";
 export default [noTodoComments];
 ```
 
-`package.json`:
+`package.json` sets `"type": "module"`, points `main` at `./src/index.js`, and declares a `markdownlint` peer dependency:
 
 ```json
 {
   "name": "markdownlint-rule-my-plugin",
   "type": "module",
   "main": "./src/index.js",
-  "peerDependencies": {
-    "markdownlint": ">=0.35.0"
-  }
+  "peerDependencies": { "markdownlint": ">=0.35.0" }
 }
 ```
 
-Install and use the plugin:
-
-```bash
-npm install markdownlint-rule-my-plugin
-```
+After `npm install markdownlint-rule-my-plugin`, reference it in `customRules`:
 
 ```jsonc
 // .markdownlint-cli2.jsonc
@@ -248,18 +198,7 @@ npm install markdownlint-rule-my-plugin
 
 ### Reusing shared primitives
 
-If your plugin uses markdownlint-trap utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-trap` as a peer dependency:
-
-```json
-{
-  "peerDependencies": {
-    "markdownlint": ">=0.35.0",
-    "markdownlint-trap": ">=2.0.0"
-  }
-}
-```
-
-Then import the utilities:
+To use markdownlint-trap utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-trap` as a peer dependency, then import from its main entry point:
 
 ```javascript
 import {
@@ -269,36 +208,34 @@ import {
 } from "markdownlint-trap";
 ```
 
-The package exports autofix safety components from its main entry point.
-
 ## Testing expectations
 
 All rules (contributed or external) should follow the project testing conventions.
 
 ### Feature tests with fixtures
 
-Create a fixture file with passing and failing examples, then test against it:
+Create fixture files with passing and failing examples, then lint each and assert on the result count:
 
 ```javascript
 import { lint } from "markdownlint/promise";
 import myRule from "../src/rules/my-rule.js";
 
-test("detects violations in failing fixture", async () => {
+async function lintFixture(name) {
+  const file = `tests/fixtures/my-rule/${name}.fixture.md`;
   const results = await lint({
-    files: ["tests/fixtures/my-rule/failing.fixture.md"],
+    files: [file],
     customRules: [myRule],
     config: { default: false, "my-rule": true },
   });
-  expect(results[fixturePath].length).toBeGreaterThan(0);
+  return results[file];
+}
+
+test("detects violations in failing fixture", async () => {
+  expect((await lintFixture("failing")).length).toBeGreaterThan(0);
 });
 
 test("passes clean fixture without violations", async () => {
-  const results = await lint({
-    files: ["tests/fixtures/my-rule/passing.fixture.md"],
-    customRules: [myRule],
-    config: { default: false, "my-rule": true },
-  });
-  expect(results[fixturePath]).toHaveLength(0);
+  expect(await lintFixture("passing")).toHaveLength(0);
 });
 ```
 
@@ -308,30 +245,17 @@ test("passes clean fixture without violations", async () => {
 - **Failing cases**: invalid markdown with violations on expected lines
 - **Auto-fix output**: if the rule provides `fixInfo`, verify the transformed output
 - **Configuration options**: each option changes behavior as documented
-- **Edge cases**: inline code, code blocks, links, emoji, and HTML comments
+- **Edge cases**: inline code, code blocks, links, emoji, and HTML comments — use [shared context detection](#context-detection) to skip these positions
 
-### Running the test suite
-
-```bash
-npm test                          # Full suite
-npm test -- tests/features/       # Feature tests only
-npm test -- --testNamePattern="my rule"  # Filter by name
-```
-
-See `docs/testing.md` for the complete testing strategy.
+Run `npm test` for the full suite, `npm test -- tests/features/` for feature tests, or `npm test -- --testNamePattern="my rule"` to filter by name. See `docs/testing.md` for the complete testing strategy.
 
 ## Contributing a rule to the project
 
 ### Proposal process
 
-1. **Open an issue** describing what the rule enforces, why it matters, and example violations
-2. **Label it** `enhancement` and `rule-proposal`
-3. **Discussion**: maintainers evaluate against these criteria:
-   - Does the rule catch a real, recurring problem in markdown documentation?
-   - Can it be automated with low false-positive rates?
-   - Does it overlap with existing markdownlint built-in rules?
-   - Should it be a core rule or an external plugin?
-4. **Approval**: maintainers label the issue `accepted` and assign a rule ID
+1. **Open an issue** describing what the rule enforces, why it matters, and example violations; label it `enhancement` and `rule-proposal`
+2. **Discussion**: maintainers weigh whether the rule catches a real recurring problem, automates with low false positives, avoids overlap with built-in rules, and belongs in core versus a plugin
+3. **Approval**: maintainers label the issue `accepted` and assign a rule ID
 
 ### Core vs. plugin rules
 
@@ -362,10 +286,8 @@ After a rule proposal is accepted:
 - Named exports for utility functions, default export for the rule object
 - JSDoc typedefs for public helpers
 - 2-space indentation
-- Use shared utilities (`shared-utils.js`, `config-validation.js`) instead of reimplementing common patterns
+- Use shared utilities (`shared-context.js`, `shared-utils.js`, `config-validation.js`) instead of reimplementing common patterns
 
 ## See also
 
-- `docs/rules.md` -- built-in rule catalogue
-- `docs/configuration.md` -- preset tiers and configuration options
-- `docs/testing.md` -- testing strategy and conventions
+The built-in rule catalogue (`docs/rules.md`), preset and configuration reference (`docs/configuration.md`), and testing strategy (`docs/testing.md`).

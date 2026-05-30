@@ -1,279 +1,115 @@
 # Rule catalogue
 
-Each custom rule's behavior, ID, and fixability. See `docs/configuration.md` for configuration options.
+Custom markdownlint rules for documentation. Each rule has an ID, autofix capability, and configurable options. See the [configuration reference](configuration.md) for preset tiers and global options.
 
-> [!NOTE]
-> Since `v1.7.0`, rules share common heuristics for acronym detection, markup preservation, and code span recognition. Shared heuristics keep behavior consistent across rules and prevent edge-case handling from drifting.
+## Rules
 
-## Summary
-
-| Rule | ID | Fixable | Purpose |
-|------|----|---------|---------|
-| `sentence-case-heading` | SC001 | Yes | Enforce sentence case for headings and bold list prefixes |
-| `backtick-code-elements` | BCE001 | Yes | Wrap code-like elements in backticks in prose |
-| `no-bare-url` | BU001 | Yes | Replace bare URLs with autolinks `<...>` |
-| `no-dead-internal-links` | DL001 | No | Validate internal file links and heading anchors |
-| `no-literal-ampersand` | NLA001 | Yes | Replace standalone `&` with "and" in prose |
-| `no-empty-list-items` | ELI001 | Yes | Remove empty list items (Word conversion artifacts) |
-| `date-time-consistency` | DTC001 | Yes | Validate weekdays, `EST`/`EDT`, and UTC offsets against the date |
-
----
+| Rule | ID | Autofix | Description |
+|------|----|---------|-------------|
+| `sentence-case-heading` | SC001 | Yes | First word capitalized, rest lowercase except acronyms |
+| `backtick-code-elements` | BCE001 | Yes | Wrap code-like terms in backticks |
+| `no-bare-url` | BU001 | Yes | Autolink or wrap bare URLs |
+| `no-dead-internal-links` | DL001 | No | Validate internal file and anchor links |
+| `no-literal-ampersand` | NLA001 | Yes | Replace literal `&` with "and" |
+| `no-empty-list-items` | ELI001 | Yes | Flag empty list items |
+| `date-time-consistency` | DTC001 | Yes | Validate weekdays, `EST`/`EDT`, UTC offsets |
 
 ## `sentence-case-heading` (SC001)
 
-Enforces sentence case for headings (ATX: `#`) and bold text in list items: capitalize the first word, lowercase the rest, except proper nouns, acronyms, and "I".
+Flag ATX headings and bold list-item labels that are not in sentence case: first word capitalized, everything else lowercase unless it is a configured acronym or proper noun.
 
-- Respects configured `specialTerms` and common technical terms (e.g., API, JSON, GitHub).
-- Recognizes standard all-caps terminology:
-  - SemVer terms: PATCH, MINOR, MAJOR, BREAKING
-  - GitHub Markdown Alerts: NOTE, TIP, IMPORTANT, WARNING, CAUTION
-- Recognizes multi-word product names:
-  - GitHub Products: GitHub Actions, GitHub Projects, GitHub Markdown Alerts
-- Recognizes documentation acronyms:
-  - ADR, ADRs (Architecture Decision Records)
-- Handles emoji-prefixed headings and extended Unicode scripts (accented Latin, CJK, RTL) for internationalized documentation.
-- With `ignoreAfterEmoji`, excludes status markers and metadata after emoji from validation.
-- Skips code-heavy headings, `version/date-only` headings, and certain bracketed labels.
-- Auto-fixes safely with guardrails.
-- Since `v1.7.0`: modular internal architecture improves maintainability and performance.
-
-Configuration options
+Configure with `acronyms` (terms that must be uppercase) and `properNouns` (terms whose capitalized form is allowed).
 
 ```jsonc
 {
   "sentence-case-heading": {
-    "specialTerms": ["JavaScript", "TypeScript", "API"],  // Custom terms with specific capitalization
-    "ignoreAfterEmoji": true  // Ignore text after first emoji (default: false)
+    "acronyms": ["API", "JSON", "HTML"],
+    "properNouns": ["JavaScript", "TypeScript", "GitHub"]
   }
 }
 ```
 
-Product-specific proper nouns
-
-Words like "Skill", "Feature", or "Workspace" that your project uses as capitalized product terms should be added to `specialTerms`. The rule cannot distinguish between the common noun "skill" and a product concept "Skill" without project-specific context. Add them to your config:
+Words like "Skill", "Feature", or "Workspace" that your project uses as capitalized product terms should be added to `properNouns`. The rule cannot distinguish the common noun "skill" from a product concept "Skill" without project-specific context.
 
 ```jsonc
 {
   "sentence-case-heading": {
-    "specialTerms": ["Skill", "Workspace", "Pipeline"]
+    "properNouns": ["Skill", "Workspace", "Pipeline"],
+    "acronyms": ["API"]
   }
 }
 ```
 
-Examples
-
-- Good: `# Getting started with APIs`
-- Good: `# Understanding PATCH releases`
-- Good: `# GitHub Projects and custom fields`
-- Good: `**IMPORTANT** security update required`
-- Bad: `# Getting Started With APIs`
-
-Status markers with `ignoreAfterEmoji`
-
-When `ignoreAfterEmoji` is enabled, the rule skips text after the first emoji. Use this for roadmaps and status tracking documents where emoji separate heading content from metadata.
-
-- Good with `ignoreAfterEmoji: true`: `## Task complete ✅ DONE`
-- Good with `ignoreAfterEmoji: true`: `## NOW (Current Sprint) ✅ COMPLETED`
-- Good with `ignoreAfterEmoji: true`: `## Infrastructure essentials ✅ HIGH PRIORITY`
-- Still validated: `## WRONG Case ✅ IGNORED` (flags "WRONG Case" before emoji)
-
-Style note: formatting terminology
-
-Formatting style names (bold, italic, underline) are common nouns and follow sentence case:
-
-- Good: `## Using bold text`
-- Good: `## Applying italic formatting`
-- Bad: `## Using Bold text`
-- Bad: `## Applying Italic formatting`
-
-To emphasize these terms, use alternative phrasing:
-
-- `## Bold text formatting`
-- `## The Bold style`
-- `## Working with the Italic font style`
-
-Word order and structure convey emphasis while maintaining sentence case.
-
----
+The deprecated `specialTerms` key still works as an alias for `properNouns` but emits a console warning; migrate to `acronyms`/`properNouns`.
 
 ## `backtick-code-elements` (BCE001)
 
-Wraps code-like tokens in prose with backticks for readability.
+Flag code-like elements in prose that are not wrapped in backticks: file paths, function calls, CLI commands, environment variables.
 
-- Detects commands, flags, file paths, filenames, function-like calls, env vars, and common tech references.
-- Skips code spans, links, HTML comments, LaTeX math, angle bracket autolinks, and configured `ignoredTerms`.
-- Reports contextual error messages and auto-fixes safely.
-- Since `v1.7.0`: shared heuristics for consistent acronym detection (e.g., PM2-style terms with numbers).
-- Since `v1.7.1`: improved path detection reduces false positives on
-  non-path text containing slashes (e.g., "Integration/E2E", "Value/Effort",
-  "pass/fail").
-- Since `v2.3.0`: distinguishes domain names in prose from full URLs with protocols (issue #106).
+The autofix wraps detected elements in backticks. Two corruption modes are explicitly rejected: wrapping a bare URL in a code span, and inserting a backtick mid-token at a letter or apostrophe boundary.
 
-Examples
+Enable `detectPascalCase` (boolean, default `false`) to flag PascalCase identifiers; it is opt-in because product and brand names frequently use PascalCase and would produce false positives.
 
-- Good: "Run `npm install` and edit `config.json`."
-- Bad: `"Run npm install and edit config.json."`
-
-Path detection heuristics
-
-The rule distinguishes actual file paths from conceptual pairs and
-category labels:
-
-- ✅ Detected as paths: `src/components/Button.tsx`, `docs/api/endpoints.md`, `/etc/hosts`
-- ❌ Not treated as paths: "Integration/E2E testing", "Value/Effort fields",
-  "pass/fail criteria"
-
-Domain names vs. full URLs
-
-The rule treats domain names and full URLs differently:
-
-- ✅ **Full URLs with protocol** require backticks: `http://example.com`, `https://github.com/user/repo`
-- ❌ **Domain names in prose** do NOT require backticks: "Visit GitHub.com", "Send email via Gmail.com"
-- ✅ **URLs in angle brackets** are autolinks (already marked up): `<https://example.com>` - not flagged
-
-Product and service names like "Outlook.com" or "Microsoft365.com" in prose pass unflagged,
-while bare URLs with protocols must be wrapped for consistency and clickability.
-
----
+```jsonc
+{
+  "backtick-code-elements": {
+    "detectPascalCase": false
+  }
+}
+```
 
 ## `no-bare-url` (BU001)
 
-Flags bare URLs linkified by markdown-it and suggests wrapping them in angle brackets.
-
-- Example: `https://example.com` → `<https://example.com>`
-- Respects optional `allowedDomains`.
-- Auto-fix wraps the URL in `<...>`.
-
----
+Flag bare URLs in prose. The autofix wraps them in angle brackets (`<https://example.com>`) or, when link text is available, a Markdown link.
 
 ## `no-dead-internal-links` (DL001)
 
-Detects broken internal links (relative paths and anchors).
-
-- Validates that the target file exists; for extensionless links, tries common Markdown extensions.
-- Optionally validates `#anchors` against extracted headings (GitHub-style slugs).
-- Detects placeholder patterns to avoid false positives in documentation templates.
-- Caches file stats and heading extraction per run for performance.
-- Not auto-fixable.
-
-Configuration options
+Validate internal links to files and heading anchors. Reports links whose target file or `#anchor` does not exist.
 
 ```jsonc
 {
   "no-dead-internal-links": {
-    "checkAnchors": true,              // Validate heading anchors (default: true)
-    "allowedExtensions": [".md", ".markdown"],  // Extensions to try for extensionless links
-    "ignoredPaths": ["node_modules"],  // Paths to skip validation
-    "allowPlaceholders": false,        // Allow placeholder patterns (default: false)
-    "placeholderPatterns": [           // Patterns to recognize as placeholders
-      "URL",
-      "link",
-      "PLACEHOLDER",
-      "TODO",
-      "XXX",
-      "path/to/",
-      "example.com"
-    ]
+    "allowPlaceholders": true,
+    "linkBase": "file",
+    "repoRoot": "."
   }
 }
 ```
 
-Placeholder detection
+- `allowPlaceholders` (default `true`): skip links that look like templated placeholders such as `{{ variable }}` or `path/to/file`.
+- `linkBase` (`"file"` or `"root"`, default `"file"`): resolve root-relative links (`/path`) from either the linking file's directory or the repository root.
+- `repoRoot` (string, default auto-detected): the repository root used when `linkBase` is `"root"`. Auto-detected by walking up to a `.git` marker.
 
-When `allowPlaceholders` is enabled, the rule recognizes common placeholder patterns in documentation templates and example files to prevent false positives.
-
-**Matching strategy:**
-
-1. **Exact match** (case-insensitive): `URL` matches `url`, `URL`, `Url`
-2. **Path prefix match**: `path/to/` matches `path/to/file.md`, `path/to/image.png`
-3. **Word-boundary substring match**: Pattern must appear as a complete word segment, separated by hyphens, underscores, dots, or slashes
-
-**Examples of word-boundary matching:**
-
-- ✅ `TODO` matches: `TODO.md`, `project-TODO.md`, `my_TODO.txt`
-- ❌ `TODO` does NOT match: `PHOTODOC.md` (embedded within word)
-- ✅ `link` matches: `link`, `my-link.md`, `docs/link/file.md`
-- ❌ `link` does NOT match: `unlinked.md`, `linking.md` (embedded within word)
-
-Word-boundary matching prevents false negatives where legitimate broken links would be skipped because they contain placeholder keywords (e.g., `unlinked-page.md` containing "link").
-
-**Use cases:**
-
-- Documentation templates with intentional placeholders
-- Example code and snippets showing link syntax
-- ADR templates using `XXX` numbering patterns
-- Newsletter and email templates using generic link text
-
-Examples
-
-- Good: link to a file that exists
-- Good (with placeholders): link to `URL` when `allowPlaceholders: true`
-- Bad: link to a file that does not exist
-- Bad (without placeholders): link to `URL` when `allowPlaceholders: false`
-
----
+Anchor checks use GitHub-style slugs: Unicode letters are retained and punctuation is stripped, so "Diátaxis" becomes `diátaxis`.
 
 ## `no-literal-ampersand` (NLA001)
 
-Replaces standalone `&` with "and" in prose.
-
-- Skips code blocks, inline code, links, and HTML entity contexts.
-- Respects configurable `exceptions` and includes common defaults (`R&D`, `Q&A`, `M&A`, `S&P`, `AT&T`).
-- Auto-fix replaces `&` with `and`.
-
----
+Flag standalone literal `&` in prose and suggest "and". Ampersands inside code spans, code blocks, and HTML entities are ignored.
 
 ## `no-empty-list-items` (ELI001)
 
-Detects list items with no content after the marker. Common in Word-to-Markdown conversions.
-
-- Checks both ordered and unordered lists via micromark tokens.
-- Auto-fix deletes the empty line.
-- No configuration options.
-
-Examples
-
-- Good: `- Item with content`
-- Bad: `-` (marker followed by whitespace only)
-
----
+Flag list items with no meaningful content (empty or whitespace-only).
 
 ## `date-time-consistency` (DTC001)
 
-Validates written weekdays, `EST`/`EDT` style abbreviations, and `(UTC±n)` offsets against the numbered calendar date in a configured IANA timezone. The numbered date is authoritative.
-
-- Parses `[<Weekday>,] <Month> <Day>[, <Year>]` in full and abbreviated forms, with ordinal suffixes (`15th`).
-- Binds each time phrase (`<hh>[:<mm>] <AM|PM> <abbr>[ (UTC±n)]`) to the nearest preceding date on the line.
-- Validates and auto-fixes three facts from the date: the weekday, the DST abbreviation (`EST`/`EDT`), and the UTC offset (`EST` = `UTC-5`, `EDT` = `UTC-4`).
-- Flags daylight-saving transition edge hours as lint-only (no auto-fix): the skipped hour on spring-forward (does not exist) and the repeated hour on fall-back (ambiguous). The correct adjacent time is author-dependent.
-- Skips dates inside fenced code blocks, inline code, and frontmatter.
-- When a year is omitted, assumes `defaultYear` (or the current year when `null`) and notes the assumption in the finding.
-- Zone resolution uses `Intl.DateTimeFormat`; no timezone-data dependency.
-
-Configuration options
+Validate weekday names, `EST`/`EDT` timezone abbreviations, and UTC offsets against the date they describe.
 
 ```jsonc
 {
   "date-time-consistency": {
-    "timezone": "America/New_York",  // IANA zone (default: America/New_York)
-    "defaultYear": null              // null = current year when year omitted
+    "timezone": "America/New_York"
   }
 }
 ```
 
-Off by default in the `basic` preset; on in `recommended` and `strict`.
+Checks performed:
 
-Examples
-
-- Good: `Saturday, November 15, 2025, at 3:00 PM EST (UTC-5)`
-- Bad (weekday): `Thursday, November 15, 2025` (November 15, 2025 is a Saturday)
-- Bad (abbreviation + offset): `Saturday, November 15, 2025, at 3:00 PM EDT (UTC-4)` (November is `EST (UTC-5)`)
-- Lint-only (skipped hour): `Sunday, March 9, 2025, at 2:30 AM EDT`
-- Lint-only (ambiguous hour): `Sunday, November 2, 2025, at 1:30 AM EDT`
-
----
+- Weekday matches the calendar date (e.g. flag "Monday, 2026-01-01" if that date is a Thursday).
+- `EST`/`EDT` matches whether the date falls in daylight saving time.
+- UTC offset matches the stated timezone and date.
 
 ## See also
 
-- `docs/extending.md` -- creating custom rules, helpers contract, plugins, and contributing
-- `docs/configuration.md` -- preset tiers and configuration options
+- [Custom rule authoring guide](extending.md) — write and register new rules.
+- [Configuration reference](configuration.md) — preset tiers and global options.
+- [Architecture overview](architecture.md) — module structure and shared helpers.

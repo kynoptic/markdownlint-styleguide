@@ -15,7 +15,7 @@ Visit [our documentation](https://example.com) for docs and tutorials.
 ## Quick start
 
 > [!IMPORTANT]
-> Requires Node.js 20+ and npm.
+> Requires Node.js 24+ (`>=24.16.0`) and npm.
 
 ```bash
 npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
@@ -47,6 +47,7 @@ npx markdownlint-cli2 "**/*.md"
 | `no-dead-internal-links` | DL001 | No | Detects broken internal links |
 | `no-literal-ampersand` | NLA001 | Yes | Replaces `&` with "and" |
 | `no-empty-list-items` | ELI001 | Yes | Flags empty or whitespace-only list items |
+| `date-time-consistency` | DTC001 | Yes | Validate weekdays, `EST`/`EDT`, and UTC offsets against the date |
 
 Auto-fixes use confidence scoring: high-confidence fixes apply automatically, ambiguous cases are flagged for review, and uncertain changes are skipped. See [rules reference](docs/rules.md) for full details.
 
@@ -67,16 +68,11 @@ See [configuration guide](docs/configuration.md) for presets, setup wizard optio
 
 ## Documentation
 
-- [Setup and installation](docs/setup.md) — getting started, consumption methods, distribution
-- [Configuration](docs/configuration.md) — presets, rule options, autofix safety tuning
-- [Rule catalogue](docs/rules.md) — rule IDs, behavior, and examples
-- [Extending and contributing](docs/extending.md) — custom rules, plugins, helpers contract
-- [Architecture](docs/architecture.md) — project structure, modules, performance
-- [Testing strategy](docs/testing.md) — test layers, conventions, validation
+The [documentation index](docs/README.md) routes to setup, configuration, the rule catalogue, architecture, testing, and the architecture decision records.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, workflow, and guidelines.
+See [the contributing guide](./CONTRIBUTING.md) for development setup, workflow, and guidelines.
 
 ## License
 

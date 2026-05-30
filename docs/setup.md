@@ -43,7 +43,7 @@ Add special terms for headings:
   "config": {
     "extends": "markdownlint-trap/basic-config.jsonc",
     "sentence-case-heading": {
-      "specialTerms": ["GitHub", "JavaScript", "TypeScript"]
+      "properNouns": ["GitHub", "JavaScript", "TypeScript"]
     }
   }
 }

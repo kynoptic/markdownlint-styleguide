@@ -208,151 +208,11 @@ Human-readable format containing:
 
 ### AI-assisted analysis
 
-Use Claude Code (or a similar AI assistant) to analyze validation reports:
-
-1. **Generate report** - Run `npm run validate:external` to produce `validation-reports/validation-report.json`
-2. **Request analysis** - Provide the report with specific goals (false positives, false negatives, autofix safety, edge cases)
-3. **Review findings** - The assistant returns pattern analysis, rule recommendations, new test cases, and priority rankings
-4. **Implement improvements** - Write failing tests for identified edge cases, update rule logic, adjust autofix thresholds
-5. **Re-validate** - Run `npm run validate:external` again and compare violation counts
-
-#### Analysis prompt templates
-
-**Comprehensive analysis**:
-
-```text
-Analyze validation-reports/validation-report.json:
-
-1. Group violations by rule name
-2. Identify top 3 rules with highest violation counts
-3. For each top rule, analyze violation patterns:
-   - Common contexts where violations occur
-   - False positive indicators (valid content flagged)
-   - False negative indicators (expected violations missing)
-4. Review autofix safety statistics:
-   - Safe fixes blocked (should be allowed)
-   - Unsafe fixes applied (should be blocked)
-5. Recommend priority improvements with test cases
-```
-
-**False positive investigation**:
-
-```text
-Analyze validation-reports/validation-report.json for false positives:
-
-1. Find violations that appear to be valid markdown content
-2. Look for patterns:
-   - Technical terms flagged as improper case
-   - Valid acronyms marked as errors
-   - Proper formatting incorrectly reported
-3. For each pattern, provide:
-   - Example violations from report
-   - Why the content is actually valid
-   - Suggested rule refinements
-   - Test cases to prevent regression
-```
-
-**Autofix safety analysis**:
-
-```text
-Analyze validation-reports/validation-report.json autofix statistics:
-
-1. Review autofixStats in summary:
-   - safeFixesAvailable (count)
-   - safeFixesBlocked (investigate why)
-   - unsafeFixesApplied (investigate why)
-
-2. For blocked safe fixes:
-   - Find examples in violations with autofixSafety.safe === false
-   - Analyze confidence scores and reasons
-   - Determine if confidence thresholds are too strict
-
-3. Recommend threshold adjustments with rationale
-```
-
-**Rule-specific deep dive**:
-
-```text
-Analyze violations for rule "sentence-case-heading" in validation-reports/validation-report.json:
-
-1. Count total violations for this rule
-2. Extract all violation contexts and details
-3. Categorize violations:
-   - Legitimate issues (correct violations)
-   - False positives (valid content flagged)
-   - Edge cases (unclear/ambiguous)
-4. Identify improvement opportunities:
-   - Heuristics to add/refine
-   - Edge cases to handle
-   - Test coverage gaps
-5. Provide specific code changes and test cases
-```
+Run `npm run validate:external` to produce the JSON report, then hand it to Claude Code with a specific goal. Ask it to group violations by rule, surface the rules with the highest counts, and separate legitimate hits from false positives, false negatives, and ambiguous edge cases. For autofix tuning, point it at `summary.autofixStats` and the per-violation `autofixSafety` fields to find safe fixes that were blocked or unsafe fixes that slipped through, then have it recommend threshold changes with rationale and test cases. Write failing tests for each accepted edge case, update the rule, and re-run validation to compare counts.
 
 ### Continuous validation
 
-Run validation regularly to:
-
-- Catch regressions before release
-- Test rule changes against real-world content
-- Discover edge cases from evolving documentation styles
-
-## Examples
-
-### Validate local documentation
-
-```jsonc
-{
-  "sources": {
-    "local": ["~/Projects/my-app/docs"]
-  },
-  "filters": {
-    "include": ["**/*.md"]
-  },
-  "reporting": {
-    "format": ["markdown"],
-    "outputDir": "validation-reports"
-  }
-}
-```
-
-### Test against popular repositories
-
-```jsonc
-{
-  "sources": {
-    "github": [
-      "vercel/next.js",
-      "facebook/react",
-      "microsoft/typescript"
-    ]
-  },
-  "filters": {
-    "include": ["**/docs/**/*.md", "README.md"]
-  },
-  "reporting": {
-    "format": ["json", "markdown"],
-    "outputDir": "validation-reports"
-  }
-}
-```
-
-### Validate specific file patterns
-
-```jsonc
-{
-  "sources": {
-    "local": ["/path/to/project"]
-  },
-  "filters": {
-    "include": ["**/API.md", "**/CHANGELOG.md"],
-    "exclude": ["**/node_modules/**", "**/vendor/**"]
-  },
-  "reporting": {
-    "format": ["json"],
-    "outputDir": "validation-reports"
-  }
-}
-```
+Run validation regularly to catch regressions before release, test rule changes against real-world content, and discover edge cases from evolving documentation styles.
 
 ## Troubleshooting
 
@@ -391,5 +251,5 @@ Verify:
 
 ## Related documentation
 
-- `docs/testing.md` - Test strategy and integration tests
-- `docs/architecture.md` - Rule architecture and design decisions
+- [Testing strategy](testing.md)
+- [Rule architecture overview](architecture.md)

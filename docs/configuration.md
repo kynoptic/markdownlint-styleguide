@@ -22,7 +22,7 @@ Presets differ in custom rule coverage and standard rule relaxations:
 
 | | Basic | Recommended | Strict |
 |---|---|---|---|
-| Custom rules | 2 (sentence-case, backticks) | All 5 | All 5 |
+| Custom rules | 2 (sentence-case, backticks) | All 7 | All 7 |
 | `MD041` first-line-h1 | off | off | **on** |
 | `MD024` duplicate heading | on | off | on |
 | `MD036` emphasis as heading | on | off | on |
@@ -108,6 +108,7 @@ Defaults: Built-in dictionary of proper nouns and tech terms covers most teams. 
 - `ignoredTerms`: string[] — Terms to ignore beyond the built-in list.
 - `skipCodeBlocks`: boolean (default: true) — Skip fenced/indented code blocks.
 - `skipMathBlocks`: boolean (default: true) — Skip LaTeX `$$` math blocks.
+- `detectPascalCase`: boolean (default: false) — Flag PascalCase identifiers as code. Opt-in because brand names (`GitHub`, `PowerPoint`) are PascalCase and would otherwise be false positives.
 
 Fixable: Yes.
 
@@ -124,8 +125,11 @@ Fixable: Yes (wrap in `<...>`). Requires markdown-it with `linkify: true`.
 ## `no-dead-internal-links` (DL001)
 
 - `ignoredPaths`: string[] — Paths to exclude from link target checks.
-- `checkAnchors`: boolean (default: true) — Validate `#anchors` against headings.
+- `checkAnchors`: boolean (default: true) — Validate `#anchors` against headings. Anchors use GitHub-style slugs that retain Unicode letters and strip punctuation, so a heading "Diátaxis" resolves to `diátaxis`.
 - `allowedExtensions`: string[] (default: ["`.md`", "`.markdown`"]) — Extensions to append when resolving extensionless links.
+- `allowPlaceholders`: boolean (default: true) — Skip placeholder-looking targets (e.g. `path/to/file`). Set to `false` to flag them.
+- `linkBase`: `"file"` | `"root"` (default: `"file"`) — How root-relative links (those beginning with `/`) resolve: relative to the linking file, or from the repository root.
+- `repoRoot`: string (default: auto-detected) — Repository root used when `linkBase` is `"root"`. When omitted, detected by walking up to the nearest `.git` marker.
 
 Fixable: No.
 
@@ -223,7 +227,8 @@ Extend a preset and override specific rules:
   "config": {
     "extends": "markdownlint-trap/recommended-config.jsonc",
     "sentence-case-heading": {
-      "specialTerms": ["GraphQL", "OAuth", "SSO"]
+      "acronyms": ["SSO"],
+      "properNouns": ["GraphQL", "OAuth"]
     },
     "no-literal-ampersand": false,
     "MD024": true,
