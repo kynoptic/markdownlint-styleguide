@@ -19,12 +19,12 @@ import {
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
-import { getCodeBlockLines, getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
+import { getInlineCodeSpans, isInCodeSpan } from './shared-utils.js';
+import { buildLineContext } from './shared-context.js';
 import { isDomainInProse } from './shared-heuristics.js';
 import {
   inMarkdownLink,
   inWikiLink,
-  inHtmlComment,
   inHtmlSemanticTag,
   inLatexMath,
   isLikelyFilePath
@@ -88,14 +88,15 @@ function backtickCodeElements(params, onError) {
   const allIgnoredTerms = new Set([...ignoredTerms, ...userIgnoredTerms]);
 
   const lines = params.lines;
-  // Use getCodeBlockLines for proper fence length tracking (handles 4-backtick fences etc.)
-  const codeBlockLines = getCodeBlockLines(lines);
+  // Shared context map tracks fenced/indented code (with proper fence-length
+  // handling), inline code, link destinations, and HTML comments.
+  const context = buildLineContext(lines);
   let inMathBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
     const line = lines[i];
-    const inCodeBlock = codeBlockLines[i];
+    const inCodeBlock = context.isInFencedCode(i);
 
     // Skip code block fence lines
     if (inCodeBlock && /^(`{3,}|~{3,})/.test(line.trim())) {
@@ -266,7 +267,7 @@ function backtickCodeElements(params, onError) {
           continue;
         }
         // Skip if inside a Markdown link, wiki link, HTML comment, or angle bracket autolink
-        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || inHtmlComment(line, start, end) || inHtmlSemanticTag(line, start, end)) {
+        if (inMarkdownLink(line, start, end) || inWikiLink(line, start, end) || context.isInHtmlComment(i, start) || inHtmlSemanticTag(line, start, end)) {
           continue;
         }
 

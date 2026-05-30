@@ -12,27 +12,37 @@ import {
   logValidationErrors,
   createMarkdownlintLogger 
 } from './config-validation.js';
-import { getCodeBlockLines, isInInlineCode } from './shared-utils.js';
 import { ampersandDefaultExceptions } from './shared-constants.js';
 import { createSafeFixInfo } from './autofix-safety.js';
+import { buildLineContext } from './shared-context.js';
 
 /**
  * Check if a character position is inside inline code or other special context.
+ *
+ * Code, link, comment, and frontmatter contexts are delegated to the shared
+ * line-context helper so detection stays consistent across rules. Only the
+ * ampersand-specific HTML entity and inline link-text checks live here.
+ *
  * @param {string} line - The line content
  * @param {number} position - Character position to check
  * @param {boolean} skipInlineCode - Whether to skip inline code contexts
+ * @param {import('./shared-context.js').LineContext} context - Shared context map
+ * @param {number} lineIndex - Zero-based index of the line
  * @returns {boolean} True if position should be ignored
  */
-function isInSpecialContext(line, position, skipInlineCode = true) {
-  // Check if inside inline code (backticks) based on configuration
-  if (skipInlineCode && isInInlineCode(line, position)) {
+function isInSpecialContext(line, position, skipInlineCode, context, lineIndex) {
+  // Code spans, link destinations, and HTML comments come from the shared map.
+  if (skipInlineCode && context.isInInlineCode(lineIndex, position)) {
+    return true;
+  }
+  if (context.isInLinkDestination(lineIndex, position) ||
+      context.isInHtmlComment(lineIndex, position)) {
     return true;
   }
 
-  // Check if inside HTML tag or entity
   const beforePosition = line.substring(0, position);
   const afterPosition = line.substring(position + 1); // +1 to skip the & itself
-  
+
   // Check for HTML entities like &amp; &lt; &gt; etc.
   // Look for pattern like &word; where we are at the &
   if (/^[a-zA-Z0-9#]+;/.test(afterPosition)) {
@@ -51,19 +61,11 @@ function isInSpecialContext(line, position, skipInlineCode = true) {
     }
   }
 
-  // Check if inside markdown link or image syntax
+  // Inside link text [text & more]: the shared map only covers destinations,
+  // so guard the bracketed label here.
   const lastOpenBracket = beforePosition.lastIndexOf('[');
   const lastCloseBracket = beforePosition.lastIndexOf(']');
-  const lastOpenParen = beforePosition.lastIndexOf('(');
-  const lastCloseParen = beforePosition.lastIndexOf(')');
-  
-  // Inside link text [text & more]
   if (lastOpenBracket > lastCloseBracket) {
-    return true;
-  }
-  
-  // Inside link URL (text)[url & params]
-  if (lastOpenParen > lastCloseParen && lastCloseBracket > lastOpenBracket) {
     return true;
   }
 
@@ -113,11 +115,13 @@ const BRAND_NAMES_WITH_AMPERSAND = [
  * @param {number} position - Position of the ampersand
  * @param {boolean} skipInlineCode - Whether to skip inline code contexts
  * @param {string[]} exceptions - Array of exception patterns
+ * @param {import('./shared-context.js').LineContext} context - Shared context map
+ * @param {number} lineIndex - Zero-based index of the line
  * @returns {boolean} True if this ampersand should be flagged
  */
-function shouldFlagAmpersand(line, position, skipInlineCode = true, exceptions = []) {
+function shouldFlagAmpersand(line, position, skipInlineCode, exceptions, context, lineIndex) {
   // Skip if in special context
-  if (isInSpecialContext(line, position, skipInlineCode)) {
+  if (isInSpecialContext(line, position, skipInlineCode, context, lineIndex)) {
     return false;
   }
 
@@ -190,7 +194,7 @@ function noLiteralAmpersand(params, onError) {
   const skipInlineCode = typeof config.skipInlineCode === 'boolean' ? config.skipInlineCode : true;
 
   const lines = params.lines;
-  const codeBlockLines = getCodeBlockLines(lines);
+  const context = buildLineContext(lines);
 
   for (let i = 0; i < lines.length; i++) {
     const lineNumber = i + 1;
@@ -201,15 +205,15 @@ function noLiteralAmpersand(params, onError) {
       continue;
     }
 
-    // Skip lines in code blocks based on configuration
-    if (skipCodeBlocks && codeBlockLines[i]) {
+    // Skip lines in fenced code or YAML frontmatter based on configuration.
+    if (skipCodeBlocks && (context.isInFencedCode(i) || context.isInFrontmatter(i))) {
       continue;
     }
 
     // Find all ampersands in the line
     for (let pos = 0; pos < line.length; pos++) {
       if (line[pos] === '&') {
-        if (shouldFlagAmpersand(line, pos, skipInlineCode, exceptions)) {
+        if (shouldFlagAmpersand(line, pos, skipInlineCode, exceptions, context, i)) {
           // Always provide fix for ampersand replacement since it's a safe operation
           const basicFixInfo = {
             editColumn: pos + 1,

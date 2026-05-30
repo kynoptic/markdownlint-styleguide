@@ -37,7 +37,8 @@ import {
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
-import { stripLeadingDecorations, truncateAtEmoji, getCodeBlockLines } from './shared-utils.js';
+import { stripLeadingDecorations, truncateAtEmoji } from './shared-utils.js';
+import { buildLineContext } from './shared-context.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading } from './sentence-case/case-classifier.js';
 import { validateBoldText } from './sentence-case/bold-text-classifier.js';
@@ -296,14 +297,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   // Bold text in the middle or end of list items should NOT be validated.
   // This fixes ~2,700 false positives (issue #105).
 
-  // Get code block lines to skip content inside fenced code blocks
-  const codeBlockLines = getCodeBlockLines(lines);
+  // Shared context map skips content inside fenced code and frontmatter.
+  const context = buildLineContext(lines);
 
   lines.forEach((line, index) => {
     const lineNumber = index + 1;
 
     // Skip lines inside code blocks - never flag or autofix code block content
-    if (codeBlockLines[index]) {
+    if (context.isInFencedCode(index) || context.isInFrontmatter(index)) {
       return;
     }
 
