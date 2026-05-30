@@ -13,10 +13,12 @@
 
 import fs from 'fs';
 import path from 'path';
-import { 
-  validateStringArray, 
+import {
+  validateStringArray,
   validateBoolean,
-  validateConfig, 
+  validateString,
+  validateEnum,
+  validateConfig,
   logValidationErrors,
   createMarkdownlintLogger
 } from './config-validation.js';
@@ -109,6 +111,40 @@ function extractHeadings(content) {
 function resolvePath(currentFile, linkPath) {
   const dir = path.dirname(currentFile);
   return path.resolve(dir, linkPath);
+}
+
+// Cache resolved repo roots per starting directory to avoid repeated upward
+// filesystem walks within a single lint run.
+const repoRootCache = new Map(); // startDir -> string|null
+
+/**
+ * Detect the repository root by walking up from a starting directory until a
+ * `.git` entry is found. Returns null when no marker is found before the
+ * filesystem root.
+ * @param {string} startDir - Directory to start searching from
+ * @returns {string|null} Absolute path to the repo root, or null
+ */
+function detectRepoRoot(startDir) {
+  if (repoRootCache.has(startDir)) {
+    return repoRootCache.get(startDir);
+  }
+
+  let dir = startDir;
+  let found = null;
+  while (true) {
+    if (fileExists(path.join(dir, '.git'))) {
+      found = dir;
+      break;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) {
+      break;
+    }
+    dir = parent;
+  }
+
+  repoRootCache.set(startDir, found);
+  return found;
 }
 
 /**
@@ -275,7 +311,9 @@ function noDeadInternalLinks(params, onError) {
     checkAnchors: validateBoolean,
     allowedExtensions: validateStringArray,
     allowPlaceholders: validateBoolean,
-    placeholderPatterns: validateStringArray
+    placeholderPatterns: validateStringArray,
+    linkBase: validateEnum(['file', 'root']),
+    repoRoot: validateString
   };
 
   const validationResult = validateConfig(config, configSchema, 'no-dead-internal-links');
@@ -290,6 +328,10 @@ function noDeadInternalLinks(params, onError) {
   const checkAnchors = typeof config.checkAnchors === 'boolean' ? config.checkAnchors : true;
   const allowedExtensions = Array.isArray(config.allowedExtensions) ? config.allowedExtensions : ['.md', '.markdown'];
   const allowPlaceholders = typeof config.allowPlaceholders === 'boolean' ? config.allowPlaceholders : true;
+  const linkBase = config.linkBase === 'root' ? 'root' : 'file';
+  const configuredRepoRoot = typeof config.repoRoot === 'string' && config.repoRoot.trim() !== ''
+    ? config.repoRoot
+    : null;
   const placeholderPatterns = Array.isArray(config.placeholderPatterns)
     ? config.placeholderPatterns
     : [
@@ -309,6 +351,17 @@ function noDeadInternalLinks(params, onError) {
   // Skip if we don't have a valid file path
   if (!currentFile || currentFile.includes('<stdin>')) {
     return;
+  }
+
+  // When linkBase is "root", resolve non-anchor links from the repo root
+  // (explicitly configured, or auto-detected by walking up for a .git marker)
+  // rather than from the current file's directory. Falls back to file-relative
+  // resolution when no root can be determined.
+  let linkBaseDir = null;
+  if (linkBase === 'root') {
+    linkBaseDir = configuredRepoRoot
+      ? path.resolve(configuredRepoRoot)
+      : detectRepoRoot(path.dirname(currentFile));
   }
 
   // PERFORMANCE: Pre-extract current file headings once for same-page anchor validation
@@ -393,8 +446,11 @@ function noDeadInternalLinks(params, onError) {
           continue;
         }
 
-        // Resolve the relative path
-        const resolvedPath = resolvePath(currentFile, filePath);
+        // Resolve the relative path. Under linkBase "root", non-absolute links
+        // resolve from the repo root; otherwise from the current file's dir.
+        const resolvedPath = linkBaseDir && !path.isAbsolute(filePath)
+          ? path.resolve(linkBaseDir, filePath)
+          : resolvePath(currentFile, filePath);
         
         // Check if it's a directory link (ends with /)
         const isDirectory = filePath.endsWith('/');
@@ -479,6 +535,7 @@ export function clearCaches() {
   fileExistenceCache.clear();
   headingCache.clear();
   contentCache.clear();
+  repoRootCache.clear();
 }
 
 /**

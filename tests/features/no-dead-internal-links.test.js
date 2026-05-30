@@ -1076,6 +1076,87 @@ Another paragraph.
       expect(errors[0].detail).toContain('Link target "dir/Missing File.md" does not exist');
     });
   });
+
+  describe('linkBase configuration (DL001 #237)', () => {
+    let repoRoot;
+    let nestedFile;
+
+    beforeEach(() => {
+      repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dl001-linkbase-'));
+      // Mark this directory as a repo root so auto-detection finds it.
+      fs.mkdirSync(path.join(repoRoot, '.git'));
+      // Root-relative target.
+      fs.mkdirSync(path.join(repoRoot, 'docs', 'design'), { recursive: true });
+      fs.writeFileSync(path.join(repoRoot, 'docs', 'design', 'x.md'), '# X\n');
+      // Source file lives in a nested subdirectory.
+      const nestedDir = path.join(repoRoot, 'a', 'b');
+      fs.mkdirSync(nestedDir, { recursive: true });
+      nestedFile = path.join(nestedDir, 'source.md');
+      fs.writeFileSync(nestedFile, '# Source\n');
+      clearCaches();
+    });
+
+    afterEach(() => {
+      fs.rmSync(repoRoot, { recursive: true, force: true });
+      clearCaches();
+    });
+
+    test('resolves root-relative link against repo root when linkBase is "root"', () => {
+      const markdown = '[design](docs/design/x.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, { linkBase: 'root' });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('reports the same root-relative link as dead under default file base', () => {
+      const markdown = '[design](docs/design/x.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, {});
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "docs/design/x.md" does not exist');
+    });
+
+    test('honors an explicit repoRoot over auto-detection', () => {
+      const markdown = '[design](docs/design/x.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, {
+        linkBase: 'root',
+        repoRoot
+      });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('still reports a genuinely missing target under linkBase "root"', () => {
+      const markdown = '[missing](docs/design/missing.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, { linkBase: 'root' });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "docs/design/missing.md" does not exist');
+    });
+
+    test('leaves same-page anchors unaffected by linkBase', () => {
+      const markdown = '# Source\n\n[self](#source)';
+      const errors = runRuleWithContent(markdown, nestedFile, { linkBase: 'root' });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('config validation accepts linkBase and repoRoot keys', () => {
+      const markdown = '[design](docs/design/x.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, {
+        linkBase: 'root',
+        repoRoot
+      });
+      const validationErrors = errors.filter(e =>
+        /Configuration validation failed|Unknown configuration option/.test(e.detail || '')
+      );
+      expect(validationErrors).toHaveLength(0);
+    });
+
+    test('config validation rejects an invalid linkBase value', () => {
+      const markdown = '[design](docs/design/x.md)';
+      const errors = runRuleWithContent(markdown, nestedFile, { linkBase: 'nonsense' });
+      const validationErrors = errors.filter(e =>
+        /Configuration validation failed/.test(e.detail || '')
+      );
+      expect(validationErrors.length).toBeGreaterThan(0);
+    });
+  });
 });
 
 describe('watch-mode stale cache (NIL001 #204)', () => {

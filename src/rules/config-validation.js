@@ -126,6 +126,57 @@ export function validateNonNegativeNumber(value, fieldName) {
 }
 
 /**
+ * Validates that a value is a string.
+ * @param {any} value - The value to validate
+ * @param {string} fieldName - Name of the configuration field
+ * @returns {ValidationError[]} Array of validation errors (empty if valid)
+ */
+export function validateString(value, fieldName) {
+  const errors = [];
+
+  if (value === undefined || value === null) {
+    return errors; // Allow undefined/null values (optional fields)
+  }
+
+  if (typeof value !== 'string') {
+    errors.push({
+      field: fieldName,
+      message: `${fieldName} must be a string`,
+      value: value,
+      expected: 'string'
+    });
+  }
+
+  return errors;
+}
+
+/**
+ * Creates a validator that requires the value to be one of the allowed strings.
+ * @param {string[]} allowed - Permitted string values
+ * @returns {function(any, string): ValidationError[]} Validator function
+ */
+export function validateEnum(allowed) {
+  return function(value, fieldName) {
+    const errors = [];
+
+    if (value === undefined || value === null) {
+      return errors; // Allow undefined/null values (optional fields)
+    }
+
+    if (typeof value !== 'string' || !allowed.includes(value)) {
+      errors.push({
+        field: fieldName,
+        message: `${fieldName} must be one of: ${allowed.join(', ')}`,
+        value: value,
+        expected: `one of: ${allowed.join(', ')}`
+      });
+    }
+
+    return errors;
+  };
+}
+
+/**
  * Formats validation errors into a user-friendly message.
  * @param {string} ruleName - Name of the rule being configured
  * @param {ValidationError[]} errors - Array of validation errors
