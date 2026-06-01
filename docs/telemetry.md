@@ -9,7 +9,7 @@ Autofix telemetry exposes safety heuristic performance, revealing which heuristi
 Telemetry is disabled by default with zero performance overhead. Initialize telemetry in your linting workflow to enable it:
 
 ```javascript
-import { initTelemetry } from 'markdownlint-trap/src/rules/autofix-telemetry.js';
+import { initTelemetry } from 'markdownlint-styleguide/src/rules/autofix-telemetry.js';
 
 // Enable telemetry
 const telemetry = initTelemetry({

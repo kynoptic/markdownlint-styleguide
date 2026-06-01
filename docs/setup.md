@@ -1,12 +1,12 @@
 # Setup and installation
 
-Apply `markdownlint-trap` rules in another repo using `markdownlint-cli2`.
+Apply `markdownlint-styleguide` rules in another repo using `markdownlint-cli2`.
 
 ## Quick start
 
 ```bash
-npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
-npx markdownlint-trap init --preset recommended --all
+npm install -D github:kynoptic/markdownlint-styleguide markdownlint-cli2
+npx mdsg init --preset recommended --all
 ```
 
 This configures the CLI, VS Code integration, CI workflow, npm scripts, and pre-commit hooks.
@@ -19,7 +19,7 @@ npm run lint:md:fix      # auto-fix issues
 For a lighter setup without CI or hooks, omit `--all`:
 
 ```bash
-npx markdownlint-trap init --preset recommended
+npx mdsg init --preset recommended
 npx markdownlint-cli2 "**/*.md"
 ```
 
@@ -30,7 +30,7 @@ Disable a rule:
 ```jsonc
 {
   "config": {
-    "extends": "markdownlint-trap/basic-config.jsonc",
+    "extends": "markdownlint-styleguide/basic-config.jsonc",
     "no-literal-ampersand": false
   }
 }
@@ -41,7 +41,7 @@ Add special terms for headings:
 ```jsonc
 {
   "config": {
-    "extends": "markdownlint-trap/basic-config.jsonc",
+    "extends": "markdownlint-styleguide/basic-config.jsonc",
     "sentence-case-heading": {
       "properNouns": ["GitHub", "JavaScript", "TypeScript"]
     }
@@ -73,13 +73,13 @@ flowchart TD
 
 ### Option A: GitHub dependency (recommended)
 
-- Install: `npm i -D github:kynoptic/markdownlint-trap#v3.0.0 markdownlint-cli2`
-  - Or pin a commit: `npm i -D github:kynoptic/markdownlint-trap#<commit-sha> markdownlint-cli2`
+- Install: `npm i -D github:kynoptic/markdownlint-styleguide#v4.0.0 markdownlint-cli2`
+  - Or pin a commit: `npm i -D github:kynoptic/markdownlint-styleguide#<commit-sha> markdownlint-cli2`
 - Configure `.markdownlint-cli2.jsonc`:
 
   ```jsonc
   {
-    "config": { "extends": "markdownlint-trap/basic-config.jsonc" },
+    "config": { "extends": "markdownlint-styleguide/basic-config.jsonc" },
     "globs": ["**/*.md", "!node_modules/**/*", "!dist/**/*"]
   }
   ```
@@ -88,25 +88,25 @@ flowchart TD
 
 ### Option B: Git submodule
 
-- Add: `git submodule add https://github.com/kynoptic/markdownlint-trap tools/markdownlint-trap`
+- Add: `git submodule add https://github.com/kynoptic/markdownlint-styleguide tools/markdownlint-styleguide`
 - Configure `.markdownlint-cli2.jsonc`:
 
   ```jsonc
   {
-    "customRules": ["./tools/markdownlint-trap/src/index.js"],
-    "config": { "extends": "./tools/markdownlint-trap/basic-config.jsonc" },
+    "customRules": ["./tools/markdownlint-styleguide/src/index.js"],
+    "config": { "extends": "./tools/markdownlint-styleguide/basic-config.jsonc" },
     "globs": ["**/*.md", "!node_modules/**/*", "!dist/**/*"]
   }
   ```
 
 - Run: `npx markdownlint-cli2 "**/*.md"`
-- Update later: `git submodule update --remote --merge tools/markdownlint-trap`
+- Update later: `git submodule update --remote --merge tools/markdownlint-styleguide`
 
 ### Option C: npm link (local development)
 
 - From this repo: `npm link`
-- In target repo: `npm link markdownlint-trap`
-- Configure like Option A and run the linter. To unlink: `npm unlink markdownlint-trap --no-save`
+- In target repo: `npm link markdownlint-styleguide`
+- Configure like Option A and run the linter. To unlink: `npm unlink markdownlint-styleguide --no-save`
 
 ### Option D: Global installation (works everywhere)
 
@@ -195,7 +195,7 @@ The distribution and linking scripts detect your package manager automatically:
 
 After distribution, VS Code:
 
-- Loads custom rules from `markdownlint-trap`
+- Loads custom rules from `markdownlint-styleguide`
 - Uses the configured preset (`basic/recommended/strict`)
 - Shows inline diagnostics and suggestions
 - Offers autofix on save
@@ -203,7 +203,7 @@ After distribution, VS Code:
 **Requirements:**
 
 - [markdownlint VS Code extension](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
-- Global installation OR project-level installation of `markdownlint-trap`
+- Global installation OR project-level installation of `markdownlint-styleguide`
 
 ## Verification and troubleshooting
 
@@ -211,11 +211,11 @@ After distribution, VS Code:
 
 ```bash
 # Check global installation
-npm list -g markdownlint-trap
+npm list -g markdownlint-styleguide
 which markdownlint-cli2
 
 # Check project linking
-ls -la ~/my-project/node_modules/markdownlint-trap
+ls -la ~/my-project/node_modules/markdownlint-styleguide
 
 # Test CLI
 cd ~/any-project
@@ -224,7 +224,7 @@ markdownlint-cli2 --help
 
 ### Cannot find custom rules when extending the preset
 
-Confirm that `markdownlint-trap` is installed (`npm list markdownlint-trap`) and that `.markdownlint-cli2.jsonc` references `customRules: ["markdownlint-trap"]` or the correct submodule path for Option B.
+Confirm that `markdownlint-styleguide` is installed (`npm list markdownlint-styleguide`) and that `.markdownlint-cli2.jsonc` references `customRules: ["markdownlint-styleguide"]` or the correct submodule path for Option B.
 
 ### No violations but expected rules
 
@@ -232,13 +232,13 @@ Confirm `.markdownlint-cli2.jsonc` extends the preset (Option A/C) or points to 
 
 ### VS Code extension not loading rules
 
-1. Verify `markdownlint-trap` is installed (globally or locally).
-2. Check that `.vscode/settings.json` includes `markdownlint.customRules: ["markdownlint-trap"]`.
+1. Verify `markdownlint-styleguide` is installed (globally or locally).
+2. Check that `.vscode/settings.json` includes `markdownlint.customRules: ["markdownlint-styleguide"]`.
 3. Reload the VS Code window: `Cmd+Shift+P` > "Reload Window".
 
 ### CLI not finding rules
 
-1. Verify the global installation: `npm list -g markdownlint-trap`.
+1. Verify the global installation: `npm list -g markdownlint-styleguide`.
 2. Check that `.markdownlint-cli2.jsonc` has the correct `customRules` path.
 3. Reinstall: `npm run dist:local`.
 
@@ -262,10 +262,10 @@ The rules become available everywhere without requiring `package.json`.
 
 ## Automated updates
 
-- **Renovate**: Match `markdownlint-trap` and group updates under "markdownlint rules".
-- **Dependabot**: Allow `markdownlint-trap`; GitHub installs update on new tags.
+- **Renovate**: Match `markdownlint-styleguide` and group updates under "markdownlint rules".
+- **Dependabot**: Allow `markdownlint-styleguide`; GitHub installs update on new tags.
 
-Update markdownlint-trap across all projects:
+Update markdownlint-styleguide across all projects:
 
 ```bash
 # Pull latest changes

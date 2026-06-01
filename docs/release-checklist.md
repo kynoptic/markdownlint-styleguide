@@ -1,6 +1,6 @@
 # Release checklist
 
-Checklist for releasing markdownlint-trap versions, aligned with semantic versioning and optimized for AI agent workflows.
+Checklist for releasing markdownlint-styleguide versions, aligned with semantic versioning and optimized for AI agent workflows.
 
 ## Pre-release validation
 
@@ -66,7 +66,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
   ```bash
   cd /tmp && mkdir test-install && cd test-install
   npm init -y
-  npm install /path/to/markdownlint-trap
+  npm install /path/to/markdownlint-styleguide
   # Test basic functionality
   ```
 
@@ -84,7 +84,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 - [ ] **Verify `npm authentication`**: `npm whoami`
 - [ ] **Dry run publish**: `npm publish --dry-run`
 - [ ] **Publish package**: `npm publish`
-- [ ] **Verify publication**: `npm view markdownlint-trap@latest`
+- [ ] **Verify publication**: `npm view markdownlint-styleguide@latest`
 
 ### GitHub release
 
@@ -95,7 +95,7 @@ Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) strictly. Anal
 
 ## Post-release validation
 
-- [ ] **Install from npm**: `npm install -g markdownlint-trap@latest`
+- [ ] **Install from npm**: `npm install -g markdownlint-styleguide@latest`
 - [ ] **Test basic functionality** on sample Markdown files
 - [ ] **Verify documentation links** resolve correctly
 - [ ] **Check `npm package` page** for correct metadata
@@ -107,13 +107,13 @@ If a critical issue surfaces:
 
 ### Immediate response
 
-- [ ] **Deprecate problematic version**: `npm deprecate markdownlint-trap@x.y.z "Critical issue - use x.y.w instead"`
+- [ ] **Deprecate problematic version**: `npm deprecate markdownlint-styleguide@x.y.z "Critical issue - use x.y.w instead"`
 - [ ] **Prepare hotfix** if feasible
 - [ ] **Notify users** via GitHub issues and release notes
 
 ### For breaking issues
 
-- [ ] **Unpublish if <72 hours**: `npm unpublish markdownlint-trap@x.y.z`
+- [ ] **Unpublish if <72 hours**: `npm unpublish markdownlint-styleguide@x.y.z`
 - [ ] **Release hotfix version** with fix
 - [ ] **Add migration notes** to documentation
 

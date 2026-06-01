@@ -1,4 +1,4 @@
-# osv-scanner configuration for markdownlint-trap
+# osv-scanner configuration for markdownlint-styleguide
 # Documentation: https://google.github.io/osv-scanner/configuration/
 
 # Ignored vulnerabilities (use sparingly and document justification)

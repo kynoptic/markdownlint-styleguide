@@ -2,7 +2,7 @@
 
 ## Overview
 
-markdownlint-trap ships custom `markdownlint` rules enforcing sentence-case headings, backtick code elements, link validation, and prose style. Native ES modules, no build step. Jest for testing, ESLint and markdownlint-cli2 for quality.
+markdownlint-styleguide ships custom `markdownlint` rules enforcing sentence-case headings, backtick code elements, link validation, and prose style. Native ES modules, no build step. Jest for testing, ESLint and markdownlint-cli2 for quality.
 
 ## Repository layout
 

@@ -1,7 +1,7 @@
 # Architecture Decision Records
 
 This directory contains Architecture Decision Records (ADRs) documenting
-significant architectural choices in the markdownlint-trap project.
+significant architectural choices in the markdownlint-styleguide project.
 
 ## About ADRs
 

@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * @fileoverview Configuration validation utilities for markdownlint-trap rules.
+ * @fileoverview Configuration validation utilities for markdownlint-styleguide rules.
  * Provides a centralized system for validating user configuration options
  * with clear error messages and helpful guidance.
  */

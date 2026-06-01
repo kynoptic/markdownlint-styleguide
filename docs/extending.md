@@ -1,4 +1,4 @@
-# Extending markdownlint-trap
+# Extending markdownlint-styleguide
 
 Create custom rules, package them as plugins, and contribute to the project.
 
@@ -115,7 +115,7 @@ Add your own rule next to the built-ins. With `markdownlint-cli2`, extend a pres
 ```jsonc
 // .markdownlint-cli2.jsonc
 {
-  "config": { "extends": "markdownlint-trap/recommended-config.jsonc" },
+  "config": { "extends": "markdownlint-styleguide/recommended-config.jsonc" },
   "customRules": ["./my-rules/no-todo-comments.js"]
 }
 ```
@@ -124,7 +124,7 @@ With the `markdownlint` API, spread the exported array and append your rule:
 
 ```javascript
 import { lint } from "markdownlint/promise";
-import markdownlintTrap from "markdownlint-trap";
+import markdownlintTrap from "markdownlint-styleguide";
 import myCustomRule from "./my-rules/no-todo-comments.js";
 
 const results = await lint({
@@ -198,14 +198,14 @@ After `npm install markdownlint-rule-my-plugin`, reference it in `customRules`:
 
 ### Reusing shared primitives
 
-To use markdownlint-trap utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-trap` as a peer dependency, then import from its main entry point:
+To use markdownlint-styleguide utilities (config validation, autofix safety, shared heuristics), declare `markdownlint-styleguide` as a peer dependency, then import from its main entry point:
 
 ```javascript
 import {
   shouldApplyAutofix,
   mergeAutofixSafetyConfig,
   validateAutofixSafetyConfig,
-} from "markdownlint-trap";
+} from "markdownlint-styleguide";
 ```
 
 ## Testing expectations

@@ -2,7 +2,7 @@
 
 ## How-to guides
 
-- [Setup and installation](setup.md) — consuming markdownlint-trap in your repo
+- [Setup and installation](setup.md) — consuming markdownlint-styleguide in your repo
 - [Configuration and presets](configuration.md) — presets, rule options, and autofix safety tuning
 - [Extending and contributing](extending.md) — creating rules, plugins, and the helpers contract
 - [External validation](external-validation.md) — testing rules against real-world repos

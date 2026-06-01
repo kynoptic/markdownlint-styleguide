@@ -213,30 +213,30 @@ function main() {
 
       try {
         // Check if already globally linked
-        const checkCmd = 'npm list -g --depth=0 markdownlint-trap';
+        const checkCmd = 'npm list -g --depth=0 markdownlint-styleguide';
         let isLinked = false;
         try {
-          isLinked = execSync(checkCmd, { stdio: 'pipe' }).toString().includes('markdownlint-trap');
+          isLinked = execSync(checkCmd, { stdio: 'pipe' }).toString().includes('markdownlint-styleguide');
         } catch (checkError) {
           // npm list exits non-zero if package not found, which is expected
           isLinked = false;
         }
 
         if (isLinked) {
-          log('✓ markdownlint-trap is already globally linked');
+          log('✓ markdownlint-styleguide is already globally linked');
         } else {
           if (linkLocal) {
-            log('Globally linking markdownlint-trap...');
+            log('Globally linking markdownlint-styleguide...');
             execSync('npm link', { cwd: repoRoot, stdio: 'inherit' });
-            log('✓ Globally linked markdownlint-trap');
+            log('✓ Globally linked markdownlint-styleguide');
           } else {
-            log('Installing markdownlint-trap globally...');
-            execSync('npm install -g markdownlint-trap', { stdio: 'inherit' });
-            log('✓ Installed markdownlint-trap globally');
+            log('Installing markdownlint-styleguide globally...');
+            execSync('npm install -g markdownlint-styleguide', { stdio: 'inherit' });
+            log('✓ Installed markdownlint-styleguide globally');
           }
         }
       } catch (e) {
-        error(`Failed to install markdownlint-trap globally: ${e.message}`);
+        error(`Failed to install markdownlint-styleguide globally: ${e.message}`);
         throw e;
       }
 

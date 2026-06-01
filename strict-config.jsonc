@@ -2,7 +2,7 @@
   // A strict preset for rigorous style and link hygiene.
   // Note: Using package reference for better compatibility
   "customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
   "config": {
     // Keep core rules strict, but line length is universally ignored

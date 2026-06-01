@@ -1,5 +1,5 @@
 version: 1
-# Local distribution config for markdownlint-trap
+# Local distribution config for markdownlint-styleguide
 # Copies configuration files to consumer projects
 # Edit this file to customize distribution targets
 
@@ -120,7 +120,7 @@ targets:
 # --------------------------------------
 # Global Installation
 # --------------------------------------
-# Install markdownlint-trap and markdownlint-cli2 globally
+# Install markdownlint-styleguide and markdownlint-cli2 globally
 # This enables usage in ALL projects (including non-Node.js projects)
 globalInstall:
   enabled: true
@@ -130,7 +130,7 @@ globalInstall:
 # NPM Package Installation (per-project)
 # --------------------------------------
 # Automatically install npm packages in target projects
-# NOTE: Set enabled to false until markdownlint-trap is published to npm
+# NOTE: Set enabled to false until markdownlint-styleguide is published to npm
 # For local development, global installation + distribution is recommended
 #
 # IMPORTANT: The default projectDirs assumes ~/Projects/* structure.
@@ -142,7 +142,7 @@ npmInstall:
   enabled: true  # Enabled to create node_modules/ for VS Code integration
   packages:
     - markdownlint-cli2
-    - markdownlint-trap
+    - markdownlint-styleguide
   projectDirs:
     - ~/Projects/*  # Default assumes this structure - customize as needed
 

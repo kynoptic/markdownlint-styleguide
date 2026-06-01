@@ -33,7 +33,7 @@ describe('cli.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('markdownlint-trap setup wizard');
+      expect(output).toContain('markdownlint-styleguide setup wizard');
     });
 
     it('should run init when init subcommand given', () => {
@@ -42,7 +42,7 @@ describe('cli.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('markdownlint-trap setup wizard');
+      expect(output).toContain('markdownlint-styleguide setup wizard');
     });
 
     it('should run doctor when doctor subcommand given', () => {
@@ -51,7 +51,7 @@ describe('cli.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('markdownlint-trap diagnostics');
+      expect(output).toContain('markdownlint-styleguide diagnostics');
     });
 
     it('should show help with --help flag', () => {
@@ -60,7 +60,7 @@ describe('cli.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('markdownlint-trap');
+      expect(output).toContain('markdownlint-styleguide');
       expect(output).toContain('init');
       expect(output).toContain('doctor');
     });
@@ -91,7 +91,7 @@ describe('init.cjs', () => {
         cwd: tempDir,
       });
 
-      expect(output).toContain('markdownlint-trap init');
+      expect(output).toContain('mdsg init');
       expect(output).toContain('Usage:');
       expect(output).toContain('--preset');
       expect(output).toContain('--vscode');
@@ -282,7 +282,7 @@ describe('init.cjs', () => {
       });
 
       // Should reference GitHub repo in documentation section
-      expect(output).toContain('github.com/kynoptic/markdownlint-trap');
+      expect(output).toContain('github.com/kynoptic/markdownlint-styleguide');
     });
   });
 
@@ -343,7 +343,7 @@ describe('init.cjs', () => {
     it('should merge new config options while preserving existing customizations', () => {
       // Create existing config with custom settings
       const existingConfig = {
-        customRules: ['markdownlint-trap'],
+        customRules: ['markdownlint-styleguide'],
         config: {
           'sentence-case-heading': {
             specialTerms: ['MyCustomTerm', 'AnotherTerm']
