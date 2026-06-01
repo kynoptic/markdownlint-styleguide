@@ -240,7 +240,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
     // Debug logging
-    if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
+    if (process.env.DEBUG === 'markdownlint-styleguide*' || params.config?.debug) {
       console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
     }
 
@@ -263,7 +263,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    */
   function validateWrapper(headingText, lineNumber, sourceLine, reportFn) {
     // Debug logging
-    if (process.env.DEBUG === 'markdownlint-trap*' || params.config?.debug) {
+    if (process.env.DEBUG === 'markdownlint-styleguide*' || params.config?.debug) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
 

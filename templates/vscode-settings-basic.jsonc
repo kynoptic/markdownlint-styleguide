@@ -1,8 +1,8 @@
 {
-  // Load the markdownlint-trap custom rules package
+  // Load the markdownlint-styleguide custom rules package
   // This enables custom rules in the VS Code markdownlint extension
   "markdownlint.customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
 
   // Configure which markdownlint rules are enabled

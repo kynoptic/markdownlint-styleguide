@@ -14,13 +14,13 @@ The `v1.7.0`+ refactoring addressed maintainability problems in the custom markd
 
 Break rule files exceeding ~500 LOC or holding more than three distinct responsibilities (parsing, validation, fixing) into composable single-responsibility modules.
 
-`sentence-case-heading` was split from 1,111 LOC into an orchestration entry point plus `token-extraction.js`, `case-classifier.js`, and `fix-builder.js` ([commit dec827f](https://github.com/kynoptic/markdownlint-trap/commit/dec827f)).
+`sentence-case-heading` was split from 1,111 LOC into an orchestration entry point plus `token-extraction.js`, `case-classifier.js`, and `fix-builder.js` ([commit dec827f](https://github.com/kynoptic/markdownlint-styleguide/commit/dec827f)).
 
 **Consequences**: 76% reduction in main-file complexity and no breaking changes for consumers, at the cost of additional module boundaries (~1-2% overhead) and a ~5% bundle-size increase from wrapper code. Modularization also improved concurrent execution from ~1,450ms to ~330ms — V8 inlines and optimizes smaller functions more aggressively, so performance does not justify monolithic files.
 
 ### Consolidated shared heuristics
 
-Centralize common detection and preservation logic in `src/rules/shared-heuristics.js` rather than duplicating it across rules ([commit c4f9417](https://github.com/kynoptic/markdownlint-trap/commit/c4f9417)).
+Centralize common detection and preservation logic in `src/rules/shared-heuristics.js` rather than duplicating it across rules ([commit c4f9417](https://github.com/kynoptic/markdownlint-styleguide/commit/c4f9417)).
 
 Before consolidation, `sentence-case-heading` and `backtick-code-elements` carried separate `isAcronym()` and markup-preservation implementations, producing behavioral drift on number-bearing terms like `PM2` and `IPv4` (Issue #66). The shared module exposes `isAcronym`, `preserveSegments`, `restoreSegments`, and `isInsideCodeSpan`. Document line/offset context detection later moved out of `shared-heuristics.js` into `shared-context.js`; the term and markup heuristics remain in `shared-heuristics.js`.
 
@@ -28,7 +28,7 @@ Before consolidation, `sentence-case-heading` and `backtick-code-elements` carri
 
 ### Autofix safety unit tests
 
-Cover the `autofix-safety.js` confidence-scoring and manual-review thresholds with behavioral unit tests rather than relying on integration tests alone ([commit 61de511](https://github.com/kynoptic/markdownlint-trap/commit/61de511)).
+Cover the `autofix-safety.js` confidence-scoring and manual-review thresholds with behavioral unit tests rather than relying on integration tests alone ([commit 61de511](https://github.com/kynoptic/markdownlint-styleguide/commit/61de511)).
 
 Unit tests exercise boundary conditions (e.g. exactly 50% confidence) in ~200ms and pinpoint which confidence function broke, where an integration test would require a full markdown document and the entire rule pipeline (~2s).
 
@@ -38,7 +38,7 @@ Maintain overlapping unit and integration layers deliberately. Unit tests verify
 
 ### Automated vulnerability scanning
 
-Run `npm audit` and osv-scanner in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-trap/commit/9bea695)). Builds fail on high/critical vulnerabilities in production dependencies; dev dependencies are excluded (`--omit=dev`). `SECURITY.md` defines the exception policy — waivers require expiry dates and quarterly review.
+Run `npm audit` and osv-scanner in the CI pipeline ([commit 9bea695](https://github.com/kynoptic/markdownlint-styleguide/commit/9bea695)). Builds fail on high/critical vulnerabilities in production dependencies; dev dependencies are excluded (`--omit=dev`). `SECURITY.md` defines the exception policy — waivers require expiry dates and quarterly review.
 
 ### Node.js version targeting
 

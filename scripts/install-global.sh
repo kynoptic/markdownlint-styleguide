@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install markdownlint-trap and markdownlint-cli2 globally for use in all projects
+# Install markdownlint-styleguide and markdownlint-cli2 globally for use in all projects
 
 set -euo pipefail
 
@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
     --help)
       echo "Usage: $0 [OPTIONS]"
       echo ""
-      echo "Install markdownlint-trap globally for use in all projects (including non-Node.js)."
+      echo "Install markdownlint-styleguide globally for use in all projects (including non-Node.js)."
       echo ""
       echo "Options:"
       echo "  --dry-run              Show what would be installed without making changes"
@@ -53,7 +53,7 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "After installation:"
       echo "  - markdownlint-cli2 will be available as a global command"
-      echo "  - markdownlint-trap rules will work in any project"
+      echo "  - markdownlint-styleguide rules will work in any project"
       echo "  - VS Code extension will pick up rules automatically"
       echo "  - Works in both Node.js and non-Node.js projects"
       exit 0
@@ -74,21 +74,21 @@ fi
 # Get the repository root (parent of scripts directory)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-log "Installing markdownlint-trap globally..."
+log "Installing markdownlint-styleguide globally..."
 echo ""
 
 # Check if npm link has already been run
-if npm list -g --depth=0 markdownlint-trap &>/dev/null; then
-  success "✓ markdownlint-trap is already globally linked"
+if npm list -g --depth=0 markdownlint-styleguide &>/dev/null; then
+  success "✓ markdownlint-styleguide is already globally linked"
 else
   if [ "$DRY_RUN" = "true" ]; then
     log "[dry-run] Would run: npm link in $REPO_ROOT"
   else
-    log "Globally linking markdownlint-trap from: $REPO_ROOT"
+    log "Globally linking markdownlint-styleguide from: $REPO_ROOT"
     if (cd "$REPO_ROOT" && npm link); then
-      success "✓ Globally linked markdownlint-trap"
+      success "✓ Globally linked markdownlint-styleguide"
     else
-      error "Failed to globally link markdownlint-trap"
+      error "Failed to globally link markdownlint-styleguide"
       exit 1
     fi
   fi
@@ -123,14 +123,14 @@ if [ "$DRY_RUN" = "true" ]; then
 else
   log "GLOBAL INSTALLATION COMPLETE"
   echo ""
-  success "✓ markdownlint-trap is globally linked"
+  success "✓ markdownlint-styleguide is globally linked"
   success "✓ markdownlint-cli2 is globally installed"
   echo ""
   log "You can now use markdownlint-cli2 in any project:"
   log "  cd ~/any-project"
   log "  markdownlint-cli2 '**/*.md'"
   echo ""
-  log "VS Code extension will automatically use markdownlint-trap rules"
+  log "VS Code extension will automatically use markdownlint-styleguide rules"
   log "in any project with .markdownlint-cli2.jsonc or .vscode/settings.json"
 fi
 

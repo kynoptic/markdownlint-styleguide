@@ -1,6 +1,6 @@
 # Testing strategy and conventions
 
-Run and understand the test suites for markdownlint-trap.
+Run and understand the test suites for markdownlint-styleguide.
 
 ## Commands
 
@@ -38,7 +38,7 @@ npm test -- --testNamePattern="should_allow_autofix_for_high_confidence"
 Enable debug logging during tests:
 
 ```bash
-DEBUG=markdownlint-trap* npm test
+DEBUG=markdownlint-styleguide* npm test
 ```
 
 ## Testing strategy
@@ -246,7 +246,7 @@ Use this validation loop to identify and fix false positives when improving rule
 
    ```bash
    cd /path/to/consumer-repo
-   npm install /path/to/markdownlint-trap  # Install local version
+   npm install /path/to/markdownlint-styleguide  # Install local version
    npx markdownlint-cli2 --fix "**/*.md"
    ```
 
@@ -266,7 +266,7 @@ Use this validation loop to identify and fix false positives when improving rule
 
 5. **Verify fixes**: run `npm test` and re-run auto-fix on the consumer.
 
-6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-trap fixes.
+6. **Undo consumer changes** with `git checkout -- .` before committing markdownlint-styleguide fixes.
 
 ## False-positive audit round consolidation
 

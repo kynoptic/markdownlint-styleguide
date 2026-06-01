@@ -34,7 +34,7 @@ describe('Renovate configuration', () => {
 
     test('should_have_description', () => {
       expect(config.description).toBeDefined();
-      expect(config.description).toContain('markdownlint-trap');
+      expect(config.description).toContain('markdownlint-styleguide');
     });
 
     test('should_extend_recommended_presets', () => {

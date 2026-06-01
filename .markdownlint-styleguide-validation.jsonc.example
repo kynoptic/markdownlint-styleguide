@@ -1,6 +1,6 @@
 {
   // External validation configuration example
-  // Copy to .markdownlint-trap-validation.jsonc and customize
+  // Copy to .markdownlint-styleguide-validation.jsonc and customize
 
   "sources": {
     // Local file paths and directories

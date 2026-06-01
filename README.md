@@ -1,4 +1,4 @@
-# markdownlint-trap
+# markdownlint-styleguide
 
 Custom [`markdownlint`](https://github.com/DavidAnson/markdownlint) rules that enforce sentence-case headings, backtick code elements, proper link formatting, and prose style — with a three-tier autofix system that applies safe fixes automatically and flags ambiguous cases for review.
 
@@ -18,8 +18,8 @@ Visit [our documentation](https://example.com) for docs and tutorials.
 > Requires Node.js 24+ (`>=24.16.0`) and npm.
 
 ```bash
-npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
-npx markdownlint-trap init --preset recommended --all
+npm install -D github:kynoptic/markdownlint-styleguide markdownlint-cli2
+npx mdsg init --preset recommended --all
 ```
 
 This configures CLI, VS Code integration, CI workflow, npm scripts, and pre-commit hooks. Then:
@@ -32,8 +32,8 @@ npm run lint:md:fix      # auto-fix issues
 For a lighter setup without CI or hooks:
 
 ```bash
-npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2
-npx markdownlint-trap init --preset recommended
+npm install -D github:kynoptic/markdownlint-styleguide markdownlint-cli2
+npx mdsg init --preset recommended
 npx markdownlint-cli2 "**/*.md"
 ```
 
@@ -58,13 +58,13 @@ Three presets are available: `basic`, `recommended`, and `strict`. Override indi
 ```jsonc
 {
   "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "extends": "markdownlint-styleguide/recommended-config.jsonc",
     "no-literal-ampersand": false
   }
 }
 ```
 
-See [configuration guide](docs/configuration.md) for presets, setup wizard options, and manual setup. Run `npx markdownlint-trap doctor` to verify your setup.
+See [configuration guide](docs/configuration.md) for presets, setup wizard options, and manual setup. Run `npx mdsg doctor` to verify your setup.
 
 ## Documentation
 

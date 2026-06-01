@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-The markdownlint-trap project provides custom markdown linting rules with autofix capabilities. When autofixes incorrectly transform content, they can:
+The markdownlint-styleguide project provides custom markdown linting rules with autofix capabilities. When autofixes incorrectly transform content, they can:
 
 - Change technical meaning (e.g., converting code references like `API` to `Api`)
 - Damage prose readability (e.g., wrapping natural language words in backticks)

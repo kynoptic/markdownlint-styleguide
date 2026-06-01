@@ -160,7 +160,7 @@ CI runs automated vulnerability scanning:
 - `backtick-code-elements` and `sentence-case-heading` operate in-memory with heuristics.
 - Scope `globs` to documentation folders (e.g., `docs/**`, `guides/**`).
 - Exclude generated paths: `!node_modules/**/*`, `!dist/**/*`, `!build/**/*`.
-- Enable debug output: `DEBUG=markdownlint-trap* npx markdownlint-cli2 "**/*.md"`
+- Enable debug output: `DEBUG=markdownlint-styleguide* npx markdownlint-cli2 "**/*.md"`
 
 ## Build
 

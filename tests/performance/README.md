@@ -1,6 +1,6 @@
 # Performance test suite
 
-Automated benchmarks to track performance and catch regressions in markdownlint-trap rules and safety classifiers.
+Automated benchmarks to track performance and catch regressions in markdownlint-styleguide rules and safety classifiers.
 
 ## What's measured
 

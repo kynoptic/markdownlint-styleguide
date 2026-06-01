@@ -1,5 +1,5 @@
 {
-  // Recommended configuration for markdownlint-trap
+  // Recommended configuration for markdownlint-styleguide
   // Enables all custom rules with balanced strictness
   "ignores": [
     "node_modules/**",

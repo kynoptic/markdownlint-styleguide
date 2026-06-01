@@ -130,7 +130,7 @@ describe('doctor.cjs', () => {
       fs.mkdirSync(vscodeDir, { recursive: true });
       fs.writeFileSync(
         vscodeConfig,
-        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-trap'] }, null, 2),
+        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-styleguide'] }, null, 2),
         'utf8'
       );
 
@@ -149,7 +149,7 @@ describe('doctor.cjs', () => {
       fs.mkdirSync(vscodeDir, { recursive: true });
       fs.writeFileSync(
         vscodeConfig,
-        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-trap'] }, null, 2),
+        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-styleguide'] }, null, 2),
         'utf8'
       );
 
@@ -240,7 +240,7 @@ describe('doctor.cjs', () => {
       fs.mkdirSync(vscodeDir, { recursive: true });
       fs.writeFileSync(
         vscodeConfig,
-        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-trap'] }, null, 2),
+        JSON.stringify({ 'markdownlint.customRules': ['markdownlint-styleguide'] }, null, 2),
         'utf8'
       );
 

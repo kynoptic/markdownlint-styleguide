@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Prepare script for markdownlint-trap.
+ * Prepare script for markdownlint-styleguide.
  * Sets up husky hooks and enforces quality gates during development.
  *
  * Note: Build step removed - native ESM distribution (see ADR-001)
@@ -25,7 +25,7 @@ function safeRun(cmd, label) {
   try {
     run(cmd);
   } catch (err) {
-    console.warn(`[markdownlint-trap] Skipped ${label}:`, err?.message || err);
+    console.warn(`[markdownlint-styleguide] Skipped ${label}:`, err?.message || err);
   }
 }
 

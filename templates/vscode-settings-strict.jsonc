@@ -1,8 +1,8 @@
 {
-  // Load the markdownlint-trap custom rules package
+  // Load the markdownlint-styleguide custom rules package
   // This enables all five custom rules in the VS Code markdownlint extension
   "markdownlint.customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
 
   // Configure which markdownlint rules are enabled
@@ -20,7 +20,7 @@
     // Enforce unordered list style - use dashes (-) for consistency
     "MD004": { "style": "dash" },
 
-    // === Custom markdownlint-trap rules ===
+    // === Custom markdownlint-styleguide rules ===
 
     // Enforce sentence case in ATX headings (e.g., "## Getting started" not "## Getting Started")
     // Preserves acronyms, proper nouns, and technical terms automatically

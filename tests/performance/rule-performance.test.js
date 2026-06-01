@@ -1,6 +1,6 @@
 /**
  * @performance
- * Performance benchmarks for markdownlint-trap rules.
+ * Performance benchmarks for markdownlint-styleguide rules.
  * Tests execution time and memory usage for critical rule operations.
  */
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
@@ -29,7 +29,7 @@ function generateLargeMarkdown(sections = 100) {
   const parts = [];
   
   parts.push('# Performance Test Document\n\n');
-  parts.push('This document is generated for performance testing of markdownlint-trap rules.\n\n');
+  parts.push('This document is generated for performance testing of markdownlint-styleguide rules.\n\n');
   
   for (let i = 1; i <= sections; i++) {
     parts.push(`## Section ${i}: Working With APIs and Database Systems\n\n`);

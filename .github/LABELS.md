@@ -1,6 +1,6 @@
 # Repository labels
 
-This document describes the semantic label system used in markdownlint-trap. Labels help categorize issues and pull requests for efficient triage, prioritization, and tracking.
+This document describes the semantic label system used in markdownlint-styleguide. Labels help categorize issues and pull requests for efficient triage, prioritization, and tracking.
 
 ## Label categories
 

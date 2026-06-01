@@ -37,7 +37,7 @@ describe('External validation workflow', () => {
 
   test('test_should_complete_full_workflow_when_config_valid', async () => {
     // Create test config
-    const configPath = path.join(TEST_CONFIG_DIR, '.markdownlint-trap-validation.jsonc');
+    const configPath = path.join(TEST_CONFIG_DIR, '.markdownlint-styleguide-validation.jsonc');
     const testConfig = {
       sources: {
         local: [FIXTURES_DIR]

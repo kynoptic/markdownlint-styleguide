@@ -64,7 +64,7 @@ class DoctorCheck {
         `${name} exists`,
         required ? 'fail' : 'warn',
         `File not found: ${filePath}`,
-        required ? `Run: npx markdownlint-trap init` : 'Optional file'
+        required ? `Run: npx mdsg init` : 'Optional file'
       );
       return false;
     }
@@ -99,7 +99,7 @@ class DoctorCheck {
       // Try to load from the package
       let rules;
       try {
-        const loaded = require('markdownlint-trap');
+        const loaded = require('markdownlint-styleguide');
         // When requiring an ESM module from CJS, Node wraps it with default export
         rules = loaded.default || loaded;
       } catch (err) {
@@ -126,7 +126,7 @@ class DoctorCheck {
             'Custom rules loadable',
             'fail',
             'Package not found in node_modules and source not available',
-            'Run: npm install markdownlint-trap'
+            'Run: npm install markdownlint-styleguide'
           );
           return false;
         } else {
@@ -156,7 +156,7 @@ class DoctorCheck {
         'Custom rules loadable',
         'fail',
         `Cannot load rules: ${err.message}`,
-        'Ensure markdownlint-trap is properly installed'
+        'Ensure markdownlint-styleguide is properly installed'
       );
       return false;
     }
@@ -176,26 +176,26 @@ class DoctorCheck {
           'VS Code custom rules configured',
           'warn',
           'markdownlint.customRules not found',
-          'Add "markdownlint.customRules": ["markdownlint-trap"]'
+          'Add "markdownlint.customRules": ["markdownlint-styleguide"]'
         );
         return;
       }
 
-      if (Array.isArray(customRules) && customRules.includes('markdownlint-trap')) {
+      if (Array.isArray(customRules) && customRules.includes('markdownlint-styleguide')) {
         this.addCheck('VS Code custom rules configured', 'pass', 'Package reference found');
       } else if (Array.isArray(customRules) && customRules.some(r => r.includes('.markdownlint-rules'))) {
         this.addCheck(
           'VS Code custom rules configured',
           'warn',
           'Using relative paths instead of package reference',
-          'Consider using "markdownlint-trap" for better portability'
+          'Consider using "markdownlint-styleguide" for better portability'
         );
       } else {
         this.addCheck(
           'VS Code custom rules configured',
           'warn',
-          'Custom rules configured but markdownlint-trap not found',
-          'Add "markdownlint-trap" to customRules array'
+          'Custom rules configured but markdownlint-styleguide not found',
+          'Add "markdownlint-styleguide" to customRules array'
         );
       }
     } catch {
@@ -205,7 +205,7 @@ class DoctorCheck {
 
   report() {
     log('\n╔═══════════════════════════════════════╗', 'cyan');
-    log('║  markdownlint-trap diagnostics       ║', 'cyan');
+    log('║  markdownlint-styleguide diagnostics  ║', 'cyan');
     log('╚═══════════════════════════════════════╝\n', 'cyan');
 
     for (const check of this.checks) {

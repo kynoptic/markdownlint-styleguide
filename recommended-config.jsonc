@@ -1,9 +1,9 @@
 {
-  // This is a shareable configuration for markdownlint-trap.
+  // This is a shareable configuration for markdownlint-styleguide.
   // Other projects can extend this file.
   // Note: Using package reference for better compatibility
   "customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
   "config": {
     // Standard markdownlint rules
