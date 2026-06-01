@@ -43,6 +43,7 @@ import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading } from './sentence-case/case-classifier.js';
 import { validateBoldText } from './sentence-case/bold-text-classifier.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
+import debug from '../logger.js';
 
 /** Track which deprecation keys have been warned to avoid warning once per file. */
 const _deprecationWarned = new Set();
@@ -240,7 +241,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     }
 
     // Debug logging
-    if (process.env.DEBUG === 'markdownlint-styleguide*' || params.config?.debug) {
+    if (debug.enabled || params.config?.debug) {
       console.log(`Validating bold text at line ${lineNumber}: "**${boldText}**"`);
     }
 
@@ -263,7 +264,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    */
   function validateWrapper(headingText, lineNumber, sourceLine, reportFn) {
     // Debug logging
-    if (process.env.DEBUG === 'markdownlint-styleguide*' || params.config?.debug) {
+    if (debug.enabled || params.config?.debug) {
       console.log(`Validating text at line ${lineNumber}: "${headingText}"`);
     }
 
