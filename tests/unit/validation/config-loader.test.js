@@ -8,7 +8,7 @@ import { loadConfig, validateConfig } from '../../../src/validation/config-loade
 describe('Config loader', () => {
   describe('loadConfig', () => {
     test('test_should_load_jsonc_config_when_file_exists', async () => {
-      const config = await loadConfig('/path/to/.markdownlint-trap-validation.jsonc');
+      const config = await loadConfig('/path/to/.markdownlint-styleguide-validation.jsonc');
 
       expect(config).toHaveProperty('sources');
       expect(config).toHaveProperty('filters');

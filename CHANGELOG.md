@@ -6,6 +6,28 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.0.0] - 2026-06-01
+
+Renamed to `markdownlint-styleguide` — the name now reflects the developer-documentation style guide it enforces.
+
+### Changed
+
+- Package renamed from `markdownlint-trap` to `markdownlint-styleguide`
+- CLI command renamed to `mdsg` (e.g., `npx mdsg init`)
+- Validation config file renamed to `.markdownlint-styleguide-validation.jsonc`
+- Debug namespace renamed to `markdownlint-styleguide*`
+
+### Migration
+
+- Reinstall under the new name: `npm i -D github:kynoptic/markdownlint-styleguide#v4.0.0 markdownlint-cli2`
+- Replace `markdownlint-trap` with `markdownlint-styleguide` in `customRules` and `extends`
+- Change CLI invocations from `npx markdownlint-trap …` to `npx mdsg …`
+- Rename `.markdownlint-trap-validation.jsonc` to `.markdownlint-styleguide-validation.jsonc`
+- Update `DEBUG=markdownlint-trap*` to `DEBUG=markdownlint-styleguide*`
+- No backward-compatible aliases ship — the old names stop resolving at `v4.0.0`
+
+---
+
 ## [3.0.2] - 2026-05-30
 
 Fix a backtick-rule false positive on hyphenated words containing non-ASCII letters.
@@ -481,31 +503,32 @@ Initial release.
 - Initial release of `markdownlint-custom-rules`
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
-[unreleased]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.2...HEAD
-[3.0.2]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.1...v3.0.2
-[3.0.1]: https://github.com/kynoptic/markdownlint-trap/compare/v3.0.0...v3.0.1
-[3.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.9.0...v3.0.0
-[2.9.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.8.0...v2.9.0
-[2.8.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.7.0...v2.8.0
-[2.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.6.0...v2.7.0
-[2.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.5.0...v2.6.0
-[2.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.4.0...v2.5.0
-[2.4.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.3.0...v2.4.0
-[2.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.2.0...v2.3.0
-[2.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.1.0...v2.2.0
-[2.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.1...v2.0.0
-[1.7.1]: https://github.com/kynoptic/markdownlint-trap/compare/v1.7.0...v1.7.1
-[1.7.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.6.0...v1.7.0
-[1.6.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.5.0...v1.6.0
-[1.5.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.4.0...v1.5.0
-[1.4.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/kynoptic/markdownlint-trap/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.3.0...v1.0.0
-[0.3.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.2...v0.3.0
-[0.2.2]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.1...v0.2.2
-[0.2.1]: https://github.com/kynoptic/markdownlint-trap/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/kynoptic/markdownlint-trap/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/kynoptic/markdownlint-trap/releases/tag/v0.1.0
+[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.2...v4.0.0
+[3.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.1...v3.0.2
+[3.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.9.0...v3.0.0
+[2.9.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.8.0...v2.9.0
+[2.8.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.7.0...v2.8.0
+[2.7.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.6.0...v2.7.0
+[2.6.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.5.0...v2.6.0
+[2.5.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.7.1...v2.0.0
+[1.7.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.7.0...v1.7.1
+[1.7.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v0.3.0...v1.0.0
+[0.3.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/kynoptic/markdownlint-styleguide/releases/tag/v0.1.0

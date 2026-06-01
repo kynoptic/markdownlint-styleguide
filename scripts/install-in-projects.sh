@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install markdownlint-trap in all projects under ~/Projects
+# Install markdownlint-styleguide in all projects under ~/Projects
 
 set -euo pipefail
 
@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
     --help)
       echo "Usage: $0 [OPTIONS]"
       echo ""
-      echo "Install markdownlint-trap and markdownlint-cli2 in all Node.js projects."
+      echo "Install markdownlint-styleguide and markdownlint-cli2 in all Node.js projects."
       echo ""
       echo "Options:"
       echo "  --dry-run              Show what would be installed without making changes"
@@ -101,8 +101,8 @@ for dir in "$PROJECTS_DIR"/*/; do
   fi
 
   # Check if already installed
-  if grep -q '"markdownlint-trap"' "$dir/package.json" 2>/dev/null; then
-    log "Skipping $project_name (already has markdownlint-trap)"
+  if grep -q '"markdownlint-styleguide"' "$dir/package.json" 2>/dev/null; then
+    log "Skipping $project_name (already has markdownlint-styleguide)"
     ((skipped_count++))
     continue
   fi
@@ -113,7 +113,7 @@ for dir in "$PROJECTS_DIR"/*/; do
   else
     log "Installing in: $project_name"
 
-    if (cd "$dir" && npm install --save-dev markdownlint-trap markdownlint-cli2 --silent); then
+    if (cd "$dir" && npm install --save-dev markdownlint-styleguide markdownlint-cli2 --silent); then
       success "✓ Installed in $project_name"
       ((installed_count++))
     else

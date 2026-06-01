@@ -2,7 +2,7 @@
   // A minimal, friendly preset for most teams.
   // Note: Using package reference for better compatibility
   "customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
   "config": {
     // Core markdownlint defaults with a few relaxed rules

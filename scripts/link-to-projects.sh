@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Link markdownlint-trap to all projects using npm link
+# Link markdownlint-styleguide to all projects using npm link
 
 set -euo pipefail
 
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Projects}"
 DRY_RUN="${DRY_RUN:-false}"
-PACKAGE_NAME="markdownlint-trap"
+PACKAGE_NAME="markdownlint-styleguide"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -44,7 +44,7 @@ while [[ $# -gt 0 ]]; do
     --help)
       echo "Usage: $0 [OPTIONS]"
       echo ""
-      echo "Link markdownlint-trap package to all Node.js projects."
+      echo "Link markdownlint-styleguide package to all Node.js projects."
       echo "Automatically detects package manager (npm, pnpm, yarn, bun) and uses the appropriate link command."
       echo ""
       echo "Options:"
@@ -68,7 +68,7 @@ while [[ $# -gt 0 ]]; do
       echo "  - default        → uses npm"
       echo ""
       echo "Prerequisites:"
-      echo "  Run 'npm link' in the markdownlint-trap repository first"
+      echo "  Run 'npm link' in the markdownlint-styleguide repository first"
       exit 0
       ;;
     *)

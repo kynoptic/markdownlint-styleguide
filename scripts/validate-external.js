@@ -17,7 +17,7 @@ async function main() {
   const configPath = await findConfig();
   if (!configPath) {
     console.error('No configuration file found.');
-    console.error('Create a .markdownlint-trap-validation.jsonc file in your project root.');
+    console.error('Create a .markdownlint-styleguide-validation.jsonc file in your project root.');
     process.exit(1);
   }
 

@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * @fileoverview CLI router for markdownlint-trap commands
+ * @fileoverview CLI router for markdownlint-styleguide commands
  * Routes to init (default) or doctor subcommands
  */
 
@@ -18,24 +18,24 @@ const colors = {
 
 function showHelp() {
   console.log(`
-${colors.cyan}markdownlint-trap${colors.reset} - Custom markdownlint rules CLI
+${colors.cyan}markdownlint-styleguide${colors.reset} - Custom markdownlint rules CLI
 
 ${colors.yellow}Usage:${colors.reset}
-  npx markdownlint-trap [command] [options]
+  npx mdsg [command] [options]
 
 ${colors.yellow}Commands:${colors.reset}
-  init     Setup markdownlint-trap in your project (default)
+  init     Setup markdownlint-styleguide in your project (default)
   doctor   Run diagnostics to check your setup
 
 ${colors.yellow}Examples:${colors.reset}
-  npx markdownlint-trap                     # Run init wizard
-  npx markdownlint-trap init --preset basic # Init with basic preset
-  npx markdownlint-trap doctor              # Check setup
+  npx mdsg                     # Run init wizard
+  npx mdsg init --preset basic # Init with basic preset
+  npx mdsg doctor              # Check setup
 
 ${colors.yellow}Options:${colors.reset}
   --help, -h    Show this help message
 
-Run 'npx markdownlint-trap init --help' for init-specific options.
+Run 'npx mdsg init --help' for init-specific options.
 `);
 }
 

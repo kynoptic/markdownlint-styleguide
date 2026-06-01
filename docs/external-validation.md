@@ -1,10 +1,10 @@
 # External validation against real-world repos
 
-Validate markdownlint-trap rules against external markdown sources to discover false positives, false negatives, and improvement opportunities.
+Validate markdownlint-styleguide rules against external markdown sources to discover false positives, false negatives, and improvement opportunities.
 
 ## Overview
 
-External validation tests markdownlint-trap rules against:
+External validation tests markdownlint-styleguide rules against:
 
 - **Local files and directories** - Your own documentation projects
 - **GitHub repositories** - Public and private repos via `gh` CLI
@@ -22,7 +22,7 @@ Validation reveals:
 
 ### 1. Create configuration file
 
-Create `.markdownlint-trap-validation.jsonc` in your project root:
+Create `.markdownlint-styleguide-validation.jsonc` in your project root:
 
 ```jsonc
 {
@@ -220,7 +220,7 @@ Run validation regularly to catch regressions before release, test rule changes 
 
 Error: `No configuration file found`
 
-Create `.markdownlint-trap-validation.jsonc` in the project root or a parent directory.
+Create `.markdownlint-styleguide-validation.jsonc` in the project root or a parent directory.
 
 ### GitHub clone failures
 

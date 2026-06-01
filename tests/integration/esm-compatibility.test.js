@@ -171,11 +171,11 @@ describe('Backward compatibility', () => {
     expect(rules.default.length).toBe(7);
 
     // Document the correct pattern for CJS consumers:
-    // const rules = await import('markdownlint-trap');
+    // const rules = await import('markdownlint-styleguide');
     // const allRules = rules.default;
     //
     // Or using .then():
-    // import('markdownlint-trap').then(mod => {
+    // import('markdownlint-styleguide').then(mod => {
     //   const allRules = mod.default;
     // });
   });

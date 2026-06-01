@@ -1,11 +1,11 @@
 {
-  // Basic configuration for markdownlint-trap
+  // Basic configuration for markdownlint-styleguide
   // Inherits all rules from the basic preset
   "customRules": [
-    "markdownlint-trap"
+    "markdownlint-styleguide"
   ],
   "config": {
-    "extends": "markdownlint-trap/basic-config.jsonc"
+    "extends": "markdownlint-styleguide/basic-config.jsonc"
     // Add repo-specific overrides below this line
   }
 }

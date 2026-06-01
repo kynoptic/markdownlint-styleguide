@@ -1,10 +1,10 @@
 # Contributing guide
 
-This guide provides instructions for contributing to the `markdownlint-trap` project. Whether you're an AI agent or a human developer, these guidelines will help you get started.
+This guide provides instructions for contributing to the `markdownlint-styleguide` project. Whether you're an AI agent or a human developer, these guidelines will help you get started.
 
 ## Project overview
 
-`markdownlint-trap` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It ships rules covering sentence-case headings, backticked code elements, link validation, prose style, and date-time consistency. The project is built with Node.js and ships native ES modules.
+`markdownlint-styleguide` is a custom `markdownlint` rule library designed to enforce specific documentation standards. It ships rules covering sentence-case headings, backticked code elements, link validation, prose style, and date-time consistency. The project is built with Node.js and ships native ES modules.
 
 ## Development setup
 
@@ -18,8 +18,8 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/kynoptic/markdownlint-trap.git
-    cd markdownlint-trap
+    git clone https://github.com/kynoptic/markdownlint-styleguide.git
+    cd markdownlint-styleguide
     ```
 
 2. **Install dependencies:**
@@ -33,7 +33,7 @@ This guide provides instructions for contributing to the `markdownlint-trap` pro
 - `npm test`: Run the Jest test suite.
 - `npm run lint`: Run ESLint on the codebase.
 - `npx markdownlint-cli2 "**/*.md"`: Lint markdown files.
-- `DEBUG=markdownlint-trap* npm test`: Run tests with debug output.
+- `DEBUG=markdownlint-styleguide* npm test`: Run tests with debug output.
 
 ### Test execution environment
 
@@ -94,4 +94,4 @@ For more details, see the [architecture](./docs/architecture.md) and [testing gu
 - Provide a clear and descriptive title and description for your pull request.
 - Reference any related issues in your pull request description.
 
-Thank you for contributing to `markdownlint-trap`!
+Thank you for contributing to `markdownlint-styleguide`!

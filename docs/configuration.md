@@ -4,7 +4,7 @@ Getting started (most users)
 
 ```jsonc
 {
-  "config": { "extends": "markdownlint-trap/basic-config.jsonc" }
+  "config": { "extends": "markdownlint-styleguide/basic-config.jsonc" }
 }
 ```
 
@@ -35,7 +35,7 @@ Example
 
 ```jsonc
 {
-  "config": { "extends": "markdownlint-trap/recommended-config.jsonc" }
+  "config": { "extends": "markdownlint-styleguide/recommended-config.jsonc" }
 }
 ```
 
@@ -54,9 +54,9 @@ A consumer repo's `.markdownlint-cli2.jsonc` should extend the preset and add on
 
 ```jsonc
 {
-  "customRules": ["markdownlint-trap"],
+  "customRules": ["markdownlint-styleguide"],
   "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "extends": "markdownlint-styleguide/recommended-config.jsonc",
     // Repo-specific overrides below
     "sentence-case-heading": {
       "acronyms": ["SSO", "OIDC"],
@@ -71,9 +71,9 @@ When the preset is updated upstream, every consumer automatically inherits the n
 ```jsonc
 {
   "ignores": ["vendor/**", "third_party/**"],
-  "customRules": ["markdownlint-trap"],
+  "customRules": ["markdownlint-styleguide"],
   "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc"
+    "extends": "markdownlint-styleguide/recommended-config.jsonc"
   }
 }
 ```
@@ -160,7 +160,7 @@ See the [rule reference](rules.md) for the validation model and examples.
 
 ## Autofix safety tuning
 
-markdownlint-trap uses a three-tier confidence system to determine autofix safety.
+markdownlint-styleguide uses a three-tier confidence system to determine autofix safety.
 
 | Tier | Default threshold | Behavior |
 |------|-------------------|----------|
@@ -173,7 +173,7 @@ markdownlint-trap uses a three-tier confidence system to determine autofix safet
 ```jsonc
 {
   "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "extends": "markdownlint-styleguide/recommended-config.jsonc",
     "sentence-case-heading": {
       "autofixSafety": {
         "confidenceThreshold": 0.8,
@@ -225,7 +225,7 @@ Extend a preset and override specific rules:
 ```jsonc
 {
   "config": {
-    "extends": "markdownlint-trap/recommended-config.jsonc",
+    "extends": "markdownlint-styleguide/recommended-config.jsonc",
     "sentence-case-heading": {
       "acronyms": ["SSO"],
       "properNouns": ["GraphQL", "OAuth"]
@@ -245,7 +245,7 @@ Extend a preset and override specific rules:
 ### Debug autofix decisions
 
 ```bash
-DEBUG=markdownlint-trap* npx markdownlint-cli2 --fix "**/*.md"
+DEBUG=markdownlint-styleguide* npx markdownlint-cli2 --fix "**/*.md"
 ```
 
 ## Migration notes

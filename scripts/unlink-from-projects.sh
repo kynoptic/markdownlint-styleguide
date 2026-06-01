@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Unlink markdownlint-trap from all projects
+# Unlink markdownlint-styleguide from all projects
 
 set -euo pipefail
 
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Projects}"
 DRY_RUN="${DRY_RUN:-false}"
-PACKAGE_NAME="markdownlint-trap"
+PACKAGE_NAME="markdownlint-styleguide"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -44,7 +44,7 @@ while [[ $# -gt 0 ]]; do
     --help)
       echo "Usage: $0 [OPTIONS]"
       echo ""
-      echo "Unlink markdownlint-trap package from all Node.js projects."
+      echo "Unlink markdownlint-styleguide package from all Node.js projects."
       echo "Automatically detects package manager (npm, pnpm, yarn, bun) and uses the appropriate unlink command."
       echo ""
       echo "Options:"

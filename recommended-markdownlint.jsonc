@@ -10,7 +10,7 @@
   "MD004": { "style": "dash" },
   "MD036": false, // no-emphasis-as-heading
 
-  // Custom rules from markdownlint-trap
+  // Custom rules from markdownlint-styleguide
   "sentence-case-heading": {
     // Terms that MUST be uppercase
     "acronyms": [

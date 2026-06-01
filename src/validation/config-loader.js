@@ -1,6 +1,6 @@
 /**
  * Configuration loader for external validation.
- * Loads and validates .markdownlint-trap-validation.jsonc config files.
+ * Loads and validates .markdownlint-styleguide-validation.jsonc config files.
  */
 import fs from 'fs';
 import path from 'path';
@@ -137,7 +137,7 @@ export function validateConfig(config) {
  * @returns {Promise<string|null>} Path to config file or null if not found
  */
 export async function findConfig(startDir = process.cwd()) {
-  const configName = '.markdownlint-trap-validation.jsonc';
+  const configName = '.markdownlint-styleguide-validation.jsonc';
   let currentDir = startDir;
   let searching = true;
 

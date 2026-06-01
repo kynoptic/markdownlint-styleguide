@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Automated dependency updates for markdownlint-trap",
+  "description": "Automated dependency updates for markdownlint-styleguide",
   "extends": [
     "config:recommended",
     ":maintainLockFilesWeekly",

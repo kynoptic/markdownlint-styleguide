@@ -82,10 +82,10 @@ function parseArgs() {
 
 function showHelp() {
   console.log(`
-${colors.cyan}markdownlint-trap init${colors.reset} - Setup markdownlint-trap in your project
+${colors.cyan}mdsg init${colors.reset} - Setup markdownlint-styleguide in your project
 
 ${colors.yellow}Usage:${colors.reset}
-  npx markdownlint-trap init [options]
+  npx mdsg init [options]
 
 ${colors.yellow}Options:${colors.reset}
   --preset <level>    Preset level: basic, recommended, or strict (default: interactive)
@@ -101,11 +101,11 @@ ${colors.yellow}Options:${colors.reset}
   -h, --help         Show this help message
 
 ${colors.yellow}Examples:${colors.reset}
-  npx markdownlint-trap init
-  npx markdownlint-trap init --preset recommended
-  npx markdownlint-trap init --preset recommended --all
-  npx markdownlint-trap init --vscode --preset strict
-  npx markdownlint-trap init --dry-run
+  npx mdsg init
+  npx mdsg init --preset recommended
+  npx mdsg init --preset recommended --all
+  npx mdsg init --vscode --preset strict
+  npx mdsg init --dry-run
 
 ${colors.yellow}Presets:${colors.reset}
   ${colors.green}basic${colors.reset}        - Core rules only (sentence-case, backticks)
@@ -553,7 +553,7 @@ async function init() {
   }
   
   log('\n╔═══════════════════════════════════════╗', 'cyan');
-  log('║  markdownlint-trap setup wizard      ║', 'cyan');
+  log('║  markdownlint-styleguide setup wizard ║', 'cyan');
   log('╚═══════════════════════════════════════╝', 'cyan');
   
   if (opts.dryRun) {
@@ -670,7 +670,7 @@ async function init() {
     let step = 1;
     if (!deps.cli2Installed) {
       log(`  ${step}. Install dependencies:`);
-      log('     npm install -D github:kynoptic/markdownlint-trap markdownlint-cli2');
+      log('     npm install -D github:kynoptic/markdownlint-styleguide markdownlint-cli2');
       step++;
     }
     log(`  ${step}. Lint your markdown: npx markdownlint-cli2 "**/*.md"`);
@@ -684,10 +684,10 @@ async function init() {
     }
 
     log('\n💡 Troubleshooting:', 'cyan');
-    log('  Run diagnostics: npx markdownlint-trap doctor');
+    log('  Run diagnostics: npx mdsg doctor');
 
     log('\n📖 Documentation:', 'cyan');
-    log('  https://github.com/kynoptic/markdownlint-trap#readme');
+    log('  https://github.com/kynoptic/markdownlint-styleguide#readme');
   } else {
     log('\nRun without --dry-run to apply changes', 'yellow');
   }
