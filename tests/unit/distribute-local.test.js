@@ -7,6 +7,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
+import os from 'os';
+import * as jsonc from 'jsonc-parser';
+import { mergeJsonSettings, usesPnpm } from '../../scripts/distribute-local.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -108,5 +111,105 @@ describe('distribute-local script', () => {
     const output = execSync('node "' + scriptPath + '" --config "' + configPath + '"', { encoding: 'utf8' });
     
     expect(output).toContain('Parent directory does not exist');
+  });
+});
+
+describe('mergeJsonSettings', () => {
+  let tmpDir;
+  const template = [
+    '{',
+    '  // Load the custom rules package',
+    '  "markdownlint.customRules": ["markdownlint-styleguide"],',
+    '',
+    '  "markdownlint.config": {',
+    '    "sentence-case-heading": true',
+    '  }',
+    '}',
+    '',
+  ].join('\n');
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdsg-merge-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  function parseErrors(text) {
+    const errors = [];
+    jsonc.parse(text, errors, { allowTrailingComma: true });
+    return errors;
+  }
+
+  it('should return template unchanged when no existing file is present', () => {
+    const result = mergeJsonSettings(path.join(tmpDir, 'absent.json'), template);
+    expect(result).toBe(template);
+  });
+
+  it('should produce valid JSON when existing file has a key after the merged block', () => {
+    const existing = path.join(tmpDir, 'settings.json');
+    fs.writeFileSync(
+      existing,
+      '{\n  "markdownlint.config": { "MD013": false },\n  "explorer.excludeGitIgnore": false\n}\n',
+      'utf8'
+    );
+
+    const result = mergeJsonSettings(existing, template);
+
+    expect(parseErrors(result)).toEqual([]);
+    const parsed = jsonc.parse(result);
+    expect(parsed['explorer.excludeGitIgnore']).toBe(false);
+  });
+
+  it('should keep template values for keys present in both files', () => {
+    const existing = path.join(tmpDir, 'settings.json');
+    fs.writeFileSync(
+      existing,
+      '{\n  "markdownlint.config": { "MD013": false }\n}\n',
+      'utf8'
+    );
+
+    const result = mergeJsonSettings(existing, template);
+    const parsed = jsonc.parse(result);
+
+    expect(parsed['markdownlint.config']).toEqual({ 'sentence-case-heading': true });
+  });
+
+  it('should preserve template comments after merging', () => {
+    const existing = path.join(tmpDir, 'settings.json');
+    fs.writeFileSync(existing, '{\n  "editor.formatOnSave": true\n}\n', 'utf8');
+
+    const result = mergeJsonSettings(existing, template);
+
+    expect(result).toContain('// Load the custom rules package');
+    expect(parseErrors(result)).toEqual([]);
+  });
+});
+
+describe('usesPnpm', () => {
+  let tmpDir;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mdsg-pnpm-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('should return true when a pnpm lockfile is present', () => {
+    fs.writeFileSync(path.join(tmpDir, 'pnpm-lock.yaml'), 'lockfileVersion: 9.0\n', 'utf8');
+    expect(usesPnpm(tmpDir)).toBe(true);
+  });
+
+  it('should return true when a pnpm workspace file is present', () => {
+    fs.writeFileSync(path.join(tmpDir, 'pnpm-workspace.yaml'), 'packages:\n', 'utf8');
+    expect(usesPnpm(tmpDir)).toBe(true);
+  });
+
+  it('should return false for a plain npm project', () => {
+    fs.writeFileSync(path.join(tmpDir, 'package-lock.json'), '{}', 'utf8');
+    expect(usesPnpm(tmpDir)).toBe(false);
   });
 });
