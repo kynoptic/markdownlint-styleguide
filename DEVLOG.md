@@ -4,6 +4,12 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+Hardened local distribution against JSONC corruption and pnpm projects (#280).
+
+- Rewrote `mergeJsonSettings` on `jsonc.modify`/`applyEdits` — the line-splice approach never added a trailing comma to the template's last property, so any project with a key after the `markdownlint.config` block received invalid JSON
+- Routed pnpm projects to `pnpm install`; `npm install` aborts on a pnpm workspace
+- Exported `mergeJsonSettings`/`usesPnpm` so the merge and install-routing logic carry direct unit coverage instead of subprocess-only tests
+
 ---
 
 ## [4.0.0] - 2026-06-01

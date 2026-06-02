@@ -126,65 +126,38 @@ function customizePackageJson(templateContent, destPath) {
   return templateContent.replace(/"name": "PLACEHOLDER_PROJECT_NAME"/, `"name": "${projectName}"`);
 }
 
+// Detect whether a project should be installed with pnpm rather than npm.
+// pnpm workspaces fail under `npm install`, so we route them to pnpm.
+function usesPnpm(projectDir) {
+  return (
+    fs.existsSync(path.join(projectDir, 'pnpm-lock.yaml')) ||
+    fs.existsSync(path.join(projectDir, 'pnpm-workspace.yaml'))
+  );
+}
+
 function mergeJsonSettings(existingPath, newContent) {
   if (!fs.existsSync(existingPath)) {
     return newContent;
   }
 
   try {
-    const existingText = fs.readFileSync(existingPath, 'utf8');
-
-    // Parse both files with JSONC to handle comments
-    const existing = jsonc.parse(existingText);
+    const existing = jsonc.parse(fs.readFileSync(existingPath, 'utf8'));
     const newData = jsonc.parse(newContent);
 
-    // Merge objects, with new content taking precedence
-    // NOTE: This is a shallow merge. Nested objects are replaced, not merged.
-    // Example: If existing has {config: {a: 1, b: 2}} and new has {config: {b: 3}},
-    // result will be {config: {b: 3}}, not {config: {a: 1, b: 3}}.
-    // For more complex merging needs, consider using lodash.merge or similar.
-    const _merged = { ...existing, ...newData };
-
-    // Use strip-json-comments approach: keep template structure with comments,
-    // then manually insert existing-only keys at the end
-    const lines = newContent.split('\n');
-    const lastBrace = lines.lastIndexOf('}');
-
-    if (lastBrace === -1) {
-      // Malformed JSON, fall back to overwrite
-      return newContent;
-    }
-
-    // Collect keys that only exist in existing file
+    // Template values win for shared keys; preserve keys the project's existing
+    // settings define on their own. Shallow merge — a shared key's value is
+    // taken from the template, not deep-merged.
     const existingOnlyKeys = Object.keys(existing).filter(key => !(key in newData));
 
-    if (existingOnlyKeys.length === 0) {
-      // No extra keys to add, return template as-is
-      return newContent;
+    // Insert each preserved key with jsonc.modify so the template's comments
+    // survive and commas are placed correctly regardless of trailing keys.
+    let result = newContent;
+    for (const key of existingOnlyKeys) {
+      const edits = jsonc.modify(result, [key], existing[key], {
+        formattingOptions: { insertSpaces: true, tabSize: 2 },
+      });
+      result = jsonc.applyEdits(result, edits);
     }
-
-    // Insert existing-only keys before the closing brace
-    const additionalLines = [];
-    additionalLines.push(''); // Blank line before existing settings
-    additionalLines.push('  // === Existing project settings ===');
-    additionalLines.push('');
-
-    for (let i = 0; i < existingOnlyKeys.length; i++) {
-      const key = existingOnlyKeys[i];
-      const value = JSON.stringify(existing[key], null, 2).split('\n').map((line, idx) =>
-        idx === 0 ? line : '  ' + line
-      ).join('\n');
-      // Add comma only if not the last key overall
-      const comma = i < existingOnlyKeys.length - 1 ? ',' : '';
-      additionalLines.push(`  ${JSON.stringify(key)}: ${value}${comma}`);
-    }
-
-    // Insert before closing brace
-    const result = [
-      ...lines.slice(0, lastBrace),
-      ...additionalLines,
-      ...lines.slice(lastBrace)
-    ].join('\n');
 
     return result;
   } catch (e) {
@@ -464,10 +437,12 @@ function main() {
             continue;
           }
 
-          // Install packages from package.json
+          // Install packages from package.json. pnpm workspaces break under
+          // `npm install`, so route them to pnpm.
+          const installCmd = usesPnpm(projectDir) ? 'pnpm install' : 'npm install';
           try {
-            log(`[installing] ${projectName}...`);
-            execSync('npm install', {
+            log(`[installing] ${projectName} (${installCmd})...`);
+            execSync(installCmd, {
               cwd: projectDir,
               stdio: 'pipe'
             });
@@ -503,4 +478,8 @@ function main() {
   if (hadErrors) process.exitCode = 1;
 }
 
-main();
+module.exports = { mergeJsonSettings, usesPnpm };
+
+if (require.main === module) {
+  main();
+}

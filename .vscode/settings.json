@@ -27,7 +27,7 @@
     // Replace literal ampersands (&) with "and" in prose
     // Improves readability (e.g., "cats and dogs" not "cats & dogs")
     "no-literal-ampersand": true
-  }
+  },
 
   // === Existing project settings ===
 
