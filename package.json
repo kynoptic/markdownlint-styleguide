@@ -65,7 +65,7 @@
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\""
   },
   "dependencies": {
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.2.0",
     "jsonc-parser": "^3.3.1"
   },
   "peerDependencies": {
@@ -80,13 +80,13 @@
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "debug": "^4.4.3",
-    "eslint": "^10.1.0",
+    "eslint": "^10.4.1",
     "glob": "^11.1.0",
-    "globals": "^17.4.0",
+    "globals": "^17.6.0",
     "husky": "^9.1.7",
-    "jest": "^30.3.0",
+    "jest": "^30.4.2",
     "lint-staged": "^16.4.0",
-    "markdown-it": "^14.1.1",
+    "markdown-it": "^14.2.0",
     "markdownlint": "^0.40.0",
     "markdownlint-cli2": "^0.22.1",
     "prettier": "^3.8.3"
