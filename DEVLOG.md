@@ -10,6 +10,7 @@ Hardened local distribution against JSONC corruption and pnpm projects (#280).
 - Routed pnpm projects to `pnpm install`; `npm install` aborts on a pnpm workspace
 - Exported `mergeJsonSettings`/`usesPnpm` so the merge and install-routing logic carry direct unit coverage instead of subprocess-only tests
 - Switched the bootstrap `templates/package.json` dependency from `file:../markdownlint-styleguide` to the `github:` tag — a relative `file:` path only resolves where the consumer is a sibling of this repo, breaking CI and fresh clones (#282)
+- Updated dev tooling — `eslint`, `jest`, `globals`, `markdown-it` — and `js-yaml`; batched the five open Renovate updates into one tested commit instead of five conflicting lockfile merges (#273-#277)
 
 ---
 
