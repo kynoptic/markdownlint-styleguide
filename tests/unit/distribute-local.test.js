@@ -160,6 +160,19 @@ describe('mergeJsonSettings', () => {
     expect(parseErrors(result)).toEqual([]);
     const parsed = jsonc.parse(result);
     expect(parsed['explorer.excludeGitIgnore']).toBe(false);
+    // Preserved key lands after the template block, not before it
+    expect(result.indexOf('explorer.excludeGitIgnore')).toBeGreaterThan(
+      result.indexOf('markdownlint.config')
+    );
+  });
+
+  it('should fall back to the template when the existing file is unparseable', () => {
+    const existing = path.join(tmpDir, 'settings.json');
+    fs.writeFileSync(existing, '', 'utf8');
+
+    const result = mergeJsonSettings(existing, template);
+
+    expect(result).toBe(template);
   });
 
   it('should keep template values for keys present in both files', () => {
@@ -211,5 +224,11 @@ describe('usesPnpm', () => {
   it('should return false for a plain npm project', () => {
     fs.writeFileSync(path.join(tmpDir, 'package-lock.json'), '{}', 'utf8');
     expect(usesPnpm(tmpDir)).toBe(false);
+  });
+
+  it('should prefer pnpm when both npm and pnpm lockfiles are present', () => {
+    fs.writeFileSync(path.join(tmpDir, 'package-lock.json'), '{}', 'utf8');
+    fs.writeFileSync(path.join(tmpDir, 'pnpm-lock.yaml'), 'lockfileVersion: 9.0\n', 'utf8');
+    expect(usesPnpm(tmpDir)).toBe(true);
   });
 });
