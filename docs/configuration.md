@@ -187,7 +187,17 @@ markdownlint-styleguide uses a three-tier confidence system to determine autofix
 
 ### Safe and unsafe words
 
-`safeWords` boosts confidence; `unsafeWords` penalizes:
+Both lists nudge the autofix confidence score that picks a fix's tier:
+boosting pushes a fix toward auto-apply, penalizing demotes it toward review.
+Each matches a flagged token by exact, case-insensitive string (not substring),
+and a word may not appear in both lists.
+
+- `safeWords` (+0.3): the term is unambiguously code, so apply the fix
+  automatically — e.g. tool names like `webpack`.
+- `unsafeWords` (-0.5): the term is a homograph that is often ordinary prose
+  (`spring`, `rust`, `swift`), so route the fix to needs-review instead of
+  guessing. This tilts toward caution; it does not veto the fix. To suppress or
+  always-review a term outright, use `neverFlag` or `alwaysReview` below.
 
 ```jsonc
 {
