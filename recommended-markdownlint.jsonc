@@ -9,6 +9,7 @@
   "MD029": { "style": "one" },
   "MD004": { "style": "dash" },
   "MD036": false, // no-emphasis-as-heading
+  "MD060": { "style": "compact" }, // table-column-style
 
   // Custom rules from markdownlint-styleguide
   "sentence-case-heading": {

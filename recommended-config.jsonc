@@ -14,6 +14,7 @@
     "MD029": { "style": "one" },
     "MD004": { "style": "dash" },
     "MD036": false, // no-emphasis-as-heading
+    "MD060": { "style": "compact" }, // table-column-style
 
     // Enable custom rules from this package
     "sentence-case-heading": {
