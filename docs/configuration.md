@@ -26,6 +26,7 @@ Presets differ in custom rule coverage and standard rule relaxations:
 | `MD041` first-line-h1 | off | off | **on** |
 | `MD024` duplicate heading | on | off | on |
 | `MD036` emphasis as heading | on | off | on |
+| `MD060` table-column-style | `any` | **`compact`** | `any` |
 
 - **Basic** (`basic-config.jsonc`) — high-signal custom rules only
 - **Recommended** (`recommended-config.jsonc`) — all custom rules, pragmatic relaxations for real-world docs
