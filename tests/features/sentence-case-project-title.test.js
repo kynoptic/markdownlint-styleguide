@@ -53,6 +53,16 @@ describe('sentence-case project-title exemption', () => {
     expect(errors).toHaveLength(1);
   });
 
+  // The exemption matches the basename only — a name that merely *ends* with an
+  // exempt token (no path boundary) is a different file and must still validate.
+  test.each(['MYREADME.md', 'foo-CLAUDE.md', 'PREAGENTS.md'])(
+    'should_flag_line_1_title_when_file_only_suffix_matches_%s',
+    async (name) => {
+      const errors = await lintNamed(name, '# HMS IT\n');
+      expect(errors).toHaveLength(1);
+    },
+  );
+
   test('should_only_exempt_line_1_and_still_validate_later_headings', async () => {
     const content = '# HMS IT\n\n## Heading In Title Case\n';
     const errors = await lintNamed('AGENTS.md', content);
