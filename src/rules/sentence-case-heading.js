@@ -284,7 +284,11 @@ function basicSentenceCaseHeadingFunction(params, onError) {
   tokens.forEach((token) => {
     if (token.type === 'atxHeading') {
       const lineNumber = token.startLine;
-      if (lineNumber === 1 && /README\.md$/i.test(params.name || '')) {
+      // The first H1 of a conventional project-root file is the project
+      // title (often an all-acronym name), not prose — exempt it. Anchor to a
+      // path boundary so only the basename matches (not e.g. `MY-README.md`);
+      // case-insensitive to allow conventional lowercase variants.
+      if (lineNumber === 1 && /(?:^|[/\\])(?:README|AGENTS|CLAUDE)\.md$/i.test(params.name || '')) {
         return;
       }
       const sourceLine = lines[lineNumber - 1];
