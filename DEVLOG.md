@@ -4,12 +4,18 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
-Hardened local distribution against JSONC corruption and pnpm projects (#280).
+---
+
+## [4.0.1] - 2026-06-05
+
+Hardened local distribution, refreshed dependencies, and tidied debug-namespace handling.
 
 - Rewrote `mergeJsonSettings` on `jsonc.modify`/`applyEdits` — the line-splice approach never added a trailing comma to the template's last property, so any project with a key after the `markdownlint.config` block received invalid JSON
 - Routed pnpm projects to `pnpm install`; `npm install` aborts on a pnpm workspace
 - Exported `mergeJsonSettings`/`usesPnpm` so the merge and install-routing logic carry direct unit coverage instead of subprocess-only tests
 - Switched the bootstrap `templates/package.json` dependency from `file:../markdownlint-styleguide` to the `github:` tag — a relative `file:` path only resolves where the consumer is a sibling of this repo, breaking CI and fresh clones (#282)
+- Replaced the exact-string `DEBUG` check in sentence-case logging with the shared `debug.enabled` flag, so the documented `markdownlint-styleguide*` namespace and wildcard `DEBUG` values are honored consistently
+- Documented the recommended `MD060` choice and clarified the `safeWords`/`unsafeWords` confidence mechanics in `docs/configuration.md`
 - Updated dev tooling — `eslint`, `jest`, `globals`, `markdown-it` — and `js-yaml`; batched the five open Renovate updates into one tested commit instead of five conflicting lockfile merges (#273-#277)
 
 ---
@@ -321,6 +327,7 @@ Documentation structure established.
 - Established the project documentation structure using the Diátaxis framework
 
 [unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...HEAD
+[4.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.2...v4.0.0
 [3.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.0...v3.0.1

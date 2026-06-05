@@ -6,6 +6,21 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.0.1] - 2026-06-05
+
+Align recommended presets and broaden the project-title heading exemption.
+
+### Changed
+
+- Recommended presets now set the base `MD060` table-column-style rule to `compact`
+
+### Fixed
+
+- The sentence-case rule now treats the first H1 of `AGENTS.md` and `CLAUDE.md` as a project title, exempting it from sentence-case (previously only `README.md` was exempt); the exemption matches the exact filename, so paths such as `MY-README.md` are no longer wrongly skipped
+- The flat `recommended-markdownlint.jsonc` config now enables the `date-time-consistency` rule, matching the nested `recommended-config.jsonc` preset
+
+---
+
 ## [4.0.0] - 2026-06-01
 
 Renamed to `markdownlint-styleguide` — the name now reflects the developer-documentation style guide it enforces.
@@ -504,6 +519,7 @@ Initial release.
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
 [unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...HEAD
+[4.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.2...v4.0.0
 [3.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.0...v3.0.1

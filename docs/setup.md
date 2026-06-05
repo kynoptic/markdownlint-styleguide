@@ -73,7 +73,7 @@ flowchart TD
 
 ### Option A: GitHub dependency (recommended)
 
-- Install: `npm i -D github:kynoptic/markdownlint-styleguide#v4.0.0 markdownlint-cli2`
+- Install: `npm i -D github:kynoptic/markdownlint-styleguide#v4.0.1 markdownlint-cli2`
   - Or pin a commit: `npm i -D github:kynoptic/markdownlint-styleguide#<commit-sha> markdownlint-cli2`
 - Configure `.markdownlint-cli2.jsonc`:
 
