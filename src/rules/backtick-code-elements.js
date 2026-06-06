@@ -225,6 +225,21 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
+        // Skip matches that are part of a Claude Code @-import (@docs/foo.md),
+        // a scoped npm package (@scope/pkg), or an email local part. Walk back
+        // over path-ish characters; if that run begins right after '@', the
+        // match sits inside an @-token. The '@' is outside the matched range,
+        // so inserting a backtick (@`docs/foo.md`) splits the token and breaks
+        // the import — and a later pattern can re-match a trailing segment
+        // (foo.md) preceded by '/', so a simple start-1 check is not enough. (#286)
+        let atScan = start - 1;
+        while (atScan >= 0 && /[\w.\-/]/.test(line[atScan])) {
+          atScan--;
+        }
+        if (atScan >= 0 && line[atScan] === '@') {
+          continue;
+        }
+
         // Skip matches that begin mid-word because an apostrophe (or other
         // non-word character the regex cannot cross) split an ordinary token.
         // For prose like "stop/don't/wait/wrong/undo/actually" the path pattern

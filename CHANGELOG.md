@@ -6,6 +6,20 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.0.2] - 2026-06-05
+
+Stop BCE001 from corrupting paths that begin with `@`.
+
+### Fixed
+
+- BCE001 no longer wraps the path that follows an `@` in backticks. Previously a
+  Claude Code include such as `@docs/foo.md` was autofixed to `` @`docs/foo.md` ``,
+  which broke the file-inclusion mechanism that `AGENTS.md` and `CLAUDE.md` rely
+  on. The guard also covers scoped npm packages (`@scope/pkg`) and email local
+  parts. (#286)
+
+---
+
 ## [4.0.1] - 2026-06-05
 
 Align recommended presets and broaden the project-title heading exemption.
