@@ -6,6 +6,20 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.0.4] - 2026-06-06
+
+Preserve acronym and proper-noun casing inside punctuation during autofix.
+
+### Fixed
+
+- The SC001 autofix no longer lowercases a configured acronym or proper noun
+  when it is wrapped in punctuation. `## Phase 2: The Structure (PARA)` now
+  autofixes to `the structure (PARA)` instead of `(para)`. The per-word
+  dictionary lookup now strips surrounding punctuation and re-wraps the
+  corrected casing, matching the validation path. (#290)
+
+---
+
 ## [4.0.3] - 2026-06-05
 
 Teach the sentence-case dictionary the Apple and Microsoft brand names.

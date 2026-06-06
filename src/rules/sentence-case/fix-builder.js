@@ -64,42 +64,49 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
       return w;
     }
 
-    const lower = w.toLowerCase();
+    // Separate surrounding punctuation (e.g. "(PARA)", "Storj)") so the bare
+    // word still matches the casing dictionary, which is keyed on the word
+    // alone. Without this, "(PARA)" keys on "(para)", misses, and is
+    // lowercased even though validation (which strips punctuation) passes. (#290)
+    const lead = (w.match(/^[^\p{L}\p{N}]+/u) || [''])[0];
+    const trail = (w.match(/[^\p{L}\p{N}]+$/u) || [''])[0];
+    const core = w.slice(lead.length, w.length - trail.length);
+    const lowerCore = core.toLowerCase();
 
     // Preserve ambiguous terms - they could be common nouns or proper nouns
     // (e.g., "Word" could be common noun "word" or Microsoft Word)
     // But only preserve if they're already in valid form (capitalized like a proper noun)
     // Don't preserve ALL CAPS or all lowercase - convert those appropriately
-    if (ambiguousTerms[lower]) {
+    if (ambiguousTerms[lowerCore]) {
       if (!firstVisibleWordCased) {
         firstVisibleWordCased = true;
         // For first word, capitalize it appropriately
-        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+        return lead + core.charAt(0).toUpperCase() + core.slice(1).toLowerCase() + trail;
       }
       // For subsequent words, check if it looks like a proper noun (first letter upper, rest lower)
       // If so, preserve it. If ALL CAPS or all lowercase, convert to lowercase.
-      const looksLikeProperNoun = /^[A-Z][a-z]/.test(w);
+      const looksLikeProperNoun = /^[A-Z][a-z]/.test(core);
       if (looksLikeProperNoun) {
         return w; // Preserve "Word" as-is
       }
-      return w.toLowerCase(); // Convert "WORD" or "word" to lowercase
+      return lead + core.toLowerCase() + trail; // Convert "WORD" or "word" to lowercase
     }
 
-    if (specialCasedTerms[lower]) {
+    if (specialCasedTerms[lowerCore]) {
       // Contextual ALL_CAPS terms (NOTE, TIP, etc.) should follow normal sentence case
       // unless the word is already ALL_CAPS in the input
-      if (contextualAllCapsTerms.has(lower) && w !== w.toUpperCase()) {
+      if (contextualAllCapsTerms.has(lowerCore) && core !== core.toUpperCase()) {
         if (!firstVisibleWordCased) {
           firstVisibleWordCased = true;
-          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+          return lead + core.charAt(0).toUpperCase() + core.slice(1).toLowerCase() + trail;
         }
-        return w.toLowerCase();
+        return lead + core.toLowerCase() + trail;
       }
       // Special term counts as the first visible word if we haven't seen one yet
       if (!firstVisibleWordCased) {
         firstVisibleWordCased = true;
       }
-      return specialCasedTerms[lower];
+      return lead + specialCasedTerms[lowerCore] + trail;
     }
 
     if (!firstVisibleWordCased) {
