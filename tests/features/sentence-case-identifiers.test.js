@@ -151,17 +151,18 @@ describe("sentence-case-heading identifier preservation", () => {
   });
 
   describe("should NOT preserve brand names as code identifiers", () => {
-    test("iPhone is flagged unless in specialCasedTerms (not treated as code)", async () => {
-      // iPhone is a brand name, not a code identifier
-      // It should be flagged by sentence-case unless added to specialCasedTerms
+    test("eBay is flagged unless in properNouns (not treated as code)", async () => {
+      // eBay is a camelCase brand name, not a code identifier
+      // It should be flagged by sentence-case unless added to properNouns
       // This verifies the code identifier exemption doesn't wrongly exempt brands
+      // (iPhone et al. are now first-class entries in casingTerms by design)
       const violations = await lintString(
-        "## Using your iPhone\n",
+        "## Using your eBay\n",
       );
-      // iPhone is NOT in default casingTerms, so it gets flagged
-      // Users should add it to specialCasedTerms if they want to preserve it
+      // eBay is NOT in default casingTerms, so it gets flagged
+      // Users should add it to properNouns if they want to preserve it
       expect(violations.length).toBe(1);
-      expect(violations[0].errorDetail).toContain("iPhone");
+      expect(violations[0].errorDetail).toContain("eBay");
     });
 
     test("McDonald is flagged unless in specialCasedTerms (not treated as code)", async () => {
