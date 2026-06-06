@@ -6,6 +6,21 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.0.3] - 2026-06-05
+
+Teach the sentence-case dictionary the Apple and Microsoft brand names.
+
+### Fixed
+
+- SC001 keeps the canonical casing of `iCloud`, `iPhone`, `iPad`, `iMac`, `iPod`,
+  `iTunes`, `iMovie`, `iWork`, `iPadOS`, `watchOS`, `tvOS`, `MacBook`,
+  `MacBook Air`, `MacBook Pro`, `Apple Photos`, `Apple Music`, and `OneDrive` in
+  headings and bold text. Previously a heading like `## iCloud sync` was
+  autofixed to `Icloud sync`. Terms that collide with common English (such as
+  "Time Machine") stay in per-repo `properNouns` config by design. (#288)
+
+---
+
 ## [4.0.2] - 2026-06-05
 
 Stop BCE001 from corrupting paths that begin with `@`.
