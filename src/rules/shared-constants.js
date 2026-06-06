@@ -201,6 +201,24 @@ export const casingTerms = {
   apache: 'Apache',
   apple: 'Apple',
   'apple mail': 'Apple Mail',
+  'apple music': 'Apple Music',
+  'apple photos': 'Apple Photos',
+  // Apple devices and operating systems (internal-caps brand names).
+  // ios/macos live with the other OS acronyms below.
+  icloud: 'iCloud',
+  imac: 'iMac',
+  imovie: 'iMovie',
+  ipad: 'iPad',
+  ipados: 'iPadOS',
+  iphone: 'iPhone',
+  ipod: 'iPod',
+  itunes: 'iTunes',
+  iwork: 'iWork',
+  macbook: 'MacBook',
+  'macbook air': 'MacBook Air',
+  'macbook pro': 'MacBook Pro',
+  tvos: 'tvOS',
+  watchos: 'watchOS',
   argocd: 'ArgoCD',
   atlassian: 'Atlassian',
   auth0: 'Auth0',
@@ -221,6 +239,7 @@ export const casingTerms = {
   opencode: 'OpenCode',
   sharepoint: 'SharePoint',  // Microsoft SharePoint (camelCase brand name)
   powerpoint: 'PowerPoint',
+  onedrive: 'OneDrive',  // Microsoft OneDrive (camelCase brand name)
   cloudflare: 'Cloudflare',
   codeberg: 'Codeberg',
   confluence: 'Confluence',
