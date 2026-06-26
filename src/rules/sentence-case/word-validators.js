@@ -363,6 +363,7 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
 export function validateSubsequentWords(words, startIndex, phraseIgnore, specialCasedTerms, headingText, ambiguousTerms = {}) {
   const colonIndex = headingText.indexOf(':');
   const emDashIndex = headingText.indexOf('—');
+  const enDashIndex = headingText.indexOf('–');
   const ampersandIndex = headingText.indexOf('&');
 
   // Initialise search cursor past the first content word so repeated words
@@ -431,6 +432,20 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
     if (emDashIndex !== -1 && wordPos > emDashIndex) {
       const afterEmDash = headingText.slice(emDashIndex + 1).trimStart();
       if (afterEmDash.startsWith(word)) {
+        const expectedSentenceCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        const matchesSpecialTerm = expectedWordCasing && word === expectedWordCasing;
+        const isCorrectlyCased = word === expectedSentenceCase || isAcronym(word) || matchesSpecialTerm;
+        if (isCorrectlyCased && !(expectedWordCasing && word !== expectedWordCasing)) {
+          continue;
+        }
+      }
+    }
+
+    // Allow proper capitalization for the first word after en-dash (e.g., "Task 1 – Create records")
+    // En dash is accepted as a two-part-heading separator alongside the em dash.
+    if (enDashIndex !== -1 && wordPos > enDashIndex) {
+      const afterEnDash = headingText.slice(enDashIndex + 1).trimStart();
+      if (afterEnDash.startsWith(word)) {
         const expectedSentenceCase = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
         const matchesSpecialTerm = expectedWordCasing && word === expectedWordCasing;
         const isCorrectlyCased = word === expectedSentenceCase || isAcronym(word) || matchesSpecialTerm;
