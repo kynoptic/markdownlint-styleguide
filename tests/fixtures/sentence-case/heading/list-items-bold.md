@@ -44,5 +44,7 @@
 - **foo**: a field <!-- ✅ -->
 - **myVar**: a camelCase identifier <!-- ✅ -->
 - **--flag**: a CLI flag <!-- ✅ -->
+- **note**: a plain lowercase word reads as an identifier label <!-- ✅ -->
 - **This Is Title Case**: desc <!-- ❌ -->
 - **This is prose Label**: with text <!-- ❌ -->
+- **Json**: a single Title-case token is still first-word checked <!-- ❌ -->
