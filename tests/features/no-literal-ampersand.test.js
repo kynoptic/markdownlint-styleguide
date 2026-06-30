@@ -55,6 +55,32 @@ function runRuleWithContent(markdown) {
   return errors;
 }
 
+/**
+ * Run the rule with a flat config object (markdownlint-cli2 form: params.config IS the config).
+ * @param {string} markdown
+ * @param {object} config - flat config, e.g. { exceptions: ['Foo & Bar'] }
+ * @returns {Array} Array of errors
+ */
+function runRuleWithConfig(markdown, config) {
+  const errors = [];
+  const onError = (error) => errors.push(error);
+
+  // In markdownlint-cli2, params.config IS the flat config object for the rule.
+  const params = {
+    name: 'test.md',
+    lines: markdown.split('\n'),
+    config,
+    parsers: {
+      micromark: {
+        tokens: []
+      }
+    }
+  };
+
+  noLiteralAmpersandRule.function(params, onError);
+  return errors;
+}
+
 describe('no-literal-ampersand rule', () => {
   const fixturesDir = path.resolve(__dirname, '../fixtures/no-literal-ampersand');
   const passingFixture = path.join(fixturesDir, 'passing.fixture.md');
@@ -234,6 +260,58 @@ function test() {
       
       // Should flag the first and third & but not the one in code
       expect(errors).toHaveLength(2);
+    });
+  });
+
+  describe('exceptions config — flat form (#304)', () => {
+    test('flat { exceptions: [...] } config suppresses flagged phrase in prose', () => {
+      // params.config IS the flat object — the || params.config fallback must be present
+      const markdown = 'See the User & Group settings page.';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['User & Group'] });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('flat config exceptions do not suppress unrelated ampersands', () => {
+      const markdown = 'See the User & Group page and also dogs & cats.';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['User & Group'] });
+      // "dogs & cats" should still be flagged
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Use "and" instead of literal ampersand (&)');
+    });
+
+    test('flat config exceptions work as substring match in headings (#298)', () => {
+      const markdown = '### Foo & Bar\n\nSome prose about it.';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['Foo & Bar'] });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('flat config exceptions work as substring match in regular prose (#298)', () => {
+      const markdown = 'See the Foo & Bar section for details.';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['Foo & Bar'] });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('unconfigured ampersand in prose is still flagged when exceptions present', () => {
+      const markdown = 'Dogs & cats.\n\n### Foo & Bar';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['Foo & Bar'] });
+      // "dogs & cats" in prose should still be flagged; heading "Foo & Bar" is excepted
+      expect(errors).toHaveLength(1);
+    });
+
+    test('multiple exceptions suppress multiple phrases', () => {
+      const markdown = 'User & Group plus Foo & Bar are both fine.';
+      const errors = runRuleWithConfig(markdown, { exceptions: ['User & Group', 'Foo & Bar'] });
+      expect(errors).toHaveLength(0);
+    });
+
+    test('empty exception string does not hang and is ignored', () => {
+      const markdown = 'Dogs & cats.';
+      const errors = runRuleWithConfig(markdown, { exceptions: [''] });
+      // An empty pattern must be skipped (no zero-width infinite loop) and
+      // must not suppress a genuine literal ampersand. The config-validation
+      // layer also surfaces the empty entry as a configuration error.
+      expect(errors.some((e) => e.detail.includes('literal ampersand'))).toBe(true);
+      expect(errors.some((e) => e.detail.includes('Configuration'))).toBe(true);
     });
   });
 
