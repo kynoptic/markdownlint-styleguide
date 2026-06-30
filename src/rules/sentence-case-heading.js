@@ -379,12 +379,13 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       // Detect whether this bold span is a definition-list label: the text
       // immediately after `**label**` in the source line opens with an em dash
-      // (—) or en dash (–). Colon is deliberately excluded — existing tests
-      // validate colon-separated bold labels as prose, and the colon split
-      // below already scopes those. Definition labels are code field names,
-      // CLI flags, or identifiers whose casing must be preserved — only the
-      // first-word check is suppressed; subsequent-word casing errors are still
-      // reported (issue #297, Problem 2).
+      // (—) or en dash (–). The colon-after-bold form (`**foo**: desc`) is
+      // intentionally left for a follow-up — existing tests validate those as
+      // prose. (The colon split below is unrelated: it scopes only an inline
+      // colon *inside* the bold markers, e.g. `**foo: bar**`.) Definition
+      // labels are code field names, CLI flags, or identifiers whose casing
+      // must be preserved — only the first-word check is suppressed;
+      // subsequent-word casing errors are still reported (issue #297, Problem 2).
       const textAfterBold = line.slice(matchEnd);
       const isDefinitionLabel = /^\s*(—|–)/.test(textAfterBold);
 
