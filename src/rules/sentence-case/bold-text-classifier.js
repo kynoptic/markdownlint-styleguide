@@ -26,9 +26,10 @@ import {
  * @param {boolean} hadLeadingEmoji Whether the original text had leading emoji.
  * @param {Object} specialCasedTerms Special casing terms.
  * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
+ * @param {{skipFirstWord?: boolean}} [options] Extra validation options.
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms = {}) {
+export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms = {}, options = {}) {
   const firstIndex = findFirstValidationWord(words);
   if (firstIndex === -1) {
     return { isValid: true };
@@ -40,9 +41,11 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
   // Check if the original text starts with a number
   const startsWithNumber = firstIndex > 0 && /^\d/.test(words[0]);
 
-  // Validate first word (but not if it comes after a number in bold text)
+  // Validate first word (but not if it comes after a number in bold text, or if
+  // the caller signals this is a definition-list label whose identifier casing must
+  // not be altered — issue #297, Problem 2).
   const firstWord = words[firstIndex];
-  if (!startsWithNumber) {
+  if (!startsWithNumber && !options.skipFirstWord) {
     const firstWordResult = validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCasedTerms, cleanedText, hadLeadingEmoji, ambiguousTerms);
     if (!firstWordResult.isValid) {
       return firstWordResult;
@@ -219,9 +222,10 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
  * @param {string} boldText The bold text to validate.
  * @param {Object} specialCasedTerms Special casing terms dictionary.
  * @param {Object} ambiguousTerms Ambiguous terms to skip (optional).
+ * @param {{skipFirstWord?: boolean}} [options] Extra validation options.
  * @returns {{isValid: boolean, errorMessage?: string}} Validation result.
  */
-export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {}) {
+export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {}, options = {}) {
   if (!boldText || !boldText.trim()) {
     return { isValid: true };
   }
@@ -308,5 +312,5 @@ export function validateBoldText(boldText, specialCasedTerms, ambiguousTerms = {
   }
 
   // For bold text, use stricter validation
-  return performBoldTextValidation(processedWords, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms);
+  return performBoldTextValidation(processedWords, cleanedText, hadLeadingEmoji, specialCasedTerms, ambiguousTerms, options);
 }
