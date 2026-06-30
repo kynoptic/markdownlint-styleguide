@@ -1,6 +1,7 @@
 {
   // Strict configuration for markdownlint-styleguide
   // Inherits all rules from the strict preset
+  "gitignore": true,
   "customRules": [
     "markdownlint-styleguide"
   ],

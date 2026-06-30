@@ -1,6 +1,7 @@
 {
   // Basic configuration for markdownlint-styleguide
   // Inherits all rules from the basic preset
+  "gitignore": true,
   "customRules": [
     "markdownlint-styleguide"
   ],
