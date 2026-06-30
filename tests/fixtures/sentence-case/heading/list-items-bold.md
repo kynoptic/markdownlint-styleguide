@@ -30,3 +30,11 @@
 - **This is a test with _BOLD_** <!-- ❌ -->
 - **This is a test with 2023-10-26 Date** <!-- ❌ -->
 - **This is a test with V1.0.0 Version** <!-- ❌ -->
+
+<!-- Definition-list label exemptions (issue #297, Problem 2) -->
+- **foo** — a short description <!-- ✅ -->
+- **url** — the request URL <!-- ✅ -->
+- **bar** — another field <!-- ✅ -->
+- **baz** – en dash definition <!-- ✅ -->
+- **This Is Title Case** — desc <!-- ❌ -->
+- **this is prose** and more text <!-- ❌ -->

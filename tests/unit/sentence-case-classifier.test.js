@@ -747,3 +747,44 @@ describe("validateBoldText — #303 parenthesized multi-word proper nouns", () =
     expect(result.isValid).toBe(false);
   });
 });
+
+describe("validateHeading — #297 multi-word specialTerms in headings", () => {
+  // Problem 1 (resolved by #303): multi-word specialTerms phrase matching in heading path.
+  // Verified here as a regression guard so this fix is not silently reverted.
+  const termsAcme = { "acme widgets": "Acme Widgets" };
+
+  test("heading with configured multi-word term does not flag second word (#297/#303)", () => {
+    const result = validateHeading("Process Acme Widgets", termsAcme);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("numbered heading with configured multi-word term does not flag term words (#297/#303)", () => {
+    const result = validateHeading("6. Process Acme Widgets", termsAcme);
+    expect(result.isValid).toBe(true);
+  });
+
+  test("unconfigured capitalized word in heading is still flagged (regression guard)", () => {
+    const result = validateHeading("Process Foo Bar", {});
+    expect(result.isValid).toBe(false);
+  });
+});
+
+describe("validateBoldText — #297 definition-label skipFirstWord invariant", () => {
+  // skipFirstWord exempts ONLY the first word's casing (identifier labels like
+  // `url`/`foo`); subsequent-word casing checks must still fire so a genuinely
+  // mis-cased multi-word label is not silently exempted.
+  test("skipFirstWord exempts a lowercase identifier first word", () => {
+    const result = validateBoldText("url", {}, {}, { skipFirstWord: true });
+    expect(result.isValid).toBe(true);
+  });
+
+  test("subsequent-word casing is still flagged under skipFirstWord", () => {
+    const result = validateBoldText(
+      "This Is Title Case",
+      {},
+      {},
+      { skipFirstWord: true },
+    );
+    expect(result.isValid).toBe(false);
+  });
+});
