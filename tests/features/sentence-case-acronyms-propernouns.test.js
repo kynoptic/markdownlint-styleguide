@@ -14,7 +14,27 @@
 
 import { describe, test, expect } from '@jest/globals';
 import { lint } from 'markdownlint/promise';
+import { applyFixes } from 'markdownlint';
 import sentenceRule from '../../src/rules/sentence-case-heading.js';
+
+/**
+ * Lint then apply SC001 fixes, returning the autofixed content.
+ * @param {string} content Markdown content to lint and fix.
+ * @param {Object} config sentence-case-heading configuration.
+ * @returns {Promise<string>} The content after applying SC001 fixes.
+ */
+async function fixMarkdown(content, config = {}) {
+  const results = await lint({
+    customRules: [sentenceRule],
+    strings: { testContent: content },
+    config: {
+      default: false,
+      'sentence-case-heading': config
+    },
+    resultVersion: 3
+  });
+  return applyFixes(content, results.testContent || []);
+}
 
 /**
  * Lint markdown content with the SC001 rule and a given config.
@@ -76,6 +96,38 @@ describe('SC001 acronyms (issue #233)', () => {
     const violations = await lintMarkdown('# A wysiwyg editor', { acronyms: ['WYSIWYG'] });
     expect(violations.length).toBeGreaterThan(0);
     expect(violations[0].errorDetail).toMatch(/WYSIWYG/);
+  });
+});
+
+describe('SC001 properNouns --fix preserves mixed-case (issue #305)', () => {
+  test('test_should_preserve_internal_capital_proper_noun_when_fixing', async () => {
+    const fixed = await fixMarkdown('## VPN + qBittorrent Stack', { properNouns: ['qBittorrent'] });
+    expect(fixed).toBe('## VPN + qBittorrent stack');
+  });
+
+  test('test_should_preserve_leading_digit_proper_noun_when_fixing', async () => {
+    const fixed = await fixMarkdown('## 1Password Items', { properNouns: ['1Password'] });
+    expect(fixed).toBe('## 1Password items');
+  });
+
+  test('test_should_preserve_proper_noun_as_first_word_when_fixing', async () => {
+    const fixed = await fixMarkdown('## qBittorrent Setup Guide', { properNouns: ['qBittorrent'] });
+    expect(fixed).toBe('## qBittorrent setup guide');
+  });
+
+  test('test_should_preserve_capitalized_ambiguous_proper_noun_when_fixing', async () => {
+    const fixed = await fixMarkdown('## Working With Craft Tools', { properNouns: ['Craft'] });
+    expect(fixed).toBe('## Working with Craft tools');
+  });
+
+  test('test_should_keep_lowercase_homograph_lowercase_when_fixing', async () => {
+    const fixed = await fixMarkdown('## Mastering Your craft Daily', { properNouns: ['Craft'] });
+    expect(fixed).toBe('## Mastering your craft daily');
+  });
+
+  test('test_should_preserve_mixed_case_proper_noun_in_bold_list_item', async () => {
+    const fixed = await fixMarkdown('- **qBittorrent Setup**: notes', { properNouns: ['qBittorrent'] });
+    expect(fixed).toBe('- **qBittorrent setup**: notes');
   });
 });
 
