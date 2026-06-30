@@ -103,6 +103,11 @@
     "node": ">=24.16.0"
   },
   "overrides": {
-    "minimatch": "^10.2.5"
+    "minimatch": "^10.2.5",
+    "markdown-it": "^14.2.0",
+    "js-yaml": "^4.2.0",
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^3.15.0"
+    }
   }
 }
