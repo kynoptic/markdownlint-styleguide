@@ -303,6 +303,16 @@ function test() {
       const errors = runRuleWithConfig(markdown, { exceptions: ['User & Group', 'Foo & Bar'] });
       expect(errors).toHaveLength(0);
     });
+
+    test('empty exception string does not hang and is ignored', () => {
+      const markdown = 'Dogs & cats.';
+      const errors = runRuleWithConfig(markdown, { exceptions: [''] });
+      // An empty pattern must be skipped (no zero-width infinite loop) and
+      // must not suppress a genuine literal ampersand. The config-validation
+      // layer also surfaces the empty entry as a configuration error.
+      expect(errors.some((e) => e.detail.includes('literal ampersand'))).toBe(true);
+      expect(errors.some((e) => e.detail.includes('Configuration'))).toBe(true);
+    });
   });
 
   describe('rule metadata', () => {
