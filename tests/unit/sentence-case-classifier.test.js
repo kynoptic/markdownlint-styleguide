@@ -712,3 +712,38 @@ describe("validateHeading — hyphenated special term matches whole token", () =
     expect(result.isValid).toBe(true);
   });
 });
+
+describe("validateBoldText — #303 parenthesized multi-word proper nouns", () => {
+  // When a multi-word proper noun like "Okta Verify" is wrapped in parentheses,
+  // the tokens include surrounding punctuation (e.g. "(okta" and "verify)") which
+  // must be stripped before phrase matching so the phrase is recognized and its
+  // words are not flagged as casing violations.
+  const terms303 = { "okta verify": "Okta Verify" };
+
+  test("parenthesized multi-word proper noun does not flag the second word (#303)", () => {
+    // Bold text that starts capitalized and contains a parenthesized multi-word term.
+    // Previously "Verify)" was flagged because the phrase match failed on tokens with
+    // surrounding punctuation.
+    const result = validateBoldText(
+      "Sign in using (Okta Verify) for authentication",
+      terms303,
+    );
+    expect(result.isValid).toBe(true);
+  });
+
+  test("multi-word proper noun with trailing comma does not flag the second word (#303)", () => {
+    const result = validateBoldText(
+      "Please set up Okta Verify, the authenticator app",
+      terms303,
+    );
+    expect(result.isValid).toBe(true);
+  });
+
+  test("genuinely miscased multi-word proper noun is still flagged (#303 regression)", () => {
+    const result = validateBoldText(
+      "Please set up okta verify before proceeding",
+      terms303,
+    );
+    expect(result.isValid).toBe(false);
+  });
+});

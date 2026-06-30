@@ -174,6 +174,16 @@ function findFirstValidationWord(words) {
 }
 
 /**
+ * Strips leading and trailing non-alphanumeric punctuation from a token for
+ * phrase matching purposes (e.g. "(okta" → "okta", "verify)" → "verify").
+ * @param {string} token The token to normalize.
+ * @returns {string} The normalized token.
+ */
+function normalizeToken(token) {
+  return token.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, '');
+}
+
+/**
  * Determine indices of words that are part of multi-word proper nouns.
  * @param {string[]} words - Tokenized heading words.
  * @param {Object} specialCasedTerms Special casing terms.
@@ -181,7 +191,7 @@ function findFirstValidationWord(words) {
  */
 function getProperPhraseIndices(words, specialCasedTerms) {
   const indices = new Set();
-  const lowerWords = words.map((w) => w.toLowerCase());
+  const lowerWords = words.map((w) => normalizeToken(w).toLowerCase());
   Object.keys(specialCasedTerms).forEach((key) => {
     if (!key.includes(' ')) {
       return;
