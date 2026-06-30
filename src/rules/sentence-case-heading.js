@@ -42,6 +42,7 @@ import { buildLineContext } from './shared-context.js';
 import { extractHeadingText } from './sentence-case/token-extraction.js';
 import { validateHeading } from './sentence-case/case-classifier.js';
 import { validateBoldText } from './sentence-case/bold-text-classifier.js';
+import { isCodeIdentifier } from './sentence-case/word-validators.js';
 import { toSentenceCase, buildHeadingFix, buildBoldTextFix } from './sentence-case/fix-builder.js';
 import debug from '../logger.js';
 
@@ -55,6 +56,31 @@ const _deprecationWarned = new Set();
  * @type {Map<string, Record<string, string>>}
  */
 const _specialCasedTermsCache = new Map();
+
+/**
+ * Determines whether a bold list-item label reads as a code identifier rather
+ * than prose. A colon-separated definition label (`**url**: the address`) skips
+ * the first-word capitalization check only when the label is identifier-shaped,
+ * so Title-Case prose labels (`**This Is Title Case**:`) stay sentence-case
+ * checked. The label must be a single token that is either lowercase-leading
+ * (`url`, `foo`, `--flag`, `node.js`) or a camelCase/PascalCase/snake_case code
+ * identifier (issue #317). The em/en-dash form is unconditional and does not
+ * pass through this gate.
+ * @param {string} label The bold label text (before any inline colon).
+ * @returns {boolean} True when the label is an identifier-style definition label.
+ */
+function isIdentifierDefinitionLabel(label) {
+  const token = label.trim();
+  if (!token || /\s/.test(token)) {
+    return false;
+  }
+  // Lowercase-leading single tokens read as identifiers, CLI flags, or paths.
+  if (/^[a-z`_$./-]/.test(token)) {
+    return true;
+  }
+  // camelCase / PascalCase / snake_case code identifiers (e.g. HttpClient).
+  return isCodeIdentifier(token);
+}
 
 /**
  * Main rule implementation.
@@ -377,25 +403,27 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       const boldText = match[1].trim();
       if (!boldText) continue;
 
-      // Detect whether this bold span is a definition-list label: the text
-      // immediately after `**label**` in the source line opens with an em dash
-      // (—) or en dash (–). The colon-after-bold form (`**foo**: desc`) is
-      // intentionally left for a follow-up — existing tests validate those as
-      // prose. (The colon split below is unrelated: it scopes only an inline
-      // colon *inside* the bold markers, e.g. `**foo: bar**`.) Definition
-      // labels are code field names, CLI flags, or identifiers whose casing
-      // must be preserved — only the first-word check is suppressed;
-      // subsequent-word casing errors are still reported (issue #297, Problem 2).
-      const textAfterBold = line.slice(matchEnd);
-      const isDefinitionLabel = /^\s*(—|–)/.test(textAfterBold);
-
       // If the bold text has a colon, only validate the part before the colon
+      // (this scopes an inline colon *inside* the bold markers, e.g. `**foo: bar**`).
       const textToValidate = boldText.includes(':') ?
         boldText.split(':')[0].trim() :
         boldText;
 
       // Skip empty text
       if (!textToValidate) continue;
+
+      // Detect whether this bold span is a definition-list label: the text
+      // immediately after `**label**` in the source line opens with a definition
+      // separator. Em/en dash (—, –) always qualifies. A colon qualifies only
+      // when the label is identifier-shaped (`**url**: ...`), so Title-Case
+      // prose labels (`**This Is Title Case**:`) stay sentence-case checked.
+      // Definition labels are code field names, CLI flags, or identifiers whose
+      // casing must be preserved — only the first-word check is suppressed;
+      // subsequent-word casing errors are still reported (issues #297, #317).
+      const textAfterBold = line.slice(matchEnd);
+      const isDefinitionLabel =
+        /^\s*(—|–)/.test(textAfterBold) ||
+        (/^\s*:/.test(textAfterBold) && isIdentifierDefinitionLabel(textToValidate));
 
       // Use the unified validation logic; pass the span offset so the autofix
       // targets this occurrence even if the same bold phrase repeats on the line.
