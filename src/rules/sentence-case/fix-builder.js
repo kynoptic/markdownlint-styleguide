@@ -81,13 +81,16 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
       // A deliberately mixed-case proper noun — an internal capital like
       // "qBittorrent" or a leading digit/symbol like "1Password" — must survive
       // --fix verbatim. Plain sentence-casing capitalizes the first character
-      // and lowercases the rest, silently renaming the product. All-caps forms
-      // are excluded so SemVer-style words (e.g. "PATCH") still normalize. (#305)
+      // and lowercases the rest, silently renaming the product. The input is
+      // preserved exactly as written rather than normalized to the configured
+      // proper form, because the allowed-both-ways contract must also let the
+      // lowercase homograph stay lowercase. All-caps forms are excluded so
+      // SemVer-style words (e.g. "PATCH") still normalize. (#305)
       const isMixedCaseProperNoun =
         core !== core.toUpperCase() && /\p{Lu}/u.test(core.slice(1));
       if (isMixedCaseProperNoun) {
         firstVisibleWordCased = true;
-        return w;
+        return lead + core + trail;
       }
       if (!firstVisibleWordCased) {
         firstVisibleWordCased = true;

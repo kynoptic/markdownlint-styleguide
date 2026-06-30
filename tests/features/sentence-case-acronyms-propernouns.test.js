@@ -19,6 +19,8 @@ import sentenceRule from '../../src/rules/sentence-case-heading.js';
 
 /**
  * Lint then apply SC001 fixes, returning the autofixed content.
+ * Unlike `lintMarkdown`, this exercises the full lint-then-apply-fixes
+ * pipeline so tests can assert the exact `--fix` output.
  * @param {string} content Markdown content to lint and fix.
  * @param {Object} config sentence-case-heading configuration.
  * @returns {Promise<string>} The content after applying SC001 fixes.
@@ -128,6 +130,14 @@ describe('SC001 properNouns --fix preserves mixed-case (issue #305)', () => {
   test('test_should_preserve_mixed_case_proper_noun_in_bold_list_item', async () => {
     const fixed = await fixMarkdown('- **qBittorrent Setup**: notes', { properNouns: ['qBittorrent'] });
     expect(fixed).toBe('- **qBittorrent setup**: notes');
+  });
+
+  test('test_should_still_normalize_all_caps_ambiguous_term_when_fixing', async () => {
+    // Guards the `!== core.toUpperCase()` exclusion: all-caps SemVer-style terms
+    // (PATCH is a built-in ambiguous term) must keep normalizing, not be
+    // preserved verbatim by the mixed-case proper-noun branch.
+    const fixed = await fixMarkdown('## Understanding PATCH Releases');
+    expect(fixed).toBe('## Understanding patch releases');
   });
 });
 
