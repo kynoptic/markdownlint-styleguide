@@ -6,6 +6,43 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ---
 
+## [4.1.0] - 2026-06-30
+
+Fix sentence-case, backtick, bare-URL, and ampersand false positives, and add gitignore-aware init.
+
+### Added
+
+- `init` now excludes gitignored paths by default, so the generated config no
+  longer scans `node_modules` and other ignored directories on first run. (#300)
+- SC001 recognizes the en dash as a sentence-case separator alongside the em
+  dash and colon, so a heading whose second part is capitalized after an en dash
+  validates the same way it already did for em dashes.
+
+### Changed
+
+- BU001 now detects bare URLs when run under `markdownlint-cli2` (`parser: none`),
+  not only inside this package's tests. Repositories upgrading may see new
+  bare-URL findings that the rule previously missed. (#307)
+
+### Fixed
+
+- SC001 autofix preserves mixed-case proper nouns such as `qBittorrent` and
+  `1Password` instead of forcing their canonical form, while all-caps terms like
+  `PATCH` still normalize. (#305)
+- SC001 no longer flags the later words of an allowlisted proper noun when it is
+  wrapped in parentheses or other punctuation. (#303)
+- SC001 exempts identifier-shaped bold labels in definition lists and list items
+  — those followed by an em dash, en dash, or colon — from the first-word casing
+  check, while Title-Case prose labels stay checked. (#297, #317)
+- BCE001 no longer flags or corrupts a hyphen suffix that follows emphasis or a
+  code span, so compounds like `*Acme*`-style and `` `Documents` ``-level are
+  left intact. (#301, #306)
+- NLA honors the `exceptions` config option when supplied as flat config, scopes
+  the exemption to the ampersand inside an allowlisted phrase, and no longer
+  hangs on empty or zero-width exception patterns. (#298, #304)
+
+---
+
 ## [4.0.4] - 2026-06-06
 
 Preserve acronym and proper-noun casing inside punctuation during autofix.
