@@ -37,6 +37,8 @@ npx mdsg init --preset recommended
 npx markdownlint-cli2 "**/*.md"
 ```
 
+The generated config includes `"gitignore": true`, so markdownlint-cli2 automatically skips `node_modules` and any other paths listed in `.gitignore`.
+
 ## Rules
 
 | Rule | ID | Auto-fix | Purpose |

@@ -47,7 +47,7 @@ Bootstrap starters in `templates/` for new consumer repos:
 - `markdownlint-cli2-*.jsonc` — for CLI usage (CI pipelines, pre-commit hooks). Uses `extends` to inherit from the corresponding preset.
 - `vscode-settings-*.jsonc` — for the VS Code markdownlint extension (different config shape)
 
-CLI templates use `extends` to inherit all rules from the preset. Distribution creates these once via `skipIfExists` and never overwrites them, so repo-specific overrides are preserved.
+CLI templates use `extends` to inherit all rules from the preset. They also include `"gitignore": true` so markdownlint-cli2 skips `node_modules` and any other paths listed in `.gitignore` by default. Distribution creates these once via `skipIfExists` and never overwrites them, so repo-specific overrides are preserved.
 
 ## Consumer repo setup
 
