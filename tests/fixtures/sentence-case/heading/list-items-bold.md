@@ -38,3 +38,11 @@
 - **baz** – en dash definition <!-- ✅ -->
 - **This Is Title Case** — desc <!-- ❌ -->
 - **this is prose** and more text <!-- ❌ -->
+
+<!-- Colon-separated identifier definition labels (issue #317) -->
+- **url**: the address <!-- ✅ -->
+- **foo**: a field <!-- ✅ -->
+- **myVar**: a camelCase identifier <!-- ✅ -->
+- **--flag**: a CLI flag <!-- ✅ -->
+- **This Is Title Case**: desc <!-- ❌ -->
+- **This is prose Label**: with text <!-- ❌ -->
