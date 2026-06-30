@@ -768,3 +768,23 @@ describe("validateHeading — #297 multi-word specialTerms in headings", () => {
     expect(result.isValid).toBe(false);
   });
 });
+
+describe("validateBoldText — #297 definition-label skipFirstWord invariant", () => {
+  // skipFirstWord exempts ONLY the first word's casing (identifier labels like
+  // `url`/`foo`); subsequent-word casing checks must still fire so a genuinely
+  // mis-cased multi-word label is not silently exempted.
+  test("skipFirstWord exempts a lowercase identifier first word", () => {
+    const result = validateBoldText("url", {}, {}, { skipFirstWord: true });
+    expect(result.isValid).toBe(true);
+  });
+
+  test("subsequent-word casing is still flagged under skipFirstWord", () => {
+    const result = validateBoldText(
+      "This Is Title Case",
+      {},
+      {},
+      { skipFirstWord: true },
+    );
+    expect(result.isValid).toBe(false);
+  });
+});
