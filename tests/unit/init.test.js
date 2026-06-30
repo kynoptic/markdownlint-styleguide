@@ -662,6 +662,38 @@ describe('init.cjs', () => {
     });
   });
 
+  describe('gitignore exclusion', () => {
+    it('should include "gitignore": true in generated basic CLI config', () => {
+      execSync('node ' + scriptPath + ' --preset basic --cli', {
+        cwd: tempDir,
+      });
+
+      const cliConfig = path.join(tempDir, '.markdownlint-cli2.jsonc');
+      const content = parseJsonc(fs.readFileSync(cliConfig, 'utf8'));
+      expect(content.gitignore).toBe(true);
+    });
+
+    it('should include "gitignore": true in generated recommended CLI config', () => {
+      execSync('node ' + scriptPath + ' --preset recommended --cli', {
+        cwd: tempDir,
+      });
+
+      const cliConfig = path.join(tempDir, '.markdownlint-cli2.jsonc');
+      const content = parseJsonc(fs.readFileSync(cliConfig, 'utf8'));
+      expect(content.gitignore).toBe(true);
+    });
+
+    it('should include "gitignore": true in generated strict CLI config', () => {
+      execSync('node ' + scriptPath + ' --preset strict --cli', {
+        cwd: tempDir,
+      });
+
+      const cliConfig = path.join(tempDir, '.markdownlint-cli2.jsonc');
+      const content = parseJsonc(fs.readFileSync(cliConfig, 'utf8'));
+      expect(content.gitignore).toBe(true);
+    });
+  });
+
   describe('config validation', () => {
     it('should validate config after creation', () => {
       const output = execSync('node ' + scriptPath + ' --preset recommended', {
