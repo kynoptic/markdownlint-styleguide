@@ -138,11 +138,29 @@ function shouldFlagAmpersand(line, position, skipInlineCode, exceptions, context
     }
   }
 
-  // Check if this ampersand matches any exception patterns
+  // Check if this ampersand falls within any exception phrase.
+  // Use position-aware matching so only the & that is part of the
+  // exception phrase is exempted, not every & on the same line.
   for (const exception of exceptions) {
-    const regex = new RegExp(exception.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    if (regex.test(line)) {
-      return false;
+    // Skip empty patterns: an empty string compiles to a zero-width regex
+    // that matches at index 0 without advancing lastIndex, hanging the loop.
+    if (!exception) {
+      continue;
+    }
+    const escaped = exception.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'gi');
+    let match;
+    while ((match = regex.exec(line)) !== null) {
+      // Defensive guard against any zero-width match advancing nowhere.
+      if (match[0].length === 0) {
+        regex.lastIndex += 1;
+        continue;
+      }
+      const start = match.index;
+      const end = start + match[0].length - 1;
+      if (position >= start && position <= end) {
+        return false;
+      }
     }
   }
 
@@ -170,7 +188,7 @@ function noLiteralAmpersand(params, onError) {
     return;
   }
 
-  const config = params.config?.['no-literal-ampersand'] || params.config?.NLA001 || {};
+  const config = params.config?.['no-literal-ampersand'] || params.config?.NLA001 || params.config || {};
 
   // Validate configuration
   const configSchema = {
