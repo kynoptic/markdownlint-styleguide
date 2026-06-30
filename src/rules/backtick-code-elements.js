@@ -352,6 +352,19 @@ function backtickCodeElements(params, onError) {
           continue;
         }
 
+        // Skip hyphenated compound suffixes immediately after an emphasis close
+        // (*Word*-style, _Word_-driven) or an inline code span (`code`-level).
+        // The `\B` anchor in the CLI flag pattern fires after `*`, `_`, and `` ` ``
+        // because those are non-word characters, causing false flags on compounds
+        // like *Acme*-style and `Documents`-level (#301, #306).
+        if (
+          /^-[a-zA-Z]/.test(fullMatch) &&
+          start > 0 &&
+          /[*_`]/.test(line[start - 1])
+        ) {
+          continue;
+        }
+
         // Skip ellipsis-joined prose words, e.g. "only...but" or "system…was" (#196).
         // Covers both the full match (e.g. "only...but") and sub-matches like "..but"
         // that occur because the dotfile pattern fires inside "word...word".
