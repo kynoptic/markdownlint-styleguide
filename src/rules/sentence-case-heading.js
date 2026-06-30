@@ -234,8 +234,10 @@ function basicSentenceCaseHeadingFunction(params, onError) {
    * @param {number} lineNumber The line number of the text.
    * @param {string} sourceLine The full source line.
    * @param {number} [matchStart=0] Offset of the bold span within sourceLine.
+   * @param {boolean} [isDefinitionLabel=false] True when the bold span is immediately
+   *   followed by a definition separator; suppresses the first-word capitalization check.
    */
-  function validateBoldTextInContext(boldText, lineNumber, sourceLine, matchStart = 0) {
+  function validateBoldTextInContext(boldText, lineNumber, sourceLine, matchStart = 0, isDefinitionLabel = false) {
     if (!boldText || !boldText.trim()) {
       return;
     }
@@ -248,7 +250,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
     // Apply ignoreAfterEmoji truncation if enabled
     const { textForValidation } = truncateAtEmoji(boldText, ignoreAfterEmoji);
 
-    const validationResult = validateBoldText(textForValidation, specialCasedTerms, effectiveAmbiguousTerms);
+    const validationResult = validateBoldText(textForValidation, specialCasedTerms, effectiveAmbiguousTerms, { skipFirstWord: isDefinitionLabel });
 
     if (!validationResult.isValid) {
       reportForBoldText(validationResult.errorMessage, lineNumber, boldText, sourceLine, textForValidation, matchStart);
@@ -375,6 +377,14 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       const boldText = match[1].trim();
       if (!boldText) continue;
 
+      // Detect whether this bold span is a definition-list label: the text
+      // immediately after `**label**` in the source line is a definition
+      // separator (em dash, en dash, hyphen-with-spaces, or colon + space).
+      // Definition labels are code field names, CLI flags, or identifiers
+      // whose casing must be preserved — only the first-word check is suppressed;
+      // subsequent-word casing errors are still reported (issue #297, Problem 2).
+      const textAfterBold = line.slice(matchEnd);
+      const isDefinitionLabel = /^\s*(—|–)/.test(textAfterBold);
 
       // If the bold text has a colon, only validate the part before the colon
       const textToValidate = boldText.includes(':') ?
@@ -386,7 +396,7 @@ function basicSentenceCaseHeadingFunction(params, onError) {
 
       // Use the unified validation logic; pass the span offset so the autofix
       // targets this occurrence even if the same bold phrase repeats on the line.
-      validateBoldTextInContext(textToValidate, lineNumber, line, matchStart);
+      validateBoldTextInContext(textToValidate, lineNumber, line, matchStart, isDefinitionLabel);
 
       // Only validate the first bold text in the list item (which we already confirmed is at the start)
       break;
