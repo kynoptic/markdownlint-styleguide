@@ -6,7 +6,6 @@
  */
 
 import { lint } from 'markdownlint/promise';
-import MarkdownIt from 'markdown-it';
 
 /**
  * Parse fixture content to extract line expectations
@@ -126,12 +125,11 @@ export async function testRuleWithFixtureValidation(rule, content, ruleName, opt
   // Parse expectations from fixture
   const expectations = parseFixtureExpectations(content);
   
-  // Default lint options with markdown-it support
+  // Default lint options
   const lintOptions = {
     customRules: [rule],
     strings: { content },
     resultVersion: 3,
-    markdownItFactory: () => new MarkdownIt({ linkify: true }),
     ...options
   };
   

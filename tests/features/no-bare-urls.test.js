@@ -2,7 +2,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { describe, test, expect, beforeAll } from "@jest/globals";
 import { lint } from "markdownlint/promise";
-import MarkdownIt from "markdown-it";
 import noBareUrls from "../../src/rules/no-bare-urls.js";
 import { parseFixture } from "../utils/fixture.js";
 
@@ -31,7 +30,6 @@ describe("no-bare-urls-trap rule", () => {
         "no-bare-url": true,
         MD034: false,
       },
-      markdownItFactory: () => new MarkdownIt({ linkify: true }),
     };
     violations = await lint(options);
   });
@@ -72,6 +70,69 @@ describe("no-bare-urls-trap rule", () => {
   });
 
   /**
+   * Regression: BU001 must fire without linkify enabled (the default for
+   * markdownlint-cli2). Previously the rule relied on markdown-it linkifying
+   * bare URLs into autolink tokens; without linkify those tokens never appeared
+   * and the rule was silently inert.
+   */
+  test("fires without linkify enabled (regression: BU001 inert under markdownlint-cli2)", async () => {
+    const bare = "See https://example.com for details.";
+    const results = await lint({
+      strings: { "test.md": bare },
+      customRules: [noBareUrls],
+      config: { default: false, "no-bare-url": true },
+      // No markdownItFactory — mirrors markdownlint-cli2 production usage
+    });
+    const errs = results["test.md"];
+    expect(errs.length).toBeGreaterThan(0);
+    expect(errs[0].ruleNames).toContain("BU001");
+  });
+
+  /**
+   * A proper [text](url) link must NOT be flagged.
+   */
+  test("does not flag a proper [text](url) markdown link", async () => {
+    const proper = "[Visit example](https://example.com)";
+    const results = await lint({
+      strings: { "test.md": proper },
+      customRules: [noBareUrls],
+      config: { default: false, "no-bare-url": true },
+    });
+    expect(results["test.md"].length).toBe(0);
+  });
+
+  /**
+   * allowedDomains config skips flagging for the listed domain.
+   */
+  test("respects allowedDomains configuration", async () => {
+    const allowed = "See https://internal.corp/docs for details.";
+    const results = await lint({
+      strings: { "test.md": allowed },
+      customRules: [noBareUrls],
+      config: {
+        default: false,
+        "no-bare-url": { allowedDomains: ["internal.corp"] },
+      },
+    });
+    expect(results["test.md"].length).toBe(0);
+  });
+
+  /**
+   * A standalone bare URL on its own line must be reported.
+   */
+  test("reports a standalone bare URL on its own line", async () => {
+    const standalone = "https://standalone.example.com";
+    const results = await lint({
+      strings: { "test.md": standalone },
+      customRules: [noBareUrls],
+      config: { default: false, "no-bare-url": true },
+    });
+    const errs = results["test.md"];
+    expect(errs.length).toBeGreaterThan(0);
+    expect(errs[0].ruleNames).toContain("BU001");
+  });
+
+  /**
    * Test specific autofix scenarios
    */
   test("correctly formats autofix for different URL patterns", async () => {
@@ -98,7 +159,6 @@ describe("no-bare-urls-trap rule", () => {
           default: false,
           "no-bare-url": true,
         },
-        markdownItFactory: () => new MarkdownIt({ linkify: true }),
       };
       
       const results = await lint(options);
