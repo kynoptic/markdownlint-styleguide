@@ -23,8 +23,9 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Strip optional items (lines ending with *(optional)* or <!-- optional -->)
-          FILTERED=$(echo "$PR_BODY" | grep -v '\*(optional)\*' | grep -v '<!--\s*optional\s*-->')
+          # Strip optional items (lines ending with *(optional)*, *(optional — reason)*,
+          # <!-- optional -->, or <!-- optional: reason -->)
+          FILTERED=$(echo "$PR_BODY" | grep -vE '\*\(optional\b' | grep -vE '<!--\s*optional\b' || true)
 
           # Count unchecked items
           UNCHECKED=$(echo "$FILTERED" | grep -cE '^\s*- \[ \]' || true)
