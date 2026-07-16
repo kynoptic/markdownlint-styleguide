@@ -27,7 +27,8 @@ import {
   inWikiLink,
   inHtmlSemanticTag,
   inLatexMath,
-  isLikelyFilePath
+  isLikelyFilePath,
+  isProseImportUsage
 } from './backtick/detection-helpers.js';
 import { generateContextualErrorMessage } from './backtick/error-messages.js';
 
@@ -166,11 +167,10 @@ function backtickCodeElements(params, onError) {
       /\b(?:cargo)\s+(?:build|run|test|bench|check|clean|doc|new|init|add|remove|update|publish|install|uninstall|search|tree|fmt|clippy)\b/g,
 
                                              // common CLI commands
-      // import statements - exclude common English words after "import"
-      // This catches "import pdfplumber" but not "import them", "import system", etc.
-      // Exclusion list covers pronouns, articles, prepositions, and common nouns
-      // Each alternative uses \b to prevent prefix-matching (e.g., "to" blocking "tokenizer")
-      /\bimport\s+(?!(?:the|a|an|your|my|our|their|its|some|all|any|this|that|these|those|from|into|in|on|with|without|for|via|using|under|over|to|new|old|more|them|it|something|everything|anything|nothing|system|systems|updates|path|paths|is|are|was|were|will|be|data|files|modules|packages|settings|config|options|rules|code|process|other|changes|and|or|statements|functions|classes|types|errors|values|items|records|content|text|names|custom|external|internal|local|global|default|specific|relevant|existing|additional|required|necessary|important|direct|proper|tool|tools|image|images|photo|photos|video|videos|asset|assets|document|documents|record|records|entry|entries|contact|contacts|user|users|product|products|order|orders|transaction|transactions|customer|customers|book|books|song|songs|track|tracks|recipe|recipes|template|templates|model|models)\b)\w+/g,
+      // import statements - prose usages ("Instagram import polish",
+      // "the import success screen") are filtered by isProseImportUsage,
+      // which holds the common-English-word exclusion list (#319)
+      /\bimport\s+\w+/g,
       // host:port patterns, avoids bible verses like "1:10" and WCAG ratios like "4.5:1"
       // Time ranges like "AM-12:30", "3-10:30" are filtered out separately
       // Negative lookbehind: not preceded by decimal number (WCAG ratios)
@@ -272,6 +272,13 @@ function backtickCodeElements(params, onError) {
         // (contain / as a literal match, not in a negative lookahead)
         const isPathPattern = pattern.source.includes('\\/') && !pattern.source.includes('(?!');
         if (isPathPattern && !isLikelyFilePath(fullMatch)) {
+          continue;
+        }
+
+        // Skip prose uses of "import" as a noun or attributive modifier
+        // ("Instagram import polish", "the import success screen") while
+        // keeping genuine statements like "import Foundation" flagged (#319).
+        if (/^import\s/.test(fullMatch) && isProseImportUsage(line, start, fullMatch)) {
           continue;
         }
 

@@ -111,6 +111,28 @@ describe("backtick-code-elements path detection", () => {
     });
   });
 
+  describe("prose slash-lists (issue #319)", () => {
+    test("should not flag plural-noun lists", async () => {
+      await testPattern("display modes: grades/stars/half-stars", false);
+    });
+
+    test("should not flag lists containing a two-letter segment", async () => {
+      await testPattern("Search by title/id/year in the library", false);
+    });
+
+    test("should not flag hyphenated compound lists", async () => {
+      await testPattern("Handle auto-renewal/cancellation/refund flows", false);
+    });
+
+    test("should still flag paths ending in a file extension", async () => {
+      await testPattern("Open src/utils/foo.ts to edit", true);
+    });
+
+    test("should still flag 'path/to/folder' placeholder paths", async () => {
+      await testPattern("Open path/to/folder/ for logs", true);
+    });
+  });
+
   describe("common option patterns", () => {
     test("should not flag pass/fail", async () => {
       await testPattern("The pass/fail criteria are documented", false);

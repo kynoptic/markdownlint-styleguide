@@ -4,6 +4,19 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- BCE001 no longer flags prose uses of "import" as a noun or attributive
+  modifier — "Instagram import polish", "the import success screen", "import
+  safety fixes" — while genuine statements like `import Foundation` and
+  `import pdfplumber` still fire. The common-word exclusion list moved out of
+  the regex into a maintainable set, and noun usage is now also detected from
+  context (a preceding determiner or mid-sentence proper noun). (#319)
+- BCE001 no longer treats prose slash-lists with short or hyphenated segments
+  — "grades/stars/half-stars", "title/id/year",
+  "auto-renewal/cancellation/refund" — as file paths. Placeholder paths like
+  `path/to/folder` and paths with extensions are still flagged. (#319)
+
 ---
 
 ## [4.1.0] - 2026-06-30

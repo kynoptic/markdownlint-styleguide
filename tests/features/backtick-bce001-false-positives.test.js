@@ -4,6 +4,7 @@
  * - #192: scientific/measurement terms (pH, fMRI, mTOR)
  * - #194: bare URLs flagged as file/directory paths
  * - #196: ellipsis-joined prose words (only...but)
+ * - #319: prose phrases misread as imports, paths, and flags
  */
 import { describe, test, expect } from "@jest/globals";
 import { lint } from "markdownlint/promise";
@@ -242,5 +243,109 @@ describe("BCE001 import-homograph prose (#236)", () => {
       "Run fill_form.py to populate the document.",
     );
     expect(violations.length).toBeGreaterThan(0);
+  });
+});
+
+describe("BCE001 noun-phrase 'import' in prose (#319)", () => {
+  test("does not flag 'import polish' after a product name", async () => {
+    const violations = await getBCE001Violations(
+      "Instagram import polish lands in this release.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'import success' after a determiner", async () => {
+    const violations = await getBCE001Violations(
+      "Improved the import success screen.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'import safety' as a bare noun compound", async () => {
+    const violations = await getBCE001Violations(
+      "Shipped import safety fixes for large libraries.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag import preceded by a determiner regardless of the following word", async () => {
+    const violations = await getBCE001Violations(
+      "The import parser opens the picker.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag import preceded by a mid-sentence proper noun", async () => {
+    const violations = await getBCE001Violations(
+      "Rebuilt the Salesforce import connector this week.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags a standalone import statement", async () => {
+    const violations = await getBCE001Violations("import Foundation");
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import Foundation",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+
+  test("still flags a mid-sentence module import", async () => {
+    const violations = await getBCE001Violations(
+      "Add import pdfplumber at the top of the script.",
+    );
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import pdfplumber",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+});
+
+describe("BCE001 prose slash-lists are not paths (#319)", () => {
+  test("does not flag a slash list of plural nouns", async () => {
+    const violations = await getBCE001Violations(
+      "display modes: grades/stars/half-stars",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag a slash list with a short segment", async () => {
+    const violations = await getBCE001Violations(
+      "Search by title/id/year in the library.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag a slash list of hyphenated compounds", async () => {
+    const violations = await getBCE001Violations(
+      "Handle auto-renewal/cancellation/refund flows.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags a real path with a file extension", async () => {
+    const violations = await getBCE001Violations(
+      "See src/utils/foo.ts for details.",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+  });
+});
+
+describe("BCE001 hyphenated compound after a code span (#319 regression)", () => {
+  test("does not flag '-returning' after a backticked identifier", async () => {
+    const violations = await getBCE001Violations(
+      "`Binding`-returning methods are now documented.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags a genuine CLI flag", async () => {
+    const violations = await getBCE001Violations(
+      "Pass the --verbose option to see details.",
+    );
+    const flagErrors = violations.filter(
+      (v) => v.errorContext === "--verbose",
+    );
+    expect(flagErrors.length).toBeGreaterThan(0);
   });
 });
