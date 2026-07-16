@@ -358,6 +358,44 @@ describe("BCE001 noun-phrase 'import' in prose (#319)", () => {
     );
     expect(violations).toHaveLength(0);
   });
+
+  test("does not flag 'from <determiner> import' English phrases", async () => {
+    const violations = await getBCE001Violations(
+      "Recover photos from the import screen.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'from your import' possessive phrases", async () => {
+    const violations = await getBCE001Violations(
+      "Load defaults from your import profile.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag 'from each import' quantified phrases", async () => {
+    const violations = await getBCE001Violations(
+      "Data flows from each import batch into the warehouse.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag a language name used attributively after a verb", async () => {
+    const violations = await getBCE001Violations(
+      "Improved Python import resolution in the bundler.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags a language-name import after a preposition", async () => {
+    const violations = await getBCE001Violations(
+      "In Swift import Foundation loads the framework.",
+    );
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import Foundation",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
 });
 
 describe("BCE001 prose slash-lists are not paths (#319)", () => {

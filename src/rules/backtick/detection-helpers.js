@@ -82,11 +82,27 @@ const importPositionalSignals = new Set([
 
 // Language names preceding "import" introduce a real statement ("For Python
 // import pdfplumber", "In Swift import Foundation"), unlike attributive
-// proper nouns ("the Salesforce import connector").
+// proper nouns ("the Salesforce import connector"). Only applied when the
+// language name is clause-initial or follows a preposition — after a verb
+// ("Improved Python import resolution") it is attributive prose.
 const importLanguageNames = new Set([
   'Python', 'Swift', 'JavaScript', 'TypeScript', 'Java', 'Kotlin', 'Rust',
   'Go', 'Ruby', 'PHP', 'Haskell', 'Scala', 'Perl', 'Julia', 'Dart',
   'Elixir', 'Lua', 'Clojure', 'Node'
+]);
+
+// Prepositions that put a following language name in statement-introducing
+// position ("For Python import X", "In Swift import Y").
+const importLanguagePrepositions = new Set([
+  'for', 'in', 'with', 'on', 'to', 'under', 'via', 'using', 'from'
+]);
+
+// Determiners and pronouns that can never be a module name in a Python-style
+// `from X import Y` clause — "from the import screen" is English, not code.
+const importFromDeterminers = new Set([
+  'the', 'a', 'an', 'your', 'my', 'our', 'their', 'its', 'his', 'her',
+  'this', 'that', 'these', 'those', 'each', 'every', 'any', 'some',
+  'no', 'one', 'another'
 ]);
 
 /**
@@ -107,8 +123,9 @@ const importLanguageNames = new Set([
  *    import pdfplumber") and sentence-initial verbs ("Add import
  *    pdfplumber") keep firing.
  *
- * A `from X import Y` clause always counts as a real statement, whatever
- * the object word.
+ * A `from X import Y` clause counts as a real statement whatever the
+ * object word — unless X is a determiner or pronoun ("from the import
+ * screen"), which is always English prose.
  *
  * @param {string} line - Line being evaluated.
  * @param {number} start - Start index of the `import …` match.
@@ -119,8 +136,10 @@ export function isProseImportUsage(line, start, match) {
   const beforeImport = line.slice(0, start);
 
   // "from sklearn import pipeline" is a Python statement regardless of how
-  // English the imported name looks.
-  if (/\bfrom\s+[\w.]+\s+$/.test(beforeImport)) {
+  // English the imported name looks — but "from the import screen" is prose
+  // (no module is named "the"); let those fall through to the noun checks.
+  const fromClauseMatch = /\bfrom\s+([\w.]+)\s+$/.exec(beforeImport);
+  if (fromClauseMatch && !importFromDeterminers.has(fromClauseMatch[1].toLowerCase())) {
     return false;
   }
 
@@ -154,7 +173,16 @@ export function isProseImportUsage(line, start, match) {
 
   if (/^[A-Z]/.test(precedingWord)) {
     if (importLanguageNames.has(precedingWord)) {
-      return false;
+      // "For Python import pdfplumber" introduces a statement; "Improved
+      // Python import resolution" uses the language name attributively.
+      const wordBeforeLanguage = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/.exec(beforeWord);
+      if (
+        wordIsSentenceInitial ||
+        (wordBeforeLanguage &&
+          importLanguagePrepositions.has(wordBeforeLanguage[1].toLowerCase()))
+      ) {
+        return false;
+      }
     }
     if (!wordIsSentenceInitial) {
       return true;
