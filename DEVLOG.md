@@ -12,7 +12,7 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 Dependency-advisory hygiene, preset guard, and CI cleanup behind the rule fixes.
 
-- Patched the markdown-it and js-yaml advisories (GHSA-h67p-54hq-rp68, GHSA-6v5v-wf23-fmfq) via lockfile regen plus `overrides` for markdownlint-cli2 nested copies and istanbul's js-yaml — transitive/dev only, no user-facing exposure, so kept out of CHANGELOG
+- Patched the markdown-it and js-yaml advisories (GHSA-6v5v-wf23-fmfq, GHSA-h67p-54hq-rp68) via lockfile regen plus `overrides` for markdownlint-cli2 nested copies and istanbul's js-yaml — transitive/dev only, no user-facing exposure, so kept out of CHANGELOG
 - Removed the pr-checklist-gate Gitea workflow — the repo is GitHub-hosted, so the Gitea-only gate never ran and was dead config
 - Added a regression test asserting MD013 stays disabled across presets, locking in the line-length policy against accidental re-enable
 - Updated dev tooling — prettier ^3.9.4, eslint ^10.6.0, lint-staged v17 — and ran lockfile maintenance
