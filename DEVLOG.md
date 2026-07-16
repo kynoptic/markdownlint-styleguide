@@ -4,6 +4,8 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- Replaced the BCE001 import exclusion regex — a ~100-alternative negative lookahead — with named `Set`s in `detection-helpers.js` (`importProseObjects` plus determiner, positional, and language-name signal sets), with the prose-vs-statement decision order documented on the new `isProseImportUsage` helper
+
 ---
 
 ## [4.1.0] - 2026-06-30
