@@ -4,6 +4,12 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+---
+
+## [4.1.1] - 2026-07-16
+
+Stop BCE001 flagging ordinary prose as code elements.
+
 ### Fixed
 
 - BCE001 no longer flags prose uses of "import" as a noun or attributive
@@ -611,7 +617,12 @@ Initial release.
 - Initial release of `markdownlint-custom-rules`
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
-[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.0...v4.1.1
+[4.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.4...v4.1.0
+[4.0.4]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.3...v4.0.4
+[4.0.3]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.2...v4.0.3
+[4.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.2...v4.0.0
 [3.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.1...v3.0.2
