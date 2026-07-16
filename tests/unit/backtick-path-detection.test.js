@@ -139,6 +139,13 @@ describe("backtick-code-elements path detection", () => {
     test("should still flag short-segment paths containing a known directory", async () => {
       await testPattern("The generated files live in dist/es/lib after the build", true);
     });
+
+    // Accepted trade-off: an extensionless kebab-case run with no known
+    // directory segment reads as a prose alternative list, so a real path
+    // of that shape goes unflagged rather than prose being flagged.
+    test("should not flag kebab-case runs lacking path evidence", async () => {
+      await testPattern("Rename my-widget/cool-icon/nice-thing before shipping", false);
+    });
   });
 
   describe("common option patterns", () => {

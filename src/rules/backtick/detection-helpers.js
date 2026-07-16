@@ -132,6 +132,10 @@ const importFromDeterminers = new Set([
  * @param {string} match - The matched text (e.g., "import polish").
  * @returns {boolean} True when the match is prose, not a code statement.
  */
+// Captures the word preceding the end of a text slice, skipping trailing
+// emphasis markers so "**Bulk** " still exposes "Bulk".
+const precedingWordPattern = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/;
+
 export function isProseImportUsage(line, start, match) {
   const beforeImport = line.slice(0, start);
 
@@ -148,9 +152,7 @@ export function isProseImportUsage(line, start, match) {
     return true;
   }
 
-  // Trailing emphasis markers are skipped so "**Bulk** import parser"
-  // still exposes the "bulk" signal.
-  const precedingWordMatch = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/.exec(beforeImport);
+  const precedingWordMatch = precedingWordPattern.exec(beforeImport);
   if (!precedingWordMatch) {
     return false;
   }
@@ -175,7 +177,7 @@ export function isProseImportUsage(line, start, match) {
     if (importLanguageNames.has(precedingWord)) {
       // "For Python import pdfplumber" introduces a statement; "Improved
       // Python import resolution" uses the language name attributively.
-      const wordBeforeLanguage = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/.exec(beforeWord);
+      const wordBeforeLanguage = precedingWordPattern.exec(beforeWord);
       if (
         wordIsSentenceInitial ||
         (wordBeforeLanguage &&
