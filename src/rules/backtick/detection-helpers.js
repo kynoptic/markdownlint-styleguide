@@ -45,7 +45,10 @@ const importProseObjects = new Set([
   'orders', 'transaction', 'transactions', 'customer', 'customers', 'book',
   'books', 'song', 'songs', 'track', 'tracks', 'recipe', 'recipes',
   'template', 'templates', 'model', 'models',
-  // Attributive nouns common in changelogs and release notes (#319)
+  // Attributive nouns common in changelogs and release notes (#319).
+  // Real module names must stay OUT of this list: 'warnings' (Python
+  // stdlib), 'views'/'tasks' (Django/Celery), and 'retry' (PyPI) are
+  // deliberately absent so bare statements like "import warnings" fire.
   'polish', 'success', 'safety', 'quality', 'speed', 'performance',
   'reliability', 'stability', 'progress', 'history', 'preview', 'screen',
   'screens', 'flow', 'flows', 'button', 'buttons', 'wizard', 'dialog',
@@ -53,10 +56,10 @@ const importProseObjects = new Set([
   'behaviour', 'workflow', 'workflows', 'feature', 'features',
   'functionality', 'improvements', 'fixes', 'logic', 'pipeline',
   'pipelines', 'status', 'summary', 'report', 'reports', 'page', 'pages',
-  'view', 'views', 'tab', 'tabs', 'panel', 'banner', 'prompt', 'prompts',
+  'view', 'tab', 'tabs', 'panel', 'banner', 'prompt', 'prompts',
   'limit', 'limits', 'count', 'counts', 'failure', 'failures', 'warning',
-  'warnings', 'notification', 'notifications', 'retry', 'retries', 'job',
-  'jobs', 'task', 'tasks', 'session', 'sessions', 'step', 'steps'
+  'notification', 'notifications', 'retries', 'job',
+  'jobs', 'task', 'session', 'sessions', 'step', 'steps'
 ]);
 
 // Determiners and modifiers that mark the following "import" as a noun
@@ -67,8 +70,23 @@ const importNounSignals = new Set([
   'each', 'every', 'any', 'some', 'another', 'no', 'one',
   'bulk', 'mass', 'batch', 'data', 'manual', 'automatic', 'automated',
   'nightly', 'daily', 'weekly', 'monthly', 'initial', 'full', 'partial',
-  'failed', 'successful', 'new', 'existing',
+  'failed', 'successful', 'new', 'existing'
+]);
+
+// Positional modifiers are noun signals only mid-sentence ("the first import
+// failed"). Sentence-initial they are imperative adverbs — "First import
+// numpy into the notebook" is a real statement and must keep firing.
+const importPositionalSignals = new Set([
   'first', 'second', 'last', 'next', 'previous'
+]);
+
+// Language names preceding "import" introduce a real statement ("For Python
+// import pdfplumber", "In Swift import Foundation"), unlike attributive
+// proper nouns ("the Salesforce import connector").
+const importLanguageNames = new Set([
+  'Python', 'Swift', 'JavaScript', 'TypeScript', 'Java', 'Kotlin', 'Rust',
+  'Go', 'Ruby', 'PHP', 'Haskell', 'Scala', 'Perl', 'Julia', 'Dart',
+  'Elixir', 'Lua', 'Clojure', 'Node'
 ]);
 
 /**
@@ -80,11 +98,17 @@ const importNounSignals = new Set([
  * 1. The word after `import` is a common English word, not a plausible
  *    module identifier.
  * 2. `import` is preceded by a determiner or noun-marking modifier
- *    ("the import …", "bulk import …").
+ *    ("the import …", "bulk import …"), or a mid-sentence positional
+ *    modifier ("the first import failed"). Sentence-initial positionals
+ *    are imperative ("First import numpy") and keep firing.
  * 3. `import` is preceded by a capitalized word that is not the start of
- *    its sentence — a mid-sentence proper noun used attributively
- *    ("…the Salesforce import connector"). Sentence-initial verbs like
- *    "Add import pdfplumber" or "Use import os" keep firing.
+ *    its sentence or clause — a proper noun used attributively
+ *    ("…the Salesforce import connector"). Language names ("For Python
+ *    import pdfplumber") and sentence-initial verbs ("Add import
+ *    pdfplumber") keep firing.
+ *
+ * A `from X import Y` clause always counts as a real statement, whatever
+ * the object word.
  *
  * @param {string} line - Line being evaluated.
  * @param {number} start - Start index of the `import …` match.
@@ -92,30 +116,47 @@ const importNounSignals = new Set([
  * @returns {boolean} True when the match is prose, not a code statement.
  */
 export function isProseImportUsage(line, start, match) {
+  const beforeImport = line.slice(0, start);
+
+  // "from sklearn import pipeline" is a Python statement regardless of how
+  // English the imported name looks.
+  if (/\bfrom\s+[\w.]+\s+$/.test(beforeImport)) {
+    return false;
+  }
+
   const objectWord = match.replace(/^import\s+/, '');
   if (importProseObjects.has(objectWord)) {
     return true;
   }
 
-  const beforeImport = line.slice(0, start);
-  const precedingWordMatch = /([A-Za-z][\w'’-]*)\s+$/.exec(beforeImport);
+  // Trailing emphasis markers are skipped so "**Bulk** import parser"
+  // still exposes the "bulk" signal.
+  const precedingWordMatch = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/.exec(beforeImport);
   if (!precedingWordMatch) {
     return false;
   }
 
   const precedingWord = precedingWordMatch[1];
-  if (importNounSignals.has(precedingWord.toLowerCase())) {
+  const beforeWord = beforeImport.slice(0, precedingWordMatch.index);
+  // Sentence- or clause-initial: only whitespace/list markers before the
+  // word, or the word follows boundary punctuation.
+  const wordIsSentenceInitial =
+    /^\s*(?:(?:[-*+>]|\d+[.)])\s+)*$/.test(beforeWord) ||
+    /[.!?:;]["')\]]*\s+$/.test(beforeWord);
+
+  const precedingLower = precedingWord.toLowerCase();
+  if (importNounSignals.has(precedingLower)) {
+    return true;
+  }
+  if (importPositionalSignals.has(precedingLower) && !wordIsSentenceInitial) {
     return true;
   }
 
   if (/^[A-Z]/.test(precedingWord)) {
-    const beforeWord = beforeImport.slice(0, precedingWordMatch.index);
-    // Sentence-initial: only whitespace/list markers before the word, or the
-    // word follows sentence-boundary punctuation.
-    const sentenceInitial =
-      /^\s*(?:(?:[-*+>]|\d+[.)])\s+)*$/.test(beforeWord) ||
-      /[.!?:;,]["')\]]*\s+$/.test(beforeWord);
-    if (!sentenceInitial) {
+    if (importLanguageNames.has(precedingWord)) {
+      return false;
+    }
+    if (!wordIsSentenceInitial) {
       return true;
     }
   }
@@ -485,18 +526,26 @@ export function isLikelyFilePath(str) {
   // "auto-renewal"), so prose alternative lists like "grades/stars/half-stars"
   // or "title/id/year" are not treated as paths (#319). Path signals that
   // override the bail-out: an absolute/relative prefix, or a "to" placeholder
-  // segment ("path/to/folder"). A known-directory first segment deliberately
-  // does not override: prose enumerations like "models/views/controllers"
-  // start with directory-like words (see the passing fixture).
+  // segment ("path/to/folder"). Additionally, the broadened word shapes
+  // (hyphenated or 2-letter segments) do not exempt a run that also contains
+  // a known directory name — "my-app/src/components" and "dist/es/lib" stay
+  // paths — while runs of plain 3+-letter words keep the pre-existing prose
+  // treatment even when directory-like ("models/views/controllers", see the
+  // passing fixture).
   const nonEmptySegments = segments.filter(s => s !== '');
   const isAbsoluteOrRelative = /^[/~.]/.test(str);
   const hasPlaceholderSegment = nonEmptySegments.includes('to');
+  const allPlainWords = nonEmptySegments.every(s => /^[a-zA-Z]{3,}$/.test(s));
+  const hasKnownDirectorySegment = nonEmptySegments.some(
+    s => knownDirectoryPrefixes.includes(s.toLowerCase())
+  );
   if (
     !isAbsoluteOrRelative &&
     !hasPlaceholderSegment &&
     nonEmptySegments.length >= 3 &&
     nonEmptySegments.every(s => /^[a-zA-Z]{2,}(?:-[a-zA-Z]+)*$/.test(s)) &&
-    !nonEmptySegments.some(s => /\.\w+$/.test(s))
+    !nonEmptySegments.some(s => /\.\w+$/.test(s)) &&
+    (allPlainWords || !hasKnownDirectorySegment)
   ) {
     return false;
   }

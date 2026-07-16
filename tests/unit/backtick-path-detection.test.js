@@ -131,6 +131,14 @@ describe("backtick-code-elements path detection", () => {
     test("should still flag 'path/to/folder' placeholder paths", async () => {
       await testPattern("Open path/to/folder/ for logs", true);
     });
+
+    test("should still flag hyphenated paths containing a known directory", async () => {
+      await testPattern("Check my-app/src/components for the layout code", true);
+    });
+
+    test("should still flag short-segment paths containing a known directory", async () => {
+      await testPattern("The generated files live in dist/es/lib after the build", true);
+    });
   });
 
   describe("common option patterns", () => {

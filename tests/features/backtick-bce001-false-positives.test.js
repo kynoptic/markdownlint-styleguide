@@ -299,6 +299,65 @@ describe("BCE001 noun-phrase 'import' in prose (#319)", () => {
     );
     expect(importErrors.length).toBeGreaterThan(0);
   });
+
+  test("still flags a bare stdlib import whose name is an English noun", async () => {
+    const violations = await getBCE001Violations("import warnings");
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import warnings",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+
+  test("still flags a from-clause import with an English object word", async () => {
+    const violations = await getBCE001Violations(
+      "Use from sklearn import pipeline in the notebook.",
+    );
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import pipeline",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+
+  test("still flags a sentence-initial imperative with an ordinal", async () => {
+    const violations = await getBCE001Violations(
+      "First import numpy into the notebook.",
+    );
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import numpy",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+
+  test("does not flag an ordinal-preceded noun import mid-sentence", async () => {
+    const violations = await getBCE001Violations(
+      "Retry when the first import attempt stalls.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("still flags an import preceded by a language name", async () => {
+    const violations = await getBCE001Violations(
+      "For Python import pdfplumber at the top.",
+    );
+    const importErrors = violations.filter(
+      (v) => v.errorContext === "import pdfplumber",
+    );
+    expect(importErrors.length).toBeGreaterThan(0);
+  });
+
+  test("does not flag noun usage after an emphasized modifier", async () => {
+    const violations = await getBCE001Violations(
+      "**Bulk** import parser now streams rows.",
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  test("does not flag a clause-initial proper noun compound", async () => {
+    const violations = await getBCE001Violations(
+      "Once enabled, Shopify import mapping runs automatically.",
+    );
+    expect(violations).toHaveLength(0);
+  });
 });
 
 describe("BCE001 prose slash-lists are not paths (#319)", () => {
@@ -331,7 +390,7 @@ describe("BCE001 prose slash-lists are not paths (#319)", () => {
   });
 });
 
-describe("BCE001 hyphenated compound after a code span (#319 regression)", () => {
+describe("BCE001 hyphenated compound after a code span (#319; behavior from #301/#306)", () => {
   test("does not flag '-returning' after a backticked identifier", async () => {
     const violations = await getBCE001Violations(
       "`Binding`-returning methods are now documented.",
