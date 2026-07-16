@@ -17,6 +17,183 @@ import {
 const linkRegex = /!?\[[^\]]*\]\([^)]*\)/g;
 const wikiLinkRegex = /!?\[\[[^\]]+\]\]/g;
 
+// Words that, when they follow "import", mark ordinary English prose rather
+// than a code import statement ("import them", "import success screen").
+// Formerly inlined as a giant negative lookahead in the import regex; moved
+// here so the list is maintainable and the check is testable (#319).
+// Matching is case-sensitive: capitalized tokens ("import Foundation",
+// "import System") keep firing as genuine module imports.
+const importProseObjects = new Set([
+  // Pronouns, articles, prepositions, conjunctions
+  'the', 'a', 'an', 'your', 'my', 'our', 'their', 'its', 'some', 'all',
+  'any', 'this', 'that', 'these', 'those', 'from', 'into', 'in', 'on',
+  'with', 'without', 'for', 'via', 'using', 'under', 'over', 'to',
+  'them', 'it', 'and', 'or', 'is', 'are', 'was', 'were', 'will', 'be',
+  // Quantifiers and generic modifiers
+  'new', 'old', 'more', 'something', 'everything', 'anything', 'nothing',
+  'other', 'custom', 'external', 'internal', 'local', 'global', 'default',
+  'specific', 'relevant', 'existing', 'additional', 'required', 'necessary',
+  'important', 'direct', 'proper',
+  // Common nouns that follow "import" used as a noun or verb in prose
+  'system', 'systems', 'updates', 'path', 'paths', 'data', 'files',
+  'modules', 'packages', 'settings', 'config', 'options', 'rules', 'code',
+  'process', 'changes', 'statements', 'functions', 'classes', 'types',
+  'errors', 'values', 'items', 'records', 'content', 'text', 'names',
+  'tool', 'tools', 'image', 'images', 'photo', 'photos', 'video', 'videos',
+  'asset', 'assets', 'document', 'documents', 'record', 'entry', 'entries',
+  'contact', 'contacts', 'user', 'users', 'product', 'products', 'order',
+  'orders', 'transaction', 'transactions', 'customer', 'customers', 'book',
+  'books', 'song', 'songs', 'track', 'tracks', 'recipe', 'recipes',
+  'template', 'templates', 'model', 'models',
+  // Attributive nouns common in changelogs and release notes (#319).
+  // Real module names must stay OUT of this list: 'warnings' (Python
+  // stdlib), 'views'/'tasks' (Django/Celery), and 'retry' (PyPI) are
+  // deliberately absent so bare statements like "import warnings" fire.
+  'polish', 'success', 'safety', 'quality', 'speed', 'performance',
+  'reliability', 'stability', 'progress', 'history', 'preview', 'screen',
+  'screens', 'flow', 'flows', 'button', 'buttons', 'wizard', 'dialog',
+  'dialogs', 'experience', 'support', 'handling', 'validation', 'behavior',
+  'behaviour', 'workflow', 'workflows', 'feature', 'features',
+  'functionality', 'improvements', 'fixes', 'logic', 'pipeline',
+  'pipelines', 'status', 'summary', 'report', 'reports', 'page', 'pages',
+  'view', 'tab', 'tabs', 'panel', 'banner', 'prompt', 'prompts',
+  'limit', 'limits', 'count', 'counts', 'failure', 'failures', 'warning',
+  'notification', 'notifications', 'retries', 'job',
+  'jobs', 'task', 'session', 'sessions', 'step', 'steps'
+]);
+
+// Determiners and modifiers that mark the following "import" as a noun
+// ("the import wizard", "bulk import support"), never a code statement.
+const importNounSignals = new Set([
+  'the', 'a', 'an', 'this', 'that', 'these', 'those',
+  'my', 'your', 'our', 'their', 'its', 'his', 'her',
+  'each', 'every', 'any', 'some', 'another', 'no', 'one',
+  'bulk', 'mass', 'batch', 'data', 'manual', 'automatic', 'automated',
+  'nightly', 'daily', 'weekly', 'monthly', 'initial', 'full', 'partial',
+  'failed', 'successful', 'new', 'existing'
+]);
+
+// Positional modifiers are noun signals only mid-sentence ("the first import
+// failed"). Sentence-initial they are imperative adverbs — "First import
+// numpy into the notebook" is a real statement and must keep firing.
+const importPositionalSignals = new Set([
+  'first', 'second', 'last', 'next', 'previous'
+]);
+
+// Language names preceding "import" introduce a real statement ("For Python
+// import pdfplumber", "In Swift import Foundation"), unlike attributive
+// proper nouns ("the Salesforce import connector"). Only applied when the
+// language name is clause-initial or follows a preposition — after a verb
+// ("Improved Python import resolution") it is attributive prose.
+const importLanguageNames = new Set([
+  'Python', 'Swift', 'JavaScript', 'TypeScript', 'Java', 'Kotlin', 'Rust',
+  'Go', 'Ruby', 'PHP', 'Haskell', 'Scala', 'Perl', 'Julia', 'Dart',
+  'Elixir', 'Lua', 'Clojure', 'Node'
+]);
+
+// Prepositions that put a following language name in statement-introducing
+// position ("For Python import X", "In Swift import Y").
+const importLanguagePrepositions = new Set([
+  'for', 'in', 'with', 'on', 'to', 'under', 'via', 'using', 'from'
+]);
+
+// Determiners and pronouns that can never be a module name in a Python-style
+// `from X import Y` clause — "from the import screen" is English, not code.
+const importFromDeterminers = new Set([
+  'the', 'a', 'an', 'your', 'my', 'our', 'their', 'its', 'his', 'her',
+  'this', 'that', 'these', 'those', 'each', 'every', 'any', 'some',
+  'no', 'one', 'another'
+]);
+
+/**
+ * Decide whether a matched `import <word>` sequence is ordinary English
+ * prose ("Instagram import polish", "the import success screen") rather
+ * than a code import statement ("import Foundation").
+ *
+ * Signals treated as prose (#319):
+ * 1. The word after `import` is a common English word, not a plausible
+ *    module identifier.
+ * 2. `import` is preceded by a determiner or noun-marking modifier
+ *    ("the import …", "bulk import …"), or a mid-sentence positional
+ *    modifier ("the first import failed"). Sentence-initial positionals
+ *    are imperative ("First import numpy") and keep firing.
+ * 3. `import` is preceded by a capitalized word that is not the start of
+ *    its sentence or clause — a proper noun used attributively
+ *    ("…the Salesforce import connector"). Language names ("For Python
+ *    import pdfplumber") and sentence-initial verbs ("Add import
+ *    pdfplumber") keep firing.
+ *
+ * A `from X import Y` clause counts as a real statement whatever the
+ * object word — unless X is a determiner or pronoun ("from the import
+ * screen"), which is always English prose.
+ *
+ * @param {string} line - Line being evaluated.
+ * @param {number} start - Start index of the `import …` match.
+ * @param {string} match - The matched text (e.g., "import polish").
+ * @returns {boolean} True when the match is prose, not a code statement.
+ */
+// Captures the word preceding the end of a text slice, skipping trailing
+// emphasis markers so "**Bulk** " still exposes "Bulk".
+const precedingWordPattern = /([A-Za-z][\w'’-]*)[*_]{0,3}\s+$/;
+
+export function isProseImportUsage(line, start, match) {
+  const beforeImport = line.slice(0, start);
+
+  // "from sklearn import pipeline" is a Python statement regardless of how
+  // English the imported name looks — but "from the import screen" is prose
+  // (no module is named "the"); let those fall through to the noun checks.
+  const fromClauseMatch = /\bfrom\s+([\w.]+)\s+$/.exec(beforeImport);
+  if (fromClauseMatch && !importFromDeterminers.has(fromClauseMatch[1].toLowerCase())) {
+    return false;
+  }
+
+  const objectWord = match.replace(/^import\s+/, '');
+  if (importProseObjects.has(objectWord)) {
+    return true;
+  }
+
+  const precedingWordMatch = precedingWordPattern.exec(beforeImport);
+  if (!precedingWordMatch) {
+    return false;
+  }
+
+  const precedingWord = precedingWordMatch[1];
+  const beforeWord = beforeImport.slice(0, precedingWordMatch.index);
+  // Sentence- or clause-initial: only whitespace/list markers before the
+  // word, or the word follows boundary punctuation.
+  const wordIsSentenceInitial =
+    /^\s*(?:(?:[-*+>]|\d+[.)])\s+)*$/.test(beforeWord) ||
+    /[.!?:;]["')\]]*\s+$/.test(beforeWord);
+
+  const precedingLower = precedingWord.toLowerCase();
+  if (importNounSignals.has(precedingLower)) {
+    return true;
+  }
+  if (importPositionalSignals.has(precedingLower) && !wordIsSentenceInitial) {
+    return true;
+  }
+
+  if (/^[A-Z]/.test(precedingWord)) {
+    if (importLanguageNames.has(precedingWord)) {
+      // "For Python import pdfplumber" introduces a statement; "Improved
+      // Python import resolution" uses the language name attributively.
+      const wordBeforeLanguage = precedingWordPattern.exec(beforeWord);
+      if (
+        wordIsSentenceInitial ||
+        (wordBeforeLanguage &&
+          importLanguagePrepositions.has(wordBeforeLanguage[1].toLowerCase()))
+      ) {
+        return false;
+      }
+    }
+    if (!wordIsSentenceInitial) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Common sentence starters that indicate a sentence boundary, not a filename.
 const sentenceStarters = new Set([
   'The', 'A', 'An', 'This', 'That', 'These', 'Those',
@@ -373,11 +550,33 @@ export function isLikelyFilePath(str) {
     return false;
   }
 
-  // If all segments (3+) are pure alphabetic words (3+ chars) with no file extensions,
-  // and it's not an absolute or relative path, it's likely natural language
+  // If all segments (3+) are plain English word shapes with no file extensions,
+  // and nothing marks the string as a real path, it's likely natural language.
+  // A word shape is 2+ letters, optionally hyphen-joined ("half-stars",
+  // "auto-renewal"), so prose alternative lists like "grades/stars/half-stars"
+  // or "title/id/year" are not treated as paths (#319). Path signals that
+  // override the bail-out: an absolute/relative prefix, or a "to" placeholder
+  // segment ("path/to/folder"). Additionally, the broadened word shapes
+  // (hyphenated or 2-letter segments) do not exempt a run that also contains
+  // a known directory name — "my-app/src/components" and "dist/es/lib" stay
+  // paths — while runs of plain 3+-letter words keep the pre-existing prose
+  // treatment even when directory-like ("models/views/controllers", see the
+  // passing fixture).
   const nonEmptySegments = segments.filter(s => s !== '');
   const isAbsoluteOrRelative = /^[/~.]/.test(str);
-  if (!isAbsoluteOrRelative && nonEmptySegments.length >= 3 && nonEmptySegments.every(s => /^[a-zA-Z]{3,}$/.test(s)) && !nonEmptySegments.some(s => /\.\w+$/.test(s))) {
+  const hasPlaceholderSegment = nonEmptySegments.includes('to');
+  const allPlainWords = nonEmptySegments.every(s => /^[a-zA-Z]{3,}$/.test(s));
+  const hasKnownDirectorySegment = nonEmptySegments.some(
+    s => knownDirectoryPrefixes.includes(s.toLowerCase())
+  );
+  if (
+    !isAbsoluteOrRelative &&
+    !hasPlaceholderSegment &&
+    nonEmptySegments.length >= 3 &&
+    nonEmptySegments.every(s => /^[a-zA-Z]{2,}(?:-[a-zA-Z]+)*$/.test(s)) &&
+    !nonEmptySegments.some(s => /\.\w+$/.test(s)) &&
+    (allPlainWords || !hasKnownDirectorySegment)
+  ) {
     return false;
   }
 

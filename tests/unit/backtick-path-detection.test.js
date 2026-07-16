@@ -111,6 +111,43 @@ describe("backtick-code-elements path detection", () => {
     });
   });
 
+  describe("prose slash-lists (issue #319)", () => {
+    test("should not flag plural-noun lists", async () => {
+      await testPattern("display modes: grades/stars/half-stars", false);
+    });
+
+    test("should not flag lists containing a two-letter segment", async () => {
+      await testPattern("Search by title/id/year in the library", false);
+    });
+
+    test("should not flag hyphenated compound lists", async () => {
+      await testPattern("Handle auto-renewal/cancellation/refund flows", false);
+    });
+
+    test("should still flag paths ending in a file extension", async () => {
+      await testPattern("Open src/utils/foo.ts to edit", true);
+    });
+
+    test("should still flag 'path/to/folder' placeholder paths", async () => {
+      await testPattern("Open path/to/folder/ for logs", true);
+    });
+
+    test("should still flag hyphenated paths containing a known directory", async () => {
+      await testPattern("Check my-app/src/components for the layout code", true);
+    });
+
+    test("should still flag short-segment paths containing a known directory", async () => {
+      await testPattern("The generated files live in dist/es/lib after the build", true);
+    });
+
+    // Accepted trade-off: an extensionless kebab-case run with no known
+    // directory segment reads as a prose alternative list, so a real path
+    // of that shape goes unflagged rather than prose being flagged.
+    test("should not flag kebab-case runs lacking path evidence", async () => {
+      await testPattern("Rename my-widget/cool-icon/nice-thing before shipping", false);
+    });
+  });
+
   describe("common option patterns", () => {
     test("should not flag pass/fail", async () => {
       await testPattern("The pass/fail criteria are documented", false);
