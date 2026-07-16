@@ -4,7 +4,17 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+---
+
+## [4.1.1] - 2026-07-16
+
+Detection-helper internals, dependency refresh, and release hygiene behind the BCE001 fix.
+
 - Replaced the BCE001 import exclusion regex — a ~100-alternative negative lookahead — with named `Set`s in `detection-helpers.js` (`importProseObjects` plus determiner, positional, and language-name signal sets), with the prose-vs-statement decision order documented on the new `isProseImportUsage` helper
+- Updated dependencies — globals ^17.7.0, js-yaml ^4.3.0 (upstream merge-key hardening; the GHSA-h67p-54hq-rp68 fix was already in ^4.2.0), markdown-it ^14.3.0 — plus a lockfile maintenance pass confined to the dev-dependency tree, with `overrides` kept in lockstep
+- Pointed `templates/package.json` at the `v4.1.0` tag so bootstrapped consumers pull the current release
+- Widened the PR checklist gate's optional-item filter to also accept `*(optional — reason)*` and `<!-- optional: reason -->` markers
+- Corrected the 4.1.0 entry below — the two GHSA IDs were swapped between markdown-it and js-yaml
 
 ---
 
@@ -339,7 +349,9 @@ Documentation structure established.
 
 - Established the project documentation structure using the Diátaxis framework
 
-[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.0...v4.1.1
+[4.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.4...v4.1.0
 [4.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.2...v4.0.0
 [3.0.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v3.0.1...v3.0.2
