@@ -4,6 +4,12 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+---
+
+## [4.1.2] - 2026-07-21
+
+Resolve DL001 false positives on percent-encoded link paths.
+
 ### Fixed
 
 - DL001 now resolves percent-encoded link paths. A link whose target uses URL-encoded spaces — `[Guide](How%20to%20access.md)` — is decoded before the existence check, so pointing at a file whose name contains spaces no longer reports a false "does not exist." Malformed escapes fall back to the raw path rather than crashing the rule.
@@ -621,7 +627,8 @@ Initial release.
 - Initial release of `markdownlint-custom-rules`
 - Introduced `sentence-case-headings-bold` and `backtick-code-elements` rules
 
-[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.2...HEAD
+[4.1.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...v4.1.2
 [4.1.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.3...v4.0.4
