@@ -4,6 +4,10 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- DL001 now resolves percent-encoded link paths. A link whose target uses URL-encoded spaces — `[Guide](How%20to%20access.md)` — is decoded before the existence check, so pointing at a file whose name contains spaces no longer reports a false "does not exist." Malformed escapes fall back to the raw path rather than crashing the rule.
+
 ---
 
 ## [4.1.1] - 2026-07-16

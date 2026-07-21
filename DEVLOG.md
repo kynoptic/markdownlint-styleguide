@@ -4,6 +4,8 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- Percent-decode happens once, right after the anchor split, in `no-dead-internal-links.js`. Decoding before ignore-matching, placeholder checks, and disk resolution means every downstream consumer sees the real filename; the `decodeLinkPath` helper wraps `decodeURIComponent` in a try/catch so a bare `%` degrades to the raw path instead of throwing out of the lint pass.
+
 ---
 
 ## [4.1.1] - 2026-07-16
