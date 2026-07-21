@@ -4,6 +4,12 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+---
+
+## [4.1.2] - 2026-07-21
+
+Percent-decode link paths in DL001 before resolution.
+
 - Percent-decode happens once, right after the anchor split, in `no-dead-internal-links.js`. Decoding before ignore-matching, placeholder checks, and disk resolution means every downstream consumer sees the real filename; the `decodeLinkPath` helper wraps `decodeURIComponent` in a try/catch so a bare `%` degrades to the raw path instead of throwing out of the lint pass.
 
 ---
@@ -351,7 +357,8 @@ Documentation structure established.
 
 - Established the project documentation structure using the Diátaxis framework
 
-[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...HEAD
+[unreleased]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.2...HEAD
+[4.1.2]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.1...v4.1.2
 [4.1.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.4...v4.1.0
 [4.0.1]: https://github.com/kynoptic/markdownlint-styleguide/compare/v4.0.0...v4.0.1
