@@ -113,6 +113,23 @@ function resolvePath(currentFile, linkPath) {
   return path.resolve(dir, linkPath);
 }
 
+/**
+ * Percent-decode a link path so URL-encoded destinations resolve against real
+ * filenames on disk — e.g. "How%20to%20access.md" -> "How to access.md".
+ * Returns the input unchanged when it carries a malformed escape (a bare "%"),
+ * which decodeURIComponent rejects, so the link is still checked rather than
+ * silently skipped.
+ * @param {string} linkPath - The raw link path, before resolution
+ * @returns {string} The decoded path, or the original on a malformed escape
+ */
+function decodeLinkPath(linkPath) {
+  try {
+    return decodeURIComponent(linkPath);
+  } catch {
+    return linkPath;
+  }
+}
+
 // Cache resolved repo roots per starting directory to avoid repeated upward
 // filesystem walks within a single lint run.
 const repoRootCache = new Map(); // startDir -> string|null
@@ -432,8 +449,10 @@ function noDeadInternalLinks(params, onError) {
         continue;
       }
       
-      // Parse the link URL to separate file path and anchor
-      const [filePath, anchor] = linkUrl.split('#');
+      // Parse the link URL to separate file path and anchor, then percent-decode
+      // the path so URL-encoded spaces and other escapes resolve to real files.
+      const [rawFilePath, anchor] = linkUrl.split('#');
+      const filePath = decodeLinkPath(rawFilePath);
 
       if (filePath) {
         // Check if this path should be ignored

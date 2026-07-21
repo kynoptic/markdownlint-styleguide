@@ -158,6 +158,30 @@ This is [a link to non-existent section](#missing-section).
       expect(errors[1].detail).toContain('Link target "subdirectory/missing.md" does not exist');
     });
 
+    test('resolves percent-encoded spaces to real filenames', () => {
+      const markdown = `
+[Encoded space, target exists](spaced%20file.md)
+[Encoded space, target missing](missing%20file.md)
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // The encoded link to "spaced file.md" resolves; only the missing one
+      // errors, and it reports the decoded target name.
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "missing file.md" does not exist');
+    });
+
+    test('does not throw on a malformed percent escape', () => {
+      const markdown = '[Bad escape](bad%ZZname.md)\n';
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      // Malformed escapes fall back to the raw path rather than crashing.
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Link target "bad%ZZname.md" does not exist');
+    });
+
     test('validates heading anchors in other files', () => {
       const markdown = `
 [Valid heading](existing-file.md#section-one)
