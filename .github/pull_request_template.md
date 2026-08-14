@@ -7,7 +7,7 @@ Avoid conventional commit format for PR titles (no "feat:", "fix:", etc.)
 Checklist guidance: every item is in scope by default. Walk the tier ladder
 before marking anything *(optional)*: CLI → browser automation
 (mcp__claude-in-chrome__*) → other MCP/API tooling → human verification.
-Reserve *(optional)* for items that genuinely require human judgment with
+Reserve *(optional)* for items that legitimately require human judgment with
 no automation path (subjective design review, third-party UI behind SSO
 with no API, physical hardware). Don't check a box you didn't verify.
 -->
