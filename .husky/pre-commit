@@ -3,6 +3,9 @@
 
 echo "🔍 Running pre-commit checks..."
 
+# Secret scan. Patterns live in this repo's git config and .gitallowed.
+git secrets --pre_commit_hook --
+
 # Run lint-staged for staged file fixes
 npx lint-staged
 
