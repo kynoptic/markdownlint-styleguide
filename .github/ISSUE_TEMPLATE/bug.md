@@ -16,9 +16,14 @@ Avoid conventional commit format for issues (no "fix:", "bug:", etc.)
 
 <One line description of the bug.>
 
-## The problem
+## Job it breaks
 
-<What's broken and why it matters to users or contributors.>
+<The one thing the person can no longer do.>
+
+<!--
+Bugs skip the story machinery — the broken job is usually obvious. No
+behavior-change field either: bugs restore behavior, they don't create it.
+-->
 
 ## Expected behavior
 
@@ -28,9 +33,22 @@ Avoid conventional commit format for issues (no "fix:", "bug:", etc.)
 
 <What actually happens (include error messages, logs, screenshots).>
 
+## Fix vs. workaround
+
+- **Fix**: <the real repair>
+- **Workaround**: <what unblocks the person today, or "none">
+
+<!-- Keeps the cheap option visible next to the expensive one. -->
+
 ## Proposed solution
 
 <How we'll fix it (technical approach if known).>
+
+## Ongoing tax
+
+<none | local | permanent — what must be supported forever once this is fixed.>
+
+<!-- How often people hit this is a `frequency:` label, not a field here. -->
 
 ## Acceptance criteria (testable)
 
@@ -52,6 +70,5 @@ Avoid vanity tests that only verify framework behavior or trivial operations
 
 ## Links
 
-- **User stories**: `US-XXX`
 - **ADRs**: `ADR-XXX`
 - **Related issues**: `#XXX`
