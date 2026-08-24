@@ -1,9 +1,13 @@
 {
-  "globs": ["**/*.md"],
   "gitignore": true,
+  "globs": ["**/*.md"],
   // Recommended configuration for markdownlint-styleguide
   // Enables all custom rules with balanced strictness
   "ignores": [
+    ".gitea/**",
+    ".github/**",
+    "CLAUDE.md",
+    "**/*-template.md",
     "node_modules/**",
     ".tmp/**",
     "tests/.tmp/**",
