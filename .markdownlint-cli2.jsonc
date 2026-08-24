@@ -1,4 +1,6 @@
 {
+  "globs": ["**/*.md"],
+  "gitignore": true,
   // Recommended configuration for markdownlint-styleguide
   // Enables all custom rules with balanced strictness
   "ignores": [
