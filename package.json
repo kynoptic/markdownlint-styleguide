@@ -89,7 +89,7 @@
     "markdown-it": "^14.3.0",
     "markdownlint": "^0.40.0",
     "markdownlint-cli2": "^0.22.1",
-    "prettier": "^3.9.4"
+    "prettier": "^3.9.6"
   },
   "lint-staged": {
     "*.{js,mjs}": [
