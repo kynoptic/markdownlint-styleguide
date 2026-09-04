@@ -4,6 +4,8 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- `headingToAnchor` in `no-dead-internal-links.js` replaced its `\s+` run-collapse with a two-step pass: drop every whitespace character except U+0020 via `[^\S ]+`, then map each remaining space one-for-one. That mirrors `github-slugger`, whose strip class covers the whole JavaScript `\s` set and whose only hyphenation step is a literal-space replace. Two pre-existing test expectations encoded the old collapsing behavior and were corrected against the real library's output rather than preserved.
+
 ---
 
 ## [4.1.2] - 2026-07-21
