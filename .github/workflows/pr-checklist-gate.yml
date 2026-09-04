@@ -25,10 +25,32 @@ jobs:
         run: |
           # Strip optional items (lines ending with *(optional)*, *(optional — reason)*,
           # <!-- optional -->, or <!-- optional: reason -->)
-          FILTERED=$(echo "$PR_BODY" | grep -vE '\*\(optional\b' | grep -vE '<!--\s*optional\b' || true)
+          #
+          # Also strip bot control checkboxes. A checkbox whose text begins with an HTML
+          # comment is a machine affordance, not a checklist item a human has to satisfy:
+          # Renovate ends every PR body with
+          #     - [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check this box
+          # which requests a rebase when ticked, so it can never legitimately be checked.
+          # Without this filter the gate fails every dependency PR forever, on a box that
+          # must stay empty. Matching the leading comment rather than the word
+          # "rebase-check" covers Dependabot and any other bot using the same convention.
+          # Human checklist lines never open with a comment, so nothing they write is
+          # excluded here.
+          FILTERED=$(echo "$PR_BODY" \
+            | grep -vE '\*\(optional\b' \
+            | grep -vE '<!--\s*optional\b' \
+            | grep -vE '^[[:space:]]*- \[ \][[:space:]]*<!--' \
+            || true)
 
           # Count unchecked items
           UNCHECKED=$(echo "$FILTERED" | grep -cE '^\s*- \[ \]' || true)
+
+          # An empty count means the comparison itself broke rather than that the body was
+          # clean, so refuse instead of falling through to the success message.
+          if ! printf '%s' "$UNCHECKED" | grep -qE '^[0-9]+$'; then
+            echo "❌ Could not count checklist items — the gate did not run correctly."
+            exit 1
+          fi
 
           if [ "$UNCHECKED" -gt 0 ]; then
             echo "❌ $UNCHECKED unchecked checklist item(s) found:"
@@ -39,6 +61,9 @@ jobs:
             echo "To exclude an item: append *(optional)* to the line — only when no automation path exists."
             echo "Default: attempt the item via CLI, browser automation, or other tooling before marking it optional."
             exit 1
+          elif [ "$UNCHECKED" -eq 0 ]; then
+            echo "✅ All checklist items are checked."
+          else
+            echo "❌ Unexpected checklist count: $UNCHECKED"
+            exit 1
           fi
-
-          echo "✅ All checklist items are checked."
