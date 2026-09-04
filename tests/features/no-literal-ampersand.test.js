@@ -315,6 +315,57 @@ function test() {
     });
   });
 
+  describe('double-quoted literal strings (#336)', () => {
+    test('ignores an ampersand inside a matched pair of double quotes', () => {
+      const markdown = '# Test\n\n- Label: "Max of CPU & GPU" sensor (`Max of CPU & GPU`)';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('flags an ampersand that merely follows a single unmatched double quote', () => {
+      // A lone quotation mark does not open a quoted string, so prose after it
+      // must still be reported.
+      const markdown = 'He said "hello there and then dogs & cats appeared.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Use "and" instead of literal ampersand (&)');
+    });
+
+    test('flags an ampersand between two separate quoted spans', () => {
+      const markdown = 'Compare "CPU & GPU" & "disk & network" readings.';
+      const errors = runRuleWithContent(markdown);
+
+      // Only the & sitting between the two quoted spans is a violation.
+      expect(errors).toHaveLength(1);
+      expect(errors[0].range[0]).toBe(21);
+    });
+
+    test('flags an ampersand in prose that appears after a closed quoted span', () => {
+      const markdown = 'The "verbatim" label covers dogs & cats too.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+
+    test('does not exempt an ampersand before the first double quote', () => {
+      const markdown = 'Dogs & cats appear in the "Max of CPU & GPU" sensor.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].range[0]).toBe(6);
+    });
+
+    test('still flags an ampersand in prose containing typographic quotes', () => {
+      // Curly quotes are not treated as verbatim string delimiters.
+      const markdown = 'The \u201cMax of CPU\u201d sensor covers dogs & cats.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+  });
+
   describe('rule metadata', () => {
     test('has correct rule names', () => {
       expect(noLiteralAmpersandRule.names).toEqual(['no-literal-ampersand', 'NLA001']);
