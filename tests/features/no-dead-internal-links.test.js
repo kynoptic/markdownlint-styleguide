@@ -244,7 +244,7 @@ This is [a link to non-existent section](#missing-section).
 ## Another Section & More Text
 
 [Link to first heading](#test-heading-with-special-characters)
-[Link to second heading](#another-section-more-text)
+[Link to second heading](#another-section--more-text)
 [Link to wrong format](#Test-Heading-With-Special-Characters!)
 `;
       
@@ -609,7 +609,7 @@ Special Characters & Symbols!
 Mixed Content-123 (Test)
 ------------------------
 
-[Link to special](#special-characters-symbols)
+[Link to special](#special-characters--symbols)
 [Link to mixed](#mixed-content-123-test)
 [Link to wrong format](#Special-Characters-&-Symbols!)
 `;
@@ -1019,6 +1019,37 @@ Another paragraph.
       const errors = runRuleWithContent(markdown, testFile);
 
       expect(errors).toHaveLength(0);
+    });
+
+    test('gives each space around a stripped em dash its own hyphen', () => {
+      const markdown = `
+# Test
+
+### Theft — host hardening does not close it
+
+See [Theft](#theft--host-hardening-does-not-close-it) for details.
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('reports the collapsed single-hyphen form as a dead anchor', () => {
+      const markdown = `
+# Test
+
+### Theft — host hardening does not close it
+
+See [Theft](#theft-host-hardening-does-not-close-it) for details.
+`;
+
+      const errors = runRuleWithContent(markdown, testFile);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain(
+        'Heading anchor "#theft-host-hardening-does-not-close-it" not found in current file'
+      );
     });
   });
 
