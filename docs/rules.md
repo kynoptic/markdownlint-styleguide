@@ -84,9 +84,9 @@ Anchor checks use GitHub-style slugs: Unicode letters are retained and punctuati
 
 ## `no-literal-ampersand` (NLA001)
 
-Flag standalone literal `&` in prose and suggest "and". Ampersands inside code spans, code blocks, HTML entities, and double-quoted strings are ignored.
+Flag standalone literal `&` in prose and suggest "and". An ampersand is ignored inside a code block or YAML frontmatter, an HTML entity such as `&amp;`, and any of the six verbatim spans the rule derives per line: an inline code span, a link destination, an HTML comment, an HTML tag, bracketed link text, and a double-quoted string.
 
-Text between a matched pair of straight double quotes is treated as verbatim, so `"Max of CPU & GPU"` is left alone. Quotes pair in order of appearance, so an ampersand following a single unmatched `"` is still flagged. Typographic quotes (`“”`) and single quotes do not create an exemption. Quotes inside a code span, link destination, or HTML comment are not counted as delimiters. Pairing is per line, so a quoted string that opens on one line and closes on the next gets no exemption and its ampersand is still flagged.
+Text between a matched pair of straight double quotes is treated as verbatim, so `"Max of CPU & GPU"` is left alone. Quotes pair in order of appearance, so an ampersand following a single unmatched `"` is still flagged. Typographic quotes (`“”`) and single quotes do not create an exemption. A quote that is backslash-escaped, or that sits inside one of the other five spans above, is not counted as a delimiter, so it cannot pair with a later quote and swallow the prose between them. Pairing is per line, so a quoted string that opens on one line and closes on the next gets no exemption and its ampersand is still flagged.
 
 ## `no-empty-list-items` (ELI001)
 
