@@ -86,3 +86,38 @@ describe("no-empty-list-items rule with inline content", () => {
     expect(results.test.length).toBe(0);
   });
 });
+
+describe("no-empty-list-items rule with digit-period leading tokens", () => {
+  test("does not flag ordered items whose text starts with a digit and period", async () => {
+    const results = await lint({
+      strings: {
+        test:
+          "1. 1. Some text starting with a digit\n" +
+          "2. 2. More text\n" +
+          "3. Normal item with no leading digit\n",
+      },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test).toEqual([]);
+  });
+
+  test("does not flag unordered items whose text starts with a dash", async () => {
+    const results = await lint({
+      strings: { test: "- - dash prefixed text\n- plain text\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test).toEqual([]);
+  });
+
+  test("still flags a genuinely empty item beside a digit-period item", async () => {
+    const results = await lint({
+      strings: { test: "1. 1. Real content\n2. \n3. Third\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test.length).toBe(1);
+    expect(results.test[0].lineNumber).toBe(2);
+  });
+});
