@@ -121,3 +121,41 @@ describe("no-empty-list-items rule with digit-period leading tokens", () => {
     expect(results.test[0].lineNumber).toBe(2);
   });
 });
+
+describe("no-empty-list-items rule with empty nested lists", () => {
+  test("flags an ordered item whose only content is an empty nested marker", async () => {
+    const results = await lint({
+      strings: { test: "1. 1.\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test.map((v) => v.lineNumber)).toEqual([1]);
+  });
+
+  test("flags an unordered item whose only content is an empty nested marker", async () => {
+    const results = await lint({
+      strings: { test: "- -\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test.map((v) => v.lineNumber)).toEqual([1]);
+  });
+
+  test("flags an item empty through two levels of nested markers", async () => {
+    const results = await lint({
+      strings: { test: "1. 1. 1.\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test.map((v) => v.lineNumber)).toEqual([1]);
+  });
+
+  test("does not flag an item with text below two levels of nested markers", async () => {
+    const results = await lint({
+      strings: { test: "1. 1. 1. deep text\n" },
+      customRules: [noEmptyListItems],
+      config: { default: false, "no-empty-list-items": true },
+    });
+    expect(results.test).toEqual([]);
+  });
+});
