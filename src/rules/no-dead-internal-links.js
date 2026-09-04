@@ -50,8 +50,14 @@ function headingToAnchor(heading) {
     // (Di\u00e1taxis -> di\u00e1taxis) but strips punctuation rather than hyphenating it,
     // so "evals.json" becomes "evalsjson" and "don't" becomes "dont".
     .replace(/[^\p{L}\p{N}\p{M}_\s-]+/gu, '')
-    // Collapse runs of whitespace into single hyphens
-    .replace(/\s+/g, '-')
+    // Drop non-space whitespace (tab, newline, form feed, carriage return),
+    // which github-slugger removes with the rest of the C0 control range.
+    .replace(/[^\S ]+/g, '')
+    // Replace each remaining space with its own hyphen rather than collapsing
+    // runs, matching github-slugger's `.replace(/ /g, '-')`. A heading like
+    // "Theft \u2014 host hardening" loses the em dash but keeps both spaces
+    // around it, so GitHub generates "theft--host-hardening".
+    .replace(/ /g, '-')
     // Remove leading/trailing hyphens
     .replace(/^-+|-+$/g, '');
 }
