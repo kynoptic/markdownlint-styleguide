@@ -4,6 +4,8 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- `isCodeIdentifier` in `sentence-case/word-validators.js` gained a segment-level check rather than another entry in the `CODE_IDENTIFIER_PATTERNS` table. A single regex cannot separate `HTTP_Client` from `ABC_Def` — the two are structurally identical, an all-caps run plus a capitalized word — so the discriminator is a `casingTerms` lookup on the all-caps segment. A first draft required only "starts capitalized, contains a lowercase letter somewhere," which exempted ordinary prose compounds; the segment loop replaced it. The check reads the default `casingTerms` table rather than the config-merged terms every other decision in the module receives, which is tracked in #349.
+
 ---
 
 ## [4.1.2] - 2026-07-21

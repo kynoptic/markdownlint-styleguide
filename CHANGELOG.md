@@ -4,6 +4,10 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- SC001 no longer flags a mixed-case identifier containing an underscore. `EasyAntiCheat_EOS` and `HTTP_Client` begin with an uppercase letter, but the identifier exemption's patterns all omitted `_` from their character classes, so the token matched none of them and fell through to the capitalization error — which also offered an autofix rewriting it to `Easyanticheat_eos`. Plain capitalized compounds joined by underscores, such as `New_York` or `Read_Me`, are still flagged: at least one underscore-joined segment must itself carry a `camelCase` hump or be a recognized all-caps acronym.
+
 ---
 
 ## [4.1.2] - 2026-07-21
