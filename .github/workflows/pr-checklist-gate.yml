@@ -32,22 +32,32 @@ jobs:
           #     - [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check this box
           # which requests a rebase when ticked, so it can never legitimately be checked.
           # Without this filter the gate fails every dependency PR forever, on a box that
-          # must stay empty. Matching the leading comment rather than the word
-          # "rebase-check" covers Dependabot and any other bot using the same convention.
+          # must stay empty. Matching the leading comment rather than the literal word
+          # "rebase-check" means a future bot adopting the same convention is covered too.
+          # Verified against Renovate only: a sample of Dependabot PR bodies carries no
+          # checkbox at all — it offers comment commands such as "@dependabot rebase"
+          # inside a <details> block — so there is nothing of Dependabot's to exclude.
           # Human checklist lines never open with a comment, so nothing they write is
           # excluded here.
-          FILTERED=$(echo "$PR_BODY" \
+          # Number every line of the body up front, so the line numbers reported below are
+          # the author's and not positions in a filtered stream. Numbering afterwards was
+          # off by the count of filtered lines, which sent the reader to the wrong line.
+          NUMBERED=$(echo "$PR_BODY" | grep -n '' || true)
+
+          FILTERED=$(printf '%s\n' "$NUMBERED" \
             | grep -vE '\*\(optional\b' \
             | grep -vE '<!--\s*optional\b' \
-            | grep -vE '^[[:space:]]*- \[ \][[:space:]]*<!--' \
+            | grep -vE '^[0-9]+:[[:space:]]*- \[ \][[:space:]]*<!--' \
             || true)
 
           # Count unchecked items
-          UNCHECKED=$(echo "$FILTERED" | grep -cE '^\s*- \[ \]' || true)
+          UNCHECKED=$(printf '%s\n' "$FILTERED" | grep -cE '^[0-9]+:[[:space:]]*- \[ \]' || true)
 
           # An empty count means the comparison itself broke rather than that the body was
-          # clean, so refuse instead of falling through to the success message.
-          if ! printf '%s' "$UNCHECKED" | grep -qE '^[0-9]+$'; then
+          # clean, so refuse instead of falling through to the success message. Matched
+          # whole-line, so a multi-line value cannot satisfy the guard on one of its lines
+          # and then die in the integer comparison below.
+          if ! printf '%s' "$UNCHECKED" | grep -qxE '[0-9]+'; then
             echo "❌ Could not count checklist items — the gate did not run correctly."
             exit 1
           fi
@@ -55,7 +65,7 @@ jobs:
           if [ "$UNCHECKED" -gt 0 ]; then
             echo "❌ $UNCHECKED unchecked checklist item(s) found:"
             echo ""
-            echo "$FILTERED" | grep -nE '^\s*- \[ \]' | sed 's/^/  /'
+            printf '%s\n' "$FILTERED" | grep -E '^[0-9]+:[[:space:]]*- \[ \]' | sed 's/^/  /'
             echo ""
             echo "To bypass: add the 'skip-checklist' label to this PR (rare — requires a real reason)."
             echo "To exclude an item: append *(optional)* to the line — only when no automation path exists."
