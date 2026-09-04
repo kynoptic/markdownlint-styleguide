@@ -144,8 +144,11 @@ describe("toSentenceCase", () => {
   });
 
   test("test_should_preserve_single_quoted_text", () => {
+    // "GitHub" is PascalCase, so the code-identifier exemption preserves it even
+    // with an empty term dictionary. Before #342 the fix builder lowercased it to
+    // "github" while the validator exempted it from being reported at all.
     const result = toSentenceCase("When To Use 'Git' Vs GitHub", {});
-    expect(result).toBe("When to use 'Git' vs github");
+    expect(result).toBe("When to use 'Git' vs GitHub");
   });
 
   test("test_should_preserve_contractions_like_dont_and_wont", () => {

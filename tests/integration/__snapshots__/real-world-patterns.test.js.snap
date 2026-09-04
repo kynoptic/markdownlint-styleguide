@@ -1200,7 +1200,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "fixInfo": {
           "deleteCount": 13,
           "editColumn": 5,
-          "insertText": "Usestate hook",
+          "insertText": "useState hook",
         },
         "lineNumber": 20,
         "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
@@ -1218,7 +1218,7 @@ exports[`Real-World Pattern Tests Combined Rule Analysis - Snapshot Tests all ru
         "fixInfo": {
           "deleteCount": 14,
           "editColumn": 5,
-          "insertText": "Useeffect hook",
+          "insertText": "useEffect hook",
         },
         "lineNumber": 40,
         "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
@@ -2033,7 +2033,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
     "fixInfo": {
       "deleteCount": 13,
       "editColumn": 5,
-      "insertText": "Usestate hook",
+      "insertText": "useState hook",
     },
     "lineNumber": 20,
     "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",
@@ -2051,7 +2051,7 @@ exports[`Real-World Pattern Tests Sentence Case Heading Rule - Snapshot Tests re
     "fixInfo": {
       "deleteCount": 14,
       "editColumn": 5,
-      "insertText": "Useeffect hook",
+      "insertText": "useEffect hook",
     },
     "lineNumber": 40,
     "ruleDescription": "Ensures ATX (\`# \`) headings and bold text (\`**bold**\`) in list items use sentence case: first word capitalized, rest lowercase except acronyms and "I". Configure with "specialTerms" for custom terms.",

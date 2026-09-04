@@ -80,6 +80,44 @@ export function isCodeIdentifier(word) {
 }
 
 /**
+ * Surrounding characters that are not part of an identifier. Underscores are
+ * kept because a snake_case identifier may legitimately open with one, so only
+ * characters that are neither a letter, a digit, nor an underscore are stripped.
+ */
+const IDENTIFIER_AFFIX_LEAD = /^[^\p{L}\p{N}_]+/u;
+const IDENTIFIER_AFFIX_TRAIL = /[^\p{L}\p{N}_]+$/u;
+
+/**
+ * The single decision every SC001 casing path consults: must this
+ * whitespace-delimited token be left exactly as the author wrote it?
+ *
+ * Every reporting path and the fix builder read this one answer, and the fix
+ * guard in fix-builder.js verifies the answer held, so a fixer and a checker
+ * cannot disagree about which tokens are off limits (#342). The token may carry
+ * surrounding markup or punctuation (`**useEffect**`, `(useEffect)`,
+ * `useEffect.`); those affixes are stripped before the identifier patterns run.
+ *
+ * @param {string} token A whitespace-delimited token from the source text.
+ * @returns {boolean} True when no casing path may report or rewrite the token.
+ */
+export function isExemptCodeToken(token) {
+  const core = token.replace(IDENTIFIER_AFFIX_LEAD, '').replace(IDENTIFIER_AFFIX_TRAIL, '');
+  return core !== '' && isCodeIdentifier(core);
+}
+
+/**
+ * Lists the tokens of a span that isExemptCodeToken exempts. The fix builder
+ * preserves exactly these tokens and the fix guard checks exactly these tokens,
+ * both from this one derivation (#342).
+ *
+ * @param {string} text The span to scan.
+ * @returns {string[]} The exempt tokens, in source order, with affixes intact.
+ */
+export function exemptCodeTokens(text) {
+  return text.split(/\s+/).filter((token) => token !== '' && isExemptCodeToken(token));
+}
+
+/**
  * Determines whether a hyphenated compound is acceptable because every segment
  * is individually valid: a lowercase word, a short acronym, or a segment whose
  * casing matches a configured acronym or proper noun (e.g. "high-CEFR",
@@ -196,8 +234,11 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
       // Regular sentence case - first letter uppercase, rest lowercase
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
-        // Allow short acronyms (<= 4 chars, all caps)
-        if (!isAcronym(firstWord)) {
+        // Allow short acronyms (<= 4 chars, all caps) and code identifiers.
+        // The identifier exemption applies here exactly as it does on the
+        // no-emoji path below; this branch returned before reaching it, so
+        // "## 🚀 useEffect setup" was flagged and lowercased (#342).
+        if (!isAcronym(firstWord) && !isExemptCodeToken(firstWord)) {
           return {
             isValid: false,
             errorMessage: `First word "${firstWord}" should be "${expectedSentenceCase}".`
@@ -337,7 +378,7 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
       if (firstWord !== expectedSentenceCase) {
         // Allow short acronyms (<= 4 chars, all caps)
         // Allow code identifiers (camelCase, PascalCase, snake_case)
-        if (!isAcronym(firstWord) && !isCodeIdentifier(firstWord)) {
+        if (!isAcronym(firstWord) && !isExemptCodeToken(firstWord)) {
           return {
             isValid: false,
             errorMessage: "Heading's first word should be capitalized."
@@ -568,7 +609,7 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
       word !== 'I' && // Allow the pronoun "I"
       !expectedWordCasing && // If it's not a known proper noun/technical term
       !word.startsWith('PRESERVED') &&
-      !isCodeIdentifier(word) // Allow code identifiers (camelCase, PascalCase, snake_case)
+      !isExemptCodeToken(word) // Allow code identifiers (camelCase, PascalCase, snake_case)
     ) {
       return {
         isValid: false,

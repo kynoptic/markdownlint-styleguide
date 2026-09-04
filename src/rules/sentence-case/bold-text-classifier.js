@@ -10,7 +10,7 @@
 
 import { isAcronym } from '../shared-heuristics.js';
 import { UNICODE_UPPERCASE_REGEX, contextualAllCapsTerms } from '../shared-constants.js';
-import { isAcceptableHyphenatedCompound, validateFirstWord } from './word-validators.js';
+import { isAcceptableHyphenatedCompound, isExemptCodeToken, validateFirstWord } from './word-validators.js';
 import {
   findFirstValidationWord,
   getProperPhraseIndices,
@@ -74,6 +74,16 @@ export function performBoldTextValidation(words, cleanedText, hadLeadingEmoji, s
 
     // Skip ambiguous terms - words that could be either common nouns or proper nouns (e.g., "go", "rust", "word")
     if (ambiguousTerms[wordLower] || ambiguousTerms[wordForLookup]) {
+      continue;
+    }
+
+    // A code identifier keeps the casing its author gave it. This check sits at
+    // the top of the loop so every casing message emitted below it is covered by
+    // the one exemption decision; this path previously duplicated the lowercase
+    // rule without consulting the exemption at all, so "**Configure useEffect**"
+    // was flagged and lowercased (#342). A configured special term still wins,
+    // matching the precedence the heading subsequent-word path already applies.
+    if (!expectedWordCasing && isExemptCodeToken(word)) {
       continue;
     }
 

@@ -9,6 +9,60 @@ import { createSafeFixInfo } from '../autofix-safety.js';
 import { stripLeadingSymbols } from './case-classifier.js';
 import { escapeRegExp } from '../shared-utils.js';
 import { contextualAllCapsTerms } from '../shared-constants.js';
+import { exemptCodeTokens, isExemptCodeToken } from './word-validators.js';
+
+/**
+ * Internal placeholder used to hold a span out of the word-by-word casing pass.
+ *
+ * The delimiter is a NULL character, which cannot appear in Markdown and has no
+ * upper or lower case, so the token round-trips through the case transformations
+ * below unchanged. The previous `__P_<n>__` form did not: a placeholder that
+ * landed inside a larger token (preserving "_is_" out of "This_is_a_sentence"
+ * leaves "This__P_0__a_sentence") was lowercased along with its host word, and
+ * the case-sensitive restore step then failed to match "__p_0__" and wrote the
+ * placeholder into the document (#343).
+ *
+ * @param {number} index Index into the preserved-segment array.
+ * @returns {string} The placeholder token.
+ */
+function placeholderFor(index) {
+  return `\u0000${index}\u0000`;
+}
+
+/** Matches a placeholder produced by placeholderFor, capturing its index. */
+// eslint-disable-next-line no-control-regex
+const PLACEHOLDER_PATTERN = /\u0000(\d+)\u0000/g;
+
+/** Prefix identifying a token that is entirely, or begins with, a placeholder. */
+const PLACEHOLDER_PREFIX = '\u0000';
+
+/**
+ * Matches any internal bookkeeping token that must never reach a document: the
+ * placeholder above, the `__P_<n>__` form it replaced in either casing, and the
+ * `__PRESERVED_<n>__` form used by shared-heuristics.js.
+ */
+// eslint-disable-next-line no-control-regex
+const INTERNAL_TOKEN_PATTERN = /\u0000|__P_\d+__|__PRESERVED_\d+__/i;
+
+/**
+ * Rejects a candidate fix that would corrupt the document.
+ *
+ * This is a backstop, not the primary fix: the casing paths consult
+ * isExemptCodeToken and the placeholder round-trips by construction. It exists
+ * so that a path which forgets either degrades to "no autofix offered" instead
+ * of "document corrupted". It reads the same exemption derivation the fixer
+ * reads, so the two cannot disagree about which tokens are off limits.
+ *
+ * @param {string} originalText The text the fix would replace.
+ * @param {string} fixedText The replacement text.
+ * @returns {boolean} True when the fix must be discarded.
+ */
+function isCorruptingFix(originalText, fixedText) {
+  if (INTERNAL_TOKEN_PATTERN.test(fixedText)) {
+    return true;
+  }
+  return exemptCodeTokens(originalText).some((token) => !fixedText.includes(token));
+}
 
 /**
  * Converts a string to sentence case, respecting preserved segments and multi-word special terms.
@@ -27,9 +81,24 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
   // Preserve markup, code, links, versions, dates, bold, italic, and quoted text
   const preservedSegmentsRegex = /`[^`]+`|\[[^\]]+\]\([^)]+\)|\[[^\]]+\]|\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9.]+)?)\b|\b(\d{4}-\d{2}-\d{2})\b|(\*\*|__)(.*?)\3|(\*|_)(.*?)\5|"[^"]+"|(?<!\w)'[^']+'/g;
 
-  let processed = textToProcess.replace(preservedSegmentsRegex, (m) => {
+  // Hold exempt code identifiers out of the casing pass first, before the markup
+  // regex runs. Order matters: the italic branch of that regex would otherwise
+  // swallow the interior of a snake_case identifier ("user_name_id" -> the "_name_"
+  // span), splitting a token the validator exempts and rewriting the remains (#342).
+  let processed = textToProcess
+    .split(/(\s+)/)
+    .map((token) => {
+      if (!isExemptCodeToken(token)) {
+        return token;
+      }
+      preserved.push(token);
+      return placeholderFor(preserved.length - 1);
+    })
+    .join('');
+
+  processed = processed.replace(preservedSegmentsRegex, (m) => {
     preserved.push(m);
-    return `__P_${preserved.length - 1}__`;
+    return placeholderFor(preserved.length - 1);
   });
 
   // Handle multi-word special terms BEFORE word-by-word processing
@@ -44,12 +113,12 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
     processed = processed.replace(regex, () => {
       // Preserve the correctly-cased phrase
       preserved.push(phraseCorrect);
-      return `__P_${preserved.length - 1}__`;
+      return placeholderFor(preserved.length - 1);
     });
   }
 
   const words = processed.split(/\s+/).filter(Boolean);
-  const firstWordIndex = words.findIndex((w) => !w.startsWith('__P_'));
+  const firstWordIndex = words.findIndex((w) => !w.startsWith(PLACEHOLDER_PREFIX));
 
   if (firstWordIndex === -1) {
     return null;
@@ -57,7 +126,7 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
 
   let firstVisibleWordCased = false;
   const fixedWords = words.map((w) => {
-    if (w.startsWith('__P_')) {
+    if (w.startsWith(PLACEHOLDER_PREFIX)) {
       // Multi-word special terms (like "Agent Skills") count as having the first word
       // so subsequent words should be lowercase
       firstVisibleWordCased = true;
@@ -146,7 +215,7 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
   });
 
   let fixed = fixedWords.join(' ');
-  fixed = fixed.replace(/__P_(\d+)__/g, (_, idx) => preserved[Number(idx)]);
+  fixed = fixed.replace(PLACEHOLDER_PATTERN, (_, idx) => preserved[Number(idx)]);
 
   const fullFixed = emojiPrefix + fixed;
   return fullFixed === text ? null : fullFixed;
@@ -170,7 +239,7 @@ export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig, amb
   const prefixLength = match[1].length + match[2].length;
   const fixedText = toSentenceCase(text, specialCasedTerms, ambiguousTerms);
 
-  if (!fixedText) {
+  if (!fixedText || isCorruptingFix(text, fixedText)) {
     return undefined;
   }
 
@@ -206,7 +275,7 @@ export function buildBoldTextFix(line, originalBoldText, fixedBoldText, safetyCo
   const boldPattern = `**${originalBoldText}**`;
   const boldIndex = line.indexOf(boldPattern, startIndex);
 
-  if (boldIndex === -1) {
+  if (boldIndex === -1 || isCorruptingFix(originalBoldText, fixedBoldText)) {
     return undefined;
   }
 
