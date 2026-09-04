@@ -11,6 +11,7 @@
 import { isAcronym } from '../shared-heuristics.js';
 import {
   camelCaseExemptions,
+  casingTerms,
   mcMacNamePattern,
   contextualAllCapsTerms
 } from '../shared-constants.js';
@@ -52,17 +53,70 @@ const CODE_IDENTIFIER_PATTERNS = {
   // Uses requirement of 2+ uppercase letters to avoid matching proper nouns like "Paris"
   pascalCase: /^[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*$/,
   // snake_case: lowercase with underscores (user_name, max_retries)
-  snakeCase: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/,
-  // Mixed-case compound: uppercase-leading segments joined by underscores, where
-  // the segments themselves are camelCase, PascalCase, or acronyms
-  // (EasyAntiCheat_EOS, HTTP_Client). The other identifier patterns exclude the
-  // underscore from their character classes, so such a token matched none of them
-  // and was flagged as an uncapitalized first word (#335). The lookahead requires
-  // a lowercase letter so all-caps constants (MAX_RETRIES) keep their existing
-  // treatment, and the uppercase start keeps lowercase-leading tokens
-  // ("easy_Anti_Cheat") subject to the first-word check.
-  mixedCaseUnderscore: /^[A-Z](?=[A-Za-z0-9_]*[a-z])[A-Za-z0-9]*(?:_[A-Za-z0-9]+)+$/
+  snakeCase: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/
 };
+
+/**
+ * Shape of one underscore-joined segment: alphanumeric, starting with a letter.
+ */
+const UNDERSCORE_SEGMENT_PATTERN = /^[A-Za-z][A-Za-z0-9]*$/;
+
+/**
+ * A segment carrying an internal lowercase-to-uppercase transition, the shape of
+ * a multi-word code identifier ("EasyAntiCheat", "HttpClient"). A plain
+ * capitalized word ("York", "Client", "Def") has no such transition, which is
+ * what separates an identifier from an English word typed with underscores.
+ */
+const CAMEL_HUMP_PATTERN = /[a-z][A-Z]/;
+
+/**
+ * Determines whether an uppercase-leading, underscore-joined token is a code
+ * identifier rather than an English phrase typed with underscores instead of
+ * spaces. The other identifier patterns exclude the underscore from their
+ * character classes, so a token like "EasyAntiCheat_EOS" matched none of them and
+ * was flagged as an uncapitalized first word (#335).
+ *
+ * At least one segment must be identifier-shaped on its own: either it carries a
+ * camelCase hump ("EasyAntiCheat") or it is a recognized all-caps acronym whose
+ * canonical casing is configured in casingTerms ("HTTP"). Requiring a recognized
+ * acronym rather than any all-caps run is what keeps "ABC_Def" flagged while
+ * "HTTP_Client" passes. Remaining segments may be plain words, acronyms, or
+ * digit-bearing suffixes.
+ *
+ * Consequently an ordinary capitalized compound stays flagged: "New_York",
+ * "Star_Wars", "Read_Me", "The_Thing", "Well_Known", and "Q1_Results" have no
+ * identifier-shaped segment. All-caps constants ("MAX_RETRIES") and
+ * lowercase-leading tokens ("easy_Anti_Cheat", "easyAntiCheat_EOS") never reach
+ * this check, keeping their existing treatment.
+ * @param {string} word The token to check.
+ * @returns {boolean} True when the token reads as an underscore-joined identifier.
+ */
+function isMixedCaseUnderscoreIdentifier(word) {
+  if (!/^[A-Z]/.test(word) || !word.includes('_')) {
+    return false;
+  }
+
+  const segments = word.split('_');
+  if (segments.length < 2) {
+    return false;
+  }
+
+  let sawIdentifierSegment = false;
+  for (const segment of segments) {
+    if (!UNDERSCORE_SEGMENT_PATTERN.test(segment)) {
+      return false;
+    }
+    if (CAMEL_HUMP_PATTERN.test(segment)) {
+      sawIdentifierSegment = true;
+      continue;
+    }
+    if (isAcronym(segment) && casingTerms[segment.toLowerCase()] === segment) {
+      sawIdentifierSegment = true;
+    }
+  }
+
+  return sawIdentifierSegment;
+}
 
 /**
  * Checks if a word is a code identifier that should preserve its casing.
@@ -85,7 +139,7 @@ export function isCodeIdentifier(word) {
     CODE_IDENTIFIER_PATTERNS.camelCase.test(word) ||
     CODE_IDENTIFIER_PATTERNS.pascalCase.test(word) ||
     CODE_IDENTIFIER_PATTERNS.snakeCase.test(word) ||
-    CODE_IDENTIFIER_PATTERNS.mixedCaseUnderscore.test(word)
+    isMixedCaseUnderscoreIdentifier(word)
   );
 }
 
