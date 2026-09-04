@@ -4,6 +4,14 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Added
+
+- NLA001 treats a double-quoted string as verbatim, the way it already treated a backtick code span. An ampersand inside matched straight double quotes is no longer reported, so a literal label copied from another system — `- Label: "Max of CPU & GPU"` — stops being flagged. Quotes pair in order of appearance, so an ampersand merely following one stray quotation mark is still reported. Typographic quotes and apostrophes create no exemption.
+
+### Changed
+
+- An ampersand inside an unclosed `[` is now reported. Previously the rule exempted everything after a bracket with no closing partner; an unclosed bracket is literal text in Markdown, so `See [odd & thing without a close bracket.` is prose and is flagged.
+
 ---
 
 ## [4.1.2] - 2026-07-21

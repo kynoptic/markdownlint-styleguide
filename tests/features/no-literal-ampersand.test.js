@@ -315,6 +315,245 @@ function test() {
     });
   });
 
+  describe('double-quoted literal strings (#336)', () => {
+    test('ignores an ampersand inside a matched pair of double quotes', () => {
+      const markdown = '# Test\n\n- Label: "Max of CPU & GPU" sensor (`Max of CPU & GPU`)';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('flags an ampersand that merely follows a single unmatched double quote', () => {
+      // A lone quotation mark does not open a quoted string, so prose after it
+      // must still be reported.
+      const markdown = 'He said "hello there and then dogs & cats appeared.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].detail).toContain('Use "and" instead of literal ampersand (&)');
+    });
+
+    test('flags an ampersand between two separate quoted spans', () => {
+      const markdown = 'Compare "CPU & GPU" & "disk & network" readings.';
+      const errors = runRuleWithContent(markdown);
+
+      // Only the & sitting between the two quoted spans is a violation.
+      expect(errors).toHaveLength(1);
+      expect(errors[0].range[0]).toBe(21);
+    });
+
+    test('flags an ampersand in prose that appears after a closed quoted span', () => {
+      const markdown = 'The "verbatim" label covers dogs & cats too.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+
+    test('does not exempt an ampersand before the first double quote', () => {
+      const markdown = 'Dogs & cats appear in the "Max of CPU & GPU" sensor.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].range[0]).toBe(6);
+    });
+
+    test('flags prose ampersands after an unpaired quote inside a code span', () => {
+      // A quote inside a code span must not vote in the quote census, or its
+      // parity flip silences every prose ampersand later on the line.
+      const markdown = 'Use `it\'s a "test` value and real & dogs "quoted" cats & mice.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(2);
+      expect(errors.map((e) => e.range[0])).toEqual([35, 56]);
+    });
+
+    test('flags an ampersand between a pair of typographic quotes', () => {
+      // Curly quotes are not verbatim delimiters, so the & between them counts.
+      const markdown = 'The \u201cCPU & GPU\u201d sensor is fast.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+
+    test('still flags an ampersand in prose containing typographic quotes', () => {
+      // Curly quotes are not treated as verbatim string delimiters.
+      const markdown = 'The \u201cMax of CPU\u201d sensor covers dogs & cats.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+  });
+
+  describe('unified verbatim-span derivation (#336)', () => {
+    // The ampersand decision and the quote census read one span list, so an
+    // unbalanced quote inside any verbatim span cannot flip the parity of the
+    // prose that follows it. One row per mechanism that contributes a span.
+    const mechanismCases = [
+      ['inline code', 'Use `a "b` and dogs & cats.', 21],
+      ['link destination', 'See [x](https://e.com/a"b) and dogs & cats.', 37],
+      ['HTML comment', '<!-- note "x --> and dogs & cats.', 27],
+      ['HTML tag', '<span title="x> and dogs & cats" tail.', 26],
+      ['link text', 'Read [a "b] and dogs & cats" now.', 22],
+      ['backslash escape', 'A literal \\" precedes dogs & cats, then "quoted".', 28]
+    ];
+
+    test.each(mechanismCases)(
+      'an unbalanced quote in %s still leaves the prose ampersand flagged',
+      (_mechanism, markdown, column) => {
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors.map((e) => e.range[0])).toEqual([column]);
+      }
+    );
+
+    test('flags a prose ampersand after an odd quote inside an HTML tag', () => {
+      // Round 2: the tag span ends at its `>`, so the attribute-delimiting
+      // quote never votes in the census and both ampersands stay prose.
+      const markdown = '<img alt="x> stray & inside odd-tag" more & prose.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors.map((e) => e.range[0])).toEqual([20, 43]);
+    });
+
+    test('flags a prose ampersand after an odd quote inside link text', () => {
+      // Round 2: the bracketed label is a span, so its stray quote is not a
+      // prose delimiter and the later quoted span pairs correctly.
+      const markdown = 'See [odd "quote in text] and real & prose "closed" more & stuff.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors.map((e) => e.range[0])).toEqual([35, 57]);
+    });
+
+    test('an escaped quote does not open or close a quoted span', () => {
+      // A `\"` renders as a plain quote but delimits nothing, so it must not
+      // pair with a later opening quote and swallow the prose between them.
+      const markdown = 'A literal \\" precedes dogs & cats, then "quoted".';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors.map((e) => e.range[0])).toEqual([28]);
+    });
+
+    test('an escaped backslash before a quote leaves the quote delimiting', () => {
+      // `\\"` is an escaped backslash followed by a real delimiter, which
+      // opens a span covering the ampersand that follows.
+      const markdown = 'A \\\\" real quote pairs, dogs & cats "x".';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('an unmatched opening bracket does not exempt later prose', () => {
+      // A lone `[` opens no span, exactly as a lone quote opens no span.
+      const markdown = 'See [odd & thing without a close bracket.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors.map((e) => e.range[0])).toEqual([10]);
+    });
+
+    test('an unterminated HTML tag covers the rest of the line', () => {
+      // A tag whose `>` is on a later line still spans to the line end, the
+      // same rule the shared map applies to an unterminated HTML comment.
+      const markdown = 'A tag left open <div class=a & b';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    test('an ampersand inside link text stays exempt', () => {
+      const markdown = 'See [Research & Development](https://example.com) today.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(0);
+    });
+
+    describe('a genuinely quoted ampersand stays exempt', () => {
+      test('quoted span containing a code span with a stray quote', () => {
+        const markdown = 'Label "CPU `a "b` & GPU" done.';
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('two quoted spans separated by a code span with a stray quote', () => {
+        const markdown = 'Use "A & B" `x "y` and "C & D" here.';
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('quoted span inside link text', () => {
+        const markdown = 'See [the "A & B" list](x.md) now.';
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('quoted span after a code span holding only a quote', () => {
+        const markdown = 'Use `"`, then "CPU & GPU".';
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('quoted span whose inner quotes are backslash-escaped', () => {
+        const markdown = '"Run \\"CPU & GPU\\" now".';
+        const errors = runRuleWithContent(markdown);
+
+        expect(errors).toHaveLength(0);
+      });
+    });
+
+    describe('previously verified behaviors survive the restructure', () => {
+      test('an ampersand inside an HTML attribute stays exempt', () => {
+        const errors = runRuleWithContent('<img alt="a & b">');
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('an ampersand inside a link title stays exempt', () => {
+        const errors = runRuleWithContent('[x](y "a & b")');
+
+        expect(errors).toHaveLength(0);
+      });
+
+      test('an ampersand after a single unmatched quote is still flagged', () => {
+        const errors = runRuleWithContent('He said "hello there and then dogs & cats appeared.');
+
+        expect(errors.map((e) => e.range[0])).toEqual([36]);
+      });
+
+      test('only the inside ampersands are exempt across two quoted spans', () => {
+        const errors = runRuleWithContent('Compare "CPU & GPU" & "disk & network" readings.');
+
+        expect(errors.map((e) => e.range[0])).toEqual([21]);
+      });
+
+      test('typographic quotes create no exemption', () => {
+        const errors = runRuleWithContent('The “CPU & GPU” sensor is fast.');
+
+        expect(errors.map((e) => e.range[0])).toEqual([10]);
+      });
+
+      test('a stray angle bracket is not an HTML tag', () => {
+        const errors = runRuleWithContent('Test < & > more text');
+
+        expect(errors.map((e) => e.range[0])).toEqual([8]);
+      });
+
+      test('skipInlineCode false reports the code ampersand, quotes still do not delimit', () => {
+        const markdown = 'Use `a "b & c` and dogs & mice.';
+
+        // Default: the code-span ampersand is exempt, the prose one is not.
+        expect(runRuleWithContent(markdown).map((e) => e.range[0])).toEqual([25]);
+        // skipInlineCode: false reports the code-span ampersand as well, and
+        // the quote inside the code span still delimits nothing.
+        expect(
+          runRuleWithConfig(markdown, { skipInlineCode: false }).map((e) => e.range[0])
+        ).toEqual([11, 25]);
+      });
+    });
+  });
+
   describe('rule metadata', () => {
     test('has correct rule names', () => {
       expect(noLiteralAmpersandRule.names).toEqual(['no-literal-ampersand', 'NLA001']);
