@@ -8,6 +8,9 @@
  * @typedef {import("markdownlint").RuleOnError} RuleOnError
  */
 
+/** Token types that always carry list item content. */
+const CONTENT_TOKEN_TYPES = new Set(["content", "listOrdered", "listUnordered"]);
+
 /**
  * Main rule implementation using micromark tokens.
  * Detects list items that have no content (only whitespace after the marker).
@@ -28,9 +31,12 @@ function noEmptyListItems(params, onError) {
         continue;
       }
 
-      // Check if the next meaningful sibling is content
+      // The sibling after a prefix carries the item's content. It is a
+      // "content" token normally, but micromark nests a whole list token
+      // there when the item's text itself starts with a list marker
+      // (for example "1. 1. text").
       const next = children[i + 1];
-      const hasContent = next && next.type === "content";
+      const hasContent = Boolean(next && CONTENT_TOKEN_TYPES.has(next.type));
 
       if (!hasContent) {
         onError({
