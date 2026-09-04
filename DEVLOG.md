@@ -4,6 +4,8 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- `no-empty-list-items.js` decides emptiness from a `CONTENT_TOKEN_TYPES` set (`content`, `listOrdered`, `listUnordered`) rather than from a single `next.type === "content"` comparison. A whitespace-based check was tried first and rejected: the fixture marks its empty items with an HTML comment, which CommonMark parses as an `htmlFlow` block, so "any non-whitespace content" swallowed exactly the cases the fixture exists to assert.
+
 ---
 
 ## [4.1.2] - 2026-07-21
