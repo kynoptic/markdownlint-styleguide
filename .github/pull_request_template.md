@@ -95,12 +95,6 @@ Drive UI flows with mcp__claude-in-chrome__* before treating anything as human-o
 - [ ] API documentation updated if public APIs added or changed
 - [ ] README updated if public-facing behavior changed
 
-## Conventional commit compliance
-
-- [ ] PR title uses solution-oriented summary (not conventional commit format)
-- [ ] Individual commits follow conventional commit format: `<type>: <description>`, subject ≤ 50 characters, no scope
-- [ ] Body lines start with `-` and stay ≤ 100 characters
-
 ## Additional context
 
 - Link to related issues or stories
