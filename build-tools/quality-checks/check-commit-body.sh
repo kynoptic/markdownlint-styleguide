@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Enforce commit message conventions:
+#   - Subject line is "<type>: <description>", scope and "!" optional
 #   - Subject line <= 50 characters
 #   - A blank line separates the subject from the body
 #   - Body lines (if present) start with "- ", or are Git trailers
@@ -244,6 +245,76 @@ trailer_grammar_re='^[A-Za-z][A-Za-z0-9-]*: +[^[:space:]]'
 issue_reference_shape_re='^[A-Za-z][A-Za-z0-9-]* +#'
 issue_reference_grammar_re='^[A-Za-z][A-Za-z0-9-]*( +#[0-9]+,?)* +#[0-9]+ *$'
 
+# ---------------------------------------------------------------------------
+# Subject grammar
+# ---------------------------------------------------------------------------
+
+# The subject was previously checked for length and nothing else, so any text at
+# all was accepted — "banana: do a thing", ": leading colon only", and bare
+# prose all passed while the file's own header claimed to enforce Conventional
+# Commits. These are the eleven types the shared convention defines; a
+# project-specific type belongs in that convention rather than being appended
+# here, because a type list that drifts per repo is not a convention.
+#
+# Scope is optional and "!" marks a breaking change, both per the Conventional
+# Commits spec, so "feat: x", "feat(api): x" and "feat(api)!: x" all pass. A
+# description is required, and it starts at the first character after the colon
+# and space: "fix:" alone is rejected, and so are "fix:" with a second space and
+# "fix: " followed by a tab, each of which a trailing "." accepted as a
+# description made of whitespace.
+conventional_subject_re='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\([^)]+\))?!?: [^[:space:]]'
+
+# Subjects that cannot carry a type. Git writes every one but "initial commit"
+# itself, and each spelling below was confirmed to reach a commit-msg hook by
+# installing a logging hook in a throwaway repository on git 2.50.1 — which is
+# how a later reader re-verifies the list, command by command:
+#
+#   "Merge "  git's merge message, seen here when a conflicted merge is
+#             finished with `git commit`.
+#   "Squashed commit of the following:"
+#             `git merge --squash <branch>` then `git commit --no-edit`.
+#   "Revert " `git revert --continue`, after a conflicted revert. Plain
+#             `git revert`, with or without --edit, invokes no commit-msg hook,
+#             so it is not what makes this entry necessary.
+#   "Reapply "
+#             the same path for a revert of a revert, which git 2.43 and later
+#             writes instead of a doubled "Revert" (see git-revert(1)).
+#   "fixup!", "squash!", "amend!"
+#             `git commit --fixup HEAD`, `git commit --squash HEAD` and
+#             `git commit --fixup=amend:HEAD~1`. NOT `git rebase -i
+#             --autosquash`: the rebase is what consumes these subjects, but it
+#             invokes no commit-msg hook, so only the `git commit` that writes
+#             one is ever checked here.
+#
+# The Merge, Revert and Reapply prefixes are not localized — fmt-merge-msg.c
+# writes "Merge " and sequencer.c writes "Reapply \"" and "Revert \"" as bare
+# literals, with no translation wrapper — so matching the English is not a
+# locale bug waiting to happen.
+#
+# "initial commit" is the one entry git has no hand in: the shared convention
+# specifies that literal subject for a new repository's first commit, which by
+# definition predates any type being meaningful. It is anchored to the whole
+# subject, so "initial commit of the whole thing" is still rejected.
+#
+# What this exemption grants is narrow: it skips the subject *shape* check and
+# nothing else. The 50-character cap below is deliberately left applying to
+# these subjects too, so `Revert "feat: enforce the commit type prefix in the
+# hook"` still fails on length — being exempt here does not make that workflow
+# complete unaided.
+exempt_subject_re='^(initial commit$|Merge |Squashed commit of the following:|Revert |Reapply |fixup!|squash!|amend!)'
+
+report_malformed_subject() {
+    echo "Subject must be '<type>: <description>' — scope and '!' optional"
+    echo "  Allowed types: feat fix docs style refactor test chore perf ci build revert"
+    echo "  Examples: 'fix: resolve the crash', 'feat(init): add a flag', 'feat!: drop v1'"
+    # Bracketed because a leading or trailing space is part of the verdict and
+    # otherwise invisible: " fix: a thing" is rejected for the space, and printed
+    # bare it is indistinguishable from this label's own spacing, so the subject
+    # reads as correct and the report as nonsense.
+    echo "  Offending subject: [${1}]"
+    errors=$((errors + 1))
+}
+
 report_malformed_trailer() {
     echo "Malformed Git trailer: needs 'Token-Name: value' with a space after the colon"
     echo "  Offending line: ${1}"
@@ -283,6 +354,14 @@ while [ "${line_index}" -lt "${line_count}" ]; do
     line_no=${line_index}
 
     if [ "${line_no}" -eq 1 ]; then
+        # Both subject rules are reported, rather than returning on the first,
+        # so a subject that is the wrong shape *and* too long names both faults
+        # in one run instead of surfacing the second only after a re-commit.
+        if ! [[ "${line}" =~ ${exempt_subject_re} ]] \
+            && ! [[ "${line}" =~ ${conventional_subject_re} ]]; then
+            report_malformed_subject "${line}"
+        fi
+
         char_len "${line}"
         if [ "${CHAR_LEN}" -gt 50 ]; then
             echo "Subject line too long (${CHAR_LEN} > 50 chars): ${line}"
