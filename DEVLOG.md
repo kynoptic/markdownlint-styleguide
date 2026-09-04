@@ -4,6 +4,9 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- Dropped the "Conventional commit compliance" section from the PR template. Two of its three boxes asked a contributor to certify what `check-commit-body.sh` already enforces mechanically on every commit — the 50-character subject limit and the body-line grammar — so a violating commit cannot exist to be attested about. The third asked for "no scope", which contradicts both the hook, whose only line-1 check is length, and the repository's own history, where 15 of the last 25 subjects carry one. That box was declined three times in a single sprint, each with a written explanation, which is what a wrong checklist item looks like. The PR-title guidance the first box duplicated already appears in the template's own instruction comment.
+- Worth knowing what this does not cover: nothing enforces the `<type>:` prefix itself. `check-commit-body.sh` never checks it, despite its header comment claiming to enforce Conventional Commits format. Deleting an unenforced checkbox does not change that; adding the check to the hook would.
+
 ---
 
 ## [4.1.2] - 2026-07-21
