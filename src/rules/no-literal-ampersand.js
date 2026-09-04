@@ -17,11 +17,42 @@ import { createSafeFixInfo } from './autofix-safety.js';
 import { buildLineContext } from './shared-context.js';
 
 /**
+ * Check if a position sits inside a matched pair of straight double quotes.
+ *
+ * Quotes are paired in order of appearance (first with second, third with
+ * fourth), so a lone unmatched quote opens no span and text following it stays
+ * subject to the rule. Only ASCII `"` delimits a verbatim string here;
+ * typographic quotes wrap quoted prose rather than literal strings.
+ *
+ * @param {string} line - The line content
+ * @param {number} position - Character position to check
+ * @returns {boolean} True if the position is between a matched quote pair
+ */
+function isInDoubleQuotedString(line, position) {
+  let openQuote = -1;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] !== '"') {
+      continue;
+    }
+    if (openQuote === -1) {
+      openQuote = i;
+      continue;
+    }
+    if (position > openQuote && position < i) {
+      return true;
+    }
+    openQuote = -1;
+  }
+  return false;
+}
+
+/**
  * Check if a character position is inside inline code or other special context.
  *
  * Code, link, comment, and frontmatter contexts are delegated to the shared
  * line-context helper so detection stays consistent across rules. Only the
- * ampersand-specific HTML entity and inline link-text checks live here.
+ * ampersand-specific HTML entity, double-quoted string, and inline link-text
+ * checks live here.
  *
  * @param {string} line - The line content
  * @param {number} position - Character position to check
@@ -59,6 +90,12 @@ function isInSpecialContext(line, position, skipInlineCode, context, lineIndex) 
     if (/^[a-zA-Z][a-zA-Z0-9]*(\s|$)/.test(tagContent)) {
       return true;
     }
+  }
+
+  // Inside a double-quoted literal string "text & more": quoted text is
+  // verbatim, the same as a code span (#336).
+  if (isInDoubleQuotedString(line, position)) {
+    return true;
   }
 
   // Inside link text [text & more]: the shared map only covers destinations,

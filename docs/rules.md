@@ -84,7 +84,9 @@ Anchor checks use GitHub-style slugs: Unicode letters are retained and punctuati
 
 ## `no-literal-ampersand` (NLA001)
 
-Flag standalone literal `&` in prose and suggest "and". Ampersands inside code spans, code blocks, and HTML entities are ignored.
+Flag standalone literal `&` in prose and suggest "and". Ampersands inside code spans, code blocks, HTML entities, and double-quoted strings are ignored.
+
+Text between a matched pair of straight double quotes is treated as verbatim, so `"Max of CPU & GPU"` is left alone. Quotes pair in order of appearance, so an ampersand following a single unmatched `"` is still flagged. Typographic quotes (`“”`) and single quotes do not create an exemption.
 
 ## `no-empty-list-items` (ELI001)
 
