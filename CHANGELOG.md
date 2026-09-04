@@ -4,6 +4,15 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- DL001 now gives each space in a heading its own hyphen when building the anchor, matching what GitHub actually generates. Where stripping punctuation leaves two adjacent spaces — an em dash between two words is the common case — the rule previously collapsed them to a single hyphen, so `### Theft — host hardening does not close it` produced `theft-host-hardening-does-not-close-it` while GitHub produces `theft--host-hardening-does-not-close-it`. A correct link was reported dead.
+- Non-space whitespace in a heading (tab, newline, carriage return, vertical tab, form feed, and Unicode spaces such as a non-breaking space) is now dropped rather than converted to a hyphen, again matching GitHub's slugger.
+
+### Changed
+
+- A link written against the old collapsed anchor now correctly reports as dead. Any document whose links were authored to satisfy the previous behavior will need those anchors updated to the form GitHub renders.
+
 ---
 
 ## [4.1.2] - 2026-07-21
