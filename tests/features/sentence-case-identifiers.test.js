@@ -134,6 +134,51 @@ describe("sentence-case-heading identifier preservation", () => {
     });
   });
 
+  describe("should preserve mixed-case identifiers containing underscores", () => {
+    test("does not flag a bold list item that is a single capitalized compound identifier", async () => {
+      const violations = await lintString(
+        "# Test\n\n- **EasyAntiCheat_EOS**\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves EasyAntiCheat_EOS as the first word of a heading", async () => {
+      const violations = await lintString(
+        "## EasyAntiCheat_EOS setup notes\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves EasyAntiCheat_EOS later in a heading", async () => {
+      const violations = await lintString(
+        "## Configure EasyAntiCheat_EOS support\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves HTTP_Client in a heading", async () => {
+      const violations = await lintString("## Tuning the HTTP_Client pool\n");
+      expect(violations).toEqual([]);
+    });
+
+    test("still flags a lowercase-leading underscore compound in bold text", async () => {
+      const violations = await lintString("# Test\n\n- **easy_Anti_Cheat**\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags lowercase-leading bold prose", async () => {
+      const violations = await lintString(
+        "# Test\n\n- **lowercase bold label**\n",
+      );
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags title case bold prose", async () => {
+      const violations = await lintString("# Test\n\n- **This Is Title Case**\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+  });
+
   describe("should still flag non-identifier capitalization errors", () => {
     test("flags Title Case words that are not identifiers", async () => {
       const violations = await lintString(

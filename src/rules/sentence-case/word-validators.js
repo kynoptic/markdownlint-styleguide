@@ -52,7 +52,16 @@ const CODE_IDENTIFIER_PATTERNS = {
   // Uses requirement of 2+ uppercase letters to avoid matching proper nouns like "Paris"
   pascalCase: /^[A-Z](?=[a-zA-Z0-9]*[A-Z])[a-zA-Z0-9]*[a-z][a-zA-Z0-9]*$/,
   // snake_case: lowercase with underscores (user_name, max_retries)
-  snakeCase: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/
+  snakeCase: /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/,
+  // Mixed-case compound: uppercase-leading segments joined by underscores, where
+  // the segments themselves are camelCase, PascalCase, or acronyms
+  // (EasyAntiCheat_EOS, HTTP_Client). The other identifier patterns exclude the
+  // underscore from their character classes, so such a token matched none of them
+  // and was flagged as an uncapitalized first word (#335). The lookahead requires
+  // a lowercase letter so all-caps constants (MAX_RETRIES) keep their existing
+  // treatment, and the uppercase start keeps lowercase-leading tokens
+  // ("easy_Anti_Cheat") subject to the first-word check.
+  mixedCaseUnderscore: /^[A-Z](?=[A-Za-z0-9_]*[a-z])[A-Za-z0-9]*(?:_[A-Za-z0-9]+)+$/
 };
 
 /**
@@ -75,7 +84,8 @@ export function isCodeIdentifier(word) {
   return (
     CODE_IDENTIFIER_PATTERNS.camelCase.test(word) ||
     CODE_IDENTIFIER_PATTERNS.pascalCase.test(word) ||
-    CODE_IDENTIFIER_PATTERNS.snakeCase.test(word)
+    CODE_IDENTIFIER_PATTERNS.snakeCase.test(word) ||
+    CODE_IDENTIFIER_PATTERNS.mixedCaseUnderscore.test(word)
   );
 }
 
