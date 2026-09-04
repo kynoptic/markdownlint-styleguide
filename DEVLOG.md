@@ -4,6 +4,12 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- Made the SC001 code-identifier exemption a single derivation. `isExemptCodeToken` and `exemptCodeTokens` in `word-validators.js` wrap the existing `isCodeIdentifier` predicate with token-affix stripping; the validators, `bold-text-classifier.js`, and `fix-builder.js` all read that one answer, and the fix guard verifies it from the same list, so a fixer and a checker cannot disagree about which tokens are off limits (#342)
+- Held exempt identifiers out of the `toSentenceCase` casing pass before the markup regex runs, so its italic branch no longer swallows the interior of a `snake_case` token and shreds it (#342)
+- Traced the placeholder leak to the fix builder's own marker mechanism, not to `preserveSegments` in `shared-heuristics.js`: `preserveSegments` emits `__PRESERVED_<n>__`, while the leaked text was `__p_0__`, the lowercased form of the fix builder's `__P_<n>__`. A marker landing inside a larger token escaped the whole-word guard, was lowercased with its host, and the case-sensitive restore regex then failed to match it. The marker is now NULL-delimited, which has no case and cannot appear in Markdown, so it round-trips by construction (#343)
+- Added `isCorruptingFix` as a backstop in front of both SC001 `fixInfo` producers. It rejects a fix carrying any internal marker, and a fix that drops an exempt token, so a path that forgets the exemption degrades to no autofix offered rather than a corrupted document (#342, #343)
+- Updated two `real-world-patterns` snapshots and one `sentence-case-fix-builder` expectation that had recorded the destructive output; reported violations are unchanged in all three
+
 ---
 
 ## [4.1.2] - 2026-07-21

@@ -4,6 +4,11 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- SC001 `--fix` no longer lowercases a code identifier. The casing exemption for `camelCase`, `PascalCase`, and `snake_case` tokens is now one decision that every reporting and fixing path reads, so `## Configure useEffect Support` corrects only `Support` and leaves `useEffect` alone. Two paths that duplicated the lowercase rule without consulting the exemption — the first word after a leading emoji, and a non-first word in bold text — no longer report an identifier at all. (#342)
+- SC001 `--fix` no longer writes its own placeholder into a document. Fixing `## This_is_a_sentence` wrote `This__p_0__a_sentence`, because the fix builder's internal marker was lowercased with its host word and its restore step then missed it. The marker is now case-invariant, and any fix that would still carry an internal marker, or would alter an exempt identifier, is withheld so the violation is reported without a corrupting fix. (#343)
+
 ---
 
 ## [4.1.2] - 2026-07-21
