@@ -4,6 +4,10 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- `no-literal-ampersand.js` derives its verbatim spans once. `collectVerbatimSpans` returns the line's complete span list in dependency order — the three shared-context predicates, then HTML tags, then bracketed link text, then quoted strings — and both consumers read that one array through `isInVerbatimSpan`. The quote census is a stage of the same derivation rather than a second opinion, so a quote inside any other span cannot delimit a string.
+- That shape replaced two rounds of patching. The rule previously answered "is this position verbatim?" twice, once for the ampersand and once per quote, from different sets of mechanisms; every mismatch silently dropped a violation. Three were reported in sequence — a quote inside a code span, then inside an HTML tag, then inside link text — plus a backslash-escaped quote. Adding a mechanism now changes one array and both consumers see it in the same call.
+- The two `lastIndexOf` probes are gone. `lastIndexOf` answers "is an unclosed opener behind me?" rather than "am I inside a span," which is why an unclosed `[` used to exempt the rest of the line.
+
 ---
 
 ## [4.1.2] - 2026-07-21
