@@ -21,17 +21,30 @@ import { buildLineContext } from './shared-context.js';
  *
  * Quotes are paired in order of appearance (first with second, third with
  * fourth), so a lone unmatched quote opens no span and text following it stays
- * subject to the rule. Only ASCII `"` delimits a verbatim string here;
- * typographic quotes wrap quoted prose rather than literal strings.
+ * subject to the rule. A quote inside inline code, a link destination, or an
+ * HTML comment is not a prose delimiter and is left out of the census, so an
+ * unpaired quote in a code span cannot flip the parity for the rest of the
+ * line. Only ASCII `"` delimits a verbatim string here; typographic quotes
+ * wrap quoted prose rather than literal strings, and a backslash-escaped `\"`
+ * is deliberately not special-cased because it renders as a plain quote.
  *
  * @param {string} line - The line content
  * @param {number} position - Character position to check
+ * @param {import('./shared-context.js').LineContext} context - Shared context map
+ * @param {number} lineIndex - Zero-based index of the line
  * @returns {boolean} True if the position is between a matched quote pair
  */
-function isInDoubleQuotedString(line, position) {
+function isInDoubleQuotedString(line, position, context, lineIndex) {
   let openQuote = -1;
   for (let i = 0; i < line.length; i++) {
     if (line[i] !== '"') {
+      continue;
+    }
+    // Count only quotes the shared context map treats as prose, so the census
+    // agrees with the contexts the rest of this rule already trusts.
+    if (context.isInInlineCode(lineIndex, i) ||
+        context.isInLinkDestination(lineIndex, i) ||
+        context.isInHtmlComment(lineIndex, i)) {
       continue;
     }
     if (openQuote === -1) {
@@ -94,7 +107,7 @@ function isInSpecialContext(line, position, skipInlineCode, context, lineIndex) 
 
   // Inside a double-quoted literal string "text & more": quoted text is
   // verbatim, the same as a code span (#336).
-  if (isInDoubleQuotedString(line, position)) {
+  if (isInDoubleQuotedString(line, position, context, lineIndex)) {
     return true;
   }
 

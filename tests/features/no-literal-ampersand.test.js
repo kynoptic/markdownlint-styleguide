@@ -357,6 +357,24 @@ function test() {
       expect(errors[0].range[0]).toBe(6);
     });
 
+    test('flags prose ampersands after an unpaired quote inside a code span', () => {
+      // A quote inside a code span must not vote in the quote census, or its
+      // parity flip silences every prose ampersand later on the line.
+      const markdown = 'Use `it\'s a "test` value and real & dogs "quoted" cats & mice.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(2);
+      expect(errors.map((e) => e.range[0])).toEqual([35, 56]);
+    });
+
+    test('flags an ampersand between a pair of typographic quotes', () => {
+      // Curly quotes are not verbatim delimiters, so the & between them counts.
+      const markdown = 'The \u201cCPU & GPU\u201d sensor is fast.';
+      const errors = runRuleWithContent(markdown);
+
+      expect(errors).toHaveLength(1);
+    });
+
     test('still flags an ampersand in prose containing typographic quotes', () => {
       // Curly quotes are not treated as verbatim string delimiters.
       const markdown = 'The \u201cMax of CPU\u201d sensor covers dogs & cats.';
