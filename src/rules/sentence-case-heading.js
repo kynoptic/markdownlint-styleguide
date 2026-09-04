@@ -250,7 +250,9 @@ function basicSentenceCaseHeadingFunction(params, onError) {
       lineNumber,
       detail,
       context: `**${textForValidation || boldText}**`,
-      fixInfo: fixedText ? buildBoldTextFix(line, fixTarget, fixedText, safetyConfig, matchStart) : undefined
+      fixInfo: fixedText ?
+        buildBoldTextFix(line, fixTarget, fixedText, safetyConfig, matchStart, specialCasedTerms) :
+        undefined
     });
   }
 
