@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Enforce commit message conventions:
+#   - Subject line is "<type>: <description>", scope and "!" optional
 #   - Subject line <= 50 characters
 #   - A blank line separates the subject from the body
 #   - Body lines (if present) start with "- ", or are Git trailers
@@ -244,6 +245,38 @@ trailer_grammar_re='^[A-Za-z][A-Za-z0-9-]*: +[^[:space:]]'
 issue_reference_shape_re='^[A-Za-z][A-Za-z0-9-]* +#'
 issue_reference_grammar_re='^[A-Za-z][A-Za-z0-9-]*( +#[0-9]+,?)* +#[0-9]+ *$'
 
+# ---------------------------------------------------------------------------
+# Subject grammar
+# ---------------------------------------------------------------------------
+
+# The subject was previously checked for length and nothing else, so any text at
+# all was accepted — "banana: do a thing", ": leading colon only", and bare
+# prose all passed while the file's own header claimed to enforce Conventional
+# Commits. These are the eleven types the shared convention defines; a
+# project-specific type belongs in that convention rather than being appended
+# here, because a type list that drifts per repo is not a convention.
+#
+# Scope is optional and "!" marks a breaking change, both per the Conventional
+# Commits spec, so "feat: x", "feat(api): x" and "feat(api)!: x" all pass. A
+# description is required: "fix:" alone is rejected.
+conventional_subject_re='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\([^)]+\))?!?: .'
+
+# Subjects that cannot carry a type, and would break real workflows if rejected.
+# Git writes the Merge and Revert forms itself; "fixup!", "squash!" and "amend!"
+# are what --autosquash consumes during an interactive rebase, so rejecting them
+# would make a rebase unfinishable; and the shared convention specifies the
+# literal "initial commit" for a new repository's first commit, which by
+# definition predates any type being meaningful.
+exempt_subject_re='^(initial commit$|Merge |Revert |fixup!|squash!|amend!)'
+
+report_malformed_subject() {
+    echo "Subject must be '<type>: <description>' — scope and '!' optional"
+    echo "  Allowed types: feat fix docs style refactor test chore perf ci build revert"
+    echo "  Examples: 'fix: resolve the crash', 'feat(init): add a flag', 'feat!: drop v1'"
+    echo "  Offending subject: ${1}"
+    errors=$((errors + 1))
+}
+
 report_malformed_trailer() {
     echo "Malformed Git trailer: needs 'Token-Name: value' with a space after the colon"
     echo "  Offending line: ${1}"
@@ -283,6 +316,14 @@ while [ "${line_index}" -lt "${line_count}" ]; do
     line_no=${line_index}
 
     if [ "${line_no}" -eq 1 ]; then
+        # Both subject rules are reported, rather than returning on the first,
+        # so a subject that is the wrong shape *and* too long names both faults
+        # in one run instead of surfacing the second only after a re-commit.
+        if ! [[ "${line}" =~ ${exempt_subject_re} ]] \
+            && ! [[ "${line}" =~ ${conventional_subject_re} ]]; then
+            report_malformed_subject "${line}"
+        fi
+
         char_len "${line}"
         if [ "${CHAR_LEN}" -gt 50 ]; then
             echo "Subject line too long (${CHAR_LEN} > 50 chars): ${line}"

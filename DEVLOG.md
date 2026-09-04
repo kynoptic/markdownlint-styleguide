@@ -4,6 +4,11 @@ Engineering record — refactors, internal tooling, build changes, ADRs, depende
 
 ## [Unreleased]
 
+- `check-commit-body.sh` now enforces the `<type>: <description>` subject shape, which it had claimed to enforce since it was written. Its only line-1 rule was length, so `banana: do a thing`, `: leading colon only`, and bare prose all committed cleanly while `.husky/commit-msg` announced "Enforce Conventional Commits format". The eleven allowed types come from the shared convention; scope and a `!` breaking marker are both optional, so `feat: x`, `feat(api): x` and `feat(api)!: x` all pass while `fix:` with no description does not.
+- Six subject forms are exempt, because rejecting them would break real workflows rather than enforce a convention: the `Merge` and `Revert` prefixes git writes itself; `fixup!`, `squash!` and `amend!`, which `--autosquash` consumes during an interactive rebase, so rejecting them would leave a rebase unfinishable; and the literal `initial commit` the shared convention specifies for a new repository's first commit. The exemption is anchored — `initial commit of the whole thing` is still rejected.
+- Calibrated against every distinct commit subject in the repository, 626 of them: exactly 5 fail the new check. Three are version-only subjects from before the convention existed (`0.2.0`, `0.2.1`, `0.2.2`) and two use types the convention does not define, `config:` and `cleanup:`, both of which the convention would have written as `chore:`.
+- Incidental finding, not addressed and not a regression: 320 of those 626 subjects exceed the 50-character cap the same script already enforced. The limit clearly postdates most of the history, so `git log` disagrees with the gate that now guards it.
+
 ---
 
 ## [4.1.2] - 2026-07-21
