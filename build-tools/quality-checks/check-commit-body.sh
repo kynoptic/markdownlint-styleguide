@@ -244,6 +244,15 @@ trailer_shape_re='^[A-Za-z][A-Za-z0-9-]*:'
 trailer_grammar_re='^[A-Za-z][A-Za-z0-9-]*: +[^[:space:]]'
 issue_reference_shape_re='^[A-Za-z][A-Za-z0-9-]* +#'
 issue_reference_grammar_re='^[A-Za-z][A-Za-z0-9-]*( +#[0-9]+,?)* +#[0-9]+ *$'
+# The provenance line `git cherry-pick -x` writes into the body. It has no
+# colon, so nothing marks it as a trailer and rule 4 rejected it as prose,
+# which blocked every conflicted `git cherry-pick -x` — including one whose
+# subject is perfectly conventional. Confirmed on git 2.50.1 with a logging
+# hook: a clean cherry-pick invokes no commit-msg hook, but `--continue` after
+# a conflict does, and the message it hands the hook carries this line.
+# Anchored on git's exact wording and a hex object name so it exempts only the
+# line git writes and cannot become a prose loophole.
+cherry_pick_re='^\(cherry picked from commit [0-9a-f]{7,40}\)$'
 
 # ---------------------------------------------------------------------------
 # Subject grammar
@@ -269,8 +278,10 @@ conventional_subject_re='^(feat|fix|docs|style|refactor|test|chore|perf|ci|build
 # installing a logging hook in a throwaway repository on git 2.50.1 — which is
 # how a later reader re-verifies the list, command by command:
 #
-#   "Merge "  git's merge message, seen here when a conflicted merge is
-#             finished with `git commit`.
+#   "Merge "  git's merge message, written by any merge that records a merge
+#             commit — an everyday `git merge --no-ff` reaches the hook with
+#             "Merge branch 'x'", conflict or no conflict, so the routine case
+#             is what makes this entry necessary, not conflict recovery.
 #   "Squashed commit of the following:"
 #             `git merge --squash <branch>` then `git commit --no-edit`.
 #   "Revert " `git revert --continue`, after a conflicted revert. Plain
@@ -389,6 +400,8 @@ while [ "${line_index}" -lt "${line_count}" ]; do
         [[ "${line}" =~ ${trailer_grammar_re} ]] || report_malformed_trailer "${line}"
     elif [[ "${line}" =~ ${issue_reference_shape_re} ]]; then
         [[ "${line}" =~ ${issue_reference_grammar_re} ]] || report_malformed_issue_reference "${line}"
+    elif [[ "${line}" =~ ${cherry_pick_re} ]]; then
+        :
     else
         report_prose "${line}"
     fi
