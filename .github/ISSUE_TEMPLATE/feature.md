@@ -17,9 +17,13 @@ Avoid conventional commit format for issues (no "feat:", "add:", etc.)
 <Link to the story this serves: #XXX>
 
 <!--
-If no story exists and the work is worth doing, write the story first. Exception
-for trivial changes: if it fits in one commit and changes no behavior contract,
-skip the story. Stories are few — never write one per issue.
+Look for an existing story first — most features hang off one already written. A
+tracking issue or audit checklist is not a story: it records findings, not a
+situation. Write a new story only when nothing fits and the work is worth doing,
+and never one per issue.
+Stories are few — a dozen or so across a project. Exception for trivial changes:
+if the change fits in one commit and changes no behavior contract, write
+"None — trivial" here and skip the story.
 -->
 
 ## Object
@@ -27,9 +31,19 @@ skip the story. Stories are few — never write one per issue.
 <Which existing object this hangs off.>
 
 <!--
-Only applies in repos with a domain model; delete this section otherwise. If the
-answer is "a new object" or "a new screen," link an ADR — object-model changes
-are the ADR trigger.
+Framework: OOUX (object-oriented UX) — a domain's objects, their attributes, and
+what is navigable from what.
+
+An object is a thing the system stores that a person can name and open — user,
+order, article. Not a class, view, or module: naming the code you'll touch
+answers a different question. This section only applies in repos that persist
+objects; delete it otherwise.
+
+Name the one existing object this hangs off, or write "no object-model change"
+when the work leaves the model alone. Three answers need a linked ADR instead: a
+new object, a move between object and attribute in either direction, or a change
+to what is navigable from what. A new screen is usually that third case.
+Nothing else requires an ADR.
 -->
 
 ## Summary
@@ -78,6 +92,11 @@ on what users already expect, which can't be observed from the repo.
 -->
 
 ## Acceptance criteria (testable)
+
+<!--
+Framework: information foraging — each criterion names concrete rendered output,
+so a reader can tell from the screen whether the behavior changed.
+-->
 
 - [ ] GIVEN … WHEN … THEN …
 - [ ] …
