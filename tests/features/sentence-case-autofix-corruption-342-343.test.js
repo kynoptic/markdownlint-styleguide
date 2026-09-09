@@ -312,18 +312,24 @@ describe('the limits this change does not reach', () => {
     });
 
   // The false-positive half of #343, with the mechanism the issue misattributes.
-  // #343 blames its emphasis-preservation pass; the real barrier is the pattern
-  // set, whose snake_case branch is /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/ — an
-  // underscore is allowed only in an all-lowercase token, so any capital beside
-  // an underscore matches none of the three patterns. Dropping the emphasis pass
-  // leaves the first two rows below green, which is how the misattribution was
-  // caught. Because the token is unrecognized, the guard has nothing to protect
-  // and only its internal-marker half can withhold anything: these two survive
-  // solely because their fix would have carried a placeholder.
+  // #343 blames its emphasis-preservation pass. When this file was written the
+  // real barrier was the pattern set, whose snake_case branch is
+  // /^_?[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/ — an underscore is allowed only in an
+  // all-lowercase token, so any capital beside an underscore matched none of the
+  // three patterns. Dropping the emphasis pass left these rows green, which is
+  // how the misattribution was caught.
+  //
+  // #340 has since added a fourth check for uppercase-leading underscore
+  // identifiers, so these tokens are now recognized and protected. They are
+  // still reported, because the first-word capitalization check runs
+  // independently of the identifier exemption, but what withholds their fix has
+  // changed: it is now the guard's protection half, not its internal-marker
+  // half. Measured by disabling the marker check — all three rows stay withheld.
   test.each([
     ['## HTTP_Client_V2', "Heading's first word should be capitalized."],
-    ['## EasyAntiCheat_EOS_Build', "Heading's first word should be capitalized."]
-  ])('GIVEN %s WHEN linted THEN it is still reported, with the fix withheld only by the marker check',
+    ['## EasyAntiCheat_EOS_Build', "Heading's first word should be capitalized."],
+    ['## Configure HTTP_CLIENT Now', 'Word "Now" in heading should be lowercase.']
+  ])('GIVEN %s WHEN linted THEN it is still reported, with the fix withheld by the guard',
     async (input, detail) => {
       const found = await violations(input);
       expect(found).toHaveLength(1);
@@ -331,17 +337,24 @@ describe('the limits this change does not reach', () => {
       expect(await autofix(input)).toBe(input);
     });
 
-  // Where no placeholder survives, nothing withholds the fix and the identifier
-  // is still flattened. Measured identical on the base commit, so this PR
-  // neither introduces nor repairs it; it is the shape the exemption misses.
+  // The one shape the exemption still misses: an all-caps compound with no
+  // recognized-acronym segment. #340 exempts HTTP_CLIENT because HTTP is a
+  // configured acronym; MAX_RETRIES has no such segment, so nothing protects it,
+  // nothing withholds the fix, and the identifier is still flattened.
   test.each([
-    ['## HTTP_CLIENT', '## Http_client'],
-    ['## MAX_RETRIES Setup', '## Max_retries setup'],
-    ['## Configure HTTP_CLIENT Now', '## Configure http_client now']
+    ['## MAX_RETRIES Setup', '## Max_retries setup']
   ])('GIVEN %s WHEN autofixed THEN the uppercase-underscore identifier is still flattened',
     async (input, expected) => {
       expect(await autofix(input)).toBe(expected);
     });
+
+  // A limit this file used to record that #340 has since lifted: HTTP_CLIENT was
+  // reported and flattened to Http_client. It is now clean outright. Pinned here
+  // so the guard cannot quietly reintroduce either a report or a rewrite on it.
+  test('GIVEN ## HTTP_CLIENT WHEN linted THEN it is clean and left untouched', async () => {
+    expect(await violations('## HTTP_CLIENT')).toHaveLength(0);
+    expect(await autofix('## HTTP_CLIENT')).toBe('## HTTP_CLIENT');
+  });
 
   test('GIVEN a heading whose identifier the emphasis pass mangles WHEN linted THEN the message still quotes the mangled token', async () => {
     const found = await violations('## \u{1F680} user_name_id setup');
