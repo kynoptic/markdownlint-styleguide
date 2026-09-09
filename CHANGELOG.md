@@ -4,6 +4,10 @@ User-facing changes — new capabilities, behavior changes, fixes that affected 
 
 ## [Unreleased]
 
+### Fixed
+
+- ELI001 no longer reports a list item as empty when its text merely begins with something shaped like a list marker. An ordered item written `1. 1. Some text` has real content, but micromark tokenizes that content as a nested list rather than as a flat `content` sibling, and the rule read the missing sibling as an empty item. Genuinely empty items are still reported.
+
 ---
 
 ## [4.1.2] - 2026-07-21
