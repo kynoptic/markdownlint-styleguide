@@ -161,6 +161,21 @@ describe("sentence-case-heading identifier preservation", () => {
       expect(violations).toEqual([]);
     });
 
+    // An all-caps constant does reach this exemption, contrary to what the
+    // helper's comment first claimed. HTTP_CLIENT passes because HTTP is a
+    // configured acronym, so it is exempted on the same grounds HTTP_Client is;
+    // MAX_RETRIES has no recognized-acronym segment and stays flagged. These two
+    // pin that boundary, which the rest of this block left uncovered.
+    test("preserves HTTP_CLIENT, whose first segment is a known acronym", async () => {
+      const violations = await lintString("## Tuning the HTTP_CLIENT pool\n");
+      expect(violations).toEqual([]);
+    });
+
+    test("still flags MAX_RETRIES, an all-caps compound of unrecognized words", async () => {
+      const violations = await lintString("## Setting MAX_RETRIES high\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
     test("still flags New_York, a plain capitalized underscore compound", async () => {
       const violations = await lintString("## Visiting New_York\n");
       expect(violations.length).toBeGreaterThan(0);

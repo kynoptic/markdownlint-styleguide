@@ -85,9 +85,13 @@ const CAMEL_HUMP_PATTERN = /[a-z][A-Z]/;
  *
  * Consequently an ordinary capitalized compound stays flagged: "New_York",
  * "Star_Wars", "Read_Me", "The_Thing", "Well_Known", and "Q1_Results" have no
- * identifier-shaped segment. All-caps constants ("MAX_RETRIES") and
- * lowercase-leading tokens ("easy_Anti_Cheat", "easyAntiCheat_EOS") never reach
- * this check, keeping their existing treatment.
+ * identifier-shaped segment. An all-caps constant does reach this check and is
+ * decided by the same acronym rule: "MAX_RETRIES" is rejected because neither
+ * segment is a recognized acronym, while "HTTP_CLIENT" is exempted on exactly
+ * the grounds "HTTP_Client" is. Rejection here is not the rule's last word —
+ * a digit-bearing token such as "MAX_RETRIES_V2" is exempted downstream. Lowercase-leading tokens
+ * ("easy_Anti_Cheat", "easyAntiCheat_EOS") return false at the first guard,
+ * keeping their existing treatment.
  * @param {string} word The token to check.
  * @returns {boolean} True when the token reads as an underscore-joined identifier.
  */
