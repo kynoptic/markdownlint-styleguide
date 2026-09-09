@@ -148,6 +148,159 @@ export function isCodeIdentifier(word) {
 }
 
 /**
+ * Surrounding characters that are not part of an identifier. Underscores are
+ * kept because a snake_case identifier may legitimately open with one, so only
+ * characters that are neither a letter, a digit, nor an underscore are stripped.
+ */
+const IDENTIFIER_AFFIX_LEAD = /^[^\p{L}\p{N}_]+/u;
+const IDENTIFIER_AFFIX_TRAIL = /[^\p{L}\p{N}_]+$/u;
+
+/**
+ * The single decision every SC001 casing path consults: must this
+ * whitespace-delimited token be left exactly as the author wrote it?
+ *
+ * Every reporting path and the fix builder read this one answer, and the fix
+ * guard in fix-builder.js verifies the answer held, so a fixer and a checker
+ * cannot disagree about which tokens are off limits (#342). The token may carry
+ * surrounding markup or punctuation (`**useEffect**`, `(useEffect)`,
+ * `useEffect.`); those affixes are stripped before the identifier patterns run.
+ *
+ * @param {string} token A whitespace-delimited token from the source text.
+ * @returns {boolean} True when no casing path may report or rewrite the token.
+ */
+export function isExemptCodeToken(token) {
+  const core = token.replace(IDENTIFIER_AFFIX_LEAD, '').replace(IDENTIFIER_AFFIX_TRAIL, '');
+  return core !== '' && isCodeIdentifier(core);
+}
+
+/**
+ * Splits a token into the surrounding punctuation the fix builder's word loop
+ * peels off and the core it keys the casing dictionary on.
+ *
+ * An edge underscore IS an affix here, unlike in IDENTIFIER_AFFIX_LEAD above,
+ * which keeps it: `splitTokenAffixes('_user_name')` gives a lead of `_` and a
+ * core of `user_name`, while `isExemptCodeToken('_user_name')` is true because
+ * it tests the whole `_user_name`. The two differ on purpose — this one has to
+ * reproduce the fix builder's regexes exactly, and those treat any
+ * non-letter, non-digit edge character as punctuation.
+ *
+ * The one derivation both the fix builder and the fix guard read, so the two
+ * cannot disagree about what the dictionary is keyed on (#342).
+ *
+ * @param {string} token A whitespace-delimited token from the source text.
+ * @returns {{lead: string, core: string, trail: string}} The token's three parts.
+ */
+export function splitTokenAffixes(token) {
+  const lead = (token.match(/^[^\p{L}\p{N}]+/u) || [''])[0];
+  const trail = (token.match(/[^\p{L}\p{N}]+$/u) || [''])[0];
+  return { lead, core: token.slice(lead.length, token.length - trail.length), trail };
+}
+
+/**
+ * Reads the casing the fix builder's word loop will force on a token.
+ *
+ * The fix guard must ask the question the fixer answers, not the one the
+ * reporting paths answer. Those paths — validateSubsequentWords below and the
+ * subsequent-word loop in bold-text-classifier.js — try a second key that
+ * strips every non-alphanumeric character, including a `snake_case`
+ * identifier's own underscores, so with `properNouns: ['Username']` configured
+ * they treat `user_name` as a configured term. The fix builder does not: it
+ * keys only on the token's core with internal characters intact, finds no
+ * `user_name` entry, and generically sentence-cases the identifier to
+ * `User_name`. Reading the reporters' answer here therefore let that rewrite
+ * onto the allowed list — the #342 corruption shape, reachable through ordinary
+ * `properNouns` and `acronyms` configuration.
+ *
+ * @param {string} token A whitespace-delimited token from the source text.
+ * @param {Object} specialCasedTerms Map of lowercase terms to their proper casing.
+ * @returns {string|undefined} The configured casing, or undefined when unconfigured.
+ */
+export function fixerConfiguredCasing(token, specialCasedTerms) {
+  return specialCasedTerms[splitTokenAffixes(token).core.toLowerCase()];
+}
+
+/**
+ * Maps each whitespace-token position a configured multi-word phrase covers to
+ * the word that phrase's configured casing puts at that position.
+ *
+ * The fix builder substitutes a configured multi-word phrase before its
+ * word-by-word loop runs, so `{ acronyms: ['MYCOMPONENT API'] }` turns
+ * `myComponent api` into `MYCOMPONENT API`. A per-token lookup cannot see that:
+ * neither `mycomponent` nor `api` is a key on its own. Matching runs over the
+ * token stream rather than character offsets so surrounding punctuation on a
+ * token cannot break the alignment.
+ *
+ * @param {string[]} tokens The span's whitespace-delimited tokens, in order.
+ * @param {Object} specialCasedTerms Map of lowercase terms to their proper casing.
+ * @returns {Map<number, string>} Token index to the configured word at that index.
+ */
+function configuredPhraseWords(tokens, specialCasedTerms) {
+  const covered = new Map();
+  const cores = tokens.map((token) => splitTokenAffixes(token).core.toLowerCase());
+
+  for (const [phraseLower, phraseCorrect] of Object.entries(specialCasedTerms)) {
+    if (!phraseLower.includes(' ')) {
+      continue;
+    }
+    const words = phraseLower.split(/\s+/).filter(Boolean);
+    const correctWords = phraseCorrect.split(/\s+/).filter(Boolean);
+    if (words.length !== correctWords.length) {
+      continue;
+    }
+    for (let start = 0; start + words.length <= cores.length; start += 1) {
+      if (words.every((word, offset) => cores[start + offset] === word)) {
+        words.forEach((_word, offset) => covered.set(start + offset, correctWords[offset]));
+      }
+    }
+  }
+  return covered;
+}
+
+/**
+ * Lists the tokens of a span that no casing path may rewrite freely, with the
+ * position each one holds among the span's whitespace-delimited tokens and every
+ * replacement that is legitimate there. The fix guard in fix-builder.js checks
+ * exactly these tokens at exactly these positions, from this one derivation (#342).
+ *
+ * A token is always allowed to survive verbatim. It is additionally allowed to
+ * become the casing the configuration forces on it, because the reporting paths
+ * let that configuration win over the identifier exemption and withholding the
+ * fix that carries it out would strand the violation with no way to resolve it.
+ * Both spellings of "the configuration forces" are covered: a single-word entry
+ * read through fixerConfiguredCasing, and a multi-word phrase read through
+ * configuredPhraseWords above.
+ *
+ * Listing the allowed replacements rather than dropping a configured token from
+ * the list keeps the guard active on it: a configured token may become its
+ * configured casing and nothing else, where dropping it permitted any rewrite.
+ *
+ * @param {string} text The span to scan.
+ * @param {Object} [specialCasedTerms={}] Map of lowercase terms to their proper casing.
+ * @returns {Array<{token: string, index: number, allowed: string[]}>} The protected tokens.
+ */
+export function exemptCodeTokens(text, specialCasedTerms = {}) {
+  const tokens = text.split(/\s+/).filter((token) => token !== '');
+  const phraseWords = configuredPhraseWords(tokens, specialCasedTerms);
+
+  return tokens
+    .map((token, index) => ({ token, index }))
+    .filter(({ token }) => isExemptCodeToken(token))
+    .map(({ token, index }) => {
+      const { lead, trail } = splitTokenAffixes(token);
+      const allowed = [token];
+      const single = fixerConfiguredCasing(token, specialCasedTerms);
+      if (single) {
+        allowed.push(lead + single + trail);
+      }
+      const fromPhrase = phraseWords.get(index);
+      if (fromPhrase) {
+        allowed.push(lead + fromPhrase + trail);
+      }
+      return { token, index, allowed };
+    });
+}
+
+/**
  * Determines whether a hyphenated compound is acceptable because every segment
  * is individually valid: a lowercase word, a short acronym, or a segment whose
  * casing matches a configured acronym or proper noun (e.g. "high-CEFR",
@@ -264,8 +417,11 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
       // Regular sentence case - first letter uppercase, rest lowercase
       const expectedSentenceCase = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
       if (firstWord !== expectedSentenceCase) {
-        // Allow short acronyms (<= 4 chars, all caps)
-        if (!isAcronym(firstWord)) {
+        // Allow short acronyms (<= 4 chars, all caps) and code identifiers.
+        // The identifier exemption applies here exactly as it does on the
+        // no-emoji path below; this branch returned before reaching it, so
+        // "## 🚀 useEffect setup" was flagged and lowercased (#342).
+        if (!isAcronym(firstWord) && !isExemptCodeToken(firstWord)) {
           return {
             isValid: false,
             errorMessage: `First word "${firstWord}" should be "${expectedSentenceCase}".`
@@ -405,7 +561,7 @@ export function validateFirstWord(firstWord, firstIndex, phraseIgnore, specialCa
       if (firstWord !== expectedSentenceCase) {
         // Allow short acronyms (<= 4 chars, all caps)
         // Allow code identifiers (camelCase, PascalCase, snake_case)
-        if (!isAcronym(firstWord) && !isCodeIdentifier(firstWord)) {
+        if (!isAcronym(firstWord) && !isExemptCodeToken(firstWord)) {
           return {
             isValid: false,
             errorMessage: "Heading's first word should be capitalized."
@@ -636,7 +792,7 @@ export function validateSubsequentWords(words, startIndex, phraseIgnore, special
       word !== 'I' && // Allow the pronoun "I"
       !expectedWordCasing && // If it's not a known proper noun/technical term
       !word.startsWith('PRESERVED') &&
-      !isCodeIdentifier(word) // Allow code identifiers (camelCase, PascalCase, snake_case)
+      !isExemptCodeToken(word) // Allow code identifiers (camelCase, PascalCase, snake_case)
     ) {
       return {
         isValid: false,

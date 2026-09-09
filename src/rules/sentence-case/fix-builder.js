@@ -9,6 +9,56 @@ import { createSafeFixInfo } from '../autofix-safety.js';
 import { stripLeadingSymbols } from './case-classifier.js';
 import { escapeRegExp } from '../shared-utils.js';
 import { contextualAllCapsTerms } from '../shared-constants.js';
+import { exemptCodeTokens, splitTokenAffixes } from './word-validators.js';
+
+/**
+ * Matches any internal bookkeeping token that must never reach a document: the
+ * fix builder's own `__P_<n>__` placeholder in either casing, and the
+ * `__PRESERVED_<n>__` form used by shared-heuristics.js. A placeholder landing
+ * inside a larger token is lowercased with its host word, and the case-sensitive
+ * restore step then misses it (#343); this pattern is what catches the resulting
+ * text before it can be offered as a fix.
+ */
+const INTERNAL_TOKEN_PATTERN = /__P_\d+__|__PRESERVED_\d+__/i;
+
+/**
+ * Rejects a candidate fix that would corrupt the document, so a casing path that
+ * mangles an exempt identifier or leaks a placeholder degrades to "no autofix
+ * offered" instead of "document corrupted" (#342, #343). This withholding is the
+ * whole safety mechanism: nothing here repairs a bad candidate.
+ *
+ * A fix is corrupting when it carries an internal marker, or when any protected
+ * token's slot in the result holds something other than one of that token's
+ * allowed replacements — the token verbatim, or the casing the configuration
+ * forces on it. Comparing by position rather than by substring means a fix that
+ * moves, duplicates or absorbs a protected token is caught too.
+ *
+ * @param {string} originalText The text the fix would replace.
+ * @param {string} fixedText The replacement text.
+ * @param {Object} specialCasedTerms Map of lowercase terms to their proper casing.
+ * @returns {boolean} True when the fix must be discarded.
+ */
+function isCorruptingFix(originalText, fixedText, specialCasedTerms) {
+  if (INTERNAL_TOKEN_PATTERN.test(fixedText)) {
+    return true;
+  }
+
+  const protectedTokens = exemptCodeTokens(originalText, specialCasedTerms);
+  if (protectedTokens.length === 0) {
+    return false;
+  }
+
+  // Positions are only comparable while the fix is a token-for-token rewrite, so
+  // a fix that changed the token count has moved, duplicated or absorbed
+  // something and is rejected without inspecting positions.
+  const originalTokens = originalText.split(/\s+/).filter(Boolean);
+  const fixedTokens = fixedText.split(/\s+/).filter(Boolean);
+  if (fixedTokens.length !== originalTokens.length) {
+    return true;
+  }
+
+  return protectedTokens.some(({ allowed, index }) => !allowed.includes(fixedTokens[index]));
+}
 
 /**
  * Converts a string to sentence case, respecting preserved segments and multi-word special terms.
@@ -68,9 +118,7 @@ export function toSentenceCase(text, specialCasedTerms, ambiguousTerms = {}) {
     // word still matches the casing dictionary, which is keyed on the word
     // alone. Without this, "(PARA)" keys on "(para)", misses, and is
     // lowercased even though validation (which strips punctuation) passes. (#290)
-    const lead = (w.match(/^[^\p{L}\p{N}]+/u) || [''])[0];
-    const trail = (w.match(/[^\p{L}\p{N}]+$/u) || [''])[0];
-    const core = w.slice(lead.length, w.length - trail.length);
+    const { lead, core, trail } = splitTokenAffixes(w);
     const lowerCore = core.toLowerCase();
 
     // Preserve ambiguous terms - they could be common nouns or proper nouns
@@ -170,7 +218,7 @@ export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig, amb
   const prefixLength = match[1].length + match[2].length;
   const fixedText = toSentenceCase(text, specialCasedTerms, ambiguousTerms);
 
-  if (!fixedText) {
+  if (!fixedText || isCorruptingFix(text, fixedText, specialCasedTerms)) {
     return undefined;
   }
 
@@ -199,14 +247,16 @@ export function buildHeadingFix(line, text, specialCasedTerms, safetyConfig, amb
  * @param {Object} safetyConfig - Safety configuration for autofix
  * @param {number} [startIndex=0] - Character offset to begin searching from, used to
  *   locate the correct occurrence when the same bold text appears multiple times on a line
+ * @param {Object} [specialCasedTerms={}] - Map of lowercase terms to their proper casing,
+ *   read by the corrupting-fix guard so a configured term is not mistaken for an identifier
  * @returns {object|undefined} Fix information or undefined if no fix available
  */
-export function buildBoldTextFix(line, originalBoldText, fixedBoldText, safetyConfig, startIndex = 0) {
+export function buildBoldTextFix(line, originalBoldText, fixedBoldText, safetyConfig, startIndex = 0, specialCasedTerms = {}) {
   // Use literal string search (indexOf) — no regex escaping needed
   const boldPattern = `**${originalBoldText}**`;
   const boldIndex = line.indexOf(boldPattern, startIndex);
 
-  if (boldIndex === -1) {
+  if (boldIndex === -1 || isCorruptingFix(originalBoldText, fixedBoldText, specialCasedTerms)) {
     return undefined;
   }
 
