@@ -26,19 +26,19 @@ jobs:
           # Strip optional items (lines ending with *(optional)*, *(optional — reason)*,
           # <!-- optional -->, or <!-- optional: reason -->)
           #
-          # Also strip bot control checkboxes. A checkbox whose text begins with an HTML
-          # comment is a machine affordance, not a checklist item a human has to satisfy:
-          # Renovate ends every PR body with
+          # Also strip bot control checkboxes. Renovate ends every PR body with
           #     - [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check this box
           # which requests a rebase when ticked, so it can never legitimately be checked.
           # Without this filter the gate fails every dependency PR forever, on a box that
-          # must stay empty. Matching the leading comment rather than the literal word
-          # "rebase-check" means a future bot adopting the same convention is covered too.
+          # must stay empty.
+          # The filter names each marker rather than matching any leading HTML comment,
+          # because the two ways of being wrong cost differently. A marker missing from
+          # the alternation fails that bot's PR visibly, and the fix is one more branch
+          # here. A human box wrongly exempted drops a real item from the count, with
+          # nothing on the log to say so. Add a bot's marker below when one appears.
           # Verified against Renovate only: a sample of Dependabot PR bodies carries no
           # checkbox at all — it offers comment commands such as "@dependabot rebase"
           # inside a <details> block — so there is nothing of Dependabot's to exclude.
-          # Human checklist lines never open with a comment, so nothing they write is
-          # excluded here.
           # Number every line of the body up front, so the line numbers reported below are
           # the author's and not positions in a filtered stream. Numbering afterwards was
           # off by the count of filtered lines, which sent the reader to the wrong line.
@@ -47,7 +47,7 @@ jobs:
           FILTERED=$(printf '%s\n' "$NUMBERED" \
             | grep -vE '\*\(optional\b' \
             | grep -vE '<!--\s*optional\b' \
-            | grep -vE '^[0-9]+:[[:space:]]*- \[ \][[:space:]]*<!--' \
+            | grep -vE '^[0-9]+:[[:space:]]*- \[ \][[:space:]]*<!--[[:space:]]*(rebase-check)[[:space:]]*-->' \
             || true)
 
           # Count unchecked items
