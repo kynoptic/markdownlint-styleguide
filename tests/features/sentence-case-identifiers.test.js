@@ -134,6 +134,101 @@ describe("sentence-case-heading identifier preservation", () => {
     });
   });
 
+  describe("should preserve mixed-case identifiers containing underscores", () => {
+    test("does not flag a bold list item that is a single capitalized compound identifier", async () => {
+      const violations = await lintString(
+        "# Test\n\n- **EasyAntiCheat_EOS**\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves EasyAntiCheat_EOS as the first word of a heading", async () => {
+      const violations = await lintString(
+        "## EasyAntiCheat_EOS setup notes\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves EasyAntiCheat_EOS later in a heading", async () => {
+      const violations = await lintString(
+        "## Configure EasyAntiCheat_EOS support\n",
+      );
+      expect(violations).toEqual([]);
+    });
+
+    test("preserves HTTP_Client in a heading", async () => {
+      const violations = await lintString("## Tuning the HTTP_Client pool\n");
+      expect(violations).toEqual([]);
+    });
+
+    // An all-caps constant does reach this exemption, contrary to what the
+    // helper's comment first claimed. HTTP_CLIENT passes because HTTP is a
+    // configured acronym, so it is exempted on the same grounds HTTP_Client is;
+    // MAX_RETRIES has no recognized-acronym segment and stays flagged. These two
+    // pin that boundary, which the rest of this block left uncovered.
+    test("preserves HTTP_CLIENT, whose first segment is a known acronym", async () => {
+      const violations = await lintString("## Tuning the HTTP_CLIENT pool\n");
+      expect(violations).toEqual([]);
+    });
+
+    test("still flags MAX_RETRIES, an all-caps compound of unrecognized words", async () => {
+      const violations = await lintString("## Setting MAX_RETRIES high\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags New_York, a plain capitalized underscore compound", async () => {
+      const violations = await lintString("## Visiting New_York\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags Star_Wars, a plain capitalized underscore compound", async () => {
+      const violations = await lintString("## Watching Star_Wars\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags Q1_Results, a digit-prefixed underscore compound", async () => {
+      const violations = await lintString("## Q1_Results summary\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags Read_Me in bold text", async () => {
+      const violations = await lintString("# Test\n\n- **Read_Me** first\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags The_Thing, a plain capitalized underscore compound", async () => {
+      const violations = await lintString("## The_Thing happened\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags Well_Known, a plain capitalized underscore compound", async () => {
+      const violations = await lintString("## Well_Known issue\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags ABC_Def, an unrecognized acronym plus a plain word", async () => {
+      const violations = await lintString("# Test\n\n- **ABC_Def**\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags a lowercase-leading underscore compound in bold text", async () => {
+      const violations = await lintString("# Test\n\n- **easy_Anti_Cheat**\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags lowercase-leading bold prose", async () => {
+      const violations = await lintString(
+        "# Test\n\n- **lowercase bold label**\n",
+      );
+      expect(violations.length).toBeGreaterThan(0);
+    });
+
+    test("still flags title case bold prose", async () => {
+      const violations = await lintString("# Test\n\n- **This Is Title Case**\n");
+      expect(violations.length).toBeGreaterThan(0);
+    });
+  });
+
   describe("should still flag non-identifier capitalization errors", () => {
     test("flags Title Case words that are not identifiers", async () => {
       const violations = await lintString(
