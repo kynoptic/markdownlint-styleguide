@@ -23,8 +23,19 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Strip optional items (lines ending with *(optional)*, *(optional — reason)*,
-          # <!-- optional -->, or <!-- optional: reason -->)
+          # Strip optional items: lines ending with *(optional)*, *(optional — reason)*,
+          # <!-- optional -->, or <!-- optional: reason -->. Any non-word character may open
+          # the reason, as it could under the old unanchored \b match. A reason cannot
+          # itself contain * in the star form or > in the comment form.
+          # The marker exempts a line only at its end. Unanchored, a box that merely
+          # mentioned *(optional)* mid-sentence dropped out of the count, and a real item
+          # passed with nothing on the log to say so. The trailing [[:space:]]* also
+          # absorbs the \r a browser form leaves on every line of a CRLF body.
+          # Case-insensitive, so *(Optional)* exempts too: with the marker pinned to the
+          # end of the line, letter case opens no new way to exempt a line by accident.
+          #
+          # A box under any GFM list marker counts: -, *, +, 1. or 1). Each renders as a
+          # checkbox. BOX is that one definition, shared by every match below.
           #
           # Also strip bot control checkboxes. Renovate ends every PR body with
           #     - [ ] <!-- rebase-check -->If you want to rebase/retry this PR, check this box
@@ -44,14 +55,27 @@ jobs:
           # off by the count of filtered lines, which sent the reader to the wrong line.
           NUMBERED=$(echo "$PR_BODY" | grep -n '' || true)
 
+          BOX='^[0-9]+:[[:space:]]*([-*+]|[0-9]+[.)])[[:space:]]+\[ \]'
+          OPTIONAL='(\*\(optional([^[:alnum:]_*][^*]*)?\)\*|<!--[[:space:]]*optional([^[:alnum:]_>][^>]*)?-->)[[:space:]]*$'
+
+          # grep exits 2 on a pattern it cannot compile, and the || true below would turn
+          # that into an empty stream and a clean pass, so prove each pattern compiles.
+          for PATTERN in "$BOX" "$OPTIONAL"; do
+            RC=0
+            printf 'x\n' | grep -iE "$PATTERN" > /dev/null || RC=$?
+            if [ "$RC" -gt 1 ]; then
+              echo "❌ Could not compile a checklist pattern — the gate did not run correctly."
+              exit 1
+            fi
+          done
+
           FILTERED=$(printf '%s\n' "$NUMBERED" \
-            | grep -vE '\*\(optional\b' \
-            | grep -vE '<!--\s*optional\b' \
-            | grep -vE '^[0-9]+:[[:space:]]*- \[ \][[:space:]]*<!--[[:space:]]*(rebase-check)[[:space:]]*-->' \
+            | grep -viE "$OPTIONAL" \
+            | grep -vE "$BOX"'[[:space:]]*<!--[[:space:]]*(rebase-check)[[:space:]]*-->' \
             || true)
 
           # Count unchecked items
-          UNCHECKED=$(printf '%s\n' "$FILTERED" | grep -cE '^[0-9]+:[[:space:]]*- \[ \]' || true)
+          UNCHECKED=$(printf '%s\n' "$FILTERED" | grep -cE "$BOX" || true)
 
           # An empty count means the comparison itself broke rather than that the body was
           # clean, so refuse instead of falling through to the success message. Matched
@@ -65,10 +89,10 @@ jobs:
           if [ "$UNCHECKED" -gt 0 ]; then
             echo "❌ $UNCHECKED unchecked checklist item(s) found:"
             echo ""
-            printf '%s\n' "$FILTERED" | grep -E '^[0-9]+:[[:space:]]*- \[ \]' | sed 's/^/  /'
+            printf '%s\n' "$FILTERED" | grep -E "$BOX" | sed 's/^/  /'
             echo ""
             echo "To bypass: add the 'skip-checklist' label to this PR (rare — requires a real reason)."
-            echo "To exclude an item: append *(optional)* to the line — only when no automation path exists."
+            echo "To exclude an item: end the line with *(optional)* — only when no automation path exists."
             echo "Default: attempt the item via CLI, browser automation, or other tooling before marking it optional."
             exit 1
           elif [ "$UNCHECKED" -eq 0 ]; then
