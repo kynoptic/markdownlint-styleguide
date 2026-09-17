@@ -103,7 +103,7 @@
     "node": ">=24.16.0"
   },
   "overrides": {
-    "minimatch": "^10.2.5",
+    "minimatch": "^10.2.6",
     "markdown-it": "^14.3.0",
     "js-yaml": "^4.3.1",
     "brace-expansion": "^5.0.9",
