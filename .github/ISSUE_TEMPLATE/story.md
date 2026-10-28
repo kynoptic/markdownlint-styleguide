@@ -21,6 +21,8 @@ become a folder structure. Never create a story to make the hierarchy look compl
 <When this comes up: where the person is standing, what they're holding. One or two sentences.>
 
 <!--
+Framework: Jobs to be Done — the circumstance someone is in, not who they are.
+
 Not a persona. A situation comes from observed behavior — someone watched, a
 support thread, a session recording. An AI assistant must never draft this
 section, even as a placeholder: a generated situation is a citation with no
