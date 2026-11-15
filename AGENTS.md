@@ -1,60 +1,19 @@
 # Agent handbook
 
-## Overview
-
-markdownlint-styleguide ships custom `markdownlint` rules enforcing sentence-case headings, backtick code elements, link validation, and prose style. Native ES modules, no build step. Jest for testing, ESLint and markdownlint-cli2 for quality.
-
-## Repository layout
-
-- `src/rules/` — Individual rule implementations and shared modules; entry point `src/index.js`
-- `*-config.jsonc` — Preset tiers (`basic`, `recommended`, `strict`); documented in the hand-maintained `docs/configuration.md`
-- `templates/` — CLI and VS Code config templates mirroring each preset
-- `tests/unit/`, `tests/features/`, `tests/integration/`, `tests/performance/` — Test layers
-- `tests/fixtures/` — Shared Markdown fixtures organized by rule
-- `docs/` — Architecture, testing strategy, rule authoring, configuration, ADRs
-- `scripts/` — CLI, maintenance, and distribution scripts
-
-## Command reference
-
-### Setup
-
-- `npm install` — Install dependencies.
-
-### Test and lint
-
-- `npm test` — Full Jest suite (all layers).
-- `npm run test:integration` — Integration scenarios.
-- `npm run test:integration:external` — Validate against external repositories.
-- `npm run test:performance` — Performance benchmarks.
-- `npm run lint` — ESLint checks.
-- `npm run lint:md` — Lint all Markdown.
-- `npm run lint:md:fix` — Auto-fix Markdown.
-- `npm run validate` — Run lint + test suite together.
-
-### Targeted tests
+## Targeted tests
 
 - `npm test -- --testNamePattern="test name"` — Run by name.
 - `npm test tests/features/specific-file.test.js` — Run single file.
 
-### Utilities
-
-- `npm run security` — Audit production dependencies.
-- `npm run doctor` — Diagnose installation issues.
-- `npm run validate:external` — Validate rules against external projects.
-
 ## Coding style
 
-- Node.js `>=24.16.0` (see `.nvmrc`). ES modules only, no transpilation.
 - Kebab-case rule filenames. Named exports for utilities. 2-space indent.
 - JSDoc typedefs for public rule helpers.
+- `docs/configuration.md` documents the preset tiers (`*-config.jsonc`) by hand, so update it when a preset changes.
 
-## Rule catalogue
+## Rules and testing
 
-Seven custom rules in `src/rules/`: `backtick-code-elements`, `sentence-case-heading`, `no-bare-url`, `no-dead-internal-links`, `no-literal-ampersand`, `no-empty-list-items`, `date-time-consistency`. Supporting modules: `shared-context` (line-scanning context helper), `shared-heuristics`, `shared-utils`, `shared-constants`, `autofix-safety`, `autofix-confidence`, `autofix-telemetry`, `config-validation`. The `sentence-case/` and `backtick/` subdirectories contain classifier and fix-builder internals. See `docs/rules.md` for full reference.
-
-## Testing
-
-Four layers: unit (`tests/unit/`), feature (`tests/features/`), integration (`tests/integration/`), performance (`tests/performance/`). Fixtures in `tests/fixtures/`. See `docs/testing.md` for strategy, conventions, and the false positive validation loop.
+See `docs/rules.md` for the full rule reference and `docs/testing.md` for test strategy and conventions.
 
 ## False positive validation
 
